@@ -6,15 +6,8 @@ using System.Threading;
 
 namespace WaterWizard.Server
 {
-    /// <summary>
-    /// Stellt den WaterWizards Server dar.
-    /// </summary>
     static class Program
     {
-        /// <summary>
-        /// Der Haupteinstiegspunkt für die Serveranwendung.
-        /// Initialisiert das Netzwerk, verarbeitet Verbindungen und Nachrichten.
-        /// </summary>
         static void Main()
         {
             Console.WriteLine("WaterWizards Server wird gestartet...");
@@ -40,8 +33,10 @@ namespace WaterWizard.Server
             listener.PeerConnectedEvent += peer =>
             {
                 Console.WriteLine($"Client {peer} verbunden");
+
+                // Notify the host about the new connection
                 var writer = new NetDataWriter();
-                writer.Put("Willkommen beim WaterWizards Server!");
+                writer.Put("Player Connected");
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
             };
 
@@ -61,9 +56,6 @@ namespace WaterWizard.Server
                 {
                     string message = reader.GetString();
                     Console.WriteLine($"Nachricht von Client {peer} (Kanal: {channelNumber}, Methode: {deliveryMethod}): {message}");
-                    var writer = new NetDataWriter();
-                    writer.Put($"Echo: {message}");
-                    peer.Send(writer, DeliveryMethod.ReliableOrdered);
                 }
                 catch (Exception ex)
                 {
