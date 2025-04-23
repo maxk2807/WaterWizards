@@ -27,7 +27,7 @@ The solution ([WaterWizards.sln](WaterWizards.sln)) contains the following proje
     dotnet build WaterWizards.sln
     ```
 
-
+    #### atm if u want to test local with 1 device, run the  Client first and then start the Server and after that, you could try to join your Localhost
 3.  **Run the Client:**
     ```sh
     dotnet run --project src/WaterWizard.Client/WaterWizard.Client.csproj
