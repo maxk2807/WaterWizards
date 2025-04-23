@@ -96,7 +96,7 @@ namespace WaterWizard.Client
             Rectangle connectButton = new Rectangle(screenWidth / 2 - 80, screenHeight / 2 + 60, 160, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), connectButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
-                NetworkManager.Instance.ConnectToServer(inputText, 9050);
+                NetworkManager.Instance.ConnectToServer(inputText, 7777);
                 currentState = GameState.InGame;
             }
 
