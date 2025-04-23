@@ -4,11 +4,11 @@ A battleship game built using .NET 8, **[Raylib-cs](https://github.com/raysan5/r
 
 ## Project Structure
 
-The solution ([WaterWizards/WaterWizards.sln](WaterWizards/WaterWizards.sln)) contains the following projects:
+The solution ([WaterWizards.sln](WaterWizards.sln)) contains the following projects:
 
-*   **[WaterWizard.Client](WaterWizards/src/WaterWizard.Client/WaterWizard.Client.csproj)**: The game client using Raylib-cs for rendering and LiteNetLib for communication. ([Program.cs](WaterWizards/src/WaterWizard.Client/Program.cs))
-*   **[WaterWizard.Server](WaterWizards/src/WaterWizard.Server/WaterWizard.Server.csproj)**: The game server using LiteNetLib to handle game logic and client connections. ([Program.cs](WaterWizards/src/WaterWizard.Server/Program.cs))
-*   **[WaterWizard.Shared](WaterWizards/src/WaterWizard.Shared/WaterWizard.Shared.csproj)**: A shared library containing common code (e.g., network messages, game state) used by both the client and server. ([Class1.cs](WaterWizards/src/WaterWizard.Shared/Class1.cs))
+*   **[WaterWizard.Client](src/WaterWizard.Client/WaterWizard.Client.csproj)**: The game client using Raylib-cs for rendering and LiteNetLib for communication. ([Program.cs](WaterWizards/src/WaterWizard.Client/Program.cs))
+*   **[WaterWizard.Server](src/WaterWizard.Server/WaterWizard.Server.csproj)**: The game server using LiteNetLib to handle game logic and client connections. ([Program.cs](WaterWizards/src/WaterWizard.Server/Program.cs))
+*   **[WaterWizard.Shared](src/WaterWizard.Shared/WaterWizard.Shared.csproj)**: A shared library containing common code (e.g., network messages, game state) used by both the client and server. ([Class1.cs](WaterWizards/src/WaterWizard.Shared/Class1.cs))
 
 ## Prerequisites
 
