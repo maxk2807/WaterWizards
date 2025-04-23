@@ -10,7 +10,9 @@ namespace WaterWizard.Client
         public static NetworkManager Instance => instance ??= new NetworkManager();
 
         private NetManager? server;
+        private NetManager? client;
         private EventBasedNetListener? serverListener;
+        private EventBasedNetListener? clientListener;
         private bool isPlayerConnected = false;
         private int hostPort = 9050;
 
@@ -50,7 +52,30 @@ namespace WaterWizard.Client
 
         public void ConnectToServer(string ip, int port)
         {
-            // Client-Verbindungslogik bleibt unverändert
+            try
+            {
+                clientListener = new EventBasedNetListener();
+                client = new NetManager(clientListener);
+                client.Start();
+
+                client.Connect(ip, port, "");
+                clientListener.PeerConnectedEvent += peer => Console.WriteLine($"Verbunden mit Server: {peer}");
+                clientListener.NetworkReceiveEvent += (peer, reader, channelNumber, deliveryMethod) =>
+                {
+                    string message = reader.GetString();
+                    Console.WriteLine($"Nachricht vom Server: {message}");
+
+                    // Update the host UI if a player connects
+                    if (message == "Player Connected")
+                    {
+                        isPlayerConnected = true;
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler beim Verbinden: {ex.Message}");
+            }
         }
 
         public int GetHostPort() => hostPort;
@@ -60,11 +85,13 @@ namespace WaterWizard.Client
         public void PollEvents()
         {
             server?.PollEvents();
+            client?.PollEvents();
         }
 
         public void Shutdown()
         {
             server?.Stop();
+            client?.Stop();
         }
     }
 }
