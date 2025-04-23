@@ -27,15 +27,18 @@ The solution ([WaterWizards.sln](WaterWizards.sln)) contains the following proje
     dotnet build WaterWizards.sln
     ```
 
-3.  **Run the Server:**
+
+3.  **Run the Client:**
+    ```sh
+    dotnet run --project src/WaterWizard.Client/WaterWizard.Client.csproj
+    ```
+
+
+4.  **Run the Server:**
     ```sh
     dotnet run --project src/WaterWizard.Server/WaterWizard.Server.csproj
     ```
 
-4.  **Run the Client:**
-    ```sh
-    dotnet run --project src/WaterWizard.Client/WaterWizard.Client.csproj
-    ```
 
 ## Dependencies
 
