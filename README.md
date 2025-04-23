@@ -1,6 +1,6 @@
 # MagicBattleShips# WaterWizards
 
-A battleship game built using .NET 8, Raylib-cs for the client-side graphics, and LiteNetLib for networking.
+A battleship game built using .NET 8, **[Raylib-cs](https://github.com/raysan5/raylib/wiki)** for the client-side graphics, and **[LiteNetLib](https://revenantx.github.io/LiteNetLib/api/index.html)** for networking.
 
 ## Project Structure
 
