@@ -4,11 +4,26 @@ namespace WaterWizard.Client
 {
     public class GameStateManager
     {
+
+        // Singleton-Instanz
+        private static GameStateManager? instance;
+        public static GameStateManager Instance => instance ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
+        private string playerName = "Player";
+        private bool isEditingName = false;
+        // Initialisierungsmethode
+        public static void Initialize(int screenWidth, int screenHeight)
+        {
+            if (instance == null)
+            {
+                instance = new GameStateManager(screenWidth, screenHeight);
+            }
+        }
         private enum GameState
         {
             MainMenu,
             ConnectingMenu,
             HostingMenu,
+            PreStartLobby,
             InGame
         }
 
@@ -26,6 +41,8 @@ namespace WaterWizard.Client
 
         public void UpdateAndDraw()
         {
+            NetworkManager.Instance.PollEvents();
+
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.Beige);
 
@@ -39,6 +56,9 @@ namespace WaterWizard.Client
                     break;
                 case GameState.HostingMenu:
                     DrawHostMenu();
+                    break;
+                case GameState.PreStartLobby:
+                    DrawPreStartLobby();
                     break;
                 case GameState.InGame:
                     DrawGameScreen();
@@ -76,6 +96,7 @@ namespace WaterWizard.Client
 
         private void DrawConnectMenu()
         {
+
             Raylib.DrawText("Enter IP Address to Connect:", screenWidth / 3, screenHeight / 3, 20, Color.DarkBlue);
 
             Rectangle inputBox = new Rectangle(screenWidth / 3, screenHeight / 2, 300, 40);
@@ -97,7 +118,7 @@ namespace WaterWizard.Client
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), connectButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 NetworkManager.Instance.ConnectToServer(inputText, 7777);
-                currentState = GameState.InGame;
+                //currentState = GameState.PreStartLobby;
             }
 
             Raylib.DrawRectangleRec(connectButton, Color.Blue);
@@ -137,14 +158,55 @@ namespace WaterWizard.Client
         }
 
 
-        private void DrawGameScreen()
+        private void DrawPreStartLobby()
         {
-            Raylib.DrawText("Game In Progress", screenWidth / 3, screenHeight / 2, 30, Color.DarkBlue);
+            Raylib.DrawText("Waiting for players...", screenWidth / 3, screenHeight / 3, 20, Color.DarkBlue);
+
+            // Zeige die Liste der verbundenen Spieler an
+            var players = NetworkManager.Instance.GetConnectedPlayers();
+            Raylib.DrawText($"Connected Players: {players.Count}", screenWidth / 3, screenHeight / 3 + 40, 18, Color.DarkGreen);
+
+            for (int i = 0; i < players.Count; i++)
+            {
+                // Convert Player object to string using ToString() or a specific property like Name
+                Raylib.DrawText(players[i].ToString(), screenWidth / 3, screenHeight / 3 + 70 + (i * 25), 16, Color.Black);
+            }
+
+            // Überprüfe, ob wir der Host sind (Server ist nicht null)
+            bool isHost = NetworkManager.Instance.IsHost();
+
+            if (isHost)
+            {
+                Rectangle startButton = new Rectangle(screenWidth / 2 - 80, screenHeight / 2 + 60, 160, 40);
+                if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), startButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+                {
+                    NetworkManager.Instance.SendToAllClients("StartGame");
+                    SetStateToInGame(); // Host wechselt in den Spielzustand
+                }
+
+                Raylib.DrawRectangleRec(startButton, Color.Blue);
+                Raylib.DrawText("Start Game", (int)startButton.X + 40, (int)startButton.Y + 10, 20, Color.White);
+            }
+
+            if (!NetworkManager.Instance.IsHost())
+            {
+                bool isReady = NetworkManager.Instance.IsClientReady();
+                Rectangle readyButton = new Rectangle(screenWidth / 2 - 80, screenHeight / 2 + 60, 160, 40);
+
+                if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), readyButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+                {
+                    NetworkManager.Instance.ToggleReadyStatus();
+                }
+
+                Raylib.DrawRectangleRec(readyButton, isReady ? Color.Green : Color.Orange);
+                Raylib.DrawText(isReady ? "Ready" : "Not Ready", (int)readyButton.X + 40, (int)readyButton.Y + 10, 20, Color.White);
+            }
 
             // Back Button
             Rectangle backButton = new Rectangle(screenWidth / 3, screenHeight / 2 + 120, 100, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
+                NetworkManager.Instance.Shutdown(); // Stop hosting or disconnect
                 currentState = GameState.MainMenu;
             }
 
@@ -173,6 +235,32 @@ namespace WaterWizard.Client
             {
                 isEditingIp = false; // Stop editing on Enter
             }
+        }
+        public void SetStateToLobby()
+        {
+            currentState = GameState.PreStartLobby;
+        }
+
+        public void SetStateToInGame()
+        {
+            currentState = GameState.InGame;
+        }
+
+        private void DrawGameScreen()
+        {
+            // Placeholder implementation for the InGame state rendering.
+            Raylib.DrawText("Game is running...", screenWidth / 3, screenHeight / 3, 20, Color.DarkGreen);
+
+            // Back Button
+            Rectangle backButton = new Rectangle(screenWidth / 3, screenHeight / 2 + 120, 100, 40);
+            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            {
+                NetworkManager.Instance.Shutdown(); // Disconnect or stop hosting
+                currentState = GameState.MainMenu;
+            }
+
+            Raylib.DrawRectangleRec(backButton, Color.Gray);
+            Raylib.DrawText("Back", (int)backButton.X + 30, (int)backButton.Y + 10, 20, Color.White);
         }
     }
 }
