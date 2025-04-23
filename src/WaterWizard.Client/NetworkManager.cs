@@ -14,7 +14,7 @@ namespace WaterWizard.Client
         private EventBasedNetListener? serverListener;
         private EventBasedNetListener? clientListener;
         private bool isPlayerConnected = false;
-        private int hostPort = 9050;
+        private int hostPort = 7777;
 
         private NetworkManager() { }
 

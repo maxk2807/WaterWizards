@@ -15,13 +15,13 @@ namespace WaterWizard.Server
             var listener = new EventBasedNetListener();
             var server = new NetManager(listener) { AutoRecycle = true };
 
-            if (!server.Start(9050))
+            if (!server.Start(7777))
             {
-                Console.WriteLine("Server konnte nicht auf Port 9050 gestartet werden!");
+                Console.WriteLine("Server konnte nicht auf Port 7777 gestartet werden!");
                 return;
             }
 
-            Console.WriteLine("Server erfolgreich auf Port 9050 gestartet");
+            Console.WriteLine("Server erfolgreich auf Port 7777 gestartet");
             Console.WriteLine("Drücke ESC zum Beenden");
 
             listener.ConnectionRequestEvent += request =>
