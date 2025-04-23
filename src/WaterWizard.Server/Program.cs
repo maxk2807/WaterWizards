@@ -1,6 +1,7 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 
@@ -8,6 +9,8 @@ namespace WaterWizard.Server
 {
     static class Program
     {
+        private static List<string> connectedPlayers = new List<string>();
+
         static void Main()
         {
             Console.WriteLine("WaterWizards Server wird gestartet...");
@@ -34,15 +37,35 @@ namespace WaterWizard.Server
             {
                 Console.WriteLine($"Client {peer} verbunden");
 
-                // Notify the host about the new connection
+                // Füge den Spieler zur Liste hinzu
+                string playerAddress = peer.ToString();
+                if (!connectedPlayers.Contains(playerAddress))
+                {
+                    connectedPlayers.Add(playerAddress);
+                }
+
+                // Sende EnterLobby
                 var writer = new NetDataWriter();
-                writer.Put("Player Connected");
+                writer.Put("EnterLobby");
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
+
+                // Sende die aktualisierte Spielerliste
+                SendPlayerList(server);
             };
 
             listener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
             {
                 Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
+
+                // Entferne den Spieler aus der Liste
+                string playerAddress = peer.ToString();
+                if (connectedPlayers.Contains(playerAddress))
+                {
+                    connectedPlayers.Remove(playerAddress);
+                }
+
+                // Sende die aktualisierte Spielerliste
+                SendPlayerList(server);
             };
 
             listener.NetworkErrorEvent += (endPoint, error) =>
@@ -82,6 +105,29 @@ namespace WaterWizard.Server
 
             server.Stop();
             Console.WriteLine("Server beendet");
+        }
+
+        private static void SendPlayerList(NetManager server)
+        {
+            // Erstelle eine Nachricht mit allen verbundenen Spielern
+            var writer = new NetDataWriter();
+            writer.Put("PlayerList");
+            writer.Put(connectedPlayers.Count);
+
+            foreach (var playerAddress in connectedPlayers)
+            {
+                writer.Put(playerAddress);     // Adresse
+                writer.Put("Player");          // Name (Standard)
+                writer.Put(false);             // Ready-Status (Standard)
+            }
+
+            // Sende die Liste an alle verbundenen Clients
+            foreach (var peer in server.ConnectedPeerList)
+            {
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);
+            }
+
+            Console.WriteLine($"Spielerliste mit {connectedPlayers.Count} Spielern gesendet");
         }
     }
 }

@@ -1,45 +1,34 @@
-﻿using Raylib_cs;
-using System;
+﻿using System;
+using Raylib_cs;
+using WaterWizard.Client;
 
-namespace WaterWizard.Client
+class Program
 {
-    static class Program
+    static void Main()
     {
-        static void Main()
+        try
         {
-            const int screenWidth = 800;
-            const int screenHeight = 600;
+            // Initialisiere Raylib vor GameStateManager
+            Raylib.InitWindow(800, 600, "Water Wizard");
 
-            try
+            // Initialisiere GameStateManager mit Bildschirmgröße
+            GameStateManager.Initialize(800, 600);
+
+            // Hauptspiel-Loop
+            while (!Raylib.WindowShouldClose())
             {
-                Raylib.InitWindow(screenWidth, screenHeight, "WaterWizards - Battleship Game");
-                Raylib.SetTargetFPS(60);
-
-                // Initialisiere den GameStateManager
-                var gameStateManager = new GameStateManager(screenWidth, screenHeight);
-
-                while (!Raylib.WindowShouldClose())
-                {
-                    // Poll Events für Netzwerk
-                    NetworkManager.Instance.PollEvents();
-
-                    // Zeichne den aktuellen Spielzustand
-                    gameStateManager.UpdateAndDraw();
-                }
+                GameStateManager.Instance.UpdateAndDraw();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ein Fehler ist aufgetreten: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-            }
-            finally
-            {
-                NetworkManager.Instance.Shutdown();
-                if (Raylib.IsWindowReady())
-                {
-                    Raylib.CloseWindow();
-                }
-            }
+
+            // Aufräumen
+            Raylib.CloseWindow();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            Console.WriteLine("Drücke eine beliebige Taste zum Beenden...");
+            Console.ReadKey();
         }
     }
 }
