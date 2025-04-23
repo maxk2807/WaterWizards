@@ -26,3 +26,6 @@ jobs:
      
       - name: Run NUKE Build and Test
         run: ./build.sh Test
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
