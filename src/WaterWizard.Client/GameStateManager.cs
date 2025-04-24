@@ -1,4 +1,5 @@
 using Raylib_cs;
+using System;
 
 namespace WaterWizard.Client
 {
@@ -10,6 +11,7 @@ namespace WaterWizard.Client
         public static GameStateManager Instance => instance ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
         private string playerName = "Player";
         private bool isEditingName = false;
+        private readonly GameTimer gameTimer;
         // Initialisierungsmethode
         public static void Initialize(int screenWidth, int screenHeight)
         {
@@ -33,10 +35,16 @@ namespace WaterWizard.Client
         private string inputText = "localhost"; // Default IP for joining
         private bool isEditingIp = false;
 
+        /// <summary>
+        /// Constructor for GameStateManager.
+        /// </summary>
+        /// <param name="screenWidth">The width of the game screen in pixels.</param>
+        /// <param name="screenHeight">The height of the game screen in pixels.</param>
         public GameStateManager(int screenWidth, int screenHeight)
         {
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
+            gameTimer = new GameTimer(this);
         }
 
         public void UpdateAndDraw()
@@ -45,6 +53,17 @@ namespace WaterWizard.Client
 
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.Beige);
+
+            // Handle the game timer in the hosting menu
+            if(currentState == GameState.HostingMenu)
+            {
+                gameTimer.Update();
+                if(gameTimer.IsTimeUp)
+                {
+                    NetworkManager.Instance.Shutdown();
+                    SetStateToMainMenu();
+                }
+            }
 
             switch (currentState)
             {
@@ -138,6 +157,9 @@ namespace WaterWizard.Client
 
         private void DrawHostMenu()
         {
+            // Draw the time in the host menu on the top left corner in red
+            gameTimer.Draw(10, 10, 20, Color.Red);
+
             string publicIp = NetworkUtils.GetPublicIPAddress();
             int hostPort = NetworkManager.Instance.GetHostPort();
             bool isPlayerConnected = NetworkManager.Instance.IsPlayerConnected();
@@ -172,7 +194,7 @@ namespace WaterWizard.Client
                 Raylib.DrawText(players[i].ToString(), screenWidth / 3, screenHeight / 3 + 70 + (i * 25), 16, Color.Black);
             }
 
-            // Überprüfe, ob wir der Host sind (Server ist nicht null)
+            // ï¿½berprï¿½fe, ob wir der Host sind (Server ist nicht null)
             bool isHost = NetworkManager.Instance.IsHost();
 
             if (isHost)
@@ -244,6 +266,11 @@ namespace WaterWizard.Client
         public void SetStateToInGame()
         {
             currentState = GameState.InGame;
+        }
+
+        public void SetStateToMainMenu()
+        {
+            currentState = GameState.MainMenu;
         }
 
         private void DrawGameScreen()
