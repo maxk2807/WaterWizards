@@ -91,8 +91,8 @@ namespace WaterWizard.Client
         {
             Raylib.DrawText("Welcome to WaterWizards!", screenWidth / 3, screenHeight / 3, 30, Color.DarkBlue);
 
-            Rectangle joinButton = new Rectangle(screenWidth / 2 - 100, screenHeight / 2, 200, 40);
-            Rectangle hostButton = new Rectangle(screenWidth / 2 - 100, screenHeight / 2 + 60, 200, 40);
+            Rectangle joinButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2, 200, 40);
+            Rectangle hostButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2 + 60, 200, 40);
 
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
@@ -118,7 +118,7 @@ namespace WaterWizard.Client
 
             Raylib.DrawText("Enter IP Address to Connect:", screenWidth / 3, screenHeight / 3, 20, Color.DarkBlue);
 
-            Rectangle inputBox = new Rectangle(screenWidth / 3, screenHeight / 2, 300, 40);
+            Rectangle inputBox = new((float)screenWidth / 3, (float)screenHeight / 2, 300, 40);
             Raylib.DrawRectangleRec(inputBox, isEditingIp ? Color.White : Color.LightGray);
             Raylib.DrawRectangleLines((int)inputBox.X, (int)inputBox.Y, (int)inputBox.Width, (int)inputBox.Height, Color.DarkBlue);
             Raylib.DrawText(inputText, (int)inputBox.X + 5, (int)inputBox.Y + 10, 20, Color.Black);
@@ -133,7 +133,7 @@ namespace WaterWizard.Client
                 HandleTextInput();
             }
 
-            Rectangle connectButton = new Rectangle(screenWidth / 2 - 80, screenHeight / 2 + 60, 160, 40);
+            Rectangle connectButton = new Rectangle((float)screenWidth / 2 - 80, (float)screenHeight / 2 + 60, 160, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), connectButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 NetworkManager.Instance.ConnectToServer(inputText, 7777);
@@ -144,7 +144,7 @@ namespace WaterWizard.Client
             Raylib.DrawText("Connect", (int)connectButton.X + 40, (int)connectButton.Y + 10, 20, Color.White);
 
             // Back Button
-            Rectangle backButton = new Rectangle(screenWidth / 3, screenHeight / 2 + 120, 100, 40);
+            Rectangle backButton = new((float)screenWidth / 3, (float)screenHeight / 2 + 120, 100, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 currentState = GameState.MainMenu;
@@ -168,7 +168,7 @@ namespace WaterWizard.Client
             Raylib.DrawText(isPlayerConnected ? "Player Connected!" : "Waiting for players...", screenWidth / 3, screenHeight / 3 + 40, 20, isPlayerConnected ? Color.Green : Color.DarkBlue);
 
             // Back Button
-            Rectangle backButton = new Rectangle(screenWidth / 3, screenHeight / 2 + 120, 100, 40);
+            Rectangle backButton = new((float)screenWidth / 3, (float)screenHeight / 2 + 120, 100, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 NetworkManager.Instance.Shutdown(); // Stop hosting
@@ -199,7 +199,7 @@ namespace WaterWizard.Client
 
             if (isHost)
             {
-                Rectangle startButton = new Rectangle(screenWidth / 2 - 80, screenHeight / 2 + 60, 160, 40);
+                Rectangle startButton = new((float)screenWidth / 2 - 80, (float)screenHeight / 2 + 60, 160, 40);
                 if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), startButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
                 {
                     NetworkManager.Instance.SendToAllClients("StartGame");
@@ -213,7 +213,7 @@ namespace WaterWizard.Client
             if (!NetworkManager.Instance.IsHost())
             {
                 bool isReady = NetworkManager.Instance.IsClientReady();
-                Rectangle readyButton = new Rectangle(screenWidth / 2 - 80, screenHeight / 2 + 60, 160, 40);
+                Rectangle readyButton = new((float)screenWidth / 2 - 80, (float)screenHeight / 2 + 60, 160, 40);
 
                 if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), readyButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
                 {
@@ -225,7 +225,7 @@ namespace WaterWizard.Client
             }
 
             // Back Button
-            Rectangle backButton = new Rectangle(screenWidth / 3, screenHeight / 2 + 120, 100, 40);
+            Rectangle backButton = new((float)screenWidth / 3, (float)screenHeight / 2 + 120, 100, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 NetworkManager.Instance.Shutdown(); // Stop hosting or disconnect
@@ -279,7 +279,7 @@ namespace WaterWizard.Client
             Raylib.DrawText("Game is running...", screenWidth / 3, screenHeight / 3, 20, Color.DarkGreen);
 
             // Back Button
-            Rectangle backButton = new Rectangle(screenWidth / 3, screenHeight / 2 + 120, 100, 40);
+            Rectangle backButton = new((float)screenWidth / 3, (float)screenHeight / 2 + 120, 100, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 NetworkManager.Instance.Shutdown(); // Disconnect or stop hosting
