@@ -32,9 +32,10 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: 'csharp'
+          queries: +security-and-quality
      
       - name: Run NUKE Build and Test
-        run: ./build.sh Test
+        run: ./build.sh Compile Test
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
