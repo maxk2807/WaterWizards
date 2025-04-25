@@ -20,12 +20,12 @@ public class GameTimer(GameStateManager gameStateManager)
     public void Update()
     {
         _timerSeconds += Raylib.GetFrameTime();
-        if (IsTimeUp) return; 
-            if (GetMinutes() >= _timeLimitMinutes && _timerSeconds % 60 >= _timeLimitSeconds)
-            {
-                IsTimeUp = true;
-                _gameStateManager.SetStateToMainMenu();
-            }
+        if (IsTimeUp) return;
+        if (GetMinutes() >= _timeLimitMinutes && _timerSeconds % 60 >= _timeLimitSeconds)
+        {
+            IsTimeUp = true;
+            _gameStateManager.SetStateToMainMenu();
+        }
     }
 
     /// <summary>
