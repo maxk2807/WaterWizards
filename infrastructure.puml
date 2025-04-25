@@ -1,0 +1,173 @@
+@startuml WaterWizards Infrastructure
+
+!define CLIENT_COLOR #ADD1B2
+!define SERVER_COLOR #LightSkyBlue
+!define SHARED_COLOR #LightGrey
+!define EXTERNAL_COLOR #Wheat
+
+skinparam packageStyle rect
+
+package "WaterWizard.Client" CLIENT_COLOR {
+    class Program <<entry point>> {
+        + static main()
+    }
+    class GameStateManager {
+        - IGameState currentState
+        + ChangeState(newState : IGameState)
+        + Update(deltaTime : float)
+        + Draw()
+    }
+    interface IGameState {
+        + Enter()
+        + Update(deltaTime : float)
+        + Draw()
+        + Exit()
+    }
+    class MainMenuState implements IGameState {
+        + Enter()
+        + Update(deltaTime : float)
+        + Draw()
+        + Exit()
+    }
+    class LobbyListMenuState implements IGameState {
+        + Enter()
+        + Update(deltaTime : float)
+        + Draw()
+        + Exit()
+    }
+    class PreStartLobbyState implements IGameState {
+        + Enter()
+        + Update(deltaTime : float)
+        + Draw()
+        + Exit()
+    }
+    class InGameState implements IGameState {
+        + Enter()
+        + Update(deltaTime : float)
+        + Draw()
+        + Exit()
+    }
+    class NetworkManager {
+        - NetManager netManager
+        - NetPeer serverPeer
+        + DiscoverLobbies()
+        + ConnectToServer(ip : string, port : int)
+        + StartHosting()
+        + SendMessage(data : NetDataWriter, deliveryMethod : DeliveryMethod)
+        + PollEvents()
+        + OnNetworkReceive(reader : NetDataReader, peer : NetPeer)
+        + OnPeerConnected(peer : NetPeer)
+        + OnPeerDisconnected(peer : NetPeer)
+    }
+    class GameTimer {
+        - float currentTime
+        + Start()
+        + Stop()
+        + GetTime() : float
+        + Update(deltaTime : float)
+    }
+
+    Program --> GameStateManager : initializes >
+    GameStateManager o--> "1" NetworkManager : uses >
+    GameStateManager *--> "1" IGameState : manages current >
+    GameStateManager --> GameTimer : uses >
+    NetworkManager --> GameStateManager : signals state changes <
+
+    ' Relationships to Shared
+    NetworkManager ..> NetworkUtils : uses >
+    InGameState ..> Coin : uses >
+    InGameState ..> Mana : uses >
+    NetworkManager ..> INetworkMessage : sends/receives >
+
+    ' Relationships to External Libraries
+    GameStateManager ..> Raylib : uses for drawing >
+    NetworkManager ..> LiteNetLib : uses for networking >
+    Program ..> Raylib : initializes >
+}
+
+package "WaterWizard.Server" SERVER_COLOR {
+    class Program <<entry point>> {
+        + static main()
+    }
+    class ServerManager {
+        - NetManager netManager
+        - List<Player> connectedPlayers
+        + StartServer(port : int)
+        + StopServer()
+        + PollEvents()
+        + BroadcastMessage(data : NetDataWriter, deliveryMethod : DeliveryMethod)
+        + OnConnectionRequest(request : ConnectionRequest)
+        + OnPeerConnected(peer : NetPeer)
+        + OnPeerDisconnected(peer : NetPeer)
+        + OnNetworkReceive(reader : NetDataReader, peer : NetPeer)
+        + UpdateGameState()
+    }
+    class Player {
+        + int PlayerId
+        + NetPeer Peer
+        + bool IsReady
+        + string Name
+        ' ... other player-specific data
+    }
+
+    Program --> ServerManager : initializes >
+    ServerManager o--> "*" Player : manages >
+
+    ' Relationships to Shared
+    ServerManager ..> NetworkUtils : uses >
+    ServerManager ..> Coin : manages game state >
+    ServerManager ..> Mana : manages game state >
+    ServerManager ..> INetworkMessage : sends/receives >
+
+    ' Relationships to External Libraries
+    ServerManager ..> LiteNetLib : uses for networking >
+    Player ..> LiteNetLib : associated with NetPeer >
+}
+
+package "WaterWizard.Shared" SHARED_COLOR {
+    class NetworkUtils <<utility>> {
+        + {static} GetLocalIpAddress() : IPAddress
+        + {static} GetPublicIpAddress() : IPAddress
+    }
+    class Coin {
+        + int Amount
+        + Add(amount : int)
+        + Spend(amount : int) : bool
+    }
+    class Mana {
+        + int CurrentMana
+        + int MaxMana
+        + Regenerate(amount : int)
+        + Spend(cost : int) : bool
+    }
+    interface INetworkMessage {
+        + Serialize(writer : NetDataWriter)
+        + Deserialize(reader : NetDataReader)
+    }
+    class MsgPlayerJoin implements INetworkMessage
+    class MsgPlayerLeave implements INetworkMessage
+    class MsgPlayerReady implements INetworkMessage
+    class MsgGameStart implements INetworkMessage
+    class MsgGameStateUpdate implements INetworkMessage
+    class MsgLobbyInfo implements INetworkMessage
+    class MsgDiscoveryRequest implements INetworkMessage
+    class MsgDiscoveryResponse implements INetworkMessage
+    ' ... other shared data structures or message types
+}
+
+package "External Libraries" EXTERNAL_COLOR {
+    class Raylib <<library>> {
+        ' Graphics functions: DrawText(), DrawTexture(), BeginDrawing(), etc.
+    }
+    class LiteNetLib <<library>> {
+        ' Networking classes: NetManager, NetPeer, NetDataWriter, NetDataReader, DeliveryMethod, ConnectionRequest, etc.
+    }
+}
+
+' Define Dependencies between Packages
+"WaterWizard.Client" ..> "WaterWizard.Shared" : uses >
+"WaterWizard.Server" ..> "WaterWizard.Shared" : uses >
+"WaterWizard.Client" ..> "External Libraries" : uses >
+"WaterWizard.Server" ..> "External Libraries" : uses >
+
+@enduml

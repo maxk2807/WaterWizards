@@ -34,14 +34,14 @@ namespace WaterWizard.Shared
             {
                 using (var client = new HttpClient())
                 {
-                    // Abrufen der öffentlichen IP-Adresse von einem externen Dienst
+                    // Abrufen der ï¿½ffentlichen IP-Adresse von einem externen Dienst
                     var response = client.GetStringAsync("https://api.ipify.org").Result;
                     return response;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fehler beim Abrufen der öffentlichen IP-Adresse: {ex.Message}");
+                Console.WriteLine($"Fehler beim Abrufen der ï¿½ffentlichen IP-Adresse: {ex.Message}");
                 return "Unbekannt";
             }
         }

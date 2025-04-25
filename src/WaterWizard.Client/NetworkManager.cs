@@ -196,7 +196,7 @@ namespace WaterWizard.Client
             else
             {
                 discoveredLobbies.Clear();
-                Console.WriteLine("[Client] Suche nach verfügbaren Lobbies...");
+                Console.WriteLine("[Client] Suche nach verfï¿½gbaren Lobbies...");
             }
 
             if (client != null && client.IsRunning)
@@ -330,7 +330,7 @@ namespace WaterWizard.Client
                     {
                         discoveredLobbies.Add(new LobbyInfo($"{localIpAddress}:{hostPort}",
                             "WaterWizards Lobby (Lokal)", connectedPlayers.Count));
-                        Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugefügt");
+                        Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugefï¿½gt");
                     }
                 }
             }
