@@ -59,10 +59,9 @@ namespace WaterWizard.Client
             int boardSize = 10;
             int cellSize = 25; 
             int boardPixelSize = boardSize * cellSize;
-            float zonePadding = screenWidth * 0.02f; 
 
             float gapBetweenBoards = screenHeight * 0.05f;
-            float totalBoardBlockHeight = boardPixelSize * 2 + gapBetweenBoards; 
+            float totalBoardBlockHeight = boardPixelSize * 2f + gapBetweenBoards; 
 
             int opponentBoardY = Math.Max((int)((screenHeight - totalBoardBlockHeight) / 2f), (int)(screenHeight * 0.1f));
             int opponentBoardX = (screenWidth - boardPixelSize) / 2;

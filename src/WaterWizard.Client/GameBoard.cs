@@ -59,8 +59,8 @@ public class GameBoard
     public Point? GetCellFromScreenCoords(Vector2 screenPos)
     {
         if (screenPos.X < Position.X || screenPos.Y < Position.Y ||
-            screenPos.X >= Position.X + GridWidth * CellSize ||
-            screenPos.Y >= Position.Y + GridHeight * CellSize)
+            screenPos.X >= Position.X + (float)GridWidth * CellSize ||
+            screenPos.Y >= Position.Y + (float)GridHeight * CellSize)
         {
             return null; 
         }
@@ -114,11 +114,11 @@ public class GameBoard
 
                 if (gridStates[x, y] == CellState.Hit)
                 {
-                    Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, CellSize / 4, Color.Red);
+                    Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.Red);
                 }
                 else if (gridStates[x, y] == CellState.Miss)
                 {
-                        Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, CellSize / 4, Color.White);
+                        Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.White);
                 }
             }
         }
