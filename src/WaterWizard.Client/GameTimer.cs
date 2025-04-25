@@ -21,16 +21,10 @@ public class GameTimer(GameStateManager gameStateManager)
     {
         _timerSeconds += Raylib.GetFrameTime();
         if (IsTimeUp) return; 
-            _timerSeconds += Raylib.GetFrameTime();
             if (GetMinutes() >= _timeLimitMinutes && _timerSeconds % 60 >= _timeLimitSeconds)
             {
                 IsTimeUp = true;
                 _gameStateManager.SetStateToMainMenu();
-            }
-            else if (_timerSeconds >= _timeLimitSeconds)
-            {
-                IsTimeUp = true;
-                _timerSeconds = _timeLimitSeconds;
             }
     }
 
