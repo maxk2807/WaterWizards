@@ -24,7 +24,7 @@ namespace WaterWizard.Client
 
         /// <summary>
         /// Startet einen Spielserver auf dem lokalen Rechner mit dem konfigurierten Port.
-        /// Initialisiert die Netzwerkkomponenten und registriert Event-Handler für Clientverbindungen.
+        /// Initialisiert die Netzwerkkomponenten und registriert Event-Handler fuer Clientverbindungen.
         /// </summary>
         public void StartHosting()
         {
@@ -48,7 +48,6 @@ namespace WaterWizard.Client
                     isPlayerConnected = true;
 
                     string playerAddress = peer.ToString();
-                    // Überprüfe, ob die Adresse bereits in der Spielerliste vorhanden ist
                     if (!PlayerExists(playerAddress))
                     {
                         connectedPlayers.Add(new Player(playerAddress));
@@ -94,20 +93,17 @@ namespace WaterWizard.Client
         {
             if (server == null) return;
 
-            // Erstelle eine Nachricht mit allen verbundenen Spielern
             var writer = new NetDataWriter();
             writer.Put("PlayerList");
             writer.Put(connectedPlayers.Count);
 
             foreach (var player in connectedPlayers)
             {
-                // Sende die Player-Informationen als Strings
                 writer.Put(player.Address);
                 writer.Put(player.Name);
                 writer.Put(player.IsReady);
             }
 
-            // Sende die Liste an alle verbundenen Clients
             foreach (var peer in server.ConnectedPeerList)
             {
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
@@ -189,7 +185,7 @@ namespace WaterWizard.Client
 
         /// <summary>
         /// Verarbeitet eingehende und ausgehende Netzwerkereignisse.
-        /// Muss regelmäßig aufgerufen werden, um Nachrichten zu empfangen und zu senden.
+        /// Muss aufgerufen werden, um Nachrichten zu empfangen und zu senden.
         /// </summary>
         public void PollEvents()
         {
