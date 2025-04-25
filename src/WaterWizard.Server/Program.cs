@@ -135,7 +135,7 @@ namespace WaterWizard.Server
                             {
                                 string address = connectedPlayers[i];
                                 updatedPlayerList.Put(address);
-                                updatedPlayerList.Put("Player"); 
+                                updatedPlayerList.Put("Player");
 
                                 bool isReady = (i == playerIndex) ? (message == "PlayerReady") : false;
                                 updatedPlayerList.Put(isReady);

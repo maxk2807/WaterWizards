@@ -9,6 +9,10 @@ namespace WaterWizard.Client
         public static GameStateManager Instance => instance ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
         private readonly GameTimer gameTimer;
 
+        private float titleAnimTime = 0;
+        private float titleVerticalPosition = 0;
+        private const float TITLE_ANIM_SPEED = 1.5f;
+        private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
         public static void Initialize(int screenWidth, int screenHeight)
         {
             if (instance == null)
@@ -28,8 +32,8 @@ namespace WaterWizard.Client
         }
 
         private GameState currentState = GameState.MainMenu;
-        private  int screenWidth;
-        private  int screenHeight;
+        private int screenWidth;
+        private int screenHeight;
         private string inputText = "localhost"; // Default
         private bool isEditingIp = false;
 
@@ -108,11 +112,39 @@ namespace WaterWizard.Client
         private void DrawMainMenu()
         {
             string title = "Welcome to WaterWizards!";
-            int titleWidth = Raylib.MeasureText(title, 30);
-            int titleX = (screenWidth - titleWidth) / 2;
-            int titleY = screenHeight / 4;
+            float letterSpacing = 3;
 
-            Raylib.DrawText(title, titleX, titleY, 30, Color.DarkBlue);
+            float totalTitleWidth = 0;
+            for (int i = 0; i < title.Length; i++)
+            {
+                totalTitleWidth += Raylib.MeasureText(title[i].ToString(), 30) + letterSpacing;
+            }
+
+            totalTitleWidth -= letterSpacing;
+
+            titleAnimTime += Raylib.GetFrameTime() * TITLE_ANIM_SPEED;
+
+            titleVerticalPosition = (float)Math.Sin(titleAnimTime) * TITLE_FLOAT_AMPLITUDE;
+
+            float titleX = (screenWidth - totalTitleWidth) / 2;
+            int titleY = screenHeight / 4 + (int)titleVerticalPosition;
+
+            for (int i = 0; i < title.Length; i++)
+            {
+                float hue = (titleAnimTime * 0.3f + i * 0.05f) % 1.0f;
+                Color charColor = ColorFromHSV(hue * 360, 0.7f, 0.9f);
+
+                int charWidth = Raylib.MeasureText(title[i].ToString(), 30);
+
+                Raylib.DrawText(
+                    title[i].ToString(),
+                    (int)titleX,
+                    titleY,
+                    30,
+                    charColor);
+
+                titleX += charWidth + letterSpacing;
+            }
 
             Rectangle joinButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2, 200, 40);
             Rectangle hostButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2 + 60, 200, 40);
@@ -134,6 +166,31 @@ namespace WaterWizard.Client
 
             Raylib.DrawRectangleRec(hostButton, Color.Blue);
             Raylib.DrawText("Host Lobby", (int)hostButton.X + 50, (int)hostButton.Y + 10, 20, Color.White);
+        }
+
+        private Color ColorFromHSV(float hue, float saturation, float value)
+        {
+            int hi = (int)(Math.Floor(hue / 60)) % 6;
+            float f = hue / 60 - (float)Math.Floor(hue / 60);
+
+            value = value * 255;
+            int v = (int)value;
+            int p = (int)(value * (1 - saturation));
+            int q = (int)(value * (1 - f * saturation));
+            int t = (int)(value * (1 - (1 - f) * saturation));
+
+            if (hi == 0)
+                return new Color(v, t, p, 255);
+            else if (hi == 1)
+                return new Color(q, v, p, 255);
+            else if (hi == 2)
+                return new Color(p, v, t, 255);
+            else if (hi == 3)
+                return new Color(p, q, v, 255);
+            else if (hi == 4)
+                return new Color(t, p, v, 255);
+            else
+                return new Color(v, p, q, 255);
         }
 
         private void DrawLobbyListMenu()
