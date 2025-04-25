@@ -8,10 +8,8 @@ class Program
     {
         try
         {
-            // Initialisiere Raylib vor GameStateManager
             Raylib.InitWindow(800, 600, "Water Wizard");
 
-            // Initialisiere GameStateManager mit Bildschirmgröße
             GameStateManager.Initialize(800, 600);
 
             // Hauptspiel-Loop
@@ -20,7 +18,6 @@ class Program
                 GameStateManager.Instance.UpdateAndDraw();
             }
 
-            // Aufräumen
             Raylib.CloseWindow();
         }
         catch (Exception ex)

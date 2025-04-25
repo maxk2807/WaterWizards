@@ -10,7 +10,7 @@ public class GameTimer(GameStateManager gameStateManager)
 {
     private float _timerSeconds;
     private const int _timeLimitMinutes = 3;
-    private const int _timeLimitSeconds = 10;
+    private const int _timeLimitSeconds = 400;
     private GameStateManager _gameStateManager = gameStateManager;
     public bool IsTimeUp { get; private set; } = false;
 

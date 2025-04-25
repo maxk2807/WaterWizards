@@ -22,6 +22,10 @@ namespace WaterWizard.Client
 
         private NetworkManager() { }
 
+        /// <summary>
+        /// Startet einen Spielserver auf dem lokalen Rechner mit dem konfigurierten Port.
+        /// Initialisiert die Netzwerkkomponenten und registriert Event-Handler für Clientverbindungen.
+        /// </summary>
         public void StartHosting()
         {
             try
@@ -155,7 +159,6 @@ namespace WaterWizard.Client
                     }
                     else if (message == "PlayerList")
                     {
-                        // Spielerliste empfangen
                         connectedPlayers.Clear();
                         int count = reader.GetInt();
 
@@ -184,6 +187,10 @@ namespace WaterWizard.Client
 
         public bool IsPlayerConnected() => isPlayerConnected;
 
+        /// <summary>
+        /// Verarbeitet eingehende und ausgehende Netzwerkereignisse.
+        /// Muss regelmäßig aufgerufen werden, um Nachrichten zu empfangen und zu senden.
+        /// </summary>
         public void PollEvents()
         {
             server?.PollEvents();
