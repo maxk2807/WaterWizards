@@ -18,6 +18,7 @@
 
     <ItemGroup>
         <Using Include="Xunit"/>
-    </ItemGroup>
+		<ProjectReference Include="..\WaterWizard.Shared\WaterWizard.Shared.csproj" />
+	</ItemGroup>
 
 </Project>

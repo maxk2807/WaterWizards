@@ -3,6 +3,8 @@ using LiteNetLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Client
 {
@@ -10,7 +12,9 @@ namespace WaterWizard.Client
     {
         private static NetworkManager? instance;
         public static NetworkManager Instance => instance ??= new NetworkManager();
+
         private List<Player> connectedPlayers = new List<Player>();
+        private List<LobbyInfo> discoveredLobbies = new List<LobbyInfo>();
 
         private NetManager? server;
         private NetManager? client;
@@ -22,29 +26,69 @@ namespace WaterWizard.Client
 
         private NetworkManager() { }
 
+        /// <summary>
+        /// Startet einen Spielserver auf dem lokalen Rechner mit dem konfigurierten Port.
+        /// Initialisiert die Netzwerkkomponenten und registriert Event-Handler fuer Clientverbindungen.
+        /// </summary>
         public void StartHosting()
         {
             try
             {
+                if (client != null && client.IsRunning)
+                {
+                    client.Stop();
+                }
+
+                discoveredLobbies.Clear();
+
                 serverListener = new EventBasedNetListener();
-                server = new NetManager(serverListener) { AutoRecycle = true };
+                server = new NetManager(serverListener)
+                {
+                    AutoRecycle = true,
+                    UnconnectedMessagesEnabled = true
+                };
 
                 if (!server.Start(hostPort))
                 {
                     Console.WriteLine("Server konnte nicht gestartet werden!");
                     return;
                 }
+
+                connectedPlayers.Clear();
                 connectedPlayers.Add(new Player("Host") { Name = "Host (You)", IsReady = true });
 
                 Console.WriteLine($"Server gestartet auf Port {hostPort}");
+
                 serverListener.ConnectionRequestEvent += request => request.Accept();
+
+                serverListener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader, msgType) =>
+                {
+                    try
+                    {
+                        string message = reader.GetString();
+                        if (message == "DiscoverLobbies")
+                        {
+                            Console.WriteLine($"[Host] Lobby-Suchanfrage von {remoteEndPoint} erhalten");
+
+                            var response = new NetDataWriter();
+                            response.Put("LobbyInfo");
+                            response.Put("WaterWizards Lobby");
+                            response.Put(connectedPlayers.Count);
+                            server.SendUnconnectedMessage(response, remoteEndPoint);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Host] Fehler bei Verarbeitung unverbundener Nachricht: {ex.Message}");
+                    }
+                };
+
                 serverListener.PeerConnectedEvent += peer =>
                 {
                     Console.WriteLine($"Client {peer} verbunden");
                     isPlayerConnected = true;
 
                     string playerAddress = peer.ToString();
-                    // Überprüfe, ob die Adresse bereits in der Spielerliste vorhanden ist
                     if (!PlayerExists(playerAddress))
                     {
                         connectedPlayers.Add(new Player(playerAddress));
@@ -55,14 +99,44 @@ namespace WaterWizard.Client
                     peer.Send(writer, DeliveryMethod.ReliableOrdered);
                     UpdatePlayerList();
                 };
+
                 serverListener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
                 {
                     Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
-                    isPlayerConnected = false;
+                    isPlayerConnected = server.ConnectedPeersCount > 0;
 
                     string playerAddress = peer.ToString();
                     RemovePlayerByAddress(playerAddress);
                     UpdatePlayerList();
+                };
+
+                serverListener.NetworkReceiveEvent += (peer, reader, channelNumber, deliveryMethod) =>
+                {
+                    try
+                    {
+                        string message = reader.GetString();
+                        Console.WriteLine($"[Host] Nachricht von Client erhalten: {message}");
+
+                        if (message == "PlayerReady" || message == "PlayerNotReady")
+                        {
+                            bool isReady = message == "PlayerReady";
+                            var player = connectedPlayers.FirstOrDefault(p => p.Address == peer.ToString());
+                            if (player != null)
+                            {
+                                player.IsReady = isReady;
+                                Console.WriteLine($"[Host] Spieler {player.Name} ist jetzt {(isReady ? "bereit" : "nicht bereit")}");
+                                UpdatePlayerList();
+                            }
+                            else
+                            {
+                                Console.WriteLine($"[Host] Spieler mit Adresse {peer} nicht gefunden!");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Host] Fehler beim Verarbeiten der Nachricht: {ex.Message}");
+                    }
                 };
             }
             catch (Exception ex)
@@ -90,28 +164,190 @@ namespace WaterWizard.Client
         {
             if (server == null) return;
 
-            // Erstelle eine Nachricht mit allen verbundenen Spielern
             var writer = new NetDataWriter();
             writer.Put("PlayerList");
             writer.Put(connectedPlayers.Count);
 
             foreach (var player in connectedPlayers)
             {
-                // Sende die Player-Informationen als Strings
                 writer.Put(player.Address);
                 writer.Put(player.Name);
                 writer.Put(player.IsReady);
+                Console.WriteLine($"[Host] Spieler: {player.Name}, Status: {(player.IsReady ? "bereit" : "nicht bereit")}");
             }
 
-            // Sende die Liste an alle verbundenen Clients
             foreach (var peer in server.ConnectedPeerList)
             {
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
+            }
+
+            Console.WriteLine($"[Host] Spielerliste mit {connectedPlayers.Count} Spielern gesendet.");
+        }
+
+        /// <summary>
+        /// Starts discovering available server lobbies on the network.
+        /// </summary>
+        public void DiscoverLobbies()
+        {
+            if (IsHost())
+            {
+                Console.WriteLine("[Client] Suche nach entfernten Lobbies (lokale Lobby wird ausgeblendet)...");
+            }
+            else
+            {
+                discoveredLobbies.Clear();
+                Console.WriteLine("[Client] Suche nach verfügbaren Lobbies...");
+            }
+
+            if (client != null && client.IsRunning)
+            {
+                client.Stop();
+            }
+
+            clientListener = new EventBasedNetListener();
+            client = new NetManager(clientListener)
+            {
+                UnconnectedMessagesEnabled = true
+            };
+
+            if (!client.Start())
+            {
+                Console.WriteLine("[Client] Fehler beim Starten des Discovery-Clients");
+                return;
+            }
+
+            clientListener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader, messageType) =>
+            {
+                try
+                {
+                    string msgType = reader.GetString();
+                    if (msgType == "LobbyInfo")
+                    {
+                        string lobbyName = reader.GetString();
+                        int playerCount = reader.GetInt();
+
+                        bool isLocalAddress = remoteEndPoint.Address.Equals(IPAddress.Loopback) ||
+                                             remoteEndPoint.Address.ToString() == NetworkUtils.GetLocalIPAddress();
+
+                        if (IsHost() && isLocalAddress)
+                        {
+                            Console.WriteLine($"[Client] Eigene Lobby gefunden und ignoriert: '{lobbyName}' auf {remoteEndPoint}");
+                            return;
+                        }
+
+                        Console.WriteLine($"[Client] Lobby gefunden: '{lobbyName}' mit {playerCount} Spieler(n) auf {remoteEndPoint}");
+
+                        var existingLobby = discoveredLobbies.FirstOrDefault(l => l.IP == remoteEndPoint.ToString());
+                        if (existingLobby != null)
+                        {
+                            existingLobby.Name = lobbyName;
+                            existingLobby.PlayerCount = playerCount;
+                        }
+                        else
+                        {
+                            discoveredLobbies.Add(new LobbyInfo(remoteEndPoint.ToString(), lobbyName, playerCount));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten der Lobby-Info: {ex.Message}");
+                }
+            };
+
+            var req = new NetDataWriter();
+            req.Put("DiscoverLobbies");
+
+            client.SendBroadcast(req, hostPort);
+
+            try
+            {
+                client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Loopback, hostPort));
+                Console.WriteLine("[Client] Discovery-Request an localhost gesendet");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Client] Fehler beim Senden an localhost: {ex.Message}");
+            }
+
+            try
+            {
+                string localIp = NetworkUtils.GetLocalIPAddress();
+                if (localIp != "127.0.0.1")
+                {
+                    client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Parse(localIp), hostPort));
+                    Console.WriteLine($"[Client] Discovery-Request an lokale IP {localIp} gesendet");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Client] Fehler beim Senden an lokale IP: {ex.Message}");
+            }
+
+            Console.WriteLine("[Client] Lobby-Suchanfragen gesendet");
+        }
+
+        /// <summary>
+        /// Returns the list of discovered lobbies.
+        /// </summary>
+        public List<LobbyInfo> GetDiscoveredLobbies() => discoveredLobbies;
+
+        /// <summary>
+        /// Refreshes the list of discovered lobbies.
+        /// </summary>
+        public void RefreshLobbies()
+        {
+            if (client != null && client.IsRunning)
+            {
+                var req = new NetDataWriter();
+                req.Put("DiscoverLobbies");
+                client.SendBroadcast(req, hostPort);
+
+                try
+                {
+                    client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Loopback, hostPort));
+                    client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Parse("127.0.0.1"), hostPort));
+
+                    string localIp = NetworkUtils.GetLocalIPAddress();
+                    client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Parse(localIp), hostPort));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler bei gezielten Anfragen: {ex.Message}");
+                }
+
+                Console.WriteLine("[Client] Lobby-Liste aktualisiert");
+
+                if (IsHost())
+                {
+                    string localIpAddress = NetworkUtils.GetLocalIPAddress();
+                    var existingLocalLobby = discoveredLobbies.FirstOrDefault(l =>
+                        l.IP.Contains("127.0.0.1") ||
+                        l.IP.Contains("localhost") ||
+                        l.IP.Contains(localIpAddress));
+
+                    if (existingLocalLobby == null)
+                    {
+                        discoveredLobbies.Add(new LobbyInfo($"{localIpAddress}:{hostPort}",
+                            "WaterWizards Lobby (Lokal)", connectedPlayers.Count));
+                        Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugefügt");
+                    }
+                }
+            }
+            else
+            {
+                DiscoverLobbies();
             }
         }
 
         public void ConnectToServer(string ip, int port)
         {
+            if (client != null && client.FirstPeer != null && client.FirstPeer.ConnectionState == ConnectionState.Connected)
+            {
+                Console.WriteLine("[Client] Bereits mit dem Server verbunden.");
+                return;
+            }
+
             try
             {
                 Console.WriteLine($"Versuche, eine Verbindung zum Server herzustellen: IP={ip}, Port={port}");
@@ -141,21 +377,15 @@ namespace WaterWizard.Client
                 clientListener.NetworkReceiveEvent += (peer, reader, channelNumber, deliveryMethod) =>
                 {
                     string message = reader.GetString();
-                    Console.WriteLine($"Nachricht vom Server empfangen: {message}");
+                    Console.WriteLine($"[Client] Nachricht vom Server empfangen: {message}");
 
-                    if (message == "EnterLobby" || message == "Player Connected")
+                    if (message == "EnterLobby")
                     {
-                        Console.WriteLine("Betrete die Pre-Start-Lobby...");
+                        Console.WriteLine("[Client] Betrete die Lobby...");
                         GameStateManager.Instance.SetStateToLobby();
-                    }
-                    else if (message == "StartGame")
-                    {
-                        Console.WriteLine("Spiel wird gestartet...");
-                        GameStateManager.Instance.SetStateToInGame();
                     }
                     else if (message == "PlayerList")
                     {
-                        // Spielerliste empfangen
                         connectedPlayers.Clear();
                         int count = reader.GetInt();
 
@@ -167,11 +397,12 @@ namespace WaterWizard.Client
 
                             Player player = new Player(address) { Name = name, IsReady = isReady };
                             connectedPlayers.Add(player);
+                            Console.WriteLine($"[Client] Spieler aktualisiert: {player.Name}, Status: {(isReady ? "bereit" : "nicht bereit")}");
                         }
-
-                        Console.WriteLine($"Spielerliste aktualisiert: {count} Spieler verbunden");
+                        GameStateManager.Instance.UpdateAndDraw();
                     }
                 };
+
             }
             catch (Exception ex)
             {
@@ -179,11 +410,14 @@ namespace WaterWizard.Client
             }
         }
 
-
         public int GetHostPort() => hostPort;
 
-        public bool IsPlayerConnected() => isPlayerConnected;
+        public bool IsPlayerConnected() => isPlayerConnected || (client != null && client.FirstPeer != null && client.FirstPeer.ConnectionState == ConnectionState.Connected);
 
+        /// <summary>
+        /// Verarbeitet eingehende und ausgehende Netzwerkereignisse.
+        /// Muss aufgerufen werden, um Nachrichten zu empfangen und zu senden.
+        /// </summary>
         public void PollEvents()
         {
             server?.PollEvents();
@@ -194,6 +428,7 @@ namespace WaterWizard.Client
         {
             server?.Stop();
             client?.Stop();
+            discoveredLobbies.Clear();
         }
 
         public void SendToAllClients(string message)
@@ -214,7 +449,6 @@ namespace WaterWizard.Client
             return connectedPlayers;
         }
 
-
         public bool IsClientReady()
         {
             return clientReady;
@@ -227,13 +461,33 @@ namespace WaterWizard.Client
             if (client != null && client.FirstPeer != null)
             {
                 var writer = new NetDataWriter();
-                writer.Put(clientReady ? "PlayerReady" : "PlayerNotReady");
+                string message = clientReady ? "PlayerReady" : "PlayerNotReady";
+                writer.Put(message);
                 client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                Console.WriteLine($"[Client] Nachricht gesendet: {message}");
+            }
+            else
+            {
+                Console.WriteLine("[Client] Kein Server verbunden, Nachricht konnte nicht gesendet werden.");
             }
         }
+
+
     }
 
+    public class LobbyInfo
+    {
+        public string IP { get; set; }
+        public string Name { get; set; }
+        public int PlayerCount { get; set; }
 
+        public LobbyInfo(string ip, string name, int playerCount = 0)
+        {
+            IP = ip;
+            Name = name;
+            PlayerCount = playerCount;
+        }
+    }
 
     public class Player
     {
