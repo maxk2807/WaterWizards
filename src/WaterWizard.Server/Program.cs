@@ -29,6 +29,7 @@ namespace WaterWizard.Server
             string publicIp = NetworkUtils.GetPublicIPAddress();
             Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
             Console.WriteLine($"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
+            Console.WriteLine($"localIp: {localIp}:7777");
             Console.WriteLine("Drücke ESC zum Beenden");
 
             listener.ConnectionRequestEvent += request =>
