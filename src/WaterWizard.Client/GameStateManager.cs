@@ -271,7 +271,7 @@ namespace WaterWizard.Client
             // -----------------------
             int manualBtnWidth = 300;
             Rectangle manualIpButton = new Rectangle(
-                (screenWidth - manualBtnWidth) / 2,
+                (float)(screenWidth - manualBtnWidth) / 2,
                 screenHeight - buttonHeight - margin,
                 manualBtnWidth,
                 buttonHeight);
@@ -410,7 +410,7 @@ namespace WaterWizard.Client
             {
                 int buttonWidth = 200;
                 int buttonHeight = 50;
-                Rectangle startButton = new Rectangle((screenWidth - buttonWidth) / 2, actionButtonY, buttonWidth, buttonHeight);
+                Rectangle startButton = new Rectangle((float)(screenWidth - buttonWidth) / 2, actionButtonY, buttonWidth, buttonHeight);
                 bool hoverStart = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), startButton);
 
                 Raylib.DrawRectangleRec(startButton, hoverStart ? Color.DarkBlue : Color.Blue);
@@ -431,7 +431,7 @@ namespace WaterWizard.Client
                 int buttonWidth = 200;
                 int buttonHeight = 50;
                 bool isReady = NetworkManager.Instance.IsClientReady();
-                Rectangle readyButton = new Rectangle((screenWidth - buttonWidth) / 2, actionButtonY, buttonWidth, buttonHeight);
+                Rectangle readyButton = new Rectangle((float)(screenWidth - buttonWidth) / 2, actionButtonY, buttonWidth, buttonHeight);
                 bool hoverReady = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), readyButton);
 
                 Raylib.DrawRectangleRec(readyButton, isReady ? Color.Green : (hoverReady ? Color.DarkGray : Color.Pink));
