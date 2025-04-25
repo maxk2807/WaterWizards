@@ -23,7 +23,7 @@ class Program
             // Hauptspiel-Loop
             while (!Raylib.WindowShouldClose())
             {
-                if (Raylib.IsKeyPressed(KeyboardKey.F11))
+                if (Raylib.IsKeyPressed(KeyboardKey.F11) || Raylib.IsKeyPressed(KeyboardKey.F))
                 {
                     isFullscreen = !isFullscreen;
 
