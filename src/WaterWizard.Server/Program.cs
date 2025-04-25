@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Server
 {
@@ -24,7 +25,10 @@ namespace WaterWizard.Server
                 return;
             }
 
-            Console.WriteLine("Server erfolgreich auf Port 7777 gestartet");
+            string localIp = NetworkUtils.GetLocalIPAddress();
+            string publicIp = NetworkUtils.GetPublicIPAddress();
+            Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
+            Console.WriteLine($"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
             Console.WriteLine("Drücke ESC zum Beenden");
 
             listener.ConnectionRequestEvent += request =>
@@ -37,19 +41,16 @@ namespace WaterWizard.Server
             {
                 Console.WriteLine($"Client {peer} verbunden");
 
-                // Füge den Spieler zur Liste hinzu
                 string playerAddress = peer.ToString();
                 if (!connectedPlayers.Contains(playerAddress))
                 {
                     connectedPlayers.Add(playerAddress);
                 }
 
-                // Sende EnterLobby
                 var writer = new NetDataWriter();
                 writer.Put("EnterLobby");
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
-                // Sende die aktualisierte Spielerliste
                 SendPlayerList(server);
             };
 
@@ -57,14 +58,12 @@ namespace WaterWizard.Server
             {
                 Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
 
-                // Entferne den Spieler aus der Liste
                 string playerAddress = peer.ToString();
                 if (connectedPlayers.Contains(playerAddress))
                 {
                     connectedPlayers.Remove(playerAddress);
                 }
 
-                // Sende die aktualisierte Spielerliste
                 SendPlayerList(server);
             };
 
@@ -109,19 +108,17 @@ namespace WaterWizard.Server
 
         private static void SendPlayerList(NetManager server)
         {
-            // Erstelle eine Nachricht mit allen verbundenen Spielern
             var writer = new NetDataWriter();
             writer.Put("PlayerList");
             writer.Put(connectedPlayers.Count);
 
             foreach (var playerAddress in connectedPlayers)
             {
-                writer.Put(playerAddress);     // Adresse
-                writer.Put("Player");          // Name (Standard)
-                writer.Put(false);             // Ready-Status (Standard)
+                writer.Put(playerAddress);     
+                writer.Put("Player");          
+                writer.Put(false);             
             }
 
-            // Sende die Liste an alle verbundenen Clients
             foreach (var peer in server.ConnectedPeerList)
             {
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);

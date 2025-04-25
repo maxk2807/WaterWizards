@@ -1,6 +1,6 @@
 using Raylib_cs;
 using System;
-
+using WaterWizard.Shared;
 namespace WaterWizard.Client
 {
     public class GameStateManager
@@ -8,8 +8,8 @@ namespace WaterWizard.Client
 
         private static GameStateManager? instance;
         public static GameStateManager Instance => instance ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
-        private string playerName = "Player";
-        private bool isEditingName = false;
+        //private string playerName = "Player";
+        //private bool isEditingName = false;
         private readonly GameTimer gameTimer;
         public static void Initialize(int screenWidth, int screenHeight)
         {

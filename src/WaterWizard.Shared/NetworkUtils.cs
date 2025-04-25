@@ -2,8 +2,9 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Net.Sockets;
 
-namespace WaterWizard.Client
+namespace WaterWizard.Shared
 {
     public static class NetworkUtils
     {
@@ -14,17 +15,17 @@ namespace WaterWizard.Client
                 var host = Dns.GetHostEntry(Dns.GetHostName());
                 foreach (var ip in host.AddressList)
                 {
-                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
                     {
                         return ip.ToString();
                     }
                 }
+                return "127.0.0.1";
             }
             catch
             {
-                // Ignorieren
+                return "127.0.0.1";
             }
-            return "127.0.0.1";
         }
 
         public static string GetPublicIPAddress()
