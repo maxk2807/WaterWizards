@@ -7,8 +7,8 @@ public class GameScreen(GameStateManager gameStateManager, GameBoard playerBoard
 {
     GameStateManager _gameStateManager = gameStateManager;
 
-    public readonly int cardWidth = (int)Math.Round(screenWidth * 1 / 12f);
-    public readonly int cardHeight = (int)Math.Round(screenHeight * 7 / 45f);
+    public readonly int cardWidth = (int)Math.Round(screenWidth * (1 / 12f));
+    public readonly int cardHeight = (int)Math.Round(screenHeight * (7 / 45f));
 
     public void Draw()
     {
