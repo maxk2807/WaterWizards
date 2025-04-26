@@ -62,24 +62,29 @@ namespace WaterWizard.Client
 
         private void InitializeBoards()
         {
-            int boardSize = 10;
-            int cellSize = 25; 
-            int boardPixelSize = boardSize * cellSize;
+            //12x10 Board
+            int boardWidth = 12;
+            int boardHeight = 10;
+            float boardRatio = boardWidth / (float)boardHeight;
+            int boardPixelHeight = (int)Math.Round(screenHeight * 0.495f);
+            int boardPixelWidth = (int)Math.Round(boardRatio * boardPixelHeight);
+            
+            //dynamic Pixels per Cell based on Screensize
+            int cellSize = boardPixelHeight / boardHeight; 
 
-            float gapBetweenBoards = screenHeight * 0.05f;
-            float totalBoardBlockHeight = boardPixelSize * 2f + gapBetweenBoards; 
-
-            int opponentBoardY = Math.Max((int)((screenHeight - totalBoardBlockHeight) / 2f), (int)(screenHeight * 0.1f));
-            int opponentBoardX = (screenWidth - boardPixelSize) / 2;
-
+            int opponentBoardY = 0;
+            int opponentBoardX = (screenWidth - boardPixelWidth) / 2;
             Vector2 opponentBoardPos = new(opponentBoardX, opponentBoardY);
-            Vector2 playerBoardPos = new(opponentBoardX, opponentBoardY + boardPixelSize + (int)gapBetweenBoards);
+
+            int playerBoardY =  screenHeight - boardPixelHeight;
+            int playerBoardX = opponentBoardX;
+            Vector2 playerBoardPos = new(playerBoardX, playerBoardY);
 
             if (playerBoard == null || opponentBoard == null)
             {
                 // First time initialization
-                playerBoard = new GameBoard(boardSize, boardSize, cellSize, playerBoardPos);
-                opponentBoard = new GameBoard(boardSize, boardSize, cellSize, opponentBoardPos);
+                playerBoard = new GameBoard(boardWidth, boardHeight, cellSize, playerBoardPos);
+                opponentBoard = new GameBoard(boardWidth, boardHeight, cellSize, opponentBoardPos);
             }
             else
             {
@@ -641,7 +646,8 @@ namespace WaterWizard.Client
             }
 
             float zonePadding = screenWidth * 0.02f;
-            int boardPixelSize = playerBoard.GridWidth * playerBoard.CellSize;
+            int boardPixelWidth = playerBoard.GridWidth * playerBoard.CellSize;
+            int boardPixelHeight = playerBoard.GridHeight * playerBoard.CellSize;
 
 
             // Opponent Hand
@@ -676,17 +682,25 @@ namespace WaterWizard.Client
                 // TODO: Send attack command
             }
 
-            // Draw board titles centered above boards
-            int playerTitleWidth = Raylib.MeasureText("Your Board", 15);
-            Raylib.DrawText("Your Board", (int)playerBoard.Position.X + (boardPixelSize - playerTitleWidth)/2, (int)playerBoard.Position.Y - 20, 15, Color.Black);
-            playerBoard.Draw();
-
-            int opponentTitleWidth = Raylib.MeasureText("Opponent's Board", 15);
-            Raylib.DrawText("Opponent's Board", (int)opponentBoard.Position.X + (boardPixelSize - opponentTitleWidth)/2, (int)opponentBoard.Position.Y - 20, 15, Color.Black);
+            // Draw board titles in boards when not hovering
             opponentBoard.Draw();
+            Rectangle opponentBoardRectangle = new(opponentBoard.Position, boardPixelWidth, boardPixelHeight);
+            bool hoverOpponentBoard = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), opponentBoardRectangle);
+            if(!hoverOpponentBoard){
+                int opponentTitleWidth = Raylib.MeasureText("Opponent's Board", 15);
+                Raylib.DrawText("Opponent's Board", (int)opponentBoard.Position.X + (boardPixelWidth - opponentTitleWidth)/2, (int)opponentBoard.Position.Y + 15, 15, Color.Black);
+            }
+
+            playerBoard.Draw();
+            Rectangle playerBoardRectangle = new(playerBoard.Position, boardPixelWidth, boardPixelHeight);
+            bool hoverPlayerBoard = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), playerBoardRectangle);
+            if(!hoverPlayerBoard){
+                int playerTitleWidth = Raylib.MeasureText("Your Board", 15);
+                Raylib.DrawText("Your Board", (int)playerBoard.Position.X + (boardPixelWidth - playerTitleWidth)/2, (int)playerBoard.Position.Y + 15, 15, Color.Black);
+            }
 
             // Draw Timer 
-            float timerX = opponentBoard.Position.X + boardPixelSize + zonePadding * 2;
+            float timerX = opponentBoard.Position.X + boardPixelWidth + zonePadding * 2;
             float timerY = screenHeight / 2f;
             gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
 
