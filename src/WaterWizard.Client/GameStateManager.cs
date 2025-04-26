@@ -196,30 +196,36 @@ namespace WaterWizard.Client
             Rectangle hostButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2 + 60, 200, 40);
             Rectangle mapButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2 + 120, 200, 40);
 
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            bool hoverJoin = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton);
+
+            if (hoverJoin && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 currentState = GameState.LobbyListMenu;
                 NetworkManager.Instance.DiscoverLobbies();
             }
 
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            bool hoverHost = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton);
+
+            if (hoverHost && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 currentState = GameState.HostingMenu;
                 NetworkManager.Instance.StartHosting();
             }
 
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), mapButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            bool hoverMap = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), mapButton);
+
+            if (hoverMap && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 currentState = GameState.InGame;
             }
 
-            Raylib.DrawRectangleRec(joinButton, Color.Blue);
+            Raylib.DrawRectangleRec(joinButton, hoverJoin ? Color.DarkBlue : Color.Blue);
             Raylib.DrawText("Join Lobby", (int)joinButton.X + 50, (int)joinButton.Y + 10, 20, Color.White);
 
-            Raylib.DrawRectangleRec(hostButton, Color.Blue);
+            Raylib.DrawRectangleRec(hostButton, hoverHost ? Color.DarkBlue : Color.Blue);
             Raylib.DrawText("Host Lobby", (int)hostButton.X + 50, (int)hostButton.Y + 10, 20, Color.White);
             
-            Raylib.DrawRectangleRec(mapButton, Color.Blue);
+            Raylib.DrawRectangleRec(mapButton, hoverMap ? Color.DarkBlue : Color.Blue);
             Raylib.DrawText("Map Test", (int)mapButton.X + 50, (int)mapButton.Y + 10, 20, Color.White);
         }
 
