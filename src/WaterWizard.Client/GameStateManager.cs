@@ -10,6 +10,8 @@ namespace WaterWizard.Client
         private static GameStateManager? instance;
         public static GameStateManager Instance => instance ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
         private readonly GameTimer gameTimer;
+        private static GameScreen? gameScreen;
+        public static GameScreen GameScreen => gameScreen ?? throw new InvalidOperationException("Game Screen wurde nicht initialisiert!");
 
         // Add GameBoard instances
         private GameBoard? playerBoard;
@@ -58,6 +60,7 @@ namespace WaterWizard.Client
             gameTimer = new GameTimer(this);
             // Initialize boards - adjust position and size as needed
             InitializeBoards();
+            InitializeGameScreen();
         }
 
         private void InitializeBoards()
@@ -91,6 +94,11 @@ namespace WaterWizard.Client
                 playerBoard.Position = playerBoardPos;
                 opponentBoard.Position = opponentBoardPos;
             }
+        }
+
+        private void InitializeGameScreen(){
+            gameScreen ??= new GameScreen(this, playerBoard ?? throw new InvalidOperationException("player Board not initialized"), 
+            opponentBoard ?? throw new InvalidOperationException("opponent Board not initialized"), screenWidth, screenHeight, gameTimer);
         }
 
         /// <summary>
@@ -639,84 +647,7 @@ namespace WaterWizard.Client
 
         private void DrawGameScreen()
         {
-            if (playerBoard == null || opponentBoard == null)
-            {
-                Raylib.DrawText("Initializing game boards...", 10, 50, 20, Color.Gray);
-                return;
-            }
-
-            float zonePadding = screenWidth * 0.02f;
-            int boardPixelWidth = playerBoard.GridWidth * playerBoard.CellSize;
-            int boardPixelHeight = playerBoard.GridHeight * playerBoard.CellSize;
-
-
-            // Opponent Hand
-            float handWidth = screenWidth * 0.25f;
-            float handHeight = screenHeight * 0.15f;
-            Rectangle opponentHandZone = new(screenWidth - handWidth - zonePadding, zonePadding, handWidth, handHeight);
-            Raylib.DrawRectangleRec(opponentHandZone, Color.LightGray);
-            Raylib.DrawRectangleLinesEx(opponentHandZone, 2, Color.DarkGray);
-            Raylib.DrawText("Opponent Hand", (int)(opponentHandZone.X + 10), (int)(opponentHandZone.Y + 10), 10, Color.Black);
-
-            // Player Hand 
-            Rectangle playerHandZone = new(screenWidth - handWidth - zonePadding, screenHeight - handHeight - zonePadding, handWidth, handHeight);
-            Raylib.DrawRectangleRec(playerHandZone, Color.LightGray);
-            Raylib.DrawRectangleLinesEx(playerHandZone, 2, Color.DarkGray);
-            Raylib.DrawText("Player Hand", (int)(playerHandZone.X + 10), (int)(playerHandZone.Y + 10), 10, Color.Black);
-
-            // Utility Area 
-            float utilityWidth = screenWidth * 0.1f;
-            float utilityHeight = screenHeight * 0.3f;
-            float utilityX = zonePadding;
-            float utilityY = (screenHeight - utilityHeight) / 2f; 
-            Rectangle utilityZone = new(utilityX, utilityY, utilityWidth, utilityHeight);
-            Raylib.DrawRectangleRec(utilityZone, Color.LightGray);
-            Raylib.DrawRectangleLinesEx(utilityZone, 2, Color.DarkGray);
-            Raylib.DrawText("Utility", (int)(utilityZone.X + 10), (int)(utilityZone.Y + 10), 10, Color.Black);
-
-            // Update and Draw Game Boards
-            GameBoard.Point? clickedCell = opponentBoard.Update();
-            if (clickedCell.HasValue)
-            {
-                Console.WriteLine($"Attack initiated at ({clickedCell.Value.X}, {clickedCell.Value.Y})");
-                // TODO: Send attack command
-            }
-
-            // Draw board titles in boards when not hovering
-            opponentBoard.Draw();
-            Rectangle opponentBoardRectangle = new(opponentBoard.Position, boardPixelWidth, boardPixelHeight);
-            bool hoverOpponentBoard = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), opponentBoardRectangle);
-            if(!hoverOpponentBoard){
-                int opponentTitleWidth = Raylib.MeasureText("Opponent's Board", 15);
-                Raylib.DrawText("Opponent's Board", (int)opponentBoard.Position.X + (boardPixelWidth - opponentTitleWidth)/2, (int)opponentBoard.Position.Y + 15, 15, Color.Black);
-            }
-
-            playerBoard.Draw();
-            Rectangle playerBoardRectangle = new(playerBoard.Position, boardPixelWidth, boardPixelHeight);
-            bool hoverPlayerBoard = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), playerBoardRectangle);
-            if(!hoverPlayerBoard){
-                int playerTitleWidth = Raylib.MeasureText("Your Board", 15);
-                Raylib.DrawText("Your Board", (int)playerBoard.Position.X + (boardPixelWidth - playerTitleWidth)/2, (int)playerBoard.Position.Y + 15, 15, Color.Black);
-            }
-
-            // Draw Timer 
-            float timerX = opponentBoard.Position.X + boardPixelWidth + zonePadding * 2;
-            float timerY = screenHeight / 2f;
-            gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
-
-            // Draw Back Button
-            int backButtonWidth = 100;
-            int backButtonHeight = 30;
-            Rectangle backButton = new Rectangle(zonePadding, screenHeight - backButtonHeight - zonePadding, backButtonWidth, backButtonHeight);
-            bool hoverBack = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton);
-            Raylib.DrawRectangleRec(backButton, hoverBack ? Color.DarkGray : Color.Gray);
-            Raylib.DrawText("Back", (int)backButton.X + 30, (int)backButton.Y + 5, 20, Color.White);
-
-            if (hoverBack && Raylib.IsMouseButtonReleased(MouseButton.Left))
-            {
-                NetworkManager.Instance.Shutdown();
-                SetStateToMainMenu();
-            }
+            GameScreen.Draw();
         }
     }
 }
