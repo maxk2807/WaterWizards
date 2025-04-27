@@ -522,7 +522,8 @@ namespace WaterWizard.Client
 
             for (int i = 0; i < players.Count; i++)
             {
-                string playerText = players[i].ToString();
+                string status = players[i].IsReady ? "(Ready)" : "(Not Ready)";
+                string playerText = $"{players[i].Name} {status}";
                 int textWidth = Raylib.MeasureText(playerText, 18);
                 if (playerListY + i * 30 < playerListY + maxListHeight)
                 {

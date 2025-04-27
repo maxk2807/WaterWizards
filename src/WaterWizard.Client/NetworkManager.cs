@@ -379,6 +379,11 @@ namespace WaterWizard.Client
                     string message = reader.GetString();
                     Console.WriteLine($"[Client] Nachricht vom Server empfangen: {message}");
 
+                    if (message == "StartGame")
+                    {
+                        GameStateManager.Instance.SetStateToInGame();
+                    }
+                    
                     if (message == "EnterLobby")
                     {
                         Console.WriteLine("[Client] Betrete die Lobby...");
