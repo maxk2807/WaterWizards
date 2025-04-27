@@ -10,7 +10,7 @@ namespace WaterWizard.Server;
 
 static class Program
 {
-    private static List<string> connectedPlayers = new List<string>();
+    private static readonly Dictionary<string, bool> ConnectedPlayers = [];
 
     static void Main()
     {
@@ -48,7 +48,7 @@ static class Program
                     var response = new NetDataWriter();
                     response.Put("LobbyInfo");
                     response.Put("WaterWizards Server");
-                    response.Put(connectedPlayers.Count);
+                    response.Put(ConnectedPlayers.Count);
                     server.SendUnconnectedMessage(response, remoteEndPoint);
                     Console.WriteLine($"Sent lobby info to {remoteEndPoint}");
                 }
@@ -70,14 +70,7 @@ static class Program
             Console.WriteLine($"Client {peer} verbunden");
 
             string playerAddress = peer.ToString();
-            if (!connectedPlayers.Contains(playerAddress))
-            {
-                connectedPlayers.Add(playerAddress);
-            }
-            else
-            {
-                Console.WriteLine($"Client {peer} ist bereits verbunden.");
-            }
+            ConnectedPlayers.TryAdd(playerAddress, false);
 
             var writer = new NetDataWriter();
             writer.Put("EnterLobby");
@@ -90,11 +83,9 @@ static class Program
         {
             Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
 
-            string playerAddress = peer.ToString();
-            if (connectedPlayers.Contains(playerAddress))
-            {
-                connectedPlayers.Remove(playerAddress);
-            }
+            var playerAddress = peer.ToString();
+            
+            ConnectedPlayers.Remove(playerAddress);
 
             SendPlayerList(server);
         };
@@ -114,39 +105,36 @@ static class Program
                 if (message == "PlayerReady" || message == "PlayerNotReady")
                 {
                     string playerAddress = peer.ToString();
-                    int playerIndex = -1;
 
-                    for (int i = 0; i < connectedPlayers.Count; i++)
+                    if (ConnectedPlayers.ContainsKey(playerAddress))
                     {
-                        if (connectedPlayers[i] == playerAddress)
+                        ConnectedPlayers[playerAddress] = (message == "PlayerReady");
+
+                        SendPlayerList(server);
+
+                        Console.WriteLine($"Spielerliste nach Ready/NotReady-Status Änderung gesendet.");
+                    }
+                    bool allReady = true;
+                    foreach (var ready in ConnectedPlayers.Values)
+                    {
+                        if (!ready)
                         {
-                            playerIndex = i;
+                            allReady = false;
                             break;
                         }
                     }
 
-                    if (playerIndex != -1)
+                    if (allReady && ConnectedPlayers.Count > 0)
                     {
-                        var updatedPlayerList = new NetDataWriter();
-                        updatedPlayerList.Put("PlayerList");
-                        updatedPlayerList.Put(connectedPlayers.Count);
-
-                        for (int i = 0; i < connectedPlayers.Count; i++)
-                        {
-                            string address = connectedPlayers[i];
-                            updatedPlayerList.Put(address);
-                            updatedPlayerList.Put("Player");
-
-                            bool isReady = (i == playerIndex) ? (message == "PlayerReady") : false;
-                            updatedPlayerList.Put(isReady);
-                        }
+                        var writer = new NetDataWriter();
+                        writer.Put("StartGame");
 
                         foreach (var connectedPeer in server.ConnectedPeerList)
                         {
-                            connectedPeer.Send(updatedPlayerList, DeliveryMethod.ReliableOrdered);
+                            connectedPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                         }
 
-                        Console.WriteLine($"Spielerliste nach Ready/NotReady-Status Änderung gesendet.");
+                        Console.WriteLine("Alle Spieler bereit. Spiel wird gestartet!");
                     }
                 }
             }
@@ -181,13 +169,13 @@ static class Program
     {
         var writer = new NetDataWriter();
         writer.Put("PlayerList");
-        writer.Put(connectedPlayers.Count);
+        writer.Put(ConnectedPlayers.Count);
 
-        foreach (var playerAddress in connectedPlayers)
+        foreach (var kvp in ConnectedPlayers)
         {
-            writer.Put(playerAddress);
+            writer.Put(kvp.Key);
             writer.Put("Player");
-            writer.Put(false);
+            writer.Put(kvp.Value);
         }
 
         foreach (var peer in server.ConnectedPeerList)
@@ -195,7 +183,7 @@ static class Program
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
 
-        Console.WriteLine($"Spielerliste mit {connectedPlayers.Count} Spielern gesendet");
+        Console.WriteLine($"Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet");
     }
 }
 

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WaterWizard.Shared\WaterWizard.Shared.csproj" />
+    <ProjectReference Include="..\WaterWizard.Client\WaterWizard.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
