@@ -56,9 +56,7 @@ namespace WaterWizard.Client
         {
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
-            // Pass 'this' instance to GameTimer
             gameTimer = new GameTimer(this);
-            // Initialize boards - adjust position and size as needed
             InitializeBoards();
             InitializeGameScreen();
         }
@@ -85,7 +83,6 @@ namespace WaterWizard.Client
 
             if (playerBoard == null || opponentBoard == null)
             {
-                // First time initialization
                 playerBoard = new GameBoard(boardWidth, boardHeight, cellSize, playerBoardPos);
                 opponentBoard = new GameBoard(boardWidth, boardHeight, cellSize, opponentBoardPos);
             }
@@ -98,7 +95,7 @@ namespace WaterWizard.Client
 
         private void InitializeGameScreen(){
             gameScreen ??= new GameScreen(this, playerBoard ?? throw new InvalidOperationException("player Board not initialized"), 
-            opponentBoard ?? throw new InvalidOperationException("opponent Board not initialized"), screenWidth, screenHeight, gameTimer);
+            opponentBoard ?? throw new InvalidOperationException("opponent Board not initialized"), gameTimer);
         }
 
         /// <summary>
@@ -647,7 +644,7 @@ namespace WaterWizard.Client
 
         private void DrawGameScreen()
         {
-            GameScreen.Draw();
+            GameScreen.Draw(screenWidth, screenHeight);
         }
     }
 }
