@@ -10,8 +10,8 @@ namespace WaterWizard.Client
         private static GameStateManager? instance;
         public static GameStateManager Instance => instance ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
         private readonly GameTimer gameTimer;
-        private static GameScreen? gameScreen;
-        public static GameScreen GameScreen => gameScreen ?? throw new InvalidOperationException("Game Screen wurde nicht initialisiert!");
+        private GameScreen? gameScreen;
+        public GameScreen GameScreen => gameScreen ?? throw new InvalidOperationException("Game Screen wurde nicht initialisiert!");
 
         // Add GameBoard instances
         private GameBoard? playerBoard;

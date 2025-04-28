@@ -5,7 +5,7 @@ namespace WaterWizard.Client;
 
 public class GameScreen(GameStateManager gameStateManager, GameBoard? playerBoard, GameBoard? opponentBoard, GameTimer gameTimer)
 {
-    GameStateManager _gameStateManager = gameStateManager;
+    readonly GameStateManager _gameStateManager = gameStateManager;
 
     public void Draw(int currentScreenWidth, int currentScreenHeight)
     {
