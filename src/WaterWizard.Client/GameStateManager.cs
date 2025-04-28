@@ -89,7 +89,13 @@ namespace WaterWizard.Client
             else
             {
                 playerBoard.Position = playerBoardPos;
+                playerBoard.CellSize = cellSize;
+                playerBoard.GridWidth = boardWidth;
+                playerBoard.GridHeight = boardHeight;
                 opponentBoard.Position = opponentBoardPos;
+                opponentBoard.CellSize = cellSize;
+                opponentBoard.GridWidth = boardWidth;
+                opponentBoard.GridHeight = boardHeight;
             }
         }
 

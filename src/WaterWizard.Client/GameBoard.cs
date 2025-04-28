@@ -20,9 +20,9 @@ public enum CellState
 /// </summary>
 public class GameBoard
 {
-    public int GridWidth { get; }
-    public int GridHeight { get; }
-    public int CellSize { get; }
+    public int GridWidth { get; set; }
+    public int GridHeight { get; set; }
+    public int CellSize { get; set; }
     public Vector2 Position { get; set; } 
 
     private readonly CellState[,] _gridStates;
