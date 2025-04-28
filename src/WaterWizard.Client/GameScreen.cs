@@ -28,14 +28,20 @@ public class GameScreen(GameStateManager gameStateManager, GameBoard? playerBoar
         DrawOpponentHand(zonePadding, handWidth, handHeight, currentScreenWidth, currentScreenHeight);
 
         // Player Hand
-        DrawPlayerHand(zonePadding, handWidth, handHeight, currentScreenWidth, currentScreenHeight); 
+        DrawPlayerHand(zonePadding, handWidth, handHeight, currentScreenWidth, currentScreenHeight);
+        
+        // Draw Timer
+        float timerX = zonePadding;
+        float timerY = (currentScreenHeight / 2f) - 10; 
+        gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
+        
 
         // Graveyard Area - Use current dimensions for calculation
         float outerBufferWidth = cardWidth * 0.1f; 
         float outerBufferHeight = cardHeight * 0.1f; 
         float graveyardWidth = cardWidth + outerBufferWidth * 2; 
         float graveyardHeight = cardHeight + outerBufferHeight * 2; 
-        float graveyardX = zonePadding;
+        float graveyardX = zonePadding * 2 + GameTimer.MaxTextWidth(20);
         float graveyardY = (currentScreenHeight - graveyardHeight) / 2f;
         DrawGraveyard(graveyardWidth, graveyardHeight, graveyardX, graveyardY, cardWidth, cardHeight, outerBufferWidth, outerBufferHeight);
 
@@ -65,11 +71,6 @@ public class GameScreen(GameStateManager gameStateManager, GameBoard? playerBoar
             int playerTitleWidth = Raylib.MeasureText("Your Board", 15);
             Raylib.DrawText("Your Board", (int)playerBoard.Position.X + (boardPixelWidth - playerTitleWidth) / 2, (int)playerBoard.Position.Y + 15, 15, Color.Black);
         }
-
-        // Draw Timer
-        float timerX = opponentBoard.Position.X + boardPixelWidth + zonePadding * 2;
-        float timerY = opponentBoard.Position.Y + (boardPixelHeight / 2f) - 10; 
-        gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
 
         // Draw Back Button
         int backButtonWidth = 100;

@@ -37,11 +37,7 @@ public class GameTimer(GameStateManager gameStateManager)
     /// <param name="color">color of the timer</param>
     public void Draw(int x, int y, int fontSize, Color color)
     {
-        int totalSeconds = (int)_timerSeconds;
-        int minutes = GetMinutes();
-        int seconds = totalSeconds % 60;
-        string timerText = $"Time: {minutes:D2}:{seconds:D2}";
-        Raylib.DrawText(timerText, x, y, fontSize, color);
+        Raylib.DrawText(TimerString(), x, y, fontSize, color);
     }
 
     /// <summary>
@@ -61,4 +57,21 @@ public class GameTimer(GameStateManager gameStateManager)
         _timerSeconds = 0;
     }
 
+    public string TimerString()
+    {
+        int totalSeconds = (int)_timerSeconds;
+        int minutes = GetMinutes();
+        int seconds = totalSeconds % 60;
+        string timerText = $"Time: {minutes:D2}:{seconds:D2}";
+        return timerText;
+    }
+
+    public int TextWidth(int fontsize){
+        return Raylib.MeasureText(TimerString(), fontsize);
+    }
+
+    internal static float MaxTextWidth(int fontsize)
+    {
+        return Raylib.MeasureText("Time: 99:99", fontsize);
+    }
 }
