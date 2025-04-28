@@ -20,12 +20,12 @@ public enum CellState
 /// </summary>
 public class GameBoard
 {
-    public int GridWidth { get; }
-    public int GridHeight { get; }
-    public int CellSize { get; }
+    public int GridWidth { get; set; }
+    public int GridHeight { get; set; }
+    public int CellSize { get; set; }
     public Vector2 Position { get; set; } 
 
-    private CellState[,] gridStates;
+    private readonly CellState[,] _gridStates;
 
     /// <summary>
     /// Constructor for the GameBoard class.
@@ -41,13 +41,13 @@ public class GameBoard
         CellSize = cellSize;
         Position = position;
 
-        gridStates = new CellState[gridWidth, gridHeight];
+        _gridStates = new CellState[gridWidth, gridHeight];
 
         for (int x = 0; x < gridWidth; x++)
         {
             for (int y = 0; y < gridHeight; y++)
             {
-                gridStates[x, y] = CellState.Unknown;
+                _gridStates[x, y] = CellState.Unknown;
             }
         }
     }
@@ -85,9 +85,9 @@ public class GameBoard
             {
                 Console.WriteLine($"Clicked on cell: ({clickedCell.Value.X}, {clickedCell.Value.Y})");
                 // TODO: Add logic to handle the click (e.g., send attack to server)
-                if (gridStates[clickedCell.Value.X, clickedCell.Value.Y] == CellState.Unknown)
+                if (_gridStates[clickedCell.Value.X, clickedCell.Value.Y] == CellState.Unknown)
                 {
-                        gridStates[clickedCell.Value.X, clickedCell.Value.Y] = CellState.Miss;
+                    _gridStates[clickedCell.Value.X, clickedCell.Value.Y] = CellState.Miss;
                 }
                 return clickedCell;
             }
@@ -107,16 +107,16 @@ public class GameBoard
                 int posX = (int)Position.X + x * CellSize;
                 int posY = (int)Position.Y + y * CellSize;
 
-                Color cellColor = GetColorForState(gridStates[x, y]);
+                Color cellColor = GetColorForState(_gridStates[x, y]);
                 Raylib.DrawRectangle(posX, posY, CellSize, CellSize, cellColor);
 
                 Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, Color.DarkGray);
 
-                if (gridStates[x, y] == CellState.Hit)
+                if (_gridStates[x, y] == CellState.Hit)
                 {
                     Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.Red);
                 }
-                else if (gridStates[x, y] == CellState.Miss)
+                else if (_gridStates[x, y] == CellState.Miss)
                 {
                         Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.White);
                 }
