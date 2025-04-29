@@ -2,4 +2,4 @@ name: "Custom CodeQL Configuration"
 
 queries:
   - uses: security-and-quality
-  - cs/local-variable-never-used
+  - uses: codeql/csharp-queries/Likely Bugs/UnusedLocalVariable.ql 
