@@ -33,7 +33,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Initialize CodeQL
-        uses: github/codeql/codeql-action/init@v3
+        uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           config-file: ./.github/codeql/codeql-config.yml
