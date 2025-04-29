@@ -2,4 +2,4 @@ name: "Custom CodeQL Configuration"
 
 queries:
   - uses: security-and-quality
-  - qlpack: codeql/csharp-queries
+  - uses: codeql/csharp-queries
