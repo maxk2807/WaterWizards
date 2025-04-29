@@ -3,5 +3,4 @@ name: "CodeQL Configuration"
 queries:
   - uses: security-and-quality
   - exclude:
-    problem.severity:
-      -note
+    problem.severity: note
