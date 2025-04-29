@@ -1,9 +1,0 @@
-name: "CodeQL Custom Config"
-
-queries:
-  - uses: security-and-quality
-
-filters:
-  problem.severity:
-    -exclude:
-      problem.severity: note
