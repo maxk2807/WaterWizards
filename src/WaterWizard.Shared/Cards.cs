@@ -47,9 +47,9 @@ public enum CardVariant
 public class CardStats
 {
     public int Mana { get; set; }
-    public string CastTime { get; set; }    // e.g. "instant" or seconds
-    public string Duration { get; set; }    // e.g. "instant", "permanent" or seconds
-    public string Target { get; set; }      // e.g. "1x1", "ship", "battlefield", etc.
+    public string? CastTime { get; set; }    // e.g. "instant" or seconds
+    public string? Duration { get; set; }   // e.g. "instant", "permanent" or seconds
+    public string? Target { get; set; }      // e.g. "1x1", "ship", "battlefield", etc.
 }
 
 public class Cards
@@ -58,9 +58,9 @@ public class Cards
     public CardVariant Variant { get; private set; }
     public int Mana { get; private set; }
     // TODO: Mana class einbeziehen
-    public string CastTime { get; private set; }
-    public string Duration { get; private set; }
-    public string Target { get; private set; }
+    public string? CastTime { get; private set; }
+    public string? Duration { get; private set; }
+    public string? Target { get; private set; }
 
     private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<CardVariant, CardType>
     {
