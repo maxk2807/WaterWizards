@@ -36,6 +36,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+          congifuration-file: ./.github/workflows/codeql-config.yml
 
       - name: Build with NUKE (required by CodeQL)
         run: ./build.sh Compile
