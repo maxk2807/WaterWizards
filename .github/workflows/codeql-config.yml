@@ -36,7 +36,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          queries: +security-and-quality, cs/local-variable-never-used
+          queries: +security-and-quality, csharp/local-variable-never-used
 
       - name: Build with NUKE (required by CodeQL)
         run: ./build.sh Compile
