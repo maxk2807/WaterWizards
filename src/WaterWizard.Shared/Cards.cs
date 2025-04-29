@@ -6,6 +6,55 @@ using System.Collections.Generic;
 /// <summary>
 /// Repräsentiert eine einzelne Spielkarte mit Typ, Variante und zugehörigen Eigenschaften.
 /// </summary>
+public enum CardType
+{
+    Damage,
+    Utility,
+    Environment,
+    Healing
+}
+
+public enum CardVariant
+{
+    // Damage Variants
+    ArcaneMissile,
+    Firebolt,
+    Fireball,
+    GreedHit,
+    FrostBolt,
+
+    // Utility Variants
+    HoveringEye,
+    SummonShip,
+    Teleport,
+    Paralize,
+    ConeOfCold,
+    MinorIllusion,
+    Polymorph,
+
+    // Environment Variants
+    Thunder,
+    Storm,
+    SpawnRocks,
+    RiseSun,
+    CallWind,
+
+    // Healing Variants
+    Heal,
+    Mending,
+    MassMending,
+    PerfectMending,
+    Lifesteal
+}
+
+public class CardStats
+{
+    public int Mana { get; set; }
+    public string? CastTime { get; set; }    // e.g. "instant" or seconds
+    public string? Duration { get; set; }   // e.g. "instant", "permanent" or seconds
+    public string? Target { get; set; }      // e.g. "1x1", "ship", "battlefield", etc.
+}
+
 public class Cards
 {
     /// <summary>
@@ -25,15 +74,15 @@ public class Cards
     /// <summary>
     /// Die Zeit (in Sekunden oder als „instant“), die zum Wirken der Karte benötigt wird.
     /// </summary>
-    public string CastTime { get; private set; }
+    public string? CastTime { get; private set; }
     /// <summary>
     /// Die Dauer (in Sekunden, „instant“ oder „permanent“) des Karteneffekts.
     /// </summary>
-    public string Duration { get; private set; }
+    public string? Duration { get; private set; }
     /// <summary>
     /// Gibt an, welches Ziel die Karte betrifft (z. B. „1x1“, „ship“, „battlefield“).
     /// </summary>
-    public string Target { get; private set; }
+    public string? Target { get; private set; }
 
     private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<CardVariant, CardType>
     {
