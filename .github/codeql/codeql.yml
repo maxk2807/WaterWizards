@@ -2,4 +2,4 @@ name: "Custom CodeQL Configuration"
 
 queries:
   - uses: security-and-quality
-  - uses: github/codeql/csharp-queries@latest
+  - uses: github/codeql/csharp-queries@v1
