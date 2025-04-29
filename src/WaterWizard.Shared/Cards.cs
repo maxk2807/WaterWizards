@@ -3,63 +3,36 @@ namespace WaterWizard.Shared;
 using System;
 using System.Collections.Generic;
 
-public enum CardType
-{
-    Damage,
-    Utility,
-    Environment,
-    Healing
-}
-
-public enum CardVariant
-{
-    // Damage Variants
-    ArcaneMissile,
-    Firebolt,
-    Fireball,
-    GreedHit,
-    FrostBolt,
-
-    // Utility Variants
-    HoveringEye,
-    SummonShip,
-    Teleport,
-    Paralize,
-    ConeOfCold,
-    MinorIllusion,
-    Polymorph,
-
-    // Environment Variants
-    Thunder,
-    Storm,
-    SpawnRocks,
-    RiseSun,
-    CallWind,
-
-    // Healing Variants
-    Heal,
-    Mending,
-    MassMending,
-    PerfectMending,
-    Lifesteal
-}
-
-public class CardStats
-{
-    public int Mana { get; set; }
-    public string CastTime { get; set; }    // e.g. "instant" or seconds
-    public string Duration { get; set; }    // e.g. "instant", "permanent" or seconds
-    public string Target { get; set; }      // e.g. "1x1", "ship", "battlefield", etc.
-}
-
+/// <summary>
+/// Repräsentiert eine einzelne Spielkarte mit Typ, Variante und zugehörigen Eigenschaften.
+/// </summary>
 public class Cards
 {
+    /// <summary>
+    /// Der übergeordnete Typ der Karte (z. B. Damage, Utility, Environment, Healing).
+    /// </summary>
     public CardType Type { get; private set; }
+    /// <summary>
+    /// Die spezifische Variante der Karte innerhalb ihres Typs.
+    /// </summary>
     public CardVariant Variant { get; private set; }
+    /// <summary>
+    /// Der Mana-Wert, der zum Ausspielen dieser Karte erforderlich ist.
+    /// </summary>
     public int Mana { get; private set; }
     // TODO: Mana class einbeziehen
+
+    /// <summary>
+    /// Die Zeit (in Sekunden oder als „instant“), die zum Wirken der Karte benötigt wird.
+    /// </summary>
     public string CastTime { get; private set; }
+    /// <summary>
+    /// Die Dauer (in Sekunden, „instant“ oder „permanent“) des Karteneffekts.
+    /// </summary>
     public string Duration { get; private set; }
+    /// <summary>
+    /// Gibt an, welches Ziel die Karte betrifft (z. B. „1x1“, „ship“, „battlefield“).
+    /// </summary>
     public string Target { get; private set; }
 
     private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<CardVariant, CardType>
@@ -128,6 +101,13 @@ public class Cards
         { CardVariant.Lifesteal,     new CardStats { Mana = 4, CastTime = "instant", Duration = "instant",   Target = "ship" } }
     };
 
+
+    /// <summary>
+    /// Erstellt eine neue Karteninstanz anhand der angegebenen Kartenvariante.
+    /// Die zugehörigen Typ- und Statuseigenschaften werden automatisch gesetzt.
+    /// </summary>
+    /// <param name="variant">Die spezifische Variante der Karte.</param>
+    /// <exception cref="ArgumentException">Wird ausgelöst, wenn die Variante unbekannt ist oder keine zugehörigen Statistiken vorhanden sind.</exception>
     public Cards(CardVariant variant)
     {
         if (!cardTypeMapping.ContainsKey(variant))
@@ -149,7 +129,10 @@ public class Cards
         }
     }
 
-    // Methode um alle Eigenschaften anzuzeigen
+
+    /// <summary>
+    /// Gibt die aktuellen Kartendaten auf der Konsole aus (Debug-Zwecke).
+    /// </summary>
     public void DisplayCardInfo()
     {
         Console.WriteLine($"Card: {Variant}");
