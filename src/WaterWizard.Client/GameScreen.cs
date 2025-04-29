@@ -19,6 +19,7 @@ public class GameScreen(GameStateManager gameStateManager, GameBoard? playerBoar
         int cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f)); 
         int cardHeight = (int)Math.Round(currentScreenHeight * (7 / 45f)); 
         float zonePadding = currentScreenWidth * 0.02f;
+        float zonePadding1 = currentScreenWidth * 0.02f;
         int boardPixelWidth = playerBoard.GridWidth * playerBoard.CellSize;
         int boardPixelHeight = playerBoard.GridHeight * playerBoard.CellSize;
 
