@@ -1,10 +1,11 @@
+// NetworkManager.cs
 using LiteNetLib;
 using LiteNetLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using WaterWizard.Shared;
+using WaterWizard.Shared; // Behält die using-Anweisungen bei
 
 namespace WaterWizard.Client
 {
@@ -196,7 +197,7 @@ namespace WaterWizard.Client
             else
             {
                 discoveredLobbies.Clear();
-                Console.WriteLine("[Client] Suche nach verf�gbaren Lobbies...");
+                Console.WriteLine("[Client] Suche nach verfgbaren Lobbies...");
             }
 
             if (client != null && client.IsRunning)
@@ -330,7 +331,7 @@ namespace WaterWizard.Client
                     {
                         discoveredLobbies.Add(new LobbyInfo($"{localIpAddress}:{hostPort}",
                             "WaterWizards Lobby (Lokal)", connectedPlayers.Count));
-                        Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugef�gt");
+                        Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugefgt");
                     }
                 }
             }
@@ -378,6 +379,11 @@ namespace WaterWizard.Client
                 {
                     string message = reader.GetString();
                     Console.WriteLine($"[Client] Nachricht vom Server empfangen: {message}");
+
+                    if (message == "StartGame")
+                    {
+                        GameStateManager.Instance.SetStateToInGame();
+                    }
 
                     if (message == "EnterLobby")
                     {
@@ -470,39 +476,6 @@ namespace WaterWizard.Client
             {
                 Console.WriteLine("[Client] Kein Server verbunden, Nachricht konnte nicht gesendet werden.");
             }
-        }
-
-
-    }
-
-    public class LobbyInfo
-    {
-        public string IP { get; set; }
-        public string Name { get; set; }
-        public int PlayerCount { get; set; }
-
-        public LobbyInfo(string ip, string name, int playerCount = 0)
-        {
-            IP = ip;
-            Name = name;
-            PlayerCount = playerCount;
-        }
-    }
-
-    public class Player
-    {
-        public string Address { get; set; }
-        public string Name { get; set; } = "Player";
-        public bool IsReady { get; set; } = false;
-
-        public Player(string address)
-        {
-            Address = address;
-        }
-
-        public override string ToString()
-        {
-            return $"{Name} ({(IsReady ? "Ready" : "Not Ready")})";
         }
     }
 }

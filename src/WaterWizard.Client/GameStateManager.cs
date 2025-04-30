@@ -1,6 +1,8 @@
 using Raylib_cs;
 using System;
+using System.Numerics; 
 using WaterWizard.Shared;
+
 namespace WaterWizard.Client
 {
     public class GameStateManager
@@ -8,11 +10,19 @@ namespace WaterWizard.Client
         private static GameStateManager? instance;
         public static GameStateManager Instance => instance ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
         private readonly GameTimer gameTimer;
+        private GameScreen? gameScreen;
+        public GameScreen GameScreen => gameScreen ?? throw new InvalidOperationException("Game Screen wurde nicht initialisiert!");
+
+        // Add GameBoard instances
+        private GameBoard? playerBoard;
+        private GameBoard? opponentBoard;
+
 
         private float titleAnimTime = 0;
         private float titleVerticalPosition = 0;
         private const float TITLE_ANIM_SPEED = 1.5f;
         private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
+      
         public static void Initialize(int screenWidth, int screenHeight)
         {
             if (instance == null)
@@ -47,7 +57,53 @@ namespace WaterWizard.Client
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
             gameTimer = new GameTimer(this);
+            InitializeBoards();
+            InitializeGameScreen();
         }
+
+        private void InitializeBoards()
+        {
+            //12x10 Board
+            int boardWidth = 12;
+            int boardHeight = 10;
+            float boardRatio = boardWidth / (float)boardHeight;
+            int boardPixelHeight = (int)Math.Round(screenHeight * 0.495f);
+            int boardPixelWidth = (int)Math.Round(boardRatio * boardPixelHeight);
+            
+            //dynamic Pixels per Cell based on Screensize
+            int cellSize = boardPixelHeight / boardHeight; 
+
+            int opponentBoardY = 0;
+            int opponentBoardX = (screenWidth - boardPixelWidth) / 2;
+            Vector2 opponentBoardPos = new(opponentBoardX, opponentBoardY);
+
+            int playerBoardY =  screenHeight - boardPixelHeight;
+            int playerBoardX = opponentBoardX;
+            Vector2 playerBoardPos = new(playerBoardX, playerBoardY);
+
+            if (playerBoard == null || opponentBoard == null)
+            {
+                playerBoard = new GameBoard(boardWidth, boardHeight, cellSize, playerBoardPos);
+                opponentBoard = new GameBoard(boardWidth, boardHeight, cellSize, opponentBoardPos);
+            }
+            else
+            {
+                playerBoard.Position = playerBoardPos;
+                playerBoard.CellSize = cellSize;
+                playerBoard.GridWidth = boardWidth;
+                playerBoard.GridHeight = boardHeight;
+                opponentBoard.Position = opponentBoardPos;
+                opponentBoard.CellSize = cellSize;
+                opponentBoard.GridWidth = boardWidth;
+                opponentBoard.GridHeight = boardHeight;
+            }
+        }
+
+        private void InitializeGameScreen(){
+            gameScreen ??= new GameScreen(this, playerBoard ?? throw new InvalidOperationException("player Board not initialized"), 
+            opponentBoard ?? throw new InvalidOperationException("opponent Board not initialized"), gameTimer);
+        }
+
         /// <summary>
         /// Updates the screen dimensions when the window size changes.
         /// </summary>
@@ -58,6 +114,8 @@ namespace WaterWizard.Client
             screenWidth = width;
             screenHeight = height;
             Console.WriteLine($"Screen size updated to {width}x{height}");
+            // Re-initialize boards to potentially reposition them based on new screen size
+            InitializeBoards();
         }
 
         /// <summary>
@@ -71,7 +129,7 @@ namespace WaterWizard.Client
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.Beige);
             // Handle the game timer in the hosting menu
-            if (currentState == GameState.HostingMenu)
+            if (currentState == GameState.HostingMenu || currentState == GameState.InGame)
             {
                 gameTimer.Update();
                 if (gameTimer.IsTimeUp)
@@ -79,6 +137,10 @@ namespace WaterWizard.Client
                     NetworkManager.Instance.Shutdown();
                     SetStateToMainMenu();
                 }
+            }
+            else
+            {
+                gameTimer.Reset();
             }
 
             switch (currentState)
@@ -148,24 +210,39 @@ namespace WaterWizard.Client
 
             Rectangle joinButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2, 200, 40);
             Rectangle hostButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2 + 60, 200, 40);
+            Rectangle mapButton = new((float)screenWidth / 2 - 100, (float)screenHeight / 2 + 120, 200, 40);
 
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            bool hoverJoin = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton);
+
+            if (hoverJoin && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 currentState = GameState.LobbyListMenu;
                 NetworkManager.Instance.DiscoverLobbies();
             }
 
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            bool hoverHost = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton);
+
+            if (hoverHost && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 currentState = GameState.HostingMenu;
                 NetworkManager.Instance.StartHosting();
             }
 
-            Raylib.DrawRectangleRec(joinButton, Color.Blue);
+            bool hoverMap = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), mapButton);
+
+            if (hoverMap && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            {
+                currentState = GameState.InGame;
+            }
+
+            Raylib.DrawRectangleRec(joinButton, hoverJoin ? Color.DarkBlue : Color.Blue);
             Raylib.DrawText("Join Lobby", (int)joinButton.X + 50, (int)joinButton.Y + 10, 20, Color.White);
 
-            Raylib.DrawRectangleRec(hostButton, Color.Blue);
+            Raylib.DrawRectangleRec(hostButton, hoverHost ? Color.DarkBlue : Color.Blue);
             Raylib.DrawText("Host Lobby", (int)hostButton.X + 50, (int)hostButton.Y + 10, 20, Color.White);
+            
+            Raylib.DrawRectangleRec(mapButton, hoverMap ? Color.DarkBlue : Color.Blue);
+            Raylib.DrawText("Map Test", (int)mapButton.X + 50, (int)mapButton.Y + 10, 20, Color.White);
         }
 
         private Color ColorFromHSV(float hue, float saturation, float value)
@@ -451,7 +528,8 @@ namespace WaterWizard.Client
 
             for (int i = 0; i < players.Count; i++)
             {
-                string playerText = players[i].ToString();
+                string status = players[i].IsReady ? "(Ready)" : "(Not Ready)";
+                string playerText = $"{players[i].Name} {status}";
                 int textWidth = Raylib.MeasureText(playerText, 18);
                 if (playerListY + i * 30 < playerListY + maxListHeight)
                 {
@@ -558,6 +636,11 @@ namespace WaterWizard.Client
         {
             Console.WriteLine("[GameStateManager] Wechsel in den Zustand: InGame");
             currentState = GameState.InGame;
+            gameTimer.Reset(); 
+            if (playerBoard == null || opponentBoard == null)
+            {
+                InitializeBoards();
+            }
         }
 
         public void SetStateToMainMenu()
@@ -568,17 +651,7 @@ namespace WaterWizard.Client
 
         private void DrawGameScreen()
         {
-            Raylib.DrawText("Game is running...", screenWidth / 3, screenHeight / 3, 20, Color.DarkGreen);
-
-            Rectangle backButton = new((float)screenWidth / 3, (float)screenHeight / 2 + 120, 100, 40);
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton) && Raylib.IsMouseButtonReleased(MouseButton.Left))
-            {
-                NetworkManager.Instance.Shutdown();
-                currentState = GameState.MainMenu;
-            }
-
-            Raylib.DrawRectangleRec(backButton, Color.Gray);
-            Raylib.DrawText("Back", (int)backButton.X + 30, (int)backButton.Y + 10, 20, Color.White);
+            GameScreen.Draw(screenWidth, screenHeight);
         }
     }
 }

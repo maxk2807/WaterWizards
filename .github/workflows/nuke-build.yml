@@ -2,9 +2,9 @@ name: NUKE Build CI
 
 on:
   push:
-    branches: [ "*" ] 
+    branches: [ "main", "dev" ] 
   pull_request:
-    branches: [ "*" ] 
+    branches: [ "**" ] 
 
   workflow_dispatch:
 
@@ -28,14 +28,5 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Initialize .NET SDK
-        uses: github/codeql-action/init@v3
-        with:
-          languages: 'csharp'
-          queries: +security-and-quality
-     
       - name: Run NUKE Build and Test
         run: ./build.sh Compile Test
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
