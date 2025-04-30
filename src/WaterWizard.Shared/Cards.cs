@@ -74,15 +74,15 @@ public class Cards
     /// <summary>
     /// Die Zeit (in Sekunden oder als „instant“), die zum Wirken der Karte benötigt wird.
     /// </summary>
-    public string? CastTime { get; private set; }
+    public string?? CastTime { get; private set; }
     /// <summary>
     /// Die Dauer (in Sekunden, „instant“ oder „permanent“) des Karteneffekts.
     /// </summary>
-    public string? Duration { get; private set; }
+    public string?? Duration { get; private set; }
     /// <summary>
     /// Gibt an, welches Ziel die Karte betrifft (z. B. „1x1“, „ship“, „battlefield“).
     /// </summary>
-    public string? Target { get; private set; }
+    public string?? Target { get; private set; }
 
     private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<CardVariant, CardType>
     {
