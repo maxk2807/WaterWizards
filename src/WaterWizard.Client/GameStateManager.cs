@@ -13,11 +13,6 @@ namespace WaterWizard.Client
         private GameScreen? gameScreen;
         public GameScreen GameScreen => gameScreen ?? throw new InvalidOperationException("Game Screen wurde nicht initialisiert!");
 
-        // Add GameBoard instances
-        private GameBoard? playerBoard;
-        private GameBoard? opponentBoard;
-
-
         private float titleAnimTime = 0;
         private float titleVerticalPosition = 0;
         private const float TITLE_ANIM_SPEED = 1.5f;
@@ -57,51 +52,12 @@ namespace WaterWizard.Client
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
             gameTimer = new GameTimer(this);
-            InitializeBoards();
             InitializeGameScreen();
         }
 
-        private void InitializeBoards()
-        {
-            //12x10 Board
-            int boardWidth = 12;
-            int boardHeight = 10;
-            float boardRatio = boardWidth / (float)boardHeight;
-            int boardPixelHeight = (int)Math.Round(screenHeight * 0.495f);
-            int boardPixelWidth = (int)Math.Round(boardRatio * boardPixelHeight);
-            
-            //dynamic Pixels per Cell based on Screensize
-            int cellSize = boardPixelHeight / boardHeight; 
-
-            int opponentBoardY = 0;
-            int opponentBoardX = (screenWidth - boardPixelWidth) / 2;
-            Vector2 opponentBoardPos = new(opponentBoardX, opponentBoardY);
-
-            int playerBoardY =  screenHeight - boardPixelHeight;
-            int playerBoardX = opponentBoardX;
-            Vector2 playerBoardPos = new(playerBoardX, playerBoardY);
-
-            if (playerBoard == null || opponentBoard == null)
-            {
-                playerBoard = new GameBoard(boardWidth, boardHeight, cellSize, playerBoardPos);
-                opponentBoard = new GameBoard(boardWidth, boardHeight, cellSize, opponentBoardPos);
-            }
-            else
-            {
-                playerBoard.Position = playerBoardPos;
-                playerBoard.CellSize = cellSize;
-                playerBoard.GridWidth = boardWidth;
-                playerBoard.GridHeight = boardHeight;
-                opponentBoard.Position = opponentBoardPos;
-                opponentBoard.CellSize = cellSize;
-                opponentBoard.GridWidth = boardWidth;
-                opponentBoard.GridHeight = boardHeight;
-            }
-        }
-
         private void InitializeGameScreen(){
-            gameScreen ??= new GameScreen(this, playerBoard ?? throw new InvalidOperationException("player Board not initialized"), 
-            opponentBoard ?? throw new InvalidOperationException("opponent Board not initialized"), gameTimer);
+            gameScreen ??= new GameScreen(this, screenWidth, screenHeight, gameTimer);
+            gameScreen.Initialize();
         }
 
         /// <summary>
@@ -115,7 +71,7 @@ namespace WaterWizard.Client
             screenHeight = height;
             Console.WriteLine($"Screen size updated to {width}x{height}");
             // Re-initialize boards to potentially reposition them based on new screen size
-            InitializeBoards();
+            GameScreen.UpdateScreenSize(width, height);
         }
 
         /// <summary>
@@ -216,23 +172,21 @@ namespace WaterWizard.Client
 
             if (hoverJoin && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
-                currentState = GameState.LobbyListMenu;
-                NetworkManager.Instance.DiscoverLobbies();
+                SetStateToLobbyList();
             }
 
             bool hoverHost = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton);
 
             if (hoverHost && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
-                currentState = GameState.HostingMenu;
-                NetworkManager.Instance.StartHosting();
+                SetStateToHostingMenu();
             }
 
             bool hoverMap = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), mapButton);
 
             if (hoverMap && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
-                currentState = GameState.InGame;
+                SetStateToInGame();
             }
 
             Raylib.DrawRectangleRec(joinButton, hoverJoin ? Color.DarkBlue : Color.Blue);
@@ -632,15 +586,24 @@ namespace WaterWizard.Client
             currentState = GameState.PreStartLobby;
         }
 
+        public void SetStateToLobbyList(){
+            Console.WriteLine("[GameStateManager] Wechsel in den Zustand: LobyListMenu");
+            currentState = GameState.LobbyListMenu;
+            NetworkManager.Instance.DiscoverLobbies();
+        }
+
+        public void SetStateToHostingMenu(){
+            Console.WriteLine("[GameStateManager] Wechsel in den Zustand: HostingMenu");
+            currentState = GameState.HostingMenu;
+            NetworkManager.Instance.StartHosting();
+        }
+
         public void SetStateToInGame()
         {
             Console.WriteLine("[GameStateManager] Wechsel in den Zustand: InGame");
             currentState = GameState.InGame;
             gameTimer.Reset(); 
-            if (playerBoard == null || opponentBoard == null)
-            {
-                InitializeBoards();
-            }
+            GameScreen.Reset();
         }
 
         public void SetStateToMainMenu()
