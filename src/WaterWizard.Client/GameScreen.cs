@@ -5,7 +5,7 @@ namespace WaterWizard.Client;
 
 public class GameScreen(GameStateManager gameStateManager, int screenWidth, int screenHeight, GameTimer gameTimer)
 {
-    readonly GameStateManager _gameStateManager = gameStateManager;
+    public readonly GameStateManager _gameStateManager = gameStateManager;
 
     public GameBoard? playerBoard, opponentBoard;
     public GameHand? playerHand, opponentHand;
@@ -18,8 +18,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
     private void InitializeHands()
     {
-        playerHand ??= new();
-        opponentHand ??= new();
+        playerHand ??= new(this);
+        opponentHand ??= new(this);
     }
 
     private void InitializeBoards()
@@ -76,12 +76,10 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         int boardPixelHeight = playerBoard.GridHeight * playerBoard.CellSize;
 
         // Opponent Hand
-        float handWidth = currentScreenWidth * 0.25f;
-        float handHeight = currentScreenHeight * 0.15f;
-        DrawOpponentHand(zonePadding, handWidth, handHeight, currentScreenWidth, currentScreenHeight);
+        DrawHand(zonePadding, cardWidth, cardHeight, false);
 
         // Player Hand
-        DrawPlayerHand(zonePadding, handWidth, handHeight, currentScreenWidth, currentScreenHeight);
+        DrawHand(zonePadding, cardWidth, cardHeight, true);
 
         // Draw Timer
         float timerX = zonePadding;
@@ -141,20 +139,13 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     }
 
     // Update helper methods to accept screen dimensions
-    private void DrawPlayerHand(float zonePadding, float handWidth, float handHeight, int currentScreenWidth, int currentScreenHeight)
+    private void DrawHand(float zonePadding, int cardWidth, int cardHeight, bool playerHand)
     {
-        Rectangle playerHandZone = new(currentScreenWidth - handWidth - zonePadding, currentScreenHeight - handHeight - zonePadding, handWidth, handHeight);
-        Raylib.DrawRectangleRec(playerHandZone, Color.LightGray);
-        Raylib.DrawRectangleLinesEx(playerHandZone, 2, Color.DarkGray);
-        Raylib.DrawText("Player Hand", (int)(playerHandZone.X + 10), (int)(playerHandZone.Y + 10), 10, Color.Black);
-    }
-
-    private void DrawOpponentHand(float zonePadding, float handWidth, float handHeight, int currentScreenWidth, int currentScreenHeight)
-    {
-        Rectangle opponentHandZone = new(currentScreenWidth - handWidth - zonePadding, zonePadding, handWidth, handHeight);
-        Raylib.DrawRectangleRec(opponentHandZone, Color.LightGray);
-        Raylib.DrawRectangleLinesEx(opponentHandZone, 2, Color.DarkGray);
-        Raylib.DrawText("Opponent Hand", (int)(opponentHandZone.X + 10), (int)(opponentHandZone.Y + 10), 10, Color.Black);
+        if(playerHand){
+            this.playerHand?.DrawAsPlayerHand(zonePadding, cardWidth, cardHeight);
+        } else {
+            opponentHand?.DrawAsOpponentHand(zonePadding, cardWidth, cardHeight);
+        }
     }
 
     // Update DrawGraveyard signature to accept local cardWidth/Height
@@ -170,14 +161,14 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         Raylib.DrawText("Graveyard", (int)outerZone.X + lineThickness, (int)outerZone.Y + lineThickness, 10, Color.White);
     }
 
-    internal void UpdateScreenSize(int width, int height)
+    public void UpdateScreenSize(int width, int height)
     {
         screenWidth = width;
         screenHeight = height;
         Initialize();
     }
 
-    internal void Reset()
+    public void Reset()
     {
         if(playerBoard is null || opponentBoard is null){
             InitializeBoards();
@@ -185,7 +176,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
             playerBoard = new(playerBoard.GridWidth, playerBoard.GridHeight, playerBoard.CellSize, playerBoard.Position);
             opponentBoard = new(opponentBoard.GridWidth, opponentBoard.GridHeight, opponentBoard.CellSize, opponentBoard.Position);
         }
-        playerHand = new();
-        opponentHand = new();
+        playerHand = new(this);
+        opponentHand = new(this);
     }
 }

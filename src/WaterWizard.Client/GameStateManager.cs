@@ -37,8 +37,8 @@ namespace WaterWizard.Client
         }
 
         private GameState currentState = GameState.MainMenu;
-        private int screenWidth;
-        private int screenHeight;
+        public int screenWidth;
+        public int screenHeight;
         private string inputText = "localhost"; // Default
         private bool isEditingIp = false;
 
