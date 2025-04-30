@@ -36,7 +36,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          config-file: ./.github/workflows/codeql-config.yml
+          config-file: .github/codeql/codeql.yml
 
       - name: Build with NUKE (required by CodeQL)
         run: ./build.sh Compile
@@ -45,4 +45,3 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: '/language:${{ matrix.language }}'
-          severity: 'warning'
