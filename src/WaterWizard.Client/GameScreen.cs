@@ -10,16 +10,39 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     public GameBoard? playerBoard, opponentBoard;
     public GameHand? playerHand, opponentHand;
 
+    public int cardWidth;
+    public int cardHeight;
+    public float ZonePadding; 
+
+    /// <summary>
+    /// Initialize all elements rendered on the GameScreen:
+    ///  the two Boards, Cardhands and Cardstacks as well as the //TODO: Graveyard and GameTimer
+    /// </summary>
     public void Initialize()
     {
+        cardWidth = (int)Math.Round(screenWidth * (1 / 12f));
+        cardHeight = (int)Math.Round(screenHeight * (7 / 45f));
+        ZonePadding = screenWidth * 0.02f;
         InitializeHands();
         InitializeBoards();
     }
 
+    /// <summary>
+    /// Initializes the Hands of Cards of both the Player and the opponent, 
+    /// assigning the central position that the GameHand will be rendered around.
+    /// </summary>
     private void InitializeHands()
     {
-        playerHand ??= new(this);
-        opponentHand ??= new(this);
+        float handWidth = screenWidth * 0.25f;
+        float handHeight = screenHeight * 0.15f;
+
+        int centralPlayerX = (int)(screenWidth - handWidth / 2 - ZonePadding);
+        int centralPlayerY = (int)(screenHeight - handHeight / 2 - ZonePadding);
+        int centralOpponentX = (int)(screenWidth - handWidth / 2 - ZonePadding);
+        int centralOpponentY = (int)ZonePadding;
+
+        playerHand = new(this, centralPlayerX, centralPlayerY);
+        opponentHand = new(this, centralOpponentX, centralOpponentY);
     }
 
     private void InitializeBoards()
@@ -69,20 +92,20 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
 
         // Calculate dynamic layout values inside Draw
-        int cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f)); 
-        int cardHeight = (int)Math.Round(currentScreenHeight * (7 / 45f)); 
-        float zonePadding = currentScreenWidth * 0.02f;
+        int cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));
+        int cardHeight = (int)Math.Round(currentScreenHeight * (7 / 45f));
+        ZonePadding = currentScreenWidth * 0.02f;
         int boardPixelWidth = playerBoard.GridWidth * playerBoard.CellSize;
         int boardPixelHeight = playerBoard.GridHeight * playerBoard.CellSize;
 
         // Opponent Hand
-        DrawHand(zonePadding, cardWidth, cardHeight, false);
+        DrawHand(false);
 
         // Player Hand
-        DrawHand(zonePadding, cardWidth, cardHeight, true);
+        DrawHand(true);
 
         // Draw Timer
-        float timerX = zonePadding;
+        float timerX = ZonePadding;
         float timerY = (currentScreenHeight / 2f) - 10;
         gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
 
@@ -92,7 +115,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         float outerBufferHeight = cardHeight * 0.1f;
         float graveyardWidth = cardWidth + outerBufferWidth * 2;
         float graveyardHeight = cardHeight + outerBufferHeight * 2;
-        float graveyardX = zonePadding * 2 + GameTimer.MaxTextWidth(20);
+        float graveyardX = ZonePadding * 2 + GameTimer.MaxTextWidth(20);
         float graveyardY = (currentScreenHeight - graveyardHeight) / 2f;
         DrawGraveyard(graveyardWidth, graveyardHeight, graveyardX, graveyardY, cardWidth, cardHeight, outerBufferWidth, outerBufferHeight);
 
@@ -126,7 +149,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         // Draw Back Button
         int backButtonWidth = 100;
         int backButtonHeight = 30;
-        Rectangle backButton = new Rectangle(zonePadding, currentScreenHeight - backButtonHeight - zonePadding, backButtonWidth, backButtonHeight);
+        Rectangle backButton = new Rectangle(ZonePadding, currentScreenHeight - backButtonHeight - ZonePadding, backButtonWidth, backButtonHeight);
         bool hoverBack = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton);
         Raylib.DrawRectangleRec(backButton, hoverBack ? Color.DarkGray : Color.Gray);
         Raylib.DrawText("Back", (int)backButton.X + 30, (int)backButton.Y + 5, 20, Color.White);
@@ -139,12 +162,15 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     }
 
     // Update helper methods to accept screen dimensions
-    private void DrawHand(float zonePadding, int cardWidth, int cardHeight, bool playerHand)
+    private void DrawHand(bool playerHand)
     {
-        if(playerHand){
-            this.playerHand?.DrawAsPlayerHand(zonePadding, cardWidth, cardHeight);
-        } else {
-            opponentHand?.DrawAsOpponentHand(zonePadding, cardWidth, cardHeight);
+        if (playerHand)
+        {
+            this.playerHand?.DrawAsPlayerHand();
+        }
+        else
+        {
+            opponentHand?.DrawAsOpponentHand();
         }
     }
 
@@ -170,13 +196,15 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
     public void Reset()
     {
-        if(playerBoard is null || opponentBoard is null){
+        if (playerBoard is null || opponentBoard is null)
+        {
             InitializeBoards();
-        }else{
+        }
+        else
+        {
             playerBoard = new(playerBoard.GridWidth, playerBoard.GridHeight, playerBoard.CellSize, playerBoard.Position);
             opponentBoard = new(opponentBoard.GridWidth, opponentBoard.GridHeight, opponentBoard.CellSize, opponentBoard.Position);
         }
-        playerHand = new(this);
-        opponentHand = new(this);
+        InitializeHands();
     }
 }
