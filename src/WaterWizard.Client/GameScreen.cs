@@ -3,9 +3,62 @@ using Raylib_cs;
 
 namespace WaterWizard.Client;
 
-public class GameScreen(GameStateManager gameStateManager, GameBoard? playerBoard, GameBoard? opponentBoard, GameTimer gameTimer)
+public class GameScreen(GameStateManager gameStateManager, int screenWidth, int screenHeight, GameTimer gameTimer)
 {
     readonly GameStateManager _gameStateManager = gameStateManager;
+
+    public GameBoard? playerBoard, opponentBoard;
+    public GameHand? playerHand, opponentHand;
+
+    public void Initialize()
+    {
+        InitializeHands();
+        InitializeBoards();
+    }
+
+    private void InitializeHands()
+    {
+        playerHand ??= new();
+        opponentHand ??= new();
+    }
+
+    private void InitializeBoards()
+    {
+        //12x10 Board
+        int boardWidth = 12;
+        int boardHeight = 10;
+        float boardRatio = boardWidth / (float)boardHeight;
+        int boardPixelHeight = (int)Math.Round(screenHeight * 0.495f);
+        int boardPixelWidth = (int)Math.Round(boardRatio * boardPixelHeight);
+
+        //dynamic Pixels per Cell based on Screensize
+        int cellSize = boardPixelHeight / boardHeight;
+
+        int opponentBoardY = 0;
+        int opponentBoardX = (screenWidth - boardPixelWidth) / 2;
+        Vector2 opponentBoardPos = new(opponentBoardX, opponentBoardY);
+
+        int playerBoardY = screenHeight - boardPixelHeight;
+        int playerBoardX = opponentBoardX;
+        Vector2 playerBoardPos = new(playerBoardX, playerBoardY);
+
+        if (playerBoard == null || opponentBoard == null)
+        {
+            playerBoard = new GameBoard(boardWidth, boardHeight, cellSize, playerBoardPos);
+            opponentBoard = new GameBoard(boardWidth, boardHeight, cellSize, opponentBoardPos);
+        }
+        else
+        {
+            playerBoard.Position = playerBoardPos;
+            playerBoard.CellSize = cellSize;
+            playerBoard.GridWidth = boardWidth;
+            playerBoard.GridHeight = boardHeight;
+            opponentBoard.Position = opponentBoardPos;
+            opponentBoard.CellSize = cellSize;
+            opponentBoard.GridWidth = boardWidth;
+            opponentBoard.GridHeight = boardHeight;
+        }
+    }
 
     public void Draw(int currentScreenWidth, int currentScreenHeight)
     {
@@ -29,18 +82,18 @@ public class GameScreen(GameStateManager gameStateManager, GameBoard? playerBoar
 
         // Player Hand
         DrawPlayerHand(zonePadding, handWidth, handHeight, currentScreenWidth, currentScreenHeight);
-        
+
         // Draw Timer
         float timerX = zonePadding;
-        float timerY = (currentScreenHeight / 2f) - 10; 
+        float timerY = (currentScreenHeight / 2f) - 10;
         gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
-        
+
 
         // Graveyard Area - Use current dimensions for calculation
-        float outerBufferWidth = cardWidth * 0.1f; 
-        float outerBufferHeight = cardHeight * 0.1f; 
-        float graveyardWidth = cardWidth + outerBufferWidth * 2; 
-        float graveyardHeight = cardHeight + outerBufferHeight * 2; 
+        float outerBufferWidth = cardWidth * 0.1f;
+        float outerBufferHeight = cardHeight * 0.1f;
+        float graveyardWidth = cardWidth + outerBufferWidth * 2;
+        float graveyardHeight = cardHeight + outerBufferHeight * 2;
         float graveyardX = zonePadding * 2 + GameTimer.MaxTextWidth(20);
         float graveyardY = (currentScreenHeight - graveyardHeight) / 2f;
         DrawGraveyard(graveyardWidth, graveyardHeight, graveyardX, graveyardY, cardWidth, cardHeight, outerBufferWidth, outerBufferHeight);
@@ -115,5 +168,24 @@ public class GameScreen(GameStateManager gameStateManager, GameBoard? playerBoar
         Raylib.DrawRectangleLinesEx(outerZone, 2, Color.Black);
         Raylib.DrawRectangleRec(cardZone, Color.LightGray);
         Raylib.DrawText("Graveyard", (int)outerZone.X + lineThickness, (int)outerZone.Y + lineThickness, 10, Color.White);
+    }
+
+    internal void UpdateScreenSize(int width, int height)
+    {
+        screenWidth = width;
+        screenHeight = height;
+        Initialize();
+    }
+
+    internal void Reset()
+    {
+        if(playerBoard is null || opponentBoard is null){
+            InitializeBoards();
+        }else{
+            playerBoard = new(playerBoard.GridWidth, playerBoard.GridHeight, playerBoard.CellSize, playerBoard.Position);
+            opponentBoard = new(opponentBoard.GridWidth, opponentBoard.GridHeight, opponentBoard.CellSize, opponentBoard.Position);
+        }
+        playerHand = new();
+        opponentHand = new();
     }
 }
