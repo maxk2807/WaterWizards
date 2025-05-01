@@ -32,7 +32,6 @@ static class Program
             try
             {
                 {
-
                     if (!server.Start(7777))
                     {
                         Log("Server konnte nicht auf Port 7777 gestartet werden!");
@@ -43,11 +42,13 @@ static class Program
                         string localIp = NetworkUtils.GetLocalIPAddress();
                         string publicIp = NetworkUtils.GetPublicIPAddress();
                         Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
-                        Console.WriteLine($"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
+                        Console.WriteLine(
+                            $"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
                         Console.WriteLine($"localIp: {localIp}:7777");
                         Console.WriteLine("Drücke ESC zum Beenden");
 
-                        listener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader, msgType) =>
+                        listener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader,
+                                                                    msgType) =>
                         {
                             try
                             {
@@ -121,45 +122,57 @@ static class Program
                             Log($"[Server] Netzwerkfehler von {endPoint}: {error}");
                         };
 
-                        listener.NetworkReceiveEvent += (peer, reader, channelNumber, deliveryMethod) =>
+                        listener.NetworkReceiveEvent += (peer, reader, channelNumber,
+                                                         deliveryMethod) =>
                         {
                             try
                             {
-                                string message = reader.GetString();
-                                Log($"[Server] Nachricht von Client {peer} (Kanal: {channelNumber}, Methode: {deliveryMethod}): {message}");
+                                string messageType = reader.GetString();
+                                Log($"[Server] Nachricht von Client {peer} (Kanal: {channelNumber}, Methode: {deliveryMethod}): {messageType}");  // Use EndPoint
 
-                                if (message == "PlayerReady" || message == "PlayerNotReady")
+                                switch (messageType)
                                 {
-                                    string playerAddress = peer.ToString();
+                                    case "PlayerReady":
+                                    case "PlayerNotReady":
+                                        string playerAddress = peer.ToString();
+                                        if (ConnectedPlayers.ContainsKey(playerAddress))
+                                        {
+                                            ConnectedPlayers[playerAddress] =
+                                                (messageType == "PlayerReady");
+                                            Log($"[Server] Player {playerAddress} status set to {(messageType == "PlayerReady")}");
+                                            SendPlayerList(server);
+                                            Log($"[Server] Spielerliste nach Ready/NotReady-Status Änderung gesendet.");
+                                        }
+                                        else
+                                        {
+                                            Log($"[Server] ERROR: Player {playerAddress} not found in dictionary!");
+                                        }
 
-                                    if (ConnectedPlayers.ContainsKey(playerAddress))
-                                    {
-                                        ConnectedPlayers[playerAddress] = (message == "PlayerReady");
-                                        Log($"[Server] Player {playerAddress} status set to {(message == "PlayerReady")}");
+                                        bool allReady = ConnectedPlayers.Values.All(ready => ready);
+                                        if (allReady && ConnectedPlayers.Count > 0 &&
+                                            _gameSessionTimer != null &&
+                                            !_gameSessionTimer.IsRunning)
+                                        {
+                                            var startWriter = new NetDataWriter();
+                                            startWriter.Put("StartGame");
+                                            BroadcastMessage(server, startWriter,
+                                                             DeliveryMethod.ReliableOrdered);
+                                            Log("[Server] Alle Spieler bereit. Spiel wird gestartet!");
+                                            _gameSessionTimer.Start();
+                                            Log("[Server] GameSessionTimer gestartet.");
+                                        }
+                                        break;
 
-                                        SendPlayerList(server);
+                                    case "ChatMessage":
+                                        string chatMsg = reader.GetString();
+                                        string senderIdentifier = $"Player_{peer.Port}";
+                                        Log($"[Server] Chat von {senderIdentifier}: {chatMsg}");
+                                        BroadcastChatMessage(server, senderIdentifier, chatMsg);
+                                        break;
 
-                                        Log($"[Server] Spielerliste nach Ready/NotReady-Status Änderung gesendet.");
-                                    }
-                                    else
-                                    {
-                                        Log($"[Server] ERROR: Player {playerAddress} not found in dictionary!");
-                                    }
-                                    bool allReady = ConnectedPlayers.Values.All(ready => ready);
-
-                                    if (allReady && ConnectedPlayers.Count > 0 && _gameSessionTimer != null && !_gameSessionTimer.IsRunning)
-                                    {
-                                        var writer = new NetDataWriter();
-                                        writer.Put("StartGame");
-                                        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
-                                        Log("[Server] Alle Spieler bereit. Spiel wird gestartet!");
-
-
-                                        Log("Alle Spieler bereit. Spiel wird gestartet!");
-                                        _gameSessionTimer.Start();
-                                        Log("[Server] GameSessionTimer gestartet.");
-
-                                    }
+                                    default:
+                                        Log($"[Server] Unbekannter Nachrichtentyp empfangen: {messageType}");
+                                        break;
                                 }
                             }
                             catch (Exception ex)
@@ -202,10 +215,11 @@ static class Program
         }
     }
 
-
-    private static void BroadcastMessage(NetManager? server, NetDataWriter writer, DeliveryMethod deliveryMethod)
+    private static void BroadcastMessage(NetManager? server, NetDataWriter writer,
+                                         DeliveryMethod deliveryMethod)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
         foreach (var connectedPeer in server.ConnectedPeerList)
         {
             connectedPeer.Send(writer, deliveryMethod);
@@ -214,20 +228,40 @@ static class Program
 
     private static void SendPlayerList(NetManager? server)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
         var writer = new NetDataWriter();
         writer.Put("PlayerList");
         writer.Put(ConnectedPlayers.Count);
 
         foreach (var kvp in ConnectedPlayers)
         {
-            writer.Put(kvp.Key); // Address (EndPoint string)
-            writer.Put($"Player_{kvp.Key.Split(':').LastOrDefault() ?? kvp.Key}"); // Basic name generation
-            writer.Put(kvp.Value); // IsReady
+            writer.Put(kvp.Key);
+            writer.Put($"Player_{kvp.Key.Split(':').LastOrDefault() ?? kvp.Key}");
+            writer.Put(kvp.Value);
         }
 
-        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered); // Use helper
+        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
 
         Log($"[Server] Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet");
+    }
+
+    private static void BroadcastChatMessage(NetManager? server, string sender,
+                                             string message)
+    {
+        if (server == null)
+            return;
+
+        var writer = new NetDataWriter();
+        writer.Put("ChatMessage");
+        writer.Put(sender);
+        writer.Put(message);
+
+        Log($"[Server] Sende Chat-Nachricht an alle: [{sender}] {message}");
+
+        foreach (var connectedPeer in server.ConnectedPeerList)
+        {
+            connectedPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
     }
 }

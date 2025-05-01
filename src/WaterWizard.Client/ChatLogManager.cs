@@ -1,0 +1,122 @@
+using Raylib_cs;
+
+
+namespace WaterWizard.Client;
+
+public class ChatLogManager
+{
+    private readonly List<string> _messages = new List<string>();
+    private readonly int _maxMessages = 100;
+    private string _currentInput = "";
+    private bool _isTyping = false;
+    private Rectangle _chatArea;
+    private Rectangle _inputArea;
+    private float _scrollOffset = 0;
+    private readonly int _lineHeight = 18;
+
+    public void AddMessage(string message)
+    {
+        string timestamp = DateTime.Now.ToString("HH:mm:ss");
+        _messages.Add($"[{timestamp}] {message}");
+        _messages.Add(message);
+
+        if (_messages.Count > _maxMessages)
+        {
+            _messages.RemoveAt(0);
+        }
+        _scrollOffset = Math.Max(0, (_messages.Count * _lineHeight) - _chatArea.Height);
+    }
+
+    public void HandleInput()
+    {
+        if (_isTyping)
+        {
+            int key = Raylib.GetCharPressed();
+            while (key > 0)
+            {
+                if ((key >= 32 && key <= 126) && _currentInput.Length < 100)
+                {
+                    _currentInput += (char)key;
+                }
+                key = Raylib.GetCharPressed();
+            }
+
+            if (Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && _currentInput.Length > 0)
+            {
+                _currentInput = _currentInput[..^1];
+            }
+
+            if (Raylib.IsKeyPressed(KeyboardKey.Enter))
+            {
+                if (!string.IsNullOrWhiteSpace(_currentInput))
+                {
+                    NetworkManager.Instance.SendChatMessage(_currentInput);
+                    _currentInput = "";
+                }
+                _isTyping = false;
+            }
+
+            if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+            {
+                _isTyping = false;
+            }
+        }
+        else
+        {
+            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _inputArea) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            {
+                _isTyping = true;
+            }
+        }
+
+        float wheelMove = Raylib.GetMouseWheelMove();
+        if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _chatArea) && wheelMove != 0)
+        {
+            _scrollOffset -= wheelMove * _lineHeight * 3;
+            _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, (_messages.Count * _lineHeight) - _chatArea.Height));
+        }
+    }
+
+    public void Draw(int screenWidth, int screenHeight)
+    {
+        float chatHeight = screenHeight * 0.4f;
+        float inputHeight = 30f;
+        float chatWidth = screenWidth * 0.3f;
+        float chatX = screenWidth - chatWidth - 20;
+        float chatY = (screenHeight - chatHeight - inputHeight - 10) / 2;
+
+        _chatArea = new Rectangle(chatX, chatY, chatWidth, chatHeight);
+        _inputArea = new Rectangle(chatX, chatY + chatHeight + 10, chatWidth, inputHeight);
+
+        Raylib.DrawRectangleRec(_chatArea, new Color(245, 245, 245, 220));
+        Raylib.DrawRectangleLinesEx(_chatArea, 1, Color.DarkGray);
+
+        Raylib.BeginScissorMode((int)_chatArea.X, (int)_chatArea.Y, (int)_chatArea.Width, (int)_chatArea.Height);
+
+        int startY = (int)(_chatArea.Y - _scrollOffset + 5);
+        for (int i = 0; i < _messages.Count; i++)
+        {
+            int currentY = startY + i * _lineHeight;
+            if (currentY + _lineHeight > _chatArea.Y && currentY < _chatArea.Y + _chatArea.Height)
+            {
+                Raylib.DrawText(_messages[i], (int)_chatArea.X + 5, currentY, 16, Color.Black);
+            }
+        }
+
+        Raylib.EndScissorMode();
+
+        Raylib.DrawRectangleRec(_inputArea, Color.White);
+        Raylib.DrawRectangleLinesEx(_inputArea, 1, _isTyping ? Color.Blue : Color.DarkGray);
+        Raylib.DrawText(_currentInput, (int)_inputArea.X + 5, (int)_inputArea.Y + 7, 16, Color.Black);
+
+        if (_isTyping && (int)(Raylib.GetTime() * 2) % 2 == 0)
+        {
+            int textWidth = Raylib.MeasureText(_currentInput, 16);
+            Raylib.DrawText("|", (int)_inputArea.X + 5 + textWidth, (int)_inputArea.Y + 7, 16, Color.Black);
+        }
+        else if (!_isTyping && string.IsNullOrWhiteSpace(_currentInput))
+        {
+            Raylib.DrawText("Click here to type...", (int)_inputArea.X + 5, (int)_inputArea.Y + 7, 16, Color.Gray);
+        }
+    }
+}
