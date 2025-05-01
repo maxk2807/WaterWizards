@@ -24,7 +24,7 @@ public class ChatLogManager
         {
             _messages.RemoveAt(0);
         }
-        _scrollOffset = Math.Max(0, (_messages.Count * _lineHeight) - _chatArea.Height);
+        _scrollOffset = Math.Max(0, (_messages.Count * (float)_lineHeight) - _chatArea.Height);
     }
 
     public void HandleInput()
@@ -70,10 +70,11 @@ public class ChatLogManager
         }
 
         float wheelMove = Raylib.GetMouseWheelMove();
-        if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _chatArea) && wheelMove != 0)
+        float epsilon = 0.0001f;
+        if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _chatArea) && Math.Abs(wheelMove) > epsilon)
         {
             _scrollOffset -= wheelMove * _lineHeight * 3;
-            _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, (_messages.Count * _lineHeight) - _chatArea.Height));
+            _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, (_messages.Count * (float)_lineHeight) - _chatArea.Height));
         }
     }
 
