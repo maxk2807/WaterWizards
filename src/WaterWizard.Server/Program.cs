@@ -8,9 +8,14 @@ static class Program
 {
     private static readonly Dictionary<string, bool> ConnectedPlayers = [];
     private static GameSessionTimer? _gameSessionTimer;
+
+    private static void Log(string message)
+    {
+        Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {message}");
+    }
     static void Main()
     {
-        Console.WriteLine("WaterWizards Server wird gestartet...");
+        Log("WaterWizards Server wird gestartet...");
 
         var listener = new EventBasedNetListener();
         var server = new NetManager(listener)
@@ -21,182 +26,201 @@ static class Program
 
         _gameSessionTimer = new GameSessionTimer(server);
 
-        if (!server.Start(7777))
+        try
         {
-            Console.WriteLine("Server konnte nicht auf Port 7777 gestartet werden!");
-            _gameSessionTimer?.Dispose();
-            return;
-        }
-
-        string localIp = NetworkUtils.GetLocalIPAddress();
-        string publicIp = NetworkUtils.GetPublicIPAddress();
-        Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
-        Console.WriteLine($"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
-        Console.WriteLine($"localIp: {localIp}:7777");
-        Console.WriteLine("Drücke ESC zum Beenden");
-
-        listener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader, msgType) =>
-        {
-            try
+            if (!server.Start(7777))
             {
-                string message = reader.GetString();
-                Console.WriteLine($"Unconnected message: {message} from {remoteEndPoint}");
+                Log("Server konnte nicht auf Port 7777 gestartet werden!");
+                return;
+            }
+            else
+            {
+                string localIp = NetworkUtils.GetLocalIPAddress();
+                string publicIp = NetworkUtils.GetPublicIPAddress();
+                Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
+                Console.WriteLine($"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
+                Console.WriteLine($"localIp: {localIp}:7777");
+                Console.WriteLine("Drücke ESC zum Beenden");
 
-                if (message == "DiscoverLobbies")
+                listener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader, msgType) =>
                 {
-                    var response = new NetDataWriter();
-                    response.Put("LobbyInfo");
-                    response.Put("WaterWizards Server");
-                    response.Put(ConnectedPlayers.Count);
-                    server.SendUnconnectedMessage(response, remoteEndPoint);
-                    Console.WriteLine($"Sent lobby info to {remoteEndPoint}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing discovery: {ex.Message}");
-            }
-        };
-
-        listener.ConnectionRequestEvent += request =>
-        {
-            request.Accept();
-            Console.WriteLine($"Client verbunden (ohne Schlüssel): {request.RemoteEndPoint}");
-        };
-
-        listener.PeerConnectedEvent += peer =>
-        {
-            Console.WriteLine($"Client {peer} verbunden");
-
-            string playerAddress = peer.ToString();
-            ConnectedPlayers.TryAdd(playerAddress, false);
-
-            var writer = new NetDataWriter();
-            writer.Put("EnterLobby");
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
-
-            if (_gameSessionTimer != null && _gameSessionTimer.IsRunning)
-            {
-                _gameSessionTimer.SendCurrentTimeToPeer(peer);
-            }
-
-            SendPlayerList(server);
-        };
-
-        listener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
-        {
-            Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
-
-            var playerAddress = peer.ToString();
-
-            ConnectedPlayers.Remove(playerAddress);
-
-            SendPlayerList(server);
-        };
-
-        listener.NetworkErrorEvent += (endPoint, error) =>
-        {
-            Console.WriteLine($"Netzwerkfehler von {endPoint}: {error}");
-        };
-
-        listener.NetworkReceiveEvent += (peer, reader, channelNumber, deliveryMethod) =>
-        {
-            try
-            {
-                string message = reader.GetString();
-                Console.WriteLine($"Nachricht von Client {peer} (Kanal: {channelNumber}, Methode: {deliveryMethod}): {message}");
-
-                if (message == "PlayerReady" || message == "PlayerNotReady")
-                {
-                    string playerAddress = peer.ToString();
-
-                    if (ConnectedPlayers.ContainsKey(playerAddress))
+                    try
                     {
-                        ConnectedPlayers[playerAddress] = (message == "PlayerReady");
+                        string message = reader.GetString();
+                        Log($"[Server] Unconnected message: {message} from {remoteEndPoint}");
 
-                        SendPlayerList(server);
-
-                        Console.WriteLine($"Spielerliste nach Ready/NotReady-Status Änderung gesendet.");
-                    }
-                    bool allReady = true;
-                    foreach (var ready in ConnectedPlayers.Values)
-                    {
-                        if (!ready)
+                        if (message == "DiscoverLobbies")
                         {
-                            allReady = false;
-                            break;
+                            var response = new NetDataWriter();
+                            response.Put("LobbyInfo");
+                            response.Put("WaterWizards Server");
+                            response.Put(ConnectedPlayers.Count);
+                            server?.SendUnconnectedMessage(response, remoteEndPoint);
+                            Log($"[Server] Sent lobby info to {remoteEndPoint}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"[Server] Error processing discovery: {ex.Message}");
+                    }
+                };
+
+                listener.ConnectionRequestEvent += request =>
+                {
+                    request.Accept();
+                    Log($"[Server] Client verbunden (ohne Schlüssel): {request.RemoteEndPoint}");
+                };
+
+                listener.PeerConnectedEvent += peer =>
+                {
+                    Log($"[Server] Client {peer} verbunden");
+
+                    string playerAddress = peer.ToString();
+                    ConnectedPlayers.TryAdd(playerAddress, false);
+
+                    var writer = new NetDataWriter();
+                    writer.Put("EnterLobby");
+                    peer.Send(writer, DeliveryMethod.ReliableOrdered);
+
+                    if (_gameSessionTimer != null && _gameSessionTimer.IsRunning)
+                    {
+                        _gameSessionTimer.SendCurrentTimeToPeer(peer);
+                    }
+
+                    SendPlayerList(server);
+                };
+
+                listener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
+                {
+                    Log($"[Server] Client {peer} getrennt: {disconnectInfo.Reason}");
+
+                    var playerAddress = peer.ToString();
+
+                    ConnectedPlayers.Remove(playerAddress);
+
+                    if (ConnectedPlayers.Count == 0)
+                    {
+                        Log("[Server] Letzter Spieler hat die Verbindung getrennt.");
+                        if (_gameSessionTimer != null && _gameSessionTimer.IsRunning)
+                        {
+                            Log("[Server] Stoppe den Spiel-Timer.");
+                            _gameSessionTimer.Stop();
                         }
                     }
 
-                    if (allReady && ConnectedPlayers.Count > 0 && _gameSessionTimer != null && !_gameSessionTimer.IsRunning) // Check if timer not already running
+                    SendPlayerList(server);
+                };
+
+                listener.NetworkErrorEvent += (endPoint, error) =>
+                {
+                    Log($"[Server] Netzwerkfehler von {endPoint}: {error}");
+                };
+
+                listener.NetworkReceiveEvent += (peer, reader, channelNumber, deliveryMethod) =>
+                {
+                    try
                     {
-                        var writer = new NetDataWriter();
-                        writer.Put("StartGame");
-                        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
+                        string message = reader.GetString();
+                        Log($"[Server] Nachricht von Client {peer} (Kanal: {channelNumber}, Methode: {deliveryMethod}): {message}");
+
+                        if (message == "PlayerReady" || message == "PlayerNotReady")
+                        {
+                            string playerAddress = peer.ToString();
+
+                            if (ConnectedPlayers.ContainsKey(playerAddress))
+                            {
+                                ConnectedPlayers[playerAddress] = (message == "PlayerReady");
+                                Log($"[Server] Player {playerAddress} status set to {(message == "PlayerReady")}");
+
+                                SendPlayerList(server);
+
+                                Log($"[Server] Spielerliste nach Ready/NotReady-Status Änderung gesendet.");
+                            }
+                            else
+                            {
+                                Log($"[Server] ERROR: Player {playerAddress} not found in dictionary!");
+                            }
+                            bool allReady = ConnectedPlayers.Values.All(ready => ready);
+
+                            if (allReady && ConnectedPlayers.Count > 0 && _gameSessionTimer != null && !_gameSessionTimer.IsRunning)
+                            {
+                                var writer = new NetDataWriter();
+                                writer.Put("StartGame");
+                                BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
+                                Log("[Server] Alle Spieler bereit. Spiel wird gestartet!");
 
 
-                        Console.WriteLine("Alle Spieler bereit. Spiel wird gestartet!");
-                        _gameSessionTimer.Start();
+                                Log("Alle Spieler bereit. Spiel wird gestartet!");
+                                _gameSessionTimer.Start();
+                                Log("[Server] GameSessionTimer gestartet.");
 
+                            }
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        Log($"[Server] Fehler beim Verarbeiten der Nachricht: {ex.Message}");
+                    }
+                    finally
+                    {
+                        reader.Recycle();
+                    }
+                };
+
+                while (true)
+                {
+                    if (Console.KeyAvailable)
+                    {
+                        var key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                            break;
+                    }
+
+                    server?.PollEvents();
+                    Thread.Sleep(15);
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fehler beim Verarbeiten der Nachricht: {ex.Message}");
-            }
-            finally
-            {
-                reader.Recycle();
-            }
-        };
-
-        while (true)
-        {
-            if (Console.KeyAvailable)
-            {
-                var key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.Escape)
-                    break;
-            }
-
-            server.PollEvents();
-            Thread.Sleep(15);
         }
-        _gameSessionTimer?.Dispose();
-        Console.WriteLine("Server wird beendet...");
-
-        server.Stop();
-        Console.WriteLine("Server beendet");
+        catch (Exception ex)
+        {
+            Log($"[Server] FATAL ERROR: {ex.Message}");
+            Log(ex.StackTrace ?? "No stack trace available.");
+        }
+        finally
+        {
+            Log("Server wird beendet...");
+            _gameSessionTimer?.Dispose();
+            server?.Stop();
+            Log("Server beendet");
+        }
     }
 
-    private static void BroadcastMessage(NetManager server, NetDataWriter writer, DeliveryMethod deliveryMethod)
+
+    private static void BroadcastMessage(NetManager? server, NetDataWriter writer, DeliveryMethod deliveryMethod)
     {
+        if (server == null) return;
         foreach (var connectedPeer in server.ConnectedPeerList)
         {
             connectedPeer.Send(writer, deliveryMethod);
         }
     }
 
-    private static void SendPlayerList(NetManager server)
+    private static void SendPlayerList(NetManager? server)
     {
+        if (server == null) return;
         var writer = new NetDataWriter();
         writer.Put("PlayerList");
         writer.Put(ConnectedPlayers.Count);
 
         foreach (var kvp in ConnectedPlayers)
         {
-            writer.Put(kvp.Key);
-            writer.Put("Player");
-            writer.Put(kvp.Value);
+            writer.Put(kvp.Key); // Address (EndPoint string)
+            writer.Put($"Player_{kvp.Key.Split(':').LastOrDefault() ?? kvp.Key}"); // Basic name generation
+            writer.Put(kvp.Value); // IsReady
         }
 
-        foreach (var peer in server.ConnectedPeerList)
-        {
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        }
+        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered); // Use helper
 
-        Console.WriteLine($"Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet");
+        Log($"[Server] Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet");
     }
 }
-
