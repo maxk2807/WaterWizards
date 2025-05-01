@@ -3,8 +3,8 @@ version: '3.8'
 services:
   waterwizard-server:
     build:
-      context: ./src/WaterWizard.Server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./src/WaterWizard.Server/Dockerfile
     ports:
       - "7777:7777"
     restart: unless-stopped
