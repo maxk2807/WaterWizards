@@ -1,9 +1,5 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
@@ -11,7 +7,7 @@ namespace WaterWizard.Server;
 static class Program
 {
     private static readonly Dictionary<string, bool> ConnectedPlayers = [];
-
+    private static GameSessionTimer? _gameSessionTimer;
     static void Main()
     {
         Console.WriteLine("WaterWizards Server wird gestartet...");
@@ -23,9 +19,12 @@ static class Program
             UnconnectedMessagesEnabled = true
         };
 
+        _gameSessionTimer = new GameSessionTimer(server);
+
         if (!server.Start(7777))
         {
             Console.WriteLine("Server konnte nicht auf Port 7777 gestartet werden!");
+            _gameSessionTimer?.Dispose();
             return;
         }
 
@@ -76,6 +75,11 @@ static class Program
             writer.Put("EnterLobby");
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
+            if (_gameSessionTimer != null && _gameSessionTimer.IsRunning)
+            {
+                _gameSessionTimer.SendCurrentTimeToPeer(peer);
+            }
+
             SendPlayerList(server);
         };
 
@@ -84,7 +88,7 @@ static class Program
             Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
 
             var playerAddress = peer.ToString();
-            
+
             ConnectedPlayers.Remove(playerAddress);
 
             SendPlayerList(server);
@@ -124,17 +128,16 @@ static class Program
                         }
                     }
 
-                    if (allReady && ConnectedPlayers.Count > 0)
+                    if (allReady && ConnectedPlayers.Count > 0 && _gameSessionTimer != null && !_gameSessionTimer.IsRunning) // Check if timer not already running
                     {
                         var writer = new NetDataWriter();
                         writer.Put("StartGame");
+                        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
 
-                        foreach (var connectedPeer in server.ConnectedPeerList)
-                        {
-                            connectedPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                        }
 
                         Console.WriteLine("Alle Spieler bereit. Spiel wird gestartet!");
+                        _gameSessionTimer.Start();
+
                     }
                 }
             }
@@ -160,9 +163,19 @@ static class Program
             server.PollEvents();
             Thread.Sleep(15);
         }
+        _gameSessionTimer?.Dispose();
+        Console.WriteLine("Server wird beendet...");
 
         server.Stop();
         Console.WriteLine("Server beendet");
+    }
+
+    private static void BroadcastMessage(NetManager server, NetDataWriter writer, DeliveryMethod deliveryMethod)
+    {
+        foreach (var connectedPeer in server.ConnectedPeerList)
+        {
+            connectedPeer.Send(writer, deliveryMethod);
+        }
     }
 
     private static void SendPlayerList(NetManager server)
