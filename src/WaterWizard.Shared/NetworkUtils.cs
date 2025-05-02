@@ -32,12 +32,15 @@ namespace WaterWizard.Shared
         {
             try
             {
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                // Abrufen der �ffentlichen IP-Adresse von einem externen Dienst
+                var response = client.GetStringAsync("https://api.ipify.org").Result;
+                if(response == null)
                 {
-                    // Abrufen der �ffentlichen IP-Adresse von einem externen Dienst
-                    var response = client.GetStringAsync("https://api.ipify.org").Result;
-                    return response;
+                    return "Justin du Nutten";
                 }
+
+                return response;
             }
             catch (Exception ex)
             {
