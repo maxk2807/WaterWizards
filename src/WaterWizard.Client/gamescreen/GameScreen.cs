@@ -9,6 +9,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
     public GameBoard? playerBoard, opponentBoard;
     public GameHand? playerHand, opponentHand;
+    public ActiveCards? activeCards;
 
     public int cardWidth;
     public int cardHeight;
@@ -25,6 +26,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         ZonePadding = screenWidth * 0.02f;
         InitializeHands();
         InitializeBoards();
+        InitializeActiveCards();
     }
 
     /// <summary>
@@ -36,12 +38,12 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         float offsetX = screenWidth * 0.143f;
 
         int centralPlayerX = (int)(screenWidth - ZonePadding - offsetX);
-        int centralPlayerY = (int)(screenHeight - ZonePadding - cardHeight);
+        int playerCardY = (int)(screenHeight - ZonePadding - cardHeight);
         int centralOpponentX = (int)(screenWidth - ZonePadding - offsetX);
-        int centralOpponentY = (int)ZonePadding;
+        int opponentCardY = (int)ZonePadding;
 
-        playerHand = new(this, centralPlayerX, centralPlayerY);
-        opponentHand = new(this, centralOpponentX, centralOpponentY);
+        playerHand = new(this, centralPlayerX, playerCardY);
+        opponentHand = new(this, centralOpponentX, opponentCardY);
     }
 
     /// <summary>
@@ -88,6 +90,11 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
     }
 
+    public void InitializeActiveCards(){
+        activeCards = new(this);
+        activeCards.Initialize();
+    }
+
     /// <summary>
     /// Draws the Boards, Hands (of cards), timer and graveyard based on the size of the screen.
     /// Also Draws other elements for navigation and handles inputs for these and for a rudimentary attack. 
@@ -109,17 +116,13 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         int boardPixelWidth = playerBoard.GridWidth * playerBoard.CellSize;
         int boardPixelHeight = playerBoard.GridHeight * playerBoard.CellSize;
 
-        // Opponent Hand
-        DrawHand(false);
-
-        // Player Hand
-        DrawHand(true);
+        // Draw the (Card) Hands of both opponent and player
+        DrawHands();
 
         // Draw Timer
         float timerX = ZonePadding;
         float timerY = currentScreenHeight / 2f - 10;
         gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
-
 
         // Graveyard Area - Use current dimensions for calculation
         float outerBufferWidth = cardWidth * 0.1f;
@@ -129,6 +132,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         float graveyardX = ZonePadding * 2 + GameTimer.MaxTextWidth(20);
         float graveyardY = (currentScreenHeight - graveyardHeight) / 2f;
         DrawGraveyard(graveyardWidth, graveyardHeight, graveyardX, graveyardY, cardWidth, cardHeight, outerBufferWidth, outerBufferHeight);
+
+        DrawActiveCards();
 
         // Update and Draw Game Boards
         GameBoard.Point? clickedCell = opponentBoard.Update();
@@ -172,17 +177,16 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
     }
 
-    // Update helper methods to accept screen dimensions
-    private void DrawHand(bool playerHand)
+    private void DrawActiveCards()
     {
-        if (playerHand)
-        {
-            this.playerHand?.Draw(false);
-        }
-        else
-        {
-            opponentHand?.Draw(true);
-        }
+        activeCards?.Draw();
+    }
+
+    // Update helper methods to accept screen dimensions
+    private void DrawHands()
+    {
+        playerHand?.Draw(true);
+        opponentHand?.Draw(false);
     }
 
     // Update DrawGraveyard signature to accept local cardWidth/Height

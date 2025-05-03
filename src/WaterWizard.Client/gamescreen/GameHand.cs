@@ -3,13 +3,13 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen;
 
-public class GameHand(GameScreen gameScreen, int centralX, int centralY)
+public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 {
     /// <summary>
     /// Represents the Cards on the given Hand.
     /// </summary>
-    private List<GameCard> _cards = new()
-    {
+    private List<GameCard> _cards =
+    [
         //Beispielkarten
         new(gameScreen, new(CardVariant.ArcaneMissile)),
         new(gameScreen, new(CardVariant.Firebolt)),
@@ -17,25 +17,25 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
         new(gameScreen, new(CardVariant.Storm)),
         new(gameScreen, new(CardVariant.Storm)),
         new(gameScreen, new(CardVariant.Storm)),
-    };
+    ];
 
-    private int _screenWidth => gameScreen._gameStateManager.screenWidth;
-    private int _screenHeight => gameScreen._gameStateManager.screenHeight;
-    private int _cardWidth => gameScreen.cardWidth;
-    private int _cardHeight => gameScreen.cardHeight;
+    private int ScreenWidth => gameScreen._gameStateManager.screenWidth;
+    private int ScreenHeight => gameScreen._gameStateManager.screenHeight;
+    private int CardWidth => gameScreen.cardWidth;
+    private int CardHeight => gameScreen.cardHeight;
 
     /// <summary>
     /// Render the Cards on this GameHand instance. If calling this with isOpponent true, 
     /// the cards take on a different color to signify the back of the cards, and get rendered 
     /// on the side of the opponent.
     /// </summary>
-    /// <param name="isOpponent"></param>
-    public void Draw(bool isOpponent)
+    /// <param name="front"></param>
+    public void Draw(bool front)
     {
         //space available for the cards to draw
-        int availableHandWidth = (int)(_screenWidth * 0.2f);
+        int availableHandWidth = (int)(ScreenWidth * 0.2f);
         //space the cards would take up if side by side
-        int totalCardWidth = _cards.Count * _cardWidth;
+        int totalCardWidth = _cards.Count * CardWidth;
         //difference between these two spaces
         int excess = totalCardWidth - availableHandWidth;
         //calculate based on difference, how much cards need to be compressed
@@ -44,7 +44,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
         {
             int cardX;
             //actual width of rendered cards, after compression
-            int effectiveCardWidth = _cardWidth - offset;
+            int effectiveCardWidth = CardWidth - offset;
 
             // calculate card position based on:
             // are cards even, how many cards, i, how much overlap
@@ -53,11 +53,12 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
                 ? -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
                 : -effectiveCardWidth / 2 - _cards.Count / 2 * effectiveCardWidth + i * effectiveCardWidth;
 
-            _cards[i].Draw(centralX + cardX, centralY, !isOpponent);
+            _cards[i].Draw(centralX + cardX, cardY, front);
 
             //Draw Card Preview if Mouse over card snippet
-            Rectangle cardRec = new(centralX + cardX, centralY, effectiveCardWidth, _cardHeight);
-            if(GameScreen.IsHoveringRec(cardRec)){
+            Rectangle cardRec = new(centralX + cardX, cardY, effectiveCardWidth, CardHeight);
+            if (GameScreen.IsHoveringRec(cardRec))
+            {
                 DrawPreview(_cards[i]);
             }
         }
@@ -69,9 +70,19 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
     /// <param name="card"></param>
     private void DrawPreview(GameCard card)
     {
-        int previewX = centralX - _cardWidth / 2 + (int)(_screenWidth * 0.03f);
-        int previewY = centralY - _cardHeight / 2 - (int)(_screenHeight * 0.12f);
+        int previewX = centralX - CardWidth / 2 + (int)(ScreenWidth * 0.03f);
+        int previewY = cardY - CardHeight / 2 - (int)(ScreenHeight * 0.10f);
 
         card.Draw(previewX, previewY, true);
+    }
+
+    public void AddCard(Cards card)
+    {
+        _cards.Add(new(gameScreen, card));
+    }
+
+    public void EmptyHand()
+    {
+        _cards.Clear();
     }
 }
