@@ -103,8 +103,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
 
         // Calculate dynamic layout values inside Draw
-        int cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));
-        int cardHeight = (int)Math.Round(currentScreenHeight * (7 / 45f));
+        cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));
+        cardHeight = (int)Math.Round(currentScreenHeight * (7 / 45f));
         ZonePadding = currentScreenWidth * 0.02f;
         int boardPixelWidth = playerBoard.GridWidth * playerBoard.CellSize;
         int boardPixelHeight = playerBoard.GridHeight * playerBoard.CellSize;

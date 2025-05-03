@@ -38,7 +38,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
         //space the cards would take up if side by side
         int totalCardWidth = _cards.Count * _cardWidth;
         //difference between these two spaces
-        int excess =  totalCardWidth - availableHandWidth;
+        int excess = totalCardWidth - availableHandWidth;
         //calculate based on difference, how much cards need to be compressed
         int offset = excess > 0 ? excess / _cards.Count : 0;
         for (int i = 0; i < _cards.Count; i++)
@@ -46,22 +46,24 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
             int cardX;
             //actual width of rendered cards, after compression
             int effectiveCardWidth = _cardWidth - offset;
-            if (_cards.Count % 2 == 0)
+
+            // checks whether cards are even
+            bool areCardsEven = _cards.Count % 2 == 0;
+            cardX = areCardsEven 
+                ? -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
+                : -effectiveCardWidth / 2 - (_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth;
+
+            if (isOpponent)
             {
-                cardX = -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth ;
-            }
-            else
-            {
-                cardX = -effectiveCardWidth / 2 - (_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth;
-            }
-            if(isOpponent){
                 DrawCard(centralX + cardX, centralY, true,
                 _cards[i].Type == CardType.Damage ? Color.Red :
                 _cards[i].Type == CardType.Environment ? Color.Blue : Color.Green);
-            } else {
+            }
+            else
+            {
                 DrawCard(centralX + cardX, centralY, true,
                 _cards[i].Type == CardType.Damage ? new(238, 156, 156) :
-                _cards[i].Type == CardType.Environment ? new(210,152,255) : new(149, 251, 215));
+                _cards[i].Type == CardType.Environment ? new(210, 152, 255) : new(149, 251, 215));
 
             }
         }
