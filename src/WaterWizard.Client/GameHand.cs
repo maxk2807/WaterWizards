@@ -21,7 +21,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
     };
 
     private int _screenWidth => gameScreen._gameStateManager.screenWidth;
-    // private int _screenHeight => gameScreen._gameStateManager.screenHeight;
+    private int _screenHeight => gameScreen._gameStateManager.screenHeight;
     private int _cardWidth => gameScreen.cardWidth;
     private int _cardHeight => gameScreen.cardHeight;
 
@@ -49,7 +49,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
 
             // checks whether cards are even
             bool areCardsEven = _cards.Count % 2 == 0;
-            cardX = areCardsEven 
+            cardX = areCardsEven
                 ? -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
                 : -effectiveCardWidth / 2 - (_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth;
 
@@ -65,8 +65,14 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
                 _cards[i].Type == CardType.Damage ? new(238, 156, 156) :
                 _cards[i].Type == CardType.Environment ? new(210, 152, 255) : new(149, 251, 215));
 
+                //Draw Card Preview if Mouse over card snippet
+                Rectangle cardRec = new(centralX + cardX, centralY, effectiveCardWidth, _cardHeight);
+                if(IsHoveringRec(cardRec)){
+                    DrawPreview(_cards[i]);
+                }
             }
         }
+
     }
 
     /// <summary>
@@ -89,5 +95,18 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
             Raylib.DrawRectangleRec(card, color);
             Raylib.DrawRectangleLinesEx(card, 2, Color.Black);
         }
+    }
+
+    private static bool IsHoveringRec(Rectangle rec){
+        return Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rec);
+    }
+
+    private void DrawPreview(Cards card)
+    {
+        int previewX = centralX - _cardWidth / 2 + (int)(_screenWidth * 0.03f);
+        int previewY = centralY - _cardHeight / 2 - (int)(_screenHeight * 0.12f);
+
+        DrawCard(previewX, previewY, true, card.Type == CardType.Damage ? new(238, 156, 156) 
+        : card.Type == CardType.Environment ? new(210, 152, 255) : new(149, 251, 215));
     }
 }
