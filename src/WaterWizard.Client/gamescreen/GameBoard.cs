@@ -1,7 +1,7 @@
 using Raylib_cs;
 using System.Numerics;
 
-namespace WaterWizard.Client;
+namespace WaterWizard.Client.gamescreen;
 
 /// <summary>
 /// CellState enum represents the possible states of a cell in the game board.
