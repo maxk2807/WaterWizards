@@ -218,4 +218,13 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
         InitializeHands();
     }
+
+    /// <summary>
+    /// Whether Raylib.GetMousePos() is currently Hovering over this Rectangle
+    /// </summary>
+    /// <param name="rec"></param>
+    /// <returns>True if Mouse is over Rectangle rec</returns>
+    public static bool IsHoveringRec(Rectangle rec){
+        return Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rec);
+    }
 }

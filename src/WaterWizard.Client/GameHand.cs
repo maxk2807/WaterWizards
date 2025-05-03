@@ -67,7 +67,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
 
                 //Draw Card Preview if Mouse over card snippet
                 Rectangle cardRec = new(centralX + cardX, centralY, effectiveCardWidth, _cardHeight);
-                if(IsHoveringRec(cardRec)){
+                if(GameScreen.IsHoveringRec(cardRec)){
                     DrawPreview(_cards[i]);
                 }
             }
@@ -97,10 +97,10 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
         }
     }
 
-    private static bool IsHoveringRec(Rectangle rec){
-        return Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rec);
-    }
-
+    /// <summary>
+    /// Renders a Card Just above the Player Hand to Preview it
+    /// </summary>
+    /// <param name="card"></param>
     private void DrawPreview(Cards card)
     {
         int previewX = centralX - _cardWidth / 2 + (int)(_screenWidth * 0.03f);
