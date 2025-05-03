@@ -33,31 +33,36 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     /// </summary>
     private void InitializeHands()
     {
-        float handWidth = screenWidth * 0.25f;
-        float handHeight = screenHeight * 0.15f;
+        float offsetX = screenWidth * 0.143f;
 
-        int centralPlayerX = (int)(screenWidth - handWidth / 2 - ZonePadding);
-        int centralPlayerY = (int)(screenHeight - handHeight - ZonePadding);
-        int centralOpponentX = (int)(screenWidth - handWidth / 2 - ZonePadding);
+        int centralPlayerX = (int)(screenWidth - ZonePadding - offsetX);
+        int centralPlayerY = (int)(screenHeight - ZonePadding - cardHeight);
+        int centralOpponentX = (int)(screenWidth - ZonePadding - offsetX);
         int centralOpponentY = (int)ZonePadding;
 
         playerHand = new(this, centralPlayerX, centralPlayerY);
         opponentHand = new(this, centralOpponentX, centralOpponentY);
     }
 
+    /// <summary>
+    /// Initialize the Boards, defines variables for positioning the boards on the Screen.
+    /// </summary>
     private void InitializeBoards()
     {
-        //12x10 Board
+        //12x10 Cells Board
         int boardWidth = 12;
         int boardHeight = 10;
+        //Ratio between width and height of the cell
         float boardRatio = boardWidth / (float)boardHeight;
         int boardPixelHeight = (int)Math.Round(screenHeight * 0.495f);
+        //Ratio used to calculate width of board
         int boardPixelWidth = (int)Math.Round(boardRatio * boardPixelHeight);
 
         //dynamic Pixels per Cell based on Screensize
         int cellSize = boardPixelHeight / boardHeight;
 
         int opponentBoardY = 0;
+        //position boards in the center of the screen
         int opponentBoardX = (screenWidth - boardPixelWidth) / 2;
         Vector2 opponentBoardPos = new(opponentBoardX, opponentBoardY);
 
@@ -83,6 +88,12 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
     }
 
+    /// <summary>
+    /// Draws the Boards, Hands (of cards), timer and graveyard based on the size of the screen.
+    /// Also Draws other elements for navigation and handles inputs for these and for a rudimentary attack. 
+    /// </summary>
+    /// <param name="currentScreenWidth"></param>
+    /// <param name="currentScreenHeight"></param>
     public void Draw(int currentScreenWidth, int currentScreenHeight)
     {
         if (playerBoard == null || opponentBoard == null)

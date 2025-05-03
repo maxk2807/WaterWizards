@@ -17,24 +17,24 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
         new(CardVariant.Heal),
         new(CardVariant.Storm),
         new(CardVariant.Storm),
-        new(CardVariant.Storm),
         new(CardVariant.Storm)
     };
 
     private int _screenWidth => gameScreen._gameStateManager.screenWidth;
-    private int _screenHeight => gameScreen._gameStateManager.screenHeight;
-
-    float HandWidth => _screenWidth * 0.25f;
-    float HandHeight => _screenHeight * 0.15f;
-
-    private float _zonePadding => gameScreen.ZonePadding;
+    // private int _screenHeight => gameScreen._gameStateManager.screenHeight;
     private int _cardWidth => gameScreen.cardWidth;
     private int _cardHeight => gameScreen.cardHeight;
 
+    /// <summary>
+    /// Render the Cards on this GameHand instance. If calling this with isOpponent true, 
+    /// the cards take on a different color to signify the back of the cards, and get rendered 
+    /// on the side of the opponent.
+    /// </summary>
+    /// <param name="isOpponent"></param>
     public void Draw(bool isOpponent)
     {
         //space available for the cards to draw
-        int availableHandWidth = (int)(_screenWidth * 0.23f);
+        int availableHandWidth = (int)(_screenWidth * 0.2f);
         //space the cards would take up if side by side
         int totalCardWidth = _cards.Count * _cardWidth;
         //difference between these two spaces
@@ -67,6 +67,14 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
         }
     }
 
+    /// <summary>
+    /// Draw the individual Card at the given coordinates.
+    /// The Card currently consists of the given color, and a black outline.
+    /// </summary>
+    /// <param name="cardX"></param>
+    /// <param name="cardY"></param>
+    /// <param name="front"></param>
+    /// <param name="color"></param>
     private void DrawCard(int cardX, int cardY, bool front, Color color)
     {
         if (front)
