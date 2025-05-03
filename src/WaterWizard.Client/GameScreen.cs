@@ -37,7 +37,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         float handHeight = screenHeight * 0.15f;
 
         int centralPlayerX = (int)(screenWidth - handWidth / 2 - ZonePadding);
-        int centralPlayerY = (int)(screenHeight - handHeight / 2 - ZonePadding);
+        int centralPlayerY = (int)(screenHeight - handHeight - ZonePadding);
         int centralOpponentX = (int)(screenWidth - handWidth / 2 - ZonePadding);
         int centralOpponentY = (int)ZonePadding;
 
