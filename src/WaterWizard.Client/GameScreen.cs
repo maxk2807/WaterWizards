@@ -166,11 +166,11 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     {
         if (playerHand)
         {
-            this.playerHand?.DrawAsPlayerHand();
+            this.playerHand?.Draw(false);
         }
         else
         {
-            opponentHand?.DrawAsOpponentHand();
+            opponentHand?.Draw(true);
         }
     }
 

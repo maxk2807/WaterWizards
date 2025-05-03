@@ -15,6 +15,9 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
         new(CardVariant.ArcaneMissile),
         new(CardVariant.Firebolt),
         new(CardVariant.Heal),
+        new(CardVariant.Storm),
+        new(CardVariant.Storm),
+        new(CardVariant.Storm),
         new(CardVariant.Storm)
     };
 
@@ -28,32 +31,40 @@ public class GameHand(GameScreen gameScreen, int centralX, int centralY)
     private int _cardWidth => gameScreen.cardWidth;
     private int _cardHeight => gameScreen.cardHeight;
 
-    public void DrawAsOpponentHand()
+    public void Draw(bool isOpponent)
     {
-        Rectangle opponentHandZone = new(centralX, centralY, HandWidth, HandHeight);
-        Raylib.DrawRectangleRec(opponentHandZone, Color.LightGray);
-        Raylib.DrawRectangleLinesEx(opponentHandZone, 2, Color.DarkGray);
-        Raylib.DrawText("Opponent Hand", (int)(opponentHandZone.X + 10), (int)(opponentHandZone.Y + 10), 10, Color.Black);
-    }
-
-    public void DrawAsPlayerHand()
-    {
-        Rectangle playerHandZone = new(centralX, centralY, HandWidth, HandHeight);
-        int cardY = (int)Math.Round(_screenHeight - HandHeight - _zonePadding);
+        //space available for the cards to draw
+        int availableHandWidth = (int)(_screenWidth * 0.23f);
+        //space the cards would take up if side by side
+        int totalCardWidth = _cards.Count * _cardWidth;
+        //difference between these two spaces
+        int excess =  totalCardWidth - availableHandWidth;
+        //calculate based on difference, how much cards need to be compressed
+        int offset = excess > 0 ? excess / _cards.Count : 0;
+        int cardY = isOpponent ? (int)Math.Round(_zonePadding) : (int)Math.Round(_screenHeight - HandHeight - _zonePadding);;
         for (int i = 0; i < _cards.Count; i++)
         {
-            int offsetX;
+            int cardX;
+            //actual width of rendered cards, after compression
+            int effectiveCardWidth = _cardWidth - offset;
             if (_cards.Count % 2 == 0)
             {
-                offsetX = -(_cards.Count / 2 * _cardWidth) + i * _cardWidth;
+                cardX = -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth ;
             }
             else
             {
-                offsetX = -_cardWidth / 2 - (_cards.Count / 2 * _cardWidth) + i * _cardWidth;
+                cardX = -effectiveCardWidth / 2 - (_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth;
             }
-            DrawCard(centralX + offsetX, cardY, true,
-            _cards[i].Type == CardType.Damage ? Color.Red :
-            _cards[i].Type == CardType.Environment ? Color.Blue : Color.Green);
+            if(isOpponent){
+                DrawCard(centralX + cardX, cardY, true,
+                _cards[i].Type == CardType.Damage ? Color.Red :
+                _cards[i].Type == CardType.Environment ? Color.Blue : Color.Green);
+            } else {
+                DrawCard(centralX + cardX, cardY, true,
+                _cards[i].Type == CardType.Damage ? new(238, 156, 156) :
+                _cards[i].Type == CardType.Environment ? new(210,152,255) : new(149, 251, 215));
+
+            }
         }
     }
 
