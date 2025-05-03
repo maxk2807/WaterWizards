@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace WaterWizard.Client;
+namespace WaterWizard.Client.gamescreen;
 
 public class GameScreen(GameStateManager gameStateManager, int screenWidth, int screenHeight, GameTimer gameTimer)
 {
@@ -117,7 +117,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
         // Draw Timer
         float timerX = ZonePadding;
-        float timerY = (currentScreenHeight / 2f) - 10;
+        float timerY = currentScreenHeight / 2f - 10;
         gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
 
 
