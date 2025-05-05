@@ -10,6 +10,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     public GameBoard? playerBoard, opponentBoard;
     public GameHand? playerHand, opponentHand;
     public ActiveCards? activeCards;
+    public CardStacksField? cardStacksField;
 
     public int cardWidth;
     public int cardHeight;
@@ -27,6 +28,13 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         InitializeHands();
         InitializeBoards();
         InitializeActiveCards();
+        InitializeCardStacksField();
+    }
+
+    private void InitializeCardStacksField()
+    {
+        cardStacksField = new(this);
+        cardStacksField.Initialize();
     }
 
     /// <summary>
@@ -135,6 +143,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
         DrawActiveCards();
 
+        DrawCardStacksField();
+
         // Update and Draw Game Boards
         GameBoard.Point? clickedCell = opponentBoard.Update();
         if (clickedCell.HasValue)
@@ -175,6 +185,11 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
             NetworkManager.Instance.Shutdown();
             _gameStateManager.SetStateToMainMenu();
         }
+    }
+
+    private void DrawCardStacksField()
+    {
+        cardStacksField!.Draw();
     }
 
     private void DrawActiveCards()
