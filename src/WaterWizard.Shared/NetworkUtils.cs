@@ -37,7 +37,7 @@ namespace WaterWizard.Shared
                 var response = client.GetStringAsync("https://api.ipify.org").Result;
                 if(response == null)
                 {
-                    return "Justin du Nutten";
+                    return "funktioniert nicht";
                 }
 
                 return response;
