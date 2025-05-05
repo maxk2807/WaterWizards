@@ -194,14 +194,14 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
     private void DrawActiveCards()
     {
-        activeCards?.Draw();
+        activeCards!.Draw();
     }
 
     // Update helper methods to accept screen dimensions
     private void DrawHands()
     {
-        playerHand?.Draw(true);
-        opponentHand?.Draw(false);
+        playerHand!.Draw(true);
+        opponentHand!.Draw(false);
     }
 
     // Update DrawGraveyard signature to accept local cardWidth/Height
