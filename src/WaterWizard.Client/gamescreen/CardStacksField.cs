@@ -35,7 +35,7 @@ public class CardStacksField(GameScreen gameScreen){
     }
 
     public void Draw(){
-        Raylib.DrawRectangleLinesEx(new(X,Y,Width,Height), 1, Color.Black);
+        // Raylib.DrawRectangleLinesEx(new(X,Y,Width,Height), 1, Color.Black);
 
         utilityStack!.Draw();
         damageStack!.Draw();
