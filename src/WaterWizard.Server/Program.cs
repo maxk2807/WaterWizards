@@ -26,6 +26,14 @@ static class Program
 
         _gameSessionTimer = new GameSessionTimer(server);
 
+        string localIp = NetworkUtils.GetLocalIPAddress();
+        //string publicIp = NetworkUtils.GetPublicIPAddress();
+        string publicIp = Environment.GetEnvironmentVariable("PUBLIC_ADDRESS") ?? NetworkUtils.GetPublicIPAddress();
+        Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
+        Console.WriteLine($"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
+        Console.WriteLine($"localIp: {localIp}:7777");
+        Console.WriteLine("Drücke ESC zum Beenden");
+
         using (_gameSessionTimer = new GameSessionTimer(server))
 
         {
@@ -39,8 +47,6 @@ static class Program
                     }
                     else
                     {
-                        string localIp = NetworkUtils.GetLocalIPAddress();
-                        string publicIp = NetworkUtils.GetPublicIPAddress();
                         Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
                         Console.WriteLine(
                             $"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
@@ -214,6 +220,7 @@ static class Program
             }
         }
     }
+
 
     private static void BroadcastMessage(NetManager? server, NetDataWriter writer,
                                          DeliveryMethod deliveryMethod)

@@ -4,19 +4,23 @@ using System.Net;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client;
+
 public class NetworkManager
 {
     private static NetworkManager? instance;
     public static NetworkManager Instance => instance ??= new NetworkManager();
 
-    private readonly List<Player> connectedPlayers = new List<Player>();
-    private readonly List<LobbyInfo> discoveredLobbies = new List<LobbyInfo>();
+    private List<Player> connectedPlayers = new List<Player>();
+    private List<LobbyInfo> discoveredLobbies = new List<LobbyInfo>();
+
 
     private NetManager? server;
     private NetManager? client;
     private EventBasedNetListener? serverListener;
     private EventBasedNetListener? clientListener;
-    private readonly int hostPort = 7777;
+    private bool isPlayerConnected = false;
+    private int hostPort = 7777;
+
     private bool clientReady = false;
 
     private NetworkManager() { }
