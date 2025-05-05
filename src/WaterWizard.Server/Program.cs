@@ -47,8 +47,6 @@ static class Program
                     }
                     else
                     {
-                        string localIp = NetworkUtils.GetLocalIPAddress();
-                        string publicIp = NetworkUtils.GetPublicIPAddress();
                         Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
                         Console.WriteLine(
                             $"Verbinde dich mit der IP-Adresse: {publicIp}:7777");

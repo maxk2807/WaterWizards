@@ -585,9 +585,7 @@ public class NetworkManager
         {
             Console.WriteLine("[NetworkManager] Only the host can start the game.");
             return;
-
         }
-    }
 
         if (!connectedPlayers.All(p => p.IsReady))
         {
