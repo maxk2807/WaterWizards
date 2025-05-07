@@ -201,7 +201,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     private void DrawHands()
     {
         playerHand!.Draw(true);
-        opponentHand!.Draw(false);
+        opponentHand!.DrawRotation(false, 180);
     }
 
     // Update DrawGraveyard signature to accept local cardWidth/Height
