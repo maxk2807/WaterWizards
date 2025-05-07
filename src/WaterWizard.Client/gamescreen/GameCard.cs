@@ -47,7 +47,7 @@ public class GameCard(GameScreen gameScreen, Cards card)
         if(!front){
             string cardBackText = this.card.Type.ToString();
             int textWidth = Raylib.MeasureText(cardBackText, 10);
-            Raylib.DrawTextPro(Raylib.GetFontDefault(), cardBackText, new(x+(Width-textWidth)/2f,y+(Height-10)/2), new(textWidth, 10), rot, 10, Raylib.GetFontDefault().GlyphPadding, Color.Black);
+            Raylib.DrawTextPro(Raylib.GetFontDefault(), cardBackText, new(x+(Width-textWidth)/2f,y+(Height-10)/2f), new(textWidth, 10), rot, 10, Raylib.GetFontDefault().GlyphPadding, Color.Black);
         }
     }
 
