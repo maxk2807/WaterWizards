@@ -129,7 +129,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
         // Draw Timer
         float timerX = ZonePadding;
-        float timerY = currentScreenHeight / 2f - 10;
+        float timerY = ZonePadding;
         gameTimer.Draw((int)timerX, (int)timerY, 20, Color.Red);
 
         // Graveyard Area - Use current dimensions for calculation
@@ -137,7 +137,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         float outerBufferHeight = cardHeight * 0.1f;
         float graveyardWidth = cardWidth + outerBufferWidth * 2;
         float graveyardHeight = cardHeight + outerBufferHeight * 2;
-        float graveyardX = ZonePadding * 2 + GameTimer.MaxTextWidth(20);
+        float graveyardX = playerBoard.Position.X - graveyardWidth - ZonePadding;
         float graveyardY = (currentScreenHeight - graveyardHeight) / 2f;
         DrawGraveyard(graveyardWidth, graveyardHeight, graveyardX, graveyardY, cardWidth, cardHeight, outerBufferWidth, outerBufferHeight);
 

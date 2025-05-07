@@ -13,23 +13,23 @@ public class CardStacksField(GameScreen gameScreen){
     private int Height;
 
     public void Initialize(){
-        Width = (int)(gameScreen.cardWidth * 2 + gameScreen.ZonePadding * 3);
-        Height = (int)(gameScreen.cardHeight * 2 + gameScreen.ZonePadding * 3);
+        Width = gameScreen.cardWidth;
+        Height = (int)(gameScreen.cardHeight * 3 + gameScreen.ZonePadding * 2);
         X = (int)gameScreen.ZonePadding;
-        Y = gameScreen._gameStateManager.screenHeight - Height - (int)gameScreen.ZonePadding;
+        Y = (gameScreen._gameStateManager.screenHeight - Height) / 2;
 
-        int utilityX = X + (int)gameScreen.ZonePadding;
-        int utilityY = Y + Height / 2 - gameScreen.cardHeight/2;
-        utilityStack = new(gameScreen, utilityX, utilityY);
-        utilityStack.InitUtility();
-
-        int damageX = X + (int)gameScreen.ZonePadding * 2 + gameScreen.cardWidth;
-        int damageY = Y + (int)gameScreen.ZonePadding;
+        int damageX = X;
+        int damageY = Y;
         damageStack = new(gameScreen, damageX, damageY);
         damageStack.InitDamage();
 
-        int environmentX = X + (int)gameScreen.ZonePadding * 2 + gameScreen.cardWidth;
-        int environmentY = Y + (int)gameScreen.ZonePadding * 2 + gameScreen.cardHeight;
+        int utilityX = X;
+        int utilityY = Y + (int)gameScreen.ZonePadding + gameScreen.cardHeight;
+        utilityStack = new(gameScreen, utilityX, utilityY);
+        utilityStack.InitUtility();
+
+        int environmentX = X;
+        int environmentY = Y + (int)gameScreen.ZonePadding * 2 + gameScreen.cardHeight * 2;
         environmentStack = new(gameScreen, environmentX, environmentY);
         environmentStack.InitEnvironment();
     }
