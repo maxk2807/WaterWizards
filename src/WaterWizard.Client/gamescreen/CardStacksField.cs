@@ -14,7 +14,7 @@ public class CardStacksField(GameScreen gameScreen){
 
     public void Initialize(){
         Width = gameScreen.cardWidth;
-        Height = (int)(gameScreen.cardHeight * 3 + gameScreen.ZonePadding * 2);
+        Height = gameScreen.cardHeight * 3 + (int)gameScreen.ZonePadding * 2;
         X = (int)gameScreen.ZonePadding;
         Y = (gameScreen._gameStateManager.screenHeight - Height) / 2;
 
