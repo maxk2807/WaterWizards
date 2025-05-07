@@ -46,9 +46,9 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         float offsetX = screenWidth * 0.143f;
 
         int centralPlayerX = (int)(screenWidth - ZonePadding - offsetX);
-        int playerCardY = (int)(screenHeight - ZonePadding - cardHeight);
+        int playerCardY = (int)(screenHeight - ZonePadding * 2 - cardHeight);
         int centralOpponentX = (int)(screenWidth - ZonePadding - offsetX);
-        int opponentCardY = (int)ZonePadding;
+        int opponentCardY = (int)ZonePadding * 2;
 
         playerHand = new(this, centralPlayerX, playerCardY);
         opponentHand = new(this, centralOpponentX, opponentCardY);
