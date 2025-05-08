@@ -23,7 +23,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 
-EXPOSE 7777
+EXPOSE 7777/udp
 
 
 ENTRYPOINT ["dotnet", "WaterWizard.Server.dll"]
