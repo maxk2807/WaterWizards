@@ -193,13 +193,6 @@ static class Program
 
                         while (true)
                         {
-                            if (Console.KeyAvailable)
-                            {
-                                var key = Console.ReadKey(true);
-                                if (key.Key == ConsoleKey.Escape)
-                                    break;
-                            }
-
                             server?.PollEvents();
                             Thread.Sleep(15);
                         }
