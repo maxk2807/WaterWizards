@@ -6,6 +6,6 @@ services:
       context: .
       dockerfile: ./src/WaterWizard.Server/Dockerfile
     ports:
-      - "7777:7777"
+      - "7777:7777/udp"
     environment:
       - PUBLIC_ADDRESS=${SERVER_IP}
