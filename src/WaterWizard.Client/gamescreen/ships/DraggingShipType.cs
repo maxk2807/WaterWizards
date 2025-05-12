@@ -24,10 +24,15 @@ public class DraggingShipType(GameScreen gameScreen, int x, int y, int width, in
     private readonly int Width = width;
     private readonly int Height = height;
 
+    private Rectangle Rectangle => new(X, Y, Width, Height);
+    private Rectangle DraggedRectangle = new(x,y,width,height);
     private bool dragging = false;
     private Vector2 offset = new();
     private bool firstDown = true;
-    private bool firstUp = true;
+    private bool validPlacement = false;
+    private bool confirming = false;
+    private int CellSize => gameScreen.playerBoard!.CellSize;
+    private int ZonePadding => (int)gameScreen.ZonePadding;
 
     public void Draw()
     {
@@ -40,8 +45,11 @@ public class DraggingShipType(GameScreen gameScreen, int x, int y, int width, in
 
     private void HandleDragging()
     {
-        Rectangle rec = new(X, Y, Width, Height);
-        bool hovering = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rec);
+        bool hovering = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), Rectangle);
+        if(confirming){
+            HandleConfirm();
+            return;
+        }
         if (!dragging)
         {
             bool clicking = Raylib.IsMouseButtonDown(MouseButton.Left);
@@ -50,10 +58,12 @@ public class DraggingShipType(GameScreen gameScreen, int x, int y, int width, in
                 if (hovering)
                 {
                     dragging = true;
-                    offset = new(Raylib.GetMousePosition().X - rec.X, Raylib.GetMousePosition().Y - rec.Y);
+                    offset = new(Raylib.GetMousePosition().X - Rectangle.X, Raylib.GetMousePosition().Y - Rectangle.Y);
                 }
                 firstDown = false;
-            }else if(!clicking && !firstDown){
+            }
+            else if (!clicking && !firstDown)
+            {
                 firstDown = true;
             }
         }
@@ -62,28 +72,83 @@ public class DraggingShipType(GameScreen gameScreen, int x, int y, int width, in
             bool released = Raylib.IsMouseButtonUp(MouseButton.Left);
             if (released)
             {
-                OnRelease(offset, rec);
+                if(validPlacement){
+                    confirming = true;
+                }
                 dragging = false;
                 firstDown = true;
             }
             else
             {
-                DrawDrag(offset);
+                validPlacement = DrawDrag(offset);
             }
         }
     }
 
-    private void OnRelease(Vector2 offset, Rectangle rec)
+    private void HandleConfirm()
     {
-        Vector2 mousePos = Raylib.GetMousePosition();
-        GameBoard.Point? cell = gameScreen.playerBoard!.GetCellFromScreenCoords(new(mousePos.X - offset.X, mousePos.Y - offset.Y));
+        //TODO: Create buttons for confirmation and rotation of ship
+        //TODO: Reduce number of current ships
+
+        SpawnShip((int)DraggedRectangle.X, (int)DraggedRectangle.Y, Math.Max(Width, Height));
+        confirming = false;
     }
 
-
-    private void DrawDrag(Vector2 offset)
+    private void SpawnShip(int x, int y, int shipSize)
     {
-        var pos = Raylib.GetMousePosition();
-        Rectangle rec2 = new(pos.X - offset.X, pos.Y - offset.Y, Width, Height);
-        Raylib.DrawRectangleRec(rec2, Color.DarkPurple);
+        gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, Width, Height));
+    }
+
+    /// <summary>
+    /// Handles the Ship while it is being dragged across the Screen.
+    /// <list type="bullet">
+    /// <item>Drawing the dragged ship over the screen and board</item>
+    /// <item>Snapping the Ship to the Cell it is currently over while dragging
+    /// over the player board</item>
+    /// <item>Checks whether the Ship is in a valid position for placement</item>
+    /// </summary>
+    /// <param name="offset"></param>
+    /// <returns>true if in valid position for placement, false if not</returns>
+    private bool DrawDrag(Vector2 offset)
+    {
+        var mousePos = Raylib.GetMousePosition();
+        var shipPos = SnapToNearestCell(mousePos, offset);
+        if (shipPos.HasValue)
+        {
+            GameBoard board = gameScreen.playerBoard!;
+            float snappedX = board.Position.X + shipPos.Value.X * CellSize;
+            float snappedY = board.Position.Y + shipPos.Value.Y * CellSize;
+            DraggedRectangle = new(snappedX, snappedY, Width, Height);
+            bool valid = IsValid(DraggedRectangle);
+            Raylib.DrawRectangleRec(DraggedRectangle, valid ? new(30, 200, 200) : new(255, 0, 0));
+            return valid;
+        }
+        else
+        {
+            DraggedRectangle = new(mousePos.X - offset.X, mousePos.Y - offset.Y, Width, Height);
+            Raylib.DrawRectangleRec(DraggedRectangle, new(0, 0, 0, 0.5f));
+            return false;
+        }
+    }
+
+    private bool IsValid(Rectangle rec)
+    {
+        GameBoard board = gameScreen.playerBoard!;
+        bool isOutOfBounds = rec.X < board.Position.X ||rec.Y < board.Position.Y ||
+                   rec.X + rec.Width > board.Position.X + (float)board.GridWidth * CellSize ||
+                   rec.Y + rec.Height > board.Position.Y + (float)board.GridHeight * CellSize;
+        return !isOutOfBounds;
+        //TODO: Check for other ships and rocks
+    }
+
+    private Vector2? SnapToNearestCell(Vector2 mousePos, Vector2 offset)
+    {
+        Vector2 shipPos = new(mousePos.X - offset.X, mousePos.Y - offset.Y);
+        var point = gameScreen.playerBoard!.GetCellFromScreenCoords(shipPos);
+        if (point.HasValue)
+        {
+            return new(point.Value.X, point.Value.Y);
+        }
+        else return null;
     }
 }
