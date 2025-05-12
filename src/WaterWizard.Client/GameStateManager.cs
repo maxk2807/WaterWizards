@@ -48,8 +48,10 @@ namespace WaterWizard.Client
 
         public int screenWidth;
         public int screenHeight;
-        private string inputText = "localhost"; // Default
+        private string inputText = "localhost"; 
+        private string inputPortText = "7777"; 
         private bool isEditingIp = false;
+        private bool isEditingPort = false;
 
         /// <summary>
         /// Constructor for GameStateManager.
@@ -417,13 +419,33 @@ namespace WaterWizard.Client
             Raylib.DrawText(inputText, (int)inputBox.X + 5, (int)inputBox.Y + 10, 20,
                             Color.Black);
 
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), inputBox) &&
-                Raylib.IsMouseButtonReleased(MouseButton.Left))
+            Raylib.DrawText("Enter Port:", screenWidth / 3, screenHeight / 3 + 60, 20, Color.DarkBlue); 
+            Rectangle portInputBox = new Rectangle((float)screenWidth / 3, (float)screenHeight / 3 + 90, 100, 40); 
+            Raylib.DrawRectangleRec(portInputBox, isEditingPort ? Color.White : Color.LightGray);
+            Raylib.DrawRectangleLines((int)portInputBox.X, (int)portInputBox.Y, (int)portInputBox.Width, (int)portInputBox.Height, Color.DarkBlue);
+            Raylib.DrawText(inputPortText, (int)portInputBox.X + 5, (int)portInputBox.Y + 10, 20, Color.Black);
+
+
+            if (Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
-                isEditingIp = true;
+                if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), inputBox))
+                {
+                    isEditingIp = true;
+                    isEditingPort = false;
+                }
+                else if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), portInputBox))
+                {
+                    isEditingIp = false;
+                    isEditingPort = true;
+                }
+                else
+                {
+                    isEditingIp = false;
+                    isEditingPort = false;
+                }
             }
 
-            if (isEditingIp)
+            if (isEditingIp || isEditingPort) 
             {
                 HandleTextInput();
             }
@@ -434,7 +456,14 @@ namespace WaterWizard.Client
                                               connectButton) &&
                 Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
-                NetworkManager.Instance.ConnectToServer(inputText, 7777);
+                if (int.TryParse(inputPortText, out int portValue) && portValue > 0 && portValue <= 65535)
+                {
+                    NetworkManager.Instance.ConnectToServer(inputText, portValue);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid port number. Please enter a number between 1 and 65535.");
+                }
             }
 
             Raylib.DrawRectangleRec(connectButton, Color.Blue);
@@ -624,21 +653,44 @@ namespace WaterWizard.Client
             int key = Raylib.GetCharPressed();
             while (key > 0)
             {
-                if ((key >= 32 && key <= 126))
+                if (isEditingIp)
                 {
-                    inputText += (char)key;
+                    if ((key >= 32 && key <= 126) && inputText.Length < 45) 
+                    {
+                        inputText += (char)key;
+                    }
+                }
+                else if (isEditingPort)
+                {
+                    if ((key >= '0' && key <= '9') && inputPortText.Length < 5) 
+                    {
+                        inputPortText += (char)key;
+                    }
                 }
                 key = Raylib.GetCharPressed();
             }
 
-            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && inputText.Length > 0)
+            if (Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) || Raylib.IsKeyPressed(KeyboardKey.Backspace))
             {
-                inputText = inputText.Substring(0, inputText.Length - 1);
+                if (isEditingIp && inputText.Length > 0)
+                {
+                    inputText = inputText.Substring(0, inputText.Length - 1);
+                }
+                else if (isEditingPort && inputPortText.Length > 0)
+                {
+                    inputPortText = inputPortText.Substring(0, inputPortText.Length - 1);
+                }
             }
 
             if (Raylib.IsKeyPressed(KeyboardKey.Enter))
             {
                 isEditingIp = false;
+                isEditingPort = false; 
+            }
+            if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+            {
+                 isEditingIp = false;
+                 isEditingPort = false;
             }
         }
 
