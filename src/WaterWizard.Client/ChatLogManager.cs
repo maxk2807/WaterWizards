@@ -16,8 +16,6 @@ public class ChatLogManager
 
     public void AddMessage(string message)
     {
-        string timestamp = DateTime.Now.ToString("HH:mm:ss");
-        _messages.Add($"[{timestamp}] {message}");
         _messages.Add(message);
 
         if (_messages.Count > _maxMessages)

@@ -129,7 +129,7 @@ static class Program
                         };
 
                         listener.NetworkReceiveEvent += (peer, reader, channelNumber,
-                                                         deliveryMethod) =>
+                                                        deliveryMethod) =>
                         {
                             try
                             {
@@ -162,7 +162,7 @@ static class Program
                                             var startWriter = new NetDataWriter();
                                             startWriter.Put("StartGame");
                                             BroadcastMessage(server, startWriter,
-                                                             DeliveryMethod.ReliableOrdered);
+                                                            DeliveryMethod.ReliableOrdered);
                                             Log("[Server] Alle Spieler bereit. Spiel wird gestartet!");
                                             _gameSessionTimer.Start();
                                             Log("[Server] GameSessionTimer gestartet.");
@@ -173,7 +173,7 @@ static class Program
                                         string chatMsg = reader.GetString();
                                         string senderIdentifier = $"Player_{peer.Port}";
                                         Log($"[Server] Chat von {senderIdentifier}: {chatMsg}");
-                                        BroadcastChatMessage(server, senderIdentifier, chatMsg);
+                                        BroadcastChatMessage(server, peer, senderIdentifier, chatMsg);
                                         break;
 
                                     default:
@@ -216,7 +216,7 @@ static class Program
 
 
     private static void BroadcastMessage(NetManager? server, NetDataWriter writer,
-                                         DeliveryMethod deliveryMethod)
+                                        DeliveryMethod deliveryMethod)
     {
         if (server == null)
             return;
@@ -241,27 +241,30 @@ static class Program
             writer.Put(kvp.Value);
         }
 
-        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
+        // BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
 
         Log($"[Server] Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet");
     }
 
-    private static void BroadcastChatMessage(NetManager? server, string sender,
-                                             string message)
+    private static void BroadcastChatMessage(NetManager? server, NetPeer senderPeer, string senderDisplayName, string message)
     {
         if (server == null)
             return;
 
         var writer = new NetDataWriter();
         writer.Put("ChatMessage");
-        writer.Put(sender);
+        writer.Put(senderDisplayName); // Der Anzeigename des Absenders
         writer.Put(message);
 
-        Log($"[Server] Sende Chat-Nachricht an alle: [{sender}] {message}");
+        Log($"[Server] Sende Chat-Nachricht von [{senderDisplayName}] an andere Spieler: {message}");
 
-        foreach (var connectedPeer in server.ConnectedPeerList)
+        foreach (var recipientPeer in server.ConnectedPeerList)
         {
-            connectedPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            // Sende die Nachricht nur, wenn der Empfänger nicht der Absender ist
+            if (recipientPeer != senderPeer)
+            {
+                recipientPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            }
         }
     }
 }
