@@ -25,12 +25,20 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     private readonly int Height = height;
 
     private Rectangle Rectangle => new(X, Y, Width, Height);
-    private Rectangle DraggedRectangle = new(x,y,width,height);
+    private Rectangle DraggedShipRectangle = new(x, y, width, height);
     private bool dragging = false;
     private Vector2 offset = new();
     private bool firstDown = true;
     private bool validPlacement = false;
+    /// <summary>
+    /// Whether there is currently a confirmation process 
+    /// (i.e. whether a ship was moved onto the board and //TODO: can now be rotated)
+    /// </summary>
     private bool confirming = false;
+    /// <summary>
+    /// Whether the confirmation button was clicked
+    /// </summary>
+    private bool confirmed = false;
     private int CellSize => gameScreen.playerBoard!.CellSize;
 
     /// <summary>
@@ -58,7 +66,8 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     private void HandleDragging()
     {
         bool hovering = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), Rectangle);
-        if(confirming){
+        if (confirming)
+        {
             HandleConfirm();
             return;
         }
@@ -84,7 +93,8 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
             bool released = Raylib.IsMouseButtonUp(MouseButton.Left);
             if (released)
             {
-                if(validPlacement){
+                if (validPlacement)
+                {
                     confirming = true;
                 }
                 dragging = false;
@@ -107,9 +117,31 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     {
         //TODO: Create buttons for confirmation and rotation of ship
         //TODO: Reduce number of current ships
+        Raylib.DrawRectangleRec(DraggedShipRectangle, new(30, 200, 200));
 
-        SpawnShip((int)DraggedRectangle.X, (int)DraggedRectangle.Y, Math.Max(Width, Height));
-        confirming = false;
+        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width/2;
+        var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
+        Rectangle confirmButton = new(confirmX, confirmY, CellSize, CellSize);
+        bool confirmHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), confirmButton);
+        Raylib.DrawRectangleRec(confirmButton, confirmHovered ? Color.LightGray : Color.Gray);
+        if (confirmHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            SpawnShip((int)DraggedShipRectangle.X, (int)DraggedShipRectangle.Y, Math.Max(Width, Height));
+            confirming = false;
+        }
+
+        var rotateX = DraggedShipRectangle.X +DraggedShipRectangle.Width/2 - CellSize;
+        var rotateY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
+        Rectangle rotateButton = new(rotateX, rotateY, CellSize, CellSize);
+        bool rotateHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rotateButton);
+        Raylib.DrawRectangleRec(rotateButton, rotateHovered ? Color.Blue : Color.DarkBlue);
+        if(rotateHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            var prevWidth = DraggedShipRectangle.Width;
+            var prevHeight = DraggedShipRectangle.Height;
+            DraggedShipRectangle.Width = prevHeight;
+            DraggedShipRectangle.Height = prevWidth;
+        }
     }
 
     /// <summary>
@@ -120,7 +152,7 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     /// <param name="shipSize"></param>
     private void SpawnShip(int x, int y, int shipSize)
     {
-        gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, Width, Height));
+        gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, (int)DraggedShipRectangle.Width, (int)DraggedShipRectangle.Height));
     }
 
     /// <summary>
@@ -144,15 +176,15 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
             GameBoard board = gameScreen.playerBoard!;
             float snappedX = board.Position.X + shipPos.Value.X * CellSize;
             float snappedY = board.Position.Y + shipPos.Value.Y * CellSize;
-            DraggedRectangle = new(snappedX, snappedY, Width, Height);
-            bool valid = IsValid(DraggedRectangle);
-            Raylib.DrawRectangleRec(DraggedRectangle, valid ? new(30, 200, 200) : new(255, 0, 0));
+            DraggedShipRectangle = new(snappedX, snappedY, Width, Height);
+            bool valid = IsValid(DraggedShipRectangle);
+            Raylib.DrawRectangleRec(DraggedShipRectangle, valid ? new(30, 200, 200) : new(255, 0, 0));
             return valid;
         }
         else
         {
-            DraggedRectangle = new(mousePos.X - offset.X, mousePos.Y - offset.Y, Width, Height);
-            Raylib.DrawRectangleRec(DraggedRectangle, new(0, 0, 0, 0.5f));
+            DraggedShipRectangle = new(mousePos.X - offset.X, mousePos.Y - offset.Y, Width, Height);
+            Raylib.DrawRectangleRec(DraggedShipRectangle, new(0, 0, 0, 0.5f));
             return false;
         }
     }
@@ -166,7 +198,7 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     private bool IsValid(Rectangle rec)
     {
         GameBoard board = gameScreen.playerBoard!;
-        bool isOutOfBounds = rec.X < board.Position.X ||rec.Y < board.Position.Y ||
+        bool isOutOfBounds = rec.X < board.Position.X || rec.Y < board.Position.Y ||
                    rec.X + rec.Width > board.Position.X + (float)board.GridWidth * CellSize ||
                    rec.Y + rec.Height > board.Position.Y + (float)board.GridHeight * CellSize;
         return !isOutOfBounds;
