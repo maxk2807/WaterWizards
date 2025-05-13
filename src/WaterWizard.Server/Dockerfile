@@ -1,16 +1,29 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+COPY WaterWizards.sln .
+
+COPY src/WaterWizard.Server/WaterWizard.Server.csproj ./src/WaterWizard.Server/
+COPY src/WaterWizard.Shared/WaterWizard.Shared.csproj ./src/WaterWizard.Shared/
+COPY src/WaterWizard.Client/WaterWizard.Client.csproj ./src/WaterWizard.Client/
+COPY src/WaterWizardTests/WaterWizardTests.csproj ./src/WaterWizardTests/
+
+RUN dotnet restore WaterWizards.sln
+
+COPY src/WaterWizard.Server/ ./src/WaterWizard.Server/
+COPY src/WaterWizard.Shared/ ./src/WaterWizard.Shared/
+COPY src/WaterWizard.Client/ ./src/WaterWizard.Client/
+COPY src/WaterWizardTests/ ./src/WaterWizardTests/
+
+RUN dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
 WORKDIR /app
 
-COPY ./WaterWizard.Server.csproj ./
-RUN dotnet restore
+COPY --from=build /app/publish .
 
-COPY . ./
-RUN dotnet publish -c Release -o /out
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0
-WORKDIR /app
-COPY --from=build /out .
+EXPOSE 7777/udp
 
-EXPOSE 7777
 
 ENTRYPOINT ["dotnet", "WaterWizard.Server.dll"]
