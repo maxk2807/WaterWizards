@@ -1,6 +1,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Net;
+using System.Net.Sockets;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client;
@@ -13,7 +14,6 @@ public class NetworkManager
     private List<Player> connectedPlayers = new List<Player>();
     private List<LobbyInfo> discoveredLobbies = new List<LobbyInfo>();
 
-
     private NetManager? server;
     private NetManager? client;
     private EventBasedNetListener? serverListener;
@@ -22,6 +22,9 @@ public class NetworkManager
     private int hostPort = 7777;
 
     private bool clientReady = false;
+
+    private GameSessionId? sessionId;
+    public GameSessionId? SessionId => sessionId;
 
     private NetworkManager() { }
 
@@ -51,6 +54,8 @@ public class NetworkManager
 
             connectedPlayers.Clear();
             connectedPlayers.Add(new Player("Host") { Name = "Host (You)", IsReady = true });
+
+            sessionId = new GameSessionId();
 
             Console.WriteLine($"Server gestartet auf Port {hostPort}");
             SetupServerEventHandlers();
@@ -83,6 +88,7 @@ public class NetworkManager
 
             var writer = new NetDataWriter();
             writer.Put("EnterLobby");
+            writer.Put(sessionId != null ? sessionId.ToString() : string.Empty);
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
             BroadcastSystemMessage($"{playerName} connected.");
@@ -141,9 +147,7 @@ public class NetworkManager
                     HandlePlayerReadyStatus(peer, messageType == "PlayerReady");
                     break;
                 case "ChatMessage":
-                    string senderName = reader.GetString();
                     string chatMsg = reader.GetString();
-                    GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
                     break;
                 default:
                     Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
@@ -271,16 +275,7 @@ public class NetworkManager
                 string lobbyName = reader.GetString();
                 int playerCount = reader.GetInt();
 
-                bool isLocalAddress = remoteEndPoint.Address.Equals(IPAddress.Loopback) ||
-                                     remoteEndPoint.Address.ToString() == NetworkUtils.GetLocalIPAddress();
-
-                if (IsHost() && isLocalAddress)
-                {
-                    Console.WriteLine($"[Client] Eigene Lobby gefunden und ignoriert: '{lobbyName}' auf {remoteEndPoint}");
-                    return;
-                }
-
-                Console.WriteLine($"[Client] Lobby gefunden: '{lobbyName}' mit {playerCount} Spieler(n) auf {remoteEndPoint}");
+                Console.WriteLine($"[Client] Lobby found: '{lobbyName}' with {playerCount} players at {remoteEndPoint}");
 
                 var existingLobby = discoveredLobbies.FirstOrDefault(l => l.IP == remoteEndPoint.ToString());
                 if (existingLobby != null)
@@ -296,7 +291,7 @@ public class NetworkManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Client] Fehler beim Verarbeiten der Lobby-Info: {ex.Message}");
+            Console.WriteLine($"[Client] Error processing lobby info: {ex.Message}");
         }
     }
 
@@ -311,22 +306,18 @@ public class NetworkManager
 
         try
         {
-            client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Loopback, hostPort));
-            Console.WriteLine("[Client] Discovery-Request an localhost gesendet");
+            client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Parse("208.77.246.27"), hostPort));
+            Console.WriteLine("[Client] Discovery request sent to 208.77.246.27");
 
-            string localIp = NetworkUtils.GetLocalIPAddress();
-            if (localIp != "127.0.0.1")
-            {
-                client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Parse(localIp), hostPort));
-                Console.WriteLine($"[Client] Discovery-Request an lokale IP {localIp} gesendet");
-            }
+            client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Loopback, hostPort));
+            Console.WriteLine("[Client] Discovery request sent to localhost");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Client] Fehler beim Senden von gezielten Anfragen: {ex.Message}");
+            Console.WriteLine($"[Client] Error sending discovery requests: {ex.Message}");
         }
 
-        Console.WriteLine("[Client] Lobby-Suchanfragen gesendet");
+        Console.WriteLine("[Client] Lobby discovery requests sent");
     }
 
     /// <summary>
@@ -371,7 +362,7 @@ public class NetworkManager
         }
     }
 
-    public void ConnectToServer(string ip, int port)
+    public void ConnectToServer(string ip, int port = 7777)
     {
         if (client != null && client.FirstPeer != null && client.FirstPeer.ConnectionState == ConnectionState.Connected)
         {
@@ -379,24 +370,134 @@ public class NetworkManager
             return;
         }
 
+        CleanupClientIfRunning();
+
         try
         {
-            Console.WriteLine($"Versuche, eine Verbindung zum Server herzustellen: IP={ip}, Port={port}");
+            string cleanIp = ip;
+            int connectionPort = port;
+
+            if (ip.Contains(":"))
+            {
+                var parts = ip.Split(':');
+                cleanIp = parts[0];
+
+                if (parts.Length > 1 && int.TryParse(parts[1], out int specifiedPort))
+                {
+                    connectionPort = specifiedPort;
+                }
+
+                Console.WriteLine($"[Client] Extracted IP: {cleanIp}, Port: {connectionPort} from {ip}");
+            }
+
+            Console.WriteLine($"Versuche, eine Verbindung zum Server herzustellen: IP={cleanIp}, Port={connectionPort}");
 
             clientListener = new EventBasedNetListener();
-            client = new NetManager(clientListener);
-            client.Start();
+            client = new NetManager(clientListener)
+            {
+                ReconnectDelay = 500,
+                MaxConnectAttempts = 10,
+                DisconnectTimeout = 10000,
+                UpdateTime = 15,
+                UnconnectedMessagesEnabled = true,
+                IPv6Enabled = false,
+                NatPunchEnabled = true, 
+                EnableStatistics = true
+            };
 
-            client.Connect(ip, port, "");
-            Console.WriteLine("Verbindungsanfrage gesendet...");
+            if (!client.Start())
+            {
+                Console.WriteLine("[Client] Fehler beim Starten des Network Clients");
+                GameStateManager.Instance.ChatLog.AddMessage("[Error] Failed to start network client");
+                return;
+            }
 
             SetupClientEventHandlers();
+
+            bool pingAttemptFailed = true;
+
+            try
+            {
+                using (var ping = new System.Net.NetworkInformation.Ping())
+                {
+                    var reply = ping.Send(cleanIp, 2000);
+                    if (reply.Status == System.Net.NetworkInformation.IPStatus.Success)
+                    {
+                        Console.WriteLine($"[Client] Server at {cleanIp} is pingable. Latency: {reply.RoundtripTime}ms");
+                        GameStateManager.Instance.ChatLog.AddMessage($"Server at {cleanIp} is reachable. Attempting connection...");
+                        pingAttemptFailed = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Client] Ping failed: {ex.Message}");
+            }
+
+            if (pingAttemptFailed)
+            {
+                GameStateManager.Instance.ChatLog.AddMessage($"Warning: Server at {cleanIp} did not respond to ping. Trying connection anyway...");
+            }
+
+            client.Connect(cleanIp, connectionPort, "WaterWizardClient");
+            Console.WriteLine($"Verbindungsanfrage gesendet an {cleanIp}:{connectionPort}...");
+
+            int connectionAttempts = 0;
+            const int maxAttempts = 20;
+
+            System.Timers.Timer connectionTimer = new System.Timers.Timer(500);
+            connectionTimer.Elapsed += (s, e) =>
+            {
+                connectionAttempts++;
+
+                client.PollEvents();
+
+                bool isConnected = client.FirstPeer != null &&
+                                   client.FirstPeer.ConnectionState == ConnectionState.Connected;
+
+                if (isConnected)
+                {
+                    connectionTimer.Stop();
+                    Console.WriteLine($"[Client] Connected to server after {connectionAttempts} attempts");
+                }
+                else if (connectionAttempts >= maxAttempts)
+                {
+                    connectionTimer.Stop();
+                    Console.WriteLine($"[Client] Failed to connect after {maxAttempts} attempts");
+
+                    GameStateManager.Instance.ChatLog.AddMessage($"Connection to server at {cleanIp}:{connectionPort} failed. Please check:");
+                    GameStateManager.Instance.ChatLog.AddMessage("1. Is the server running?");
+                    GameStateManager.Instance.ChatLog.AddMessage("2. Is the IP address correct?");
+                    GameStateManager.Instance.ChatLog.AddMessage("3. Is port 7777 open in the server's firewall?");
+
+                    TryDirectConnection(cleanIp, connectionPort);
+                }
+                else
+                {
+                    if (connectionAttempts % 5 == 0)
+                    {
+                        Console.WriteLine($"[Client] Connection attempt #{connectionAttempts}...");
+                    }
+                }
+            };
+
+            connectionTimer.Start();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Fehler beim Verbinden mit dem Server: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            GameStateManager.Instance.ChatLog.AddMessage($"Error connecting to server: {ex.Message}");
         }
     }
+
+    private void TryDirectConnection(string ip, int port)
+    {
+        GameStateManager.Instance.ChatLog.AddMessage("Attempting direct connection as last resort...");
+        ConnectToServerDirect(ip, port);
+    }
+
+
 
     private void SetupClientEventHandlers()
     {
@@ -404,20 +505,108 @@ public class NetworkManager
 
         clientListener.PeerConnectedEvent += peer =>
         {
-            Console.WriteLine($"Erfolgreich mit dem Server verbunden: {peer}");
+            Console.WriteLine($"[Client] Erfolgreich mit dem Server verbunden: {peer}");
+
+            GameStateManager.Instance.ChatLog.AddMessage(
+                $"Connected to server at {peer}"
+            );
         };
 
         clientListener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
         {
-            Console.WriteLine($"Verbindung zum Server verloren: {peer}, Grund: {disconnectInfo.Reason}");
+            Console.WriteLine($"[Client] Verbindung zum Server verloren: {peer}, Grund: {disconnectInfo.Reason}");
+
+            string reasonExplanation = disconnectInfo.Reason switch
+            {
+                DisconnectReason.ConnectionFailed => "Could not establish connection (firewall or server offline?)",
+                DisconnectReason.Timeout => "Connection timed out (network issues?)",
+                DisconnectReason.RemoteConnectionClose => "Server closed the connection",
+                _ => disconnectInfo.Reason.ToString()
+            };
+
+            Console.WriteLine($"[Client] Disconnect explanation: {reasonExplanation}");
+
+            GameStateManager.Instance.ChatLog.AddMessage(
+                $"Disconnected from server: {reasonExplanation}"
+            );
         };
 
         clientListener.NetworkErrorEvent += (endPoint, error) =>
         {
-            Console.WriteLine($"Netzwerkfehler bei Verbindung zu {endPoint}: {error}");
+            Console.WriteLine($"[Client] Netzwerkfehler bei Verbindung zu {endPoint}: {error}");
+            string errorExplanation = error switch
+            {
+                SocketError.HostUnreachable => "Host unreachable (check firewall settings or if server is online)",
+                SocketError.ConnectionRefused => "Connection refused (server may be running but rejecting connections)",
+                SocketError.TimedOut => "Connection timed out (network issues)",
+                _ => error.ToString()
+            };
+
+            Console.WriteLine($"[Client] Error explanation: {errorExplanation}");
+
+            GameStateManager.Instance.ChatLog.AddMessage(
+                $"Network error: {errorExplanation}"
+            );
         };
 
         clientListener.NetworkReceiveEvent += HandleClientReceiveEvent;
+    }
+
+    public void ConnectToServerDirect(string ip, int port)
+    {
+        try
+        {
+            Console.WriteLine($"[Client] Attempting direct connection to {ip}:{port}...");
+
+            CleanupClientIfRunning();
+
+            clientListener = new EventBasedNetListener();
+            client = new NetManager(clientListener)
+            {
+                ReconnectDelay = 500,
+                MaxConnectAttempts = 10,
+                DisconnectTimeout = 10000,
+                UpdateTime = 15,
+                UnconnectedMessagesEnabled = true,
+                IPv6Enabled = false,
+                NatPunchEnabled = true,  
+                EnableStatistics = true
+            };
+
+            if (!client.Start())
+            {
+                Console.WriteLine("[Client] Failed to start network client for direct connection");
+                return;
+            }
+
+            SetupClientEventHandlers();
+
+            // Try connection with a key (sometimes helps with certain NAT configurations)
+            client.Connect(ip, port, "WaterWizardClientDirect");
+            Console.WriteLine($"[Client] Direct connection request sent to {ip}:{port}");
+
+            // Actively poll events to process connection
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                for (int i = 0; i < 100; i++) // Poll for 10 seconds
+                {
+                    client.PollEvents();
+                    System.Threading.Thread.Sleep(100);
+
+                    if (client.FirstPeer != null &&
+                        client.FirstPeer.ConnectionState == ConnectionState.Connected)
+                    {
+                        Console.WriteLine("[Client] Direct connection successful!");
+                        return;
+                    }
+                }
+                Console.WriteLine("[Client] Direct connection attempt timed out");
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Error in direct connection attempt: {ex.Message}");
+        }
     }
 
     private void HandleClientReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
@@ -433,6 +622,9 @@ public class NetworkManager
                     GameStateManager.Instance.SetStateToInGame();
                     break;
                 case "EnterLobby":
+                    string receivedSessionId = reader.GetString();
+                    if (!string.IsNullOrEmpty(receivedSessionId))
+                        sessionId = new GameSessionId(receivedSessionId);
                     Console.WriteLine("[Client] Betrete die Lobby...");
                     GameStateManager.Instance.SetStateToLobby();
                     break;
@@ -446,14 +638,13 @@ public class NetworkManager
                     string senderName = reader.GetString();
                     string chatMsg = reader.GetString();
                     GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
-                    if (senderName != "You")
-                    {
-                        GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
-                    }
                     break;
                 case "SystemMessage":
                     string systemMsg = reader.GetString();
                     GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
+                    break;
+                case "StartPlacementPhase":
+                    GameStateManager.Instance.SetStateToPlacementPhase();
                     break;
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
@@ -515,7 +706,6 @@ public class NetworkManager
         discoveredLobbies.Clear();
         connectedPlayers.Clear();
     }
-
 
     private void BroadcastSystemMessage(string message)
     {
@@ -624,6 +814,21 @@ public class NetworkManager
         catch (Exception ex)
         {
             Console.WriteLine($"[Client] Error sending chat message: {ex.Message}");
+        }
+    }
+
+    public void SendPlacementReady()
+    {
+        if (client != null && client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("PlacementReady");
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] PlacementReady gesendet");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden.");
         }
     }
 }

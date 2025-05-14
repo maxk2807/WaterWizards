@@ -1,5 +1,6 @@
 using Raylib_cs;
 using System.Numerics;
+using WaterWizard.Client.gamescreen.ships;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -20,6 +21,8 @@ public enum CellState
 /// </summary>
 public class GameBoard
 {
+    private List<GameShip> ships = [];
+
     public int GridWidth { get; set; }
     public int GridHeight { get; set; }
     public int CellSize { get; set; }
@@ -52,23 +55,32 @@ public class GameBoard
         }
     }
 
+    public void putShip(GameShip ship){
+        ships.Add(ship);
+    }
+
     /// <summary>
     /// Converts screen coordinates to grid cell coordinates.
     /// Returns null if the coordinates are outside the board.
     /// </summary>
     public Point? GetCellFromScreenCoords(Vector2 screenPos)
     {
-        if (screenPos.X < Position.X || screenPos.Y < Position.Y ||
-            screenPos.X >= Position.X + (float)GridWidth * CellSize ||
-            screenPos.Y >= Position.Y + (float)GridHeight * CellSize)
+        if (IsPointOutside(screenPos))
         {
-            return null; 
+            return null;
         }
 
         int gridX = (int)((screenPos.X - Position.X) / CellSize);
         int gridY = (int)((screenPos.Y - Position.Y) / CellSize);
 
         return new Point(gridX, gridY);
+    }
+
+    public bool IsPointOutside(Vector2 screenPos)
+    {
+        return screenPos.X < Position.X || screenPos.Y < Position.Y ||
+                    screenPos.X >= Position.X + (float)GridWidth * CellSize ||
+                    screenPos.Y >= Position.Y + (float)GridHeight * CellSize;
     }
 
     /// <summary>
@@ -121,6 +133,9 @@ public class GameBoard
                         Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.White);
                 }
             }
+        }
+        foreach(GameShip ship in ships){
+            ship.Draw();
         }
     }
 

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Client.gamescreen.ships;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -11,10 +12,11 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     public GameHand? playerHand, opponentHand;
     public ActiveCards? activeCards;
     public CardStacksField? cardStacksField;
+    public ShipField? shipField;
 
     public int cardWidth;
     public int cardHeight;
-    public float ZonePadding; 
+    public float ZonePadding;
 
     /// <summary>
     /// Initialize all elements rendered on the GameScreen:
@@ -29,6 +31,13 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         InitializeBoards();
         InitializeActiveCards();
         InitializeCardStacksField();
+        InitializeShipField();
+    }
+
+    private void InitializeShipField()
+    {
+        shipField = new(this);
+        shipField.Initialize();
     }
 
     private void InitializeCardStacksField()
@@ -98,7 +107,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
     }
 
-    public void InitializeActiveCards(){
+    public void InitializeActiveCards()
+    {
         activeCards = new(this);
         activeCards.Initialize();
     }
@@ -145,6 +155,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
         DrawCardStacksField();
 
+       
+
         // Update and Draw Game Boards
         GameBoard.Point? clickedCell = opponentBoard.Update();
         if (clickedCell.HasValue)
@@ -172,6 +184,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
             Raylib.DrawText("Your Board", (int)playerBoard.Position.X + (boardPixelWidth - playerTitleWidth) / 2, (int)playerBoard.Position.Y + 15, 15, Color.Black);
         }
 
+        DrawShipField();
+
         // Draw Back Button
         int backButtonWidth = 100;
         int backButtonHeight = 30;
@@ -185,6 +199,12 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
             NetworkManager.Instance.Shutdown();
             _gameStateManager.SetStateToMainMenu();
         }
+        
+    }
+
+    private void DrawShipField()
+    {
+        shipField!.Draw();
     }
 
     private void DrawCardStacksField()
@@ -243,7 +263,8 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     /// </summary>
     /// <param name="rec"></param>
     /// <returns>True if Mouse is over Rectangle rec</returns>
-    public static bool IsHoveringRec(Rectangle rec){
+    public static bool IsHoveringRec(Rectangle rec)
+    {
         return Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rec);
     }
 }
