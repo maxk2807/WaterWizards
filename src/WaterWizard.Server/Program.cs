@@ -7,9 +7,9 @@ namespace WaterWizard.Server;
 
 static class Program
 {
-    private static readonly Dictionary<string, bool> ConnectedPlayers = new();
-    private static readonly Dictionary<string, bool> PlacementReadyPlayers = new();
-    private static readonly Dictionary<string, string> PlayerNames = new();
+    public static readonly Dictionary<string, bool> ConnectedPlayers = [];
+    private static readonly Dictionary<string, bool> PlacementReadyPlayers = [];
+    private static readonly Dictionary<string, string> PlayerNames = [];
     private static GameSessionTimer? _gameSessionTimer;
 
     private static void Log(string message)
@@ -139,13 +139,43 @@ static class Program
                         try
                         {
                             string messageType = reader.GetString();
+                            Log($"[Server] Received: {messageType} from {peer}"); 
+
                             switch (messageType)
                             {
                                 case "PlayerJoin":
                                     string playerName = reader.GetString();
+                                    ConnectedPlayers[peer.ToString()] = false;
                                     PlayerNames[peer.ToString()] = playerName;
                                     Log($"[Server] PlayerJoin: {playerName} ({peer})");
                                     SendPlayerList(server);
+                                    break;
+                                case "PlayerReady":
+                                    if (ConnectedPlayers.ContainsKey(peer.ToString()))
+                                    {
+                                        ConnectedPlayers[peer.ToString()] = true;
+                                        Log($"[Server] Player {PlayerNames.GetValueOrDefault(peer.ToString(), peer.ToString())} is Ready.");
+                                        SendPlayerList(server);
+                                        (gameStateManager.CurrentState as LobbyState)?.CheckAllPlayersReady(gameStateManager);
+                                    }
+                                    else
+                                    {
+                                        Log($"[Server] Warning: Received PlayerReady from unknown peer {peer}");
+                                    }
+                                    break;
+                                case "PlayerNotReady":
+                                    if (ConnectedPlayers.ContainsKey(peer.ToString()))
+                                    {
+                                        ConnectedPlayers[peer.ToString()] = false;
+                                        Log($"[Server] Player {PlayerNames.GetValueOrDefault(peer.ToString(), peer.ToString())} is Not Ready.");
+                                        SendPlayerList(server);
+                                        // Optionally, call CheckAllPlayersReady here too, though it's less likely to start the game.
+                                        (gameStateManager.CurrentState as LobbyState)?.CheckAllPlayersReady(gameStateManager);
+                                    }
+                                    else
+                                    {
+                                        Log($"[Server] Warning: Received PlayerNotReady from unknown peer {peer}");
+                                    }
                                     break;
                                 case "ChatMessage":
                                     string chatMsg = reader.GetString();
@@ -153,7 +183,7 @@ static class Program
                                     BroadcastChatMessage(server, peer, senderName, chatMsg);
                                     break;
                                 default:
-                                    gameStateManager.HandleNetworkEvent(peer, reader);
+                                    gameStateManager.HandleNetworkEvent(peer, reader, messageType);
                                     break;
                             }
                         }

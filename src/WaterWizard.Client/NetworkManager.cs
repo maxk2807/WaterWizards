@@ -11,15 +11,15 @@ public class NetworkManager
     private static NetworkManager? instance;
     public static NetworkManager Instance => instance ??= new NetworkManager();
 
-    private List<Player> connectedPlayers = new List<Player>();
-    private List<LobbyInfo> discoveredLobbies = new List<LobbyInfo>();
+    private readonly List<Player> connectedPlayers = [];
+    private readonly List<LobbyInfo> discoveredLobbies = [];
 
     private NetManager? server;
     private NetManager? client;
     private EventBasedNetListener? serverListener;
     private EventBasedNetListener? clientListener;
-    private bool isPlayerConnected = false;
-    private int hostPort = 7777;
+    private readonly bool isPlayerConnected = false;
+    private readonly int hostPort = 7777;
 
     private bool clientReady = false;
 
@@ -53,7 +53,7 @@ public class NetworkManager
             }
 
             connectedPlayers.Clear();
-            connectedPlayers.Add(new Player("Host") { Name = "Host (You)", IsReady = true });
+            connectedPlayers.Add(new Player("Host") { Name = "Host (You)", IsReady = false });
 
             sessionId = new GameSessionId();
 
@@ -149,6 +149,25 @@ public class NetworkManager
                 case "ChatMessage":
                     string chatMsg = reader.GetString();
                     break;
+                case "PlayerJoin":
+                    string playerName = reader.GetString(); // Name sent by the client
+                    var playerToUpdate = connectedPlayers.FirstOrDefault(p => p.Address == peer.ToString());
+                    if (playerToUpdate != null)
+                    {
+                        playerToUpdate.Name = playerName;
+                        UpdatePlayerList(); // Broadcast the updated player list to all clients
+                    }
+                    else
+                    {
+                        // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
+                        Console.WriteLine($"[Host] PlayerJoin: Player with address {peer.ToString()} not found in connectedPlayers. Name received: {playerName}");
+                        // Optionally, handle this by adding the player if it's a valid scenario,
+                        // though players are typically added during PeerConnectedEvent.
+                        // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
+                        // UpdatePlayerList();
+                    }
+                    break;
+                    
                 default:
                     Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
@@ -766,6 +785,13 @@ public class NetworkManager
         if (client != null && client.FirstPeer != null)
         {
             var writer = new NetDataWriter();
+            //writer.Put("PlayerList");
+            //writer.Put(connectedPlayers.Count);
+            //string message = clientReady ? "PlayerReady" : "PlayerNotReady";
+            //writer.Put(message);
+            //client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            //Console.WriteLine($"[Client] Nachricht gesendet: {message}");
+
             string message = clientReady ? "PlayerReady" : "PlayerNotReady";
             writer.Put(message);
             client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);

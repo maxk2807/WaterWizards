@@ -10,12 +10,14 @@ using LiteNetLib.Utils;
 public class ServerGameStateManager
 {
     private IServerGameState? _currentState;
-    public IServerGameState? CurrentState => _currentState;
-    public NetManager Server { get; }
+    public IServerGameState? CurrentState { get; private set; }
+    public NetManager _server;
 
     public ServerGameStateManager(NetManager server)
     {
-        Server = server;
+        _server = server;
+        CurrentState = new LobbyState(_server);
+        CurrentState.OnEnter();
     }
 
     /// <summary>
@@ -23,16 +25,16 @@ public class ServerGameStateManager
     /// </summary>
     public void ChangeState(IServerGameState newState)
     {
-        _currentState?.OnExit();
-        _currentState = newState;
-        _currentState.OnEnter();
+        CurrentState?.OnExit();
+        CurrentState = newState;
+        CurrentState.OnEnter();
     }
 
     /// <summary>
     /// Leitet ein Netzwerkereignis an den aktuellen State weiter.
     /// </summary>
-    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader)
+    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, string messageType)
     {
-        _currentState?.HandleNetworkEvent(peer, reader, Server, this);
+        _currentState?.HandleNetworkEvent(peer, reader, _server, this, messageType);
     }
 }
