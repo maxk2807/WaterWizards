@@ -8,6 +8,10 @@ static class Program
 {
     private static readonly Dictionary<string, bool> ConnectedPlayers = [];
     private static GameSessionTimer? _gameSessionTimer;
+    var manaService = new ManaUpdateService(gameDataLogger, server, playerPeers);
+    var manaUpdater = new PeriodicManaUpdater(manaService);
+    
+    Dictionary<string, NetPeer> playerPeers = new();
 
     private static void Log(string message)
     {

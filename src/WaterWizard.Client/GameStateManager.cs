@@ -25,6 +25,9 @@ namespace WaterWizard.Client
         private float titleVerticalPosition = 0;
         private const float TITLE_ANIM_SPEED = 1.5f;
         private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
+        
+        
+        public ManaStatusHandler ManaStatusHandler { get; } = new();
 
         public static void Initialize(int screenWidth, int screenHeight)
         {

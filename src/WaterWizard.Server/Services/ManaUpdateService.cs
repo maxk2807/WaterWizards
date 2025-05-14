@@ -14,12 +14,15 @@ public class ManaUpdateService
     private readonly NetManager _server;
     private readonly int _manaIncrease = 10; // Konstante Erhöhung
 
-    public ManaUpdateService(GameDataLogger logger, NetManager server)
+    private readonly Dictionary<string, NetPeer> _playerPeers;
+
+    public ManaUpdateService(GameDataLogger logger, NetManager server, Dictionary<string, NetPeer> playerPeers)
     {
         _logger = logger;
         _server = server;
+        _playerPeers = playerPeers;
     }
-
+    
     /// <summary>
     /// Aktualisiert Mana aller verbundenen Spieler.
     /// </summary>
@@ -32,9 +35,8 @@ public class ManaUpdateService
                 string playerName = playerEntry.Key;
                 PlayerHistory history = playerEntry.Value;
 
-                var peer = _server.ConnectedPeerList.FirstOrDefault(p => p.EndPoint.ToString().Contains(playerName));
-                if (peer == null)
-                    continue; // Spieler nicht verbunden
+                if (!_playerPeers.TryGetValue(playerName, out var peer))
+                    continue;
 
                 var lastEntry = history.Entries.LastOrDefault();
                 if (lastEntry == null)

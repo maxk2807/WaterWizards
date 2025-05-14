@@ -71,6 +71,12 @@ public class NetworkManager
 
             string playerAddress = peer.ToString();
             string playerName = $"Player_{playerAddress.Split(':').LastOrDefault() ?? playerAddress}";
+            
+            // Spieler ↔ Peer registrieren
+            if (!playerPeers.ContainsKey(playerName))
+            {
+                playerPeers[playerName] = peer;
+            }
 
             if (!PlayerExists(playerAddress))
             {
@@ -92,6 +98,8 @@ public class NetworkManager
             string playerAddress = peer.ToString();
             string playerName = connectedPlayers.FirstOrDefault(p => p.Address == playerAddress)?.Name ??
                                $"Player_{playerAddress.Split(':').LastOrDefault()}";
+            
+            playerPeers.Remove(playerName);
 
             RemovePlayerByAddress(playerAddress);
             BroadcastSystemMessage($"{playerName} disconnected ({disconnectInfo.Reason}).");
@@ -450,6 +458,10 @@ public class NetworkManager
                 case "SystemMessage":
                     string systemMsg = reader.GetString();
                     GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
+                    break;
+                case "ManaUpdate":
+                    int newMana = reader.GetInt();
+                    GameStateManager.Instance.ManaStatusHandler.HandleManaUpdate(newMana);
                     break;
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
