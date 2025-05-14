@@ -55,7 +55,6 @@ public class NetworkManager
             connectedPlayers.Clear();
             connectedPlayers.Add(new Player("Host") { Name = "Host (You)", IsReady = true });
 
-            // Create a new session ID when hosting starts
             sessionId = new GameSessionId();
 
             Console.WriteLine($"Server gestartet auf Port {hostPort}");
@@ -89,7 +88,6 @@ public class NetworkManager
 
             var writer = new NetDataWriter();
             writer.Put("EnterLobby");
-            // Send the session ID to the client
             writer.Put(sessionId != null ? sessionId.ToString() : string.Empty);
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
@@ -149,9 +147,7 @@ public class NetworkManager
                     HandlePlayerReadyStatus(peer, messageType == "PlayerReady");
                     break;
                 case "ChatMessage":
-                    //string senderName = reader.GetString();
                     string chatMsg = reader.GetString();
-                    //GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
                     break;
                 default:
                     Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
@@ -306,16 +302,13 @@ public class NetworkManager
         var req = new NetDataWriter();
         req.Put("DiscoverLobbies");
 
-        // Send broadcast to the local network
         client.SendBroadcast(req, hostPort);
 
         try
         {
-            // Send to the specific server IP
             client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Parse("208.77.246.27"), hostPort));
             Console.WriteLine("[Client] Discovery request sent to 208.77.246.27");
 
-            // Optionally, send to localhost for testing
             client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Loopback, hostPort));
             Console.WriteLine("[Client] Discovery request sent to localhost");
         }
@@ -377,22 +370,18 @@ public class NetworkManager
             return;
         }
 
-        // Clean up any existing client
         CleanupClientIfRunning();
 
         try
         {
-            // Parse the IP properly to handle any format issues
             string cleanIp = ip;
             int connectionPort = port;
 
-            // Handle IP:port format if provided
             if (ip.Contains(":"))
             {
                 var parts = ip.Split(':');
                 cleanIp = parts[0];
 
-                // If port is specified in the IP string, use that instead
                 if (parts.Length > 1 && int.TryParse(parts[1], out int specifiedPort))
                 {
                     connectionPort = specifiedPort;
@@ -406,15 +395,14 @@ public class NetworkManager
             clientListener = new EventBasedNetListener();
             client = new NetManager(clientListener)
             {
-                // Add these configurations to improve connection chances
-                ReconnectDelay = 500,          // Try to reconnect every 500ms
-                MaxConnectAttempts = 10,       // Try 10 times before giving up
-                DisconnectTimeout = 10000,     // 10 seconds timeout
-                UpdateTime = 15,               // More frequent updates for responsiveness
-                UnconnectedMessagesEnabled = true,  // Required for discovery messages
-                IPv6Enabled = false,           // Disable IPv6 if you're having issues
-                NatPunchEnabled = true,        // Enable NAT punch-through capabilities  
-                EnableStatistics = true        // Enable network statistics for diagnostics
+                ReconnectDelay = 500,
+                MaxConnectAttempts = 10,
+                DisconnectTimeout = 10000,
+                UpdateTime = 15,
+                UnconnectedMessagesEnabled = true,
+                IPv6Enabled = false,
+                NatPunchEnabled = true, 
+                EnableStatistics = true
             };
 
             if (!client.Start())
@@ -426,14 +414,13 @@ public class NetworkManager
 
             SetupClientEventHandlers();
 
-            // First ping the server to check reachability
             bool pingAttemptFailed = true;
 
             try
             {
                 using (var ping = new System.Net.NetworkInformation.Ping())
                 {
-                    var reply = ping.Send(cleanIp, 2000); // 2 second timeout
+                    var reply = ping.Send(cleanIp, 2000);
                     if (reply.Status == System.Net.NetworkInformation.IPStatus.Success)
                     {
                         Console.WriteLine($"[Client] Server at {cleanIp} is pingable. Latency: {reply.RoundtripTime}ms");
@@ -445,7 +432,6 @@ public class NetworkManager
             catch (Exception ex)
             {
                 Console.WriteLine($"[Client] Ping failed: {ex.Message}");
-                // Continue anyway, as many servers block ICMP
             }
 
             if (pingAttemptFailed)
@@ -453,50 +439,41 @@ public class NetworkManager
                 GameStateManager.Instance.ChatLog.AddMessage($"Warning: Server at {cleanIp} did not respond to ping. Trying connection anyway...");
             }
 
-            // Now attempt to connect with the configured client
             client.Connect(cleanIp, connectionPort, "WaterWizardClient");
             Console.WriteLine($"Verbindungsanfrage gesendet an {cleanIp}:{connectionPort}...");
 
-            // Start a timer to poll events until connected or too many attempts
             int connectionAttempts = 0;
-            const int maxAttempts = 20; // Try for about 10 seconds (20 * 500ms)
+            const int maxAttempts = 20;
 
             System.Timers.Timer connectionTimer = new System.Timers.Timer(500);
             connectionTimer.Elapsed += (s, e) =>
             {
                 connectionAttempts++;
 
-                // Poll events to process network messages
                 client.PollEvents();
 
-                // Check if we're connected
                 bool isConnected = client.FirstPeer != null &&
                                    client.FirstPeer.ConnectionState == ConnectionState.Connected;
 
                 if (isConnected)
                 {
-                    // Successfully connected
                     connectionTimer.Stop();
                     Console.WriteLine($"[Client] Connected to server after {connectionAttempts} attempts");
                 }
                 else if (connectionAttempts >= maxAttempts)
                 {
-                    // Too many attempts, give up
                     connectionTimer.Stop();
                     Console.WriteLine($"[Client] Failed to connect after {maxAttempts} attempts");
 
-                    // Add more diagnostic information
                     GameStateManager.Instance.ChatLog.AddMessage($"Connection to server at {cleanIp}:{connectionPort} failed. Please check:");
                     GameStateManager.Instance.ChatLog.AddMessage("1. Is the server running?");
                     GameStateManager.Instance.ChatLog.AddMessage("2. Is the IP address correct?");
                     GameStateManager.Instance.ChatLog.AddMessage("3. Is port 7777 open in the server's firewall?");
 
-                    // Try direct connection without timer as last resort
                     TryDirectConnection(cleanIp, connectionPort);
                 }
                 else
                 {
-                    // Still trying, log every 5 attempts
                     if (connectionAttempts % 5 == 0)
                     {
                         Console.WriteLine($"[Client] Connection attempt #{connectionAttempts}...");
@@ -526,12 +503,10 @@ public class NetworkManager
     {
         if (clientListener == null) return;
 
-        // Improved event handler with more detailed logging
         clientListener.PeerConnectedEvent += peer =>
         {
             Console.WriteLine($"[Client] Erfolgreich mit dem Server verbunden: {peer}");
 
-            // Add connection info to chat log for user visibility
             GameStateManager.Instance.ChatLog.AddMessage(
                 $"Connected to server at {peer}"
             );
@@ -541,7 +516,6 @@ public class NetworkManager
         {
             Console.WriteLine($"[Client] Verbindung zum Server verloren: {peer}, Grund: {disconnectInfo.Reason}");
 
-            // Add detailed explanation based on reason
             string reasonExplanation = disconnectInfo.Reason switch
             {
                 DisconnectReason.ConnectionFailed => "Could not establish connection (firewall or server offline?)",
@@ -552,7 +526,6 @@ public class NetworkManager
 
             Console.WriteLine($"[Client] Disconnect explanation: {reasonExplanation}");
 
-            // Notify user via chat log
             GameStateManager.Instance.ChatLog.AddMessage(
                 $"Disconnected from server: {reasonExplanation}"
             );
@@ -561,7 +534,6 @@ public class NetworkManager
         clientListener.NetworkErrorEvent += (endPoint, error) =>
         {
             Console.WriteLine($"[Client] Netzwerkfehler bei Verbindung zu {endPoint}: {error}");
-            // Add detailed explanation based on error type
             string errorExplanation = error switch
             {
                 SocketError.HostUnreachable => "Host unreachable (check firewall settings or if server is online)",
@@ -572,7 +544,6 @@ public class NetworkManager
 
             Console.WriteLine($"[Client] Error explanation: {errorExplanation}");
 
-            // Notify user via chat log
             GameStateManager.Instance.ChatLog.AddMessage(
                 $"Network error: {errorExplanation}"
             );
@@ -587,22 +558,19 @@ public class NetworkManager
         {
             Console.WriteLine($"[Client] Attempting direct connection to {ip}:{port}...");
 
-            // Clean up existing client
             CleanupClientIfRunning();
 
-            // Create a new client with optimized settings for difficult connections
             clientListener = new EventBasedNetListener();
             client = new NetManager(clientListener)
             {
-                // Add these configurations to improve connection chances
-                ReconnectDelay = 500,          // Try to reconnect every 500ms
-                MaxConnectAttempts = 10,       // Try 10 times before giving up
-                DisconnectTimeout = 10000,     // 10 seconds timeout
-                UpdateTime = 15,               // More frequent updates for responsiveness
-                UnconnectedMessagesEnabled = true,  // Required for discovery messages
-                IPv6Enabled = false,           // Disable IPv6 if you're having issues
-                NatPunchEnabled = true,        // Enable NAT punch-through capabilities  
-                EnableStatistics = true        // Enable network statistics for diagnostics
+                ReconnectDelay = 500,
+                MaxConnectAttempts = 10,
+                DisconnectTimeout = 10000,
+                UpdateTime = 15,
+                UnconnectedMessagesEnabled = true,
+                IPv6Enabled = false,
+                NatPunchEnabled = true,  
+                EnableStatistics = true
             };
 
             if (!client.Start())
@@ -625,7 +593,6 @@ public class NetworkManager
                     client.PollEvents();
                     System.Threading.Thread.Sleep(100);
 
-                    // Check if connected
                     if (client.FirstPeer != null &&
                         client.FirstPeer.ConnectionState == ConnectionState.Connected)
                     {
@@ -655,7 +622,6 @@ public class NetworkManager
                     GameStateManager.Instance.SetStateToInGame();
                     break;
                 case "EnterLobby":
-                    // Receive and store the session ID from the server
                     string receivedSessionId = reader.GetString();
                     if (!string.IsNullOrEmpty(receivedSessionId))
                         sessionId = new GameSessionId(receivedSessionId);
@@ -676,6 +642,9 @@ public class NetworkManager
                 case "SystemMessage":
                     string systemMsg = reader.GetString();
                     GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
+                    break;
+                case "StartPlacementPhase":
+                    GameStateManager.Instance.SetStateToPlacementPhase();
                     break;
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
@@ -848,6 +817,18 @@ public class NetworkManager
         }
     }
 
-
-
+    public void SendPlacementReady()
+    {
+        if (client != null && client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("PlacementReady");
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] PlacementReady gesendet");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden.");
+        }
+    }
 }
