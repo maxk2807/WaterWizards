@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.ships;
 
 /// <summary>
 /// This class represents a type of Ship on the <see cref="ShipField"/> that can be dragged 
