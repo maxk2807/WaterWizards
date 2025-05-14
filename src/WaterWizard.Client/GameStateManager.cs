@@ -38,6 +38,7 @@ public class GameStateManager
         }
     }
 
+
     private IGameState currentState;
 
     public int screenWidth;
@@ -92,7 +93,7 @@ public class GameStateManager
         GameScreen.UpdateScreenSize(width, height);
     }
 
-    /// <summary>
+        /// <summary>
     /// Aktualisiert den Spielzustand und zeichnet die entsprechende
     /// Benutzeroberfläche. Diese Methode muss in jedem Frame aufgerufen werden.
     /// </summary>
@@ -186,13 +187,46 @@ public class GameStateManager
 
         if ((Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) || Raylib.IsKeyPressed(KeyboardKey.Backspace)))
         {
-            if (isEditingIp && inputText.Length > 0)
+            while (key > 0)
             {
-                inputText = inputText.Substring(0, inputText.Length - 1);
+                if (isEditingIp)
+                {
+                    if ((key >= 32 && key <= 126) && inputText.Length < 45) 
+                    {
+                        inputText += (char)key;
+                    }
+                }
+                else if (isEditingPort)
+                {
+                    if ((key >= '0' && key <= '9') && inputPortText.Length < 5) 
+                    {
+                        inputPortText += (char)key;
+                    }
+                }
+                key = Raylib.GetCharPressed();
+            }
+
+            if (Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) || Raylib.IsKeyPressed(KeyboardKey.Backspace))
+
+            {
+                if (isEditingIp && inputText.Length > 0)
+                {
+                    inputText = inputText.Substring(0, inputText.Length - 1);
+                }
+                else if (isEditingPort && inputPortText.Length > 0)
+                {
+                    inputPortText = inputPortText.Substring(0, inputPortText.Length - 1);
+                }
             }
             else if (isEditingPort && inputPortText.Length > 0)
             {
-                inputPortText = inputPortText.Substring(0, inputPortText.Length - 1);
+                isEditingIp = false;
+                isEditingPort = false; 
+            }
+            if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+            {
+                 isEditingIp = false;
+                 isEditingPort = false;
             }
         }
 
