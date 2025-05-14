@@ -88,7 +88,4 @@ namespace WaterWizard.Server.Logging
             _sessions.Clear();
         }
     }
-}"
-
-
 }

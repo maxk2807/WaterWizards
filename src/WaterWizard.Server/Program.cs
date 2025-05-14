@@ -1,6 +1,9 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Shared;
+using WaterWizard.Server.Logging;
+using WaterWizard.Server.Services;
+using WaterWizard.Server.Models;
 
 namespace WaterWizard.Server;
 
@@ -8,10 +11,12 @@ static class Program
 {
     private static readonly Dictionary<string, bool> ConnectedPlayers = [];
     private static GameSessionTimer? _gameSessionTimer;
-    var manaService = new ManaUpdateService(gameDataLogger, server, playerPeers);
-    var manaUpdater = new PeriodicManaUpdater(manaService);
+    private static GameDataLogger? gameDataLogger;
+    private static NetManager server;
+    private static Dictionary<string, NetPeer> playerPeers;
+    static ManaUpdateService manaService = new ManaUpdateService(gameDataLogger, server, playerPeers);
+    static PeriodicManaUpdater manaUpdater = new PeriodicManaUpdater(manaService);
     
-    Dictionary<string, NetPeer> playerPeers = new();
 
     private static void Log(string message)
     {

@@ -73,10 +73,11 @@ public class NetworkManager
             string playerName = $"Player_{playerAddress.Split(':').LastOrDefault() ?? playerAddress}";
             
             // Spieler ↔ Peer registrieren
-            if (!playerPeers.ContainsKey(playerName))
+            if (!PlayerExists(playerAddress))
             {
-                playerPeers[playerName] = peer;
+                connectedPlayers.Add(new Player(playerAddress) { Name = playerName });
             }
+
 
             if (!PlayerExists(playerAddress))
             {
@@ -99,7 +100,7 @@ public class NetworkManager
             string playerName = connectedPlayers.FirstOrDefault(p => p.Address == playerAddress)?.Name ??
                                $"Player_{playerAddress.Split(':').LastOrDefault()}";
             
-            playerPeers.Remove(playerName);
+            RemovePlayerByAddress(playerAddress);
 
             RemovePlayerByAddress(playerAddress);
             BroadcastSystemMessage($"{playerName} disconnected ({disconnectInfo.Reason}).");
