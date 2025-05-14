@@ -12,14 +12,14 @@ public class ConnectingMenuState : IGameState
     private void DrawConnectMenu(GameStateManager manager)
     {
         Raylib.DrawText("Enter IP Address:", manager.screenWidth / 3, manager.screenHeight / 2 - 40, 20, Color.DarkBlue);
-        Rectangle inputBox = new(manager.screenWidth / 3, manager.screenHeight / 2, 250, 40); 
+        Rectangle inputBox = new((float)manager.screenWidth / 3, (float)manager.screenHeight / 2, 250, 40); 
         Raylib.DrawRectangleRec(inputBox, manager.IsEditingIp() ? Color.White : Color.LightGray);
         Raylib.DrawRectangleLinesEx(inputBox, 1, Color.DarkBlue);
         Raylib.DrawText(manager.GetInputText(), (int)inputBox.X + 5, (int)inputBox.Y + 10, 20, Color.Black);
 
         int portInputX = (int)inputBox.X + (int)inputBox.Width + 20; 
         Raylib.DrawText("Enter Port:", portInputX, manager.screenHeight / 2 - 40, 20, Color.DarkBlue);
-        Rectangle portInputBox = new(portInputX, manager.screenHeight / 2f, 100, 40);
+        Rectangle portInputBox = new(portInputX, (float)manager.screenHeight / 2, 100, 40);
         Raylib.DrawRectangleRec(portInputBox, manager.IsEditingPort() ? Color.White : Color.LightGray); 
         Raylib.DrawRectangleLinesEx(portInputBox, 1, Color.DarkBlue);
         Raylib.DrawText(manager.GetInputPortText(), (int)portInputBox.X + 5, (int)portInputBox.Y + 10, 20, Color.Black); 
