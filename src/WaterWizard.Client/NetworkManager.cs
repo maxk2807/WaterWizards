@@ -13,7 +13,6 @@ public class NetworkManager
     private List<Player> connectedPlayers = new List<Player>();
     private List<LobbyInfo> discoveredLobbies = new List<LobbyInfo>();
 
-
     private NetManager? server;
     private NetManager? client;
     private EventBasedNetListener? serverListener;
@@ -22,6 +21,9 @@ public class NetworkManager
     private int hostPort = 7777;
 
     private bool clientReady = false;
+
+    private GameSessionId? sessionId;
+    public GameSessionId? SessionId => sessionId;
 
     private NetworkManager() { }
 
@@ -51,6 +53,9 @@ public class NetworkManager
 
             connectedPlayers.Clear();
             connectedPlayers.Add(new Player("Host") { Name = "Host (You)", IsReady = true });
+
+            // Create a new session ID when hosting starts
+            sessionId = new GameSessionId();
 
             Console.WriteLine($"Server gestartet auf Port {hostPort}");
             SetupServerEventHandlers();
@@ -83,6 +88,8 @@ public class NetworkManager
 
             var writer = new NetDataWriter();
             writer.Put("EnterLobby");
+            // Send the session ID to the client
+            writer.Put(sessionId != null ? sessionId.ToString() : string.Empty);
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
             BroadcastSystemMessage($"{playerName} connected.");
@@ -433,6 +440,10 @@ public class NetworkManager
                     GameStateManager.Instance.SetStateToInGame();
                     break;
                 case "EnterLobby":
+                    // Receive and store the session ID from the server
+                    string receivedSessionId = reader.GetString();
+                    if (!string.IsNullOrEmpty(receivedSessionId))
+                        sessionId = new GameSessionId(receivedSessionId);
                     Console.WriteLine("[Client] Betrete die Lobby...");
                     GameStateManager.Instance.SetStateToLobby();
                     break;
@@ -515,7 +526,6 @@ public class NetworkManager
         discoveredLobbies.Clear();
         connectedPlayers.Clear();
     }
-
 
     private void BroadcastSystemMessage(string message)
     {
