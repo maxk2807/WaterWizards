@@ -93,7 +93,7 @@ public class GameStateManager
         GameScreen.UpdateScreenSize(width, height);
     }
 
-    /// <summary>
+        /// <summary>
     /// Aktualisiert den Spielzustand und zeichnet die entsprechende
     /// Benutzeroberfläche. Diese Methode muss in jedem Frame aufgerufen werden.
     /// </summary>
@@ -129,83 +129,6 @@ public class GameStateManager
         }
         else
         {
-            Raylib.DrawText("Enter IP Address:", screenWidth / 3,
-                            screenHeight / 2 - 40, 20, Color.DarkBlue);
-
-            Rectangle inputBox =
-                new((float)screenWidth / 3, (float)screenHeight / 2, 300, 40);
-            Raylib.DrawRectangleRec(inputBox,
-                                    isEditingIp ? Color.White : Color.LightGray);
-            Raylib.DrawRectangleLines((int)inputBox.X, (int)inputBox.Y,
-                                      (int)inputBox.Width, (int)inputBox.Height,
-                                      Color.DarkBlue);
-            Raylib.DrawText(inputText, (int)inputBox.X + 5, (int)inputBox.Y + 10, 20,
-                            Color.Black);
-
-            Raylib.DrawText("Enter Port:", screenWidth / 2 + 40, screenHeight / 2 - 40, 20, Color.DarkBlue); 
-            Rectangle portInputBox = new((float)screenWidth / 3 + 300, (float)screenHeight / 2, 100, 40); 
-            Raylib.DrawRectangleRec(portInputBox, isEditingPort ? Color.White : Color.LightGray);
-            Raylib.DrawRectangleLines((int)portInputBox.X, (int)portInputBox.Y, (int)portInputBox.Width, (int)portInputBox.Height, Color.DarkBlue);
-            Raylib.DrawText(inputPortText, (int)portInputBox.X + 5, (int)portInputBox.Y + 10, 20, Color.Black);
-
-
-            if (Raylib.IsMouseButtonReleased(MouseButton.Left))
-            {
-                if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), inputBox))
-                {
-                    isEditingIp = true;
-                    isEditingPort = false;
-                }
-                else if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), portInputBox))
-                {
-                    isEditingIp = false;
-                    isEditingPort = true;
-                }
-                else
-                {
-                    isEditingIp = false;
-                    isEditingPort = false;
-                }
-            }
-
-            if (isEditingIp || isEditingPort) 
-            {
-                HandleTextInput();
-            }
-
-            Rectangle connectButton = new(
-                (float)screenWidth / 2 - 80, (float)screenHeight / 2 + 60, 160, 40);
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(),
-                                              connectButton) &&
-                Raylib.IsMouseButtonReleased(MouseButton.Left))
-            {
-                if (int.TryParse(inputPortText, out int portValue) && portValue > 0 && portValue <= 65535)
-                {
-                    NetworkManager.Instance.ConnectToServer(inputText, portValue);
-                }
-                else
-                {
-                    Console.WriteLine("Invalid port number. Please enter a number between 1 and 65535.");
-                }
-            }
-
-            Raylib.DrawRectangleRec(connectButton, Color.Blue);
-            Raylib.DrawText("Connect", (int)connectButton.X + 40,
-                            (int)connectButton.Y + 10, 20, Color.White);
-
-            Rectangle backButton =
-                new((float)screenWidth / 3, (float)screenHeight / 2 + 120, 100, 40);
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(),
-                                              backButton) &&
-                Raylib.IsMouseButtonReleased(MouseButton.Left))
-            {
-                currentState = GameState.MainMenu;
-                isEditingIp = false;
-            }
-
-            Raylib.DrawRectangleRec(backButton, Color.Gray);
-            Raylib.DrawText("Back", (int)backButton.X + 30, (int)backButton.Y + 10,
-                            20, Color.White);
             gameTimer.Reset();
         }
 
@@ -264,7 +187,6 @@ public class GameStateManager
 
         if ((Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) || Raylib.IsKeyPressed(KeyboardKey.Backspace)))
         {
-            int key = Raylib.GetCharPressed();
             while (key > 0)
             {
                 if (isEditingIp)
