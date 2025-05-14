@@ -9,6 +9,7 @@ static class Program
 {
     private static readonly Dictionary<string, bool> ConnectedPlayers = new();
     private static readonly Dictionary<string, bool> PlacementReadyPlayers = new();
+    private static readonly Dictionary<string, string> PlayerNames = new();
     private static GameSessionTimer? _gameSessionTimer;
 
     private static void Log(string message)
@@ -29,7 +30,7 @@ static class Program
         _gameSessionTimer = new GameSessionTimer(server);
 
         var gameStateManager = new ServerGameStateManager(server);
-        gameStateManager.ChangeState(new PlacementState(server));
+        gameStateManager.ChangeState(new LobbyState(server));
 
         string localIp = NetworkUtils.GetLocalIPAddress();
         string publicIp = Environment.GetEnvironmentVariable("PUBLIC_ADDRESS") ?? NetworkUtils.GetPublicIPAddress();
@@ -92,6 +93,7 @@ static class Program
 
                         var writer = new NetDataWriter();
                         writer.Put("EnterLobby");
+                        writer.Put(""); // Leere SessionId, damit Client korrekt liest
                         peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
                         if (_gameSessionTimer != null && _gameSessionTimer.IsRunning)
@@ -101,10 +103,6 @@ static class Program
 
                         SendPlayerList(server);
 
-                        var placementWriter = new NetDataWriter();
-                        placementWriter.Put("StartPlacementPhase");
-                        BroadcastMessage(server, placementWriter, DeliveryMethod.ReliableOrdered);
-                        Log("[Server] StartPlacementPhase an alle Spieler gesendet.");
                         PlacementReadyPlayers.Clear();
                     };
 
@@ -116,6 +114,7 @@ static class Program
 
                         ConnectedPlayers.Remove(playerAddress);
                         PlacementReadyPlayers.Remove(playerAddress);
+                        PlayerNames.Remove(playerAddress);
 
                         if (ConnectedPlayers.Count == 0)
                         {
@@ -137,7 +136,35 @@ static class Program
 
                     listener.NetworkReceiveEvent += (peer, reader, channelNumber, deliveryMethod) =>
                     {
-                        gameStateManager.HandleNetworkEvent(peer, reader);
+                        try
+                        {
+                            string messageType = reader.GetString();
+                            switch (messageType)
+                            {
+                                case "PlayerJoin":
+                                    string playerName = reader.GetString();
+                                    PlayerNames[peer.ToString()] = playerName;
+                                    Log($"[Server] PlayerJoin: {playerName} ({peer})");
+                                    SendPlayerList(server);
+                                    break;
+                                case "ChatMessage":
+                                    string chatMsg = reader.GetString();
+                                    string senderName = PlayerNames.TryGetValue(peer.ToString(), out var name) ? name : $"Player_{peer.Port}";
+                                    BroadcastChatMessage(server, peer, senderName, chatMsg);
+                                    break;
+                                default:
+                                    gameStateManager.HandleNetworkEvent(peer, reader);
+                                    break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log($"[Server] Fehler beim Verarbeiten der Nachricht: {ex.Message}");
+                        }
+                        finally
+                        {
+                            reader.Recycle();
+                        }
                     };
 
                     while (true)
@@ -183,10 +210,11 @@ static class Program
         foreach (var kvp in ConnectedPlayers)
         {
             writer.Put(kvp.Key);
-            writer.Put($"Player_{kvp.Key.Split(':').LastOrDefault() ?? kvp.Key}");
+            writer.Put(PlayerNames.TryGetValue(kvp.Key, out var name) ? name : $"Player_{kvp.Key.Split(':').LastOrDefault()}");
             writer.Put(kvp.Value);
         }
 
+        BroadcastMessage(server, writer, DeliveryMethod.ReliableOrdered);
         Log($"[Server] Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet");
     }
 
