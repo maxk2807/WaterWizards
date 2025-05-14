@@ -8,8 +8,8 @@ class Program
     {
         try
         {
-            const int defaultWidth = 1024;
-            const int defaultHeight = 768;
+            const int defaultWidth = 1200;
+            const int defaultHeight = 900;
 
             Raylib.InitWindow(defaultWidth, defaultHeight, "Water Wizard");
             Raylib.SetExitKey(KeyboardKey.Escape); // Escape-Taste zum Beenden
