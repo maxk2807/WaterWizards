@@ -13,6 +13,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     public ActiveCards? activeCards;
     public CardStacksField? cardStacksField;
     public ShipField? shipField;
+    public RessourceField? ressourceField;
 
     public int cardWidth;
     public int cardHeight;
@@ -32,6 +33,13 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         InitializeActiveCards();
         InitializeCardStacksField();
         InitializeShipField();
+        InitializeRessourceField();
+    }
+
+    private void InitializeRessourceField()
+    {
+        ressourceField = new(this);
+        ressourceField.Initialize();
     }
 
     private void InitializeShipField()
@@ -155,7 +163,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
         DrawCardStacksField();
 
-       
+        DrawRessourceField();
 
         // Update and Draw Game Boards
         GameBoard.Point? clickedCell = opponentBoard.Update();
@@ -200,6 +208,11 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
             _gameStateManager.SetStateToMainMenu();
         }
         
+    }
+
+    private void DrawRessourceField()
+    {
+        ressourceField!.Draw();
     }
 
     private void DrawShipField()
