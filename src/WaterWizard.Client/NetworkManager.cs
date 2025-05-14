@@ -626,6 +626,14 @@ public class NetworkManager
                     if (!string.IsNullOrEmpty(receivedSessionId))
                         sessionId = new GameSessionId(receivedSessionId);
                     Console.WriteLine("[Client] Betrete die Lobby...");
+                    // Sende eigenen Namen an den Server
+                    if (client != null && client.FirstPeer != null)
+                    {
+                        var joinWriter = new NetDataWriter();
+                        joinWriter.Put("PlayerJoin");
+                        joinWriter.Put(Environment.UserName); // oder eigenen Namen aus UI
+                        client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
+                    }
                     GameStateManager.Instance.SetStateToLobby();
                     break;
                 case "PlayerList":
@@ -810,6 +818,8 @@ public class NetworkManager
             writer.Put("ChatMessage");
             writer.Put(message);
             client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            // Zeige die eigene Nachricht sofort im Chatfenster an
+            GameStateManager.Instance.ChatLog.AddMessage($"{Environment.UserName}: {message}");
         }
         catch (Exception ex)
         {

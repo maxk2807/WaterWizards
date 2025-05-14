@@ -92,7 +92,6 @@ public class LobbyListMenuState : IGameState
         if (hoverManualIp && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             manager.SetStateToConnectingMenu();
-            // isEditingIp muss im Manager gesetzt werden, falls benötigt
         }
     }
 }

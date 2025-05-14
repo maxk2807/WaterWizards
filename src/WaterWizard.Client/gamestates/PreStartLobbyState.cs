@@ -81,4 +81,11 @@ public class PreStartLobbyState : IGameState
             manager.SetStateToMainMenu();
         }
     }
+
+    // Called when the client joins a server and receives the EnterLobby message
+    // This ensures we always switch to the PreStartLobbyState after joining
+    public static void SwitchToPreStartLobby()
+    {
+        GameStateManager.Instance.SetStateToLobby();
+    }
 }
