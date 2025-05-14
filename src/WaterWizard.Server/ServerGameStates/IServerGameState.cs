@@ -20,5 +20,5 @@ public interface IServerGameState
     /// <summary>
     /// Behandelt Netzwerkereignisse, die im aktuellen State eintreffen.
     /// </summary>
-    void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager server, ServerGameStateManager manager);
+    void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager server, ServerGameStateManager manager, string MessageType);
 }

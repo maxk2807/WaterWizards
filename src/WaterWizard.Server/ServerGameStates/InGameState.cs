@@ -24,7 +24,9 @@ public class InGameState : IServerGameState
     /// <summary>
     /// Behandelt Netzwerkereignisse während der Spielphase.
     /// </summary>
-    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager server, ServerGameStateManager manager)
+    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager serverInstance, ServerGameStateManager manager, string messageType)
     {
+        // Handle game-specific messages here, using messageType
+        Console.WriteLine($"[InGameState] HandleNetworkEvent called for peer {peer} with messageType {messageType}. Reader position: {reader.Position}");
     }
 }
