@@ -45,7 +45,6 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     /// <summary>
     /// Whether the confirmation button was clicked
     /// </summary>
-    private bool confirmed = false;
     private int CellSize => gameScreen.playerBoard!.CellSize;
 
     /// <summary>
