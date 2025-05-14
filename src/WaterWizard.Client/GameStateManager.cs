@@ -43,12 +43,18 @@ public class GameStateManager
     public int screenWidth;
     public int screenHeight;
     private string inputText = "localhost"; // Default
+    private string inputPortText = "7777"; // Default
     private bool isEditingIp = false;
+    private bool isEditingPort = false;
 
     public string GetInputText() => inputText;
+    public string GetInputPortText() => inputPortText;
     public bool IsEditingIp() => isEditingIp;
+    public bool IsEditingPort() => isEditingPort;
     public void SetEditingIp(bool value) => isEditingIp = value;
+    public void SetEditingPort(bool value) => isEditingPort = value;
     public void SetInputText(string value) => inputText = value;
+    public void SetInputPortText(string value) => inputPortText = value;
 
     /// <summary>
     /// Constructor for GameStateManager.
@@ -83,7 +89,6 @@ public class GameStateManager
         screenWidth = width;
         screenHeight = height;
         Console.WriteLine($"Screen size updated to {width}x{height}");
-        // Re-initialize boards to potentially reposition them based on new screen size
         GameScreen.UpdateScreenSize(width, height);
     }
 
@@ -165,19 +170,41 @@ public class GameStateManager
         {
             if ((key >= 32 && key <= 126))
             {
-                inputText += (char)key;
+                if (isEditingIp)
+                {
+                    if (inputText.Length < 45)
+                        inputText += (char)key;
+                }
+                else if (isEditingPort)
+                {
+                    if ((key >= '0' && key <= '9') && inputPortText.Length < 5)
+                        inputPortText += (char)key;
+                }
             }
             key = Raylib.GetCharPressed();
         }
 
-        if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && inputText.Length > 0)
+        if ((Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) || Raylib.IsKeyPressed(KeyboardKey.Backspace)))
         {
-            inputText = inputText.Substring(0, inputText.Length - 1);
+            if (isEditingIp && inputText.Length > 0)
+            {
+                inputText = inputText.Substring(0, inputText.Length - 1);
+            }
+            else if (isEditingPort && inputPortText.Length > 0)
+            {
+                inputPortText = inputPortText.Substring(0, inputPortText.Length - 1);
+            }
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Enter))
         {
             isEditingIp = false;
+            isEditingPort = false;
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+        {
+            isEditingIp = false;
+            isEditingPort = false;
         }
     }
 
