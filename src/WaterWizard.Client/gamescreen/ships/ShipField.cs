@@ -1,4 +1,4 @@
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.ships;
 
 public class ShipField(GameScreen gameScreen)
 {

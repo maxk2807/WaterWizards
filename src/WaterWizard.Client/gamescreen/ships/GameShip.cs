@@ -1,7 +1,7 @@
 
 using Raylib_cs;
 
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.ships;
 
 public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int width, int height)
 {
