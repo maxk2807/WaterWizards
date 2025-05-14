@@ -24,7 +24,14 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     private readonly int Width = width;
     private readonly int Height = height;
 
+    /// <summary>
+    /// <see cref="Raylib_cs.Rectangle"/> of the Original Ship on the <see cref="ShipField"/>.
+    /// </summary>
     private Rectangle Rectangle => new(X, Y, Width, Height);
+    /// <summary>
+    /// <see cref="Raylib_cs.Rectangle"/> of the Ship that is being dragged onto the Screen to place
+    /// a <see cref="GameShip"/>.
+    /// </summary>
     private Rectangle DraggedShipRectangle = new(x, y, width, height);
     private bool dragging = false;
     private Vector2 offset = new();
@@ -65,11 +72,10 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     /// </summary>
     private void HandleDragging()
     {
-        bool hovering = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), Rectangle);
+        bool hovering = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), DraggedShipRectangle);
         if (confirming)
         {
             HandleConfirm();
-            return;
         }
         if (!dragging)
         {
@@ -79,7 +85,7 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
                 if (hovering)
                 {
                     dragging = true;
-                    offset = new(Raylib.GetMousePosition().X - Rectangle.X, Raylib.GetMousePosition().Y - Rectangle.Y);
+                    offset = new(Raylib.GetMousePosition().X - DraggedShipRectangle.X, Raylib.GetMousePosition().Y - DraggedShipRectangle.Y);
                 }
                 firstDown = false;
             }
@@ -103,6 +109,11 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
             else
             {
                 validPlacement = DrawDrag(offset);
+                if(!validPlacement){
+                    confirming = false;
+                    DraggedShipRectangle.X = Rectangle.X;
+                    DraggedShipRectangle.Y = Rectangle.Y;
+                }
             }
         }
     }
@@ -128,6 +139,7 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
         {
             SpawnShip((int)DraggedShipRectangle.X, (int)DraggedShipRectangle.Y, Math.Max(Width, Height));
             confirming = false;
+            DraggedShipRectangle = new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
         }
 
         var rotateX = DraggedShipRectangle.X +DraggedShipRectangle.Width/2 - CellSize;
@@ -176,15 +188,15 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
             GameBoard board = gameScreen.playerBoard!;
             float snappedX = board.Position.X + shipPos.Value.X * CellSize;
             float snappedY = board.Position.Y + shipPos.Value.Y * CellSize;
-            DraggedShipRectangle = new(snappedX, snappedY, Width, Height);
+            DraggedShipRectangle = new(snappedX, snappedY, DraggedShipRectangle.Width, DraggedShipRectangle.Height);
             bool valid = IsValid(DraggedShipRectangle);
             Raylib.DrawRectangleRec(DraggedShipRectangle, valid ? new(30, 200, 200) : new(255, 0, 0));
             return valid;
         }
         else
         {
-            DraggedShipRectangle = new(mousePos.X - offset.X, mousePos.Y - offset.Y, Width, Height);
-            Raylib.DrawRectangleRec(DraggedShipRectangle, new(0, 0, 0, 0.5f));
+            DraggedShipRectangle = new(mousePos.X - offset.X, mousePos.Y - offset.Y, DraggedShipRectangle.Width, DraggedShipRectangle.Height);
+            Raylib.DrawRectangleRec(DraggedShipRectangle, new(200, 0, 0, 0.5f));
             return false;
         }
     }
