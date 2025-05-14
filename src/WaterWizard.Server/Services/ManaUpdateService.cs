@@ -60,6 +60,7 @@ public class ManaUpdateService
                 writer.Put("ManaUpdate");
                 writer.Put(newMana);
                 peer.Send(writer, DeliveryMethod.Unreliable);
+                Console.WriteLine($"[Server] Mana für Spieler '{playerName}' auf {newMana} erhöht und gesendet.");
             }
         }
     }

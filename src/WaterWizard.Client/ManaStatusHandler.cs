@@ -14,6 +14,7 @@ public class ManaStatusHandler
     public void HandleManaUpdate(int newMana)
     {
         CurrentMana = newMana;
+        Console.WriteLine($"[Client] Mana empfangen: {newMana}");
         Console.WriteLine($"[ManaStatusHandler] Neuer Mana-Wert: {CurrentMana}");
         // Optional: UI-Aktualisierung oder Weiterleitung an Spielzustand
     }
