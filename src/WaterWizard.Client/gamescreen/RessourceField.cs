@@ -40,7 +40,7 @@ public class RessourceField(GameScreen gameScreen)
 
         int manaFontSize = 30;
         int manaWidth = Raylib.MeasureText(manaString, manaFontSize);
-        int manaX = X + (int)(3 * Width / 4f - manaWidth / 2d);
+        int manaX = X + (int)(3 * Width / 4f - manaWidth / 2f);
         int manaY = (int)(Y + (Height - manaFontSize) / 2f);
 
         ManaRec = new(manaX, manaY, manaWidth, manaFontSize);
