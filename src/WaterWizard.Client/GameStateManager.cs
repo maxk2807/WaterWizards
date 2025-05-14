@@ -406,8 +406,8 @@ namespace WaterWizard.Client
 
         private void DrawConnectMenu()
         {
-            Raylib.DrawText("Enter IP Address to Connect:", screenWidth / 3,
-                            screenHeight / 3, 20, Color.DarkBlue);
+            Raylib.DrawText("Enter IP Address:", screenWidth / 3,
+                            screenHeight / 2 - 40, 20, Color.DarkBlue);
 
             Rectangle inputBox =
                 new((float)screenWidth / 3, (float)screenHeight / 2, 300, 40);
@@ -419,8 +419,8 @@ namespace WaterWizard.Client
             Raylib.DrawText(inputText, (int)inputBox.X + 5, (int)inputBox.Y + 10, 20,
                             Color.Black);
 
-            Raylib.DrawText("Enter Port:", screenWidth / 3, screenHeight / 3 + 60, 20, Color.DarkBlue); 
-            Rectangle portInputBox = new Rectangle((float)screenWidth / 3, (float)screenHeight / 3 + 90, 100, 40); 
+            Raylib.DrawText("Enter Port:", screenWidth / 2 + 40, screenHeight / 2 - 40, 20, Color.DarkBlue); 
+            Rectangle portInputBox = new((float)screenWidth / 3 + 300, (float)screenHeight / 2, 100, 40); 
             Raylib.DrawRectangleRec(portInputBox, isEditingPort ? Color.White : Color.LightGray);
             Raylib.DrawRectangleLines((int)portInputBox.X, (int)portInputBox.Y, (int)portInputBox.Width, (int)portInputBox.Height, Color.DarkBlue);
             Raylib.DrawText(inputPortText, (int)portInputBox.X + 5, (int)portInputBox.Y + 10, 20, Color.Black);
@@ -450,7 +450,7 @@ namespace WaterWizard.Client
                 HandleTextInput();
             }
 
-            Rectangle connectButton = new Rectangle(
+            Rectangle connectButton = new(
                 (float)screenWidth / 2 - 80, (float)screenHeight / 2 + 60, 160, 40);
             if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(),
                                               connectButton) &&
