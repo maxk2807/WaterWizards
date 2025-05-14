@@ -3,26 +3,17 @@ using Raylib_cs;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
-/// <summary>
-/// This class represents a type of Ship on the <see cref="ShipField"/> that can be dragged 
-/// onto the Board to place. Once placed, the dragged <see cref="DraggingShip"/> spawns 
-/// a normal Ship on that location.
-/// In the beginning, there are 1 Ship of length 5, 2 Ships of length 4, 2 Ships of length 3,
-/// 4 ships of length 2 and 5 ships of length 5. Further Ships can be summoned with the cards.
-/// The number of ships is indicated by the number written in the middle
-/// </summary>
-/// <param name="gameScreen"></param>
-/// <param name="x"></param>
-/// <param name="y"></param>
-/// <param name="length"></param>
-/// <param name="currentNumber"></param>
-/// <param name="orientation"></param>
-public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int height, int currentNumber)
+public class DraggingShip
 {
-    private readonly int X = x;
-    private readonly int Y = y;
-    private readonly int Width = width;
-    private readonly int Height = height;
+    private readonly GameScreen gameScreen;
+    private readonly int X;
+    private readonly int Y;
+    private readonly int Width;
+    private readonly int Height;
+    private readonly int currentNumber;
+
+    public Texture2D rotateIcon;
+    public Texture2D confirmIcon;
 
     /// <summary>
     /// <see cref="Raylib_cs.Rectangle"/> of the Original Ship on the <see cref="ShipField"/>.
@@ -32,7 +23,7 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     /// <see cref="Raylib_cs.Rectangle"/> of the Ship that is being dragged onto the Screen to place
     /// a <see cref="GameShip"/>.
     /// </summary>
-    private Rectangle DraggedShipRectangle = new(x, y, width, height);
+    private Rectangle DraggedShipRectangle;
     private bool dragging = false;
     private Vector2 offset = new();
     private bool firstDown = true;
@@ -46,6 +37,33 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
     /// Whether the confirmation button was clicked
     /// </summary>
     private int CellSize => gameScreen.playerBoard!.CellSize;
+
+    /// <summary>
+    /// This class represents a type of Ship on the <see cref="ShipField"/> that can be dragged 
+    /// onto the Board to place. Once placed, the dragged <see cref="DraggingShip"/> spawns 
+    /// a normal Ship on that location.
+    /// In the beginning, there are 1 Ship of length 5, 2 Ships of length 4, 2 Ships of length 3,
+    /// 4 ships of length 2 and 5 ships of length 5. Further Ships can be summoned with the cards.
+    /// The number of ships is indicated by the number written in the middle
+    /// </summary>
+    /// <param name="gameScreen"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="length"></param>
+    /// <param name="currentNumber"></param>
+    /// <param name="orientation"></param>
+    public DraggingShip(GameScreen gameScreen, int x, int y, int width, int height, int currentNumber)
+    {
+        this.gameScreen = gameScreen;
+        X = x;
+        Y = y;
+        Width = width;
+        Height = height;
+        this.currentNumber = currentNumber;
+        DraggedShipRectangle = new(x, y, width, height);
+        rotateIcon = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/icons8-rotate-48.png");
+        confirmIcon = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/icons8-tick-60.png");
+    }
 
     /// <summary>
     /// Handles Rendering of the Ships that can be Dragged and placed on the board. Handles dragging and placement
@@ -108,7 +126,8 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
             else
             {
                 validPlacement = DrawDrag(offset);
-                if(!validPlacement){
+                if (!validPlacement)
+                {
                     confirming = false;
                     DraggedShipRectangle.X = Rectangle.X;
                     DraggedShipRectangle.Y = Rectangle.Y;
@@ -129,11 +148,18 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
         //TODO: Reduce number of current ships
         Raylib.DrawRectangleRec(DraggedShipRectangle, new(30, 200, 200));
 
-        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width/2;
+        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
         var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
         Rectangle confirmButton = new(confirmX, confirmY, CellSize, CellSize);
         bool confirmHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), confirmButton);
         Raylib.DrawRectangleRec(confirmButton, confirmHovered ? Color.LightGray : Color.Gray);
+
+        float confirIconScale = CellSize * 0.8f / confirmIcon.Height;
+        float confirmIconSize = confirmIcon.Height * confirIconScale;
+        int confirmIconX = (int)(confirmX + (CellSize - confirmIconSize)/2f);
+        int confirmIconY = (int)(confirmY + (CellSize - confirmIconSize)/2f);
+        Raylib.DrawTextureEx(confirmIcon, new(confirmIconX, confirmIconY), 0, confirIconScale, Color.White);
+
         if (confirmHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
             SpawnShip((int)DraggedShipRectangle.X, (int)DraggedShipRectangle.Y, Math.Max(Width, Height));
@@ -141,12 +167,19 @@ public class DraggingShip(GameScreen gameScreen, int x, int y, int width, int he
             DraggedShipRectangle = new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
         }
 
-        var rotateX = DraggedShipRectangle.X +DraggedShipRectangle.Width/2 - CellSize;
+        var rotateX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2 - CellSize;
         var rotateY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
         Rectangle rotateButton = new(rotateX, rotateY, CellSize, CellSize);
         bool rotateHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rotateButton);
-        Raylib.DrawRectangleRec(rotateButton, rotateHovered ? Color.Blue : Color.DarkBlue);
-        if(rotateHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        Raylib.DrawRectangleRec(rotateButton, rotateHovered ? Color.LightGray : Color.Gray);
+
+        float rotateIconScale = CellSize * 0.7f / rotateIcon.Height;
+        float rotateIconSize = rotateIcon.Height * rotateIconScale;
+        int rotateIconX = (int)(rotateX + (CellSize - rotateIconSize)/2f);
+        int rotateIconY = (int)(rotateY + (CellSize - rotateIconSize)/2f);
+        Raylib.DrawTextureEx(rotateIcon, new(rotateIconX, rotateIconY), 0, rotateIconScale, Color.White);
+
+        if (rotateHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
             var prevWidth = DraggedShipRectangle.Width;
             var prevHeight = DraggedShipRectangle.Height;

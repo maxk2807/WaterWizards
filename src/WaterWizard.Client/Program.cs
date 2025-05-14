@@ -56,6 +56,7 @@ class Program
                 GameStateManager.Instance.UpdateAndDraw();
             }
 
+            TextureManager.UnloadAllTextures();
             Raylib.CloseWindow();
         }
         catch (Exception ex)

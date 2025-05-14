@@ -2,7 +2,7 @@ namespace WaterWizard.Client.gamescreen.ships;
 
 public class ShipField(GameScreen gameScreen)
 {
-    private Dictionary<DraggingShip, int> ships = [];
+    public Dictionary<DraggingShip, int> Ships = [];
 
     private int X;
     private int Y;
@@ -23,41 +23,41 @@ public class ShipField(GameScreen gameScreen)
         int width = CellSize;
         int height = CellSize * 5;
         DraggingShip ship = new(gameScreen, shipX, shipY, width, height, 1);
-        ships.Add(ship, 1);
+        Ships.Add(ship, 1);
 
         shipX = X + ZonePadding / 2 + CellSize;
         shipY = Y;
         width = CellSize;
         height = CellSize * 4;
         ship = new(gameScreen, shipX, shipY, width, height, 2);
-        ships.Add(ship, 2);
+        Ships.Add(ship, 2);
         
         shipX = X + ZonePadding + CellSize * 2;
         //same shipY
         width = CellSize;
         height = CellSize * 3;
         ship = new(gameScreen, shipX, shipY, width, height, 2);
-        ships.Add(ship, 2);
+        Ships.Add(ship, 2);
         
         //same shipX
         shipY = Y + CellSize * 3 + ZonePadding / 2;
         width = CellSize;
         height = CellSize * 2;
         ship = new(gameScreen, shipX, shipY, width, height, 4);
-        ships.Add(ship, 4);
+        Ships.Add(ship, 4);
         
         shipX = X + ZonePadding / 2 + CellSize;
         shipY = Y + CellSize * 4 + ZonePadding / 2;
         width = CellSize;
         height = CellSize;
         ship = new(gameScreen, shipX, shipY, width, height, 5);
-        ships.Add(ship, 5);
-        Console.WriteLine(ships.Count);
+        Ships.Add(ship, 5);
+        Console.WriteLine(Ships.Count);
     }
 
     public void Draw()
     {
-        foreach (var pair in ships)
+        foreach (var pair in Ships)
         {
             pair.Key.Draw();
         }
