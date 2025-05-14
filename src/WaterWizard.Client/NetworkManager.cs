@@ -160,7 +160,7 @@ public class NetworkManager
                     else
                     {
                         // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
-                        Console.WriteLine($"[Host] PlayerJoin: Player with address {peer.ToString()} not found in connectedPlayers. Name received: {playerName}");
+                        Console.WriteLine($"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}");
                         // Optionally, handle this by adding the player if it's a valid scenario,
                         // though players are typically added during PeerConnectedEvent.
                         // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
