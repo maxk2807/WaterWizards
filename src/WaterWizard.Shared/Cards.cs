@@ -143,4 +143,19 @@ public class Cards
         Console.WriteLine($"Target: {Target}");
         Console.WriteLine();
     }
+
+    public static List<Cards> GetCardsOfType(CardType type)
+    {
+        List<Cards> cards = [];
+        var cardVariants = cardTypeMapping.Where((variantTypePair) =>
+        {
+            return variantTypePair.Value == type;
+        });
+        foreach (var variant in cardVariants)
+        {
+            cards.Add(new(variant.Key));
+        }
+
+        return cards;
+    }
 }
