@@ -31,6 +31,7 @@ jobs:
       - name: Get and increment version if needed
         id: get_version
         run: |
+          git fetch --tags
           VERSION=$(grep -m1 '<Version>' src/WaterWizard.Server/WaterWizard.Server.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
           if [ -z "$VERSION" ]; then
             VERSION="0.0.$GITHUB_RUN_NUMBER"
