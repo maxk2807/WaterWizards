@@ -25,32 +25,48 @@ jobs:
       - name: Run NUKE Build
         run: ./build.sh Clean Compile Test
 
-      - name: Publish Server
-        run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -o ./publish
+      - name: Publish Client (Windows)
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win
 
-      - name: Get version from project
+      - name: Publish Client (MacOS)
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx
+
+      - name: Prepare release assets
+        run: |
+          mkdir release-assets
+
+          # Copy only the binaries you want to release
+          cp ./publish/win/WaterWizard.Client.exe release-assets/
+          cp ./publish/osx/WaterWizard.Client release-assets/WaterWizard.Client.BinaryMacOs.Client
+
+      - name: Get and increment version if needed
         id: get_version
         run: |
+          git fetch --tags
           VERSION=$(grep -m1 '<Version>' src/WaterWizard.Server/WaterWizard.Server.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
           if [ -z "$VERSION" ]; then
-            VERSION="v0.0.$GITHUB_RUN_NUMBER"
+            VERSION="0.0.$GITHUB_RUN_NUMBER"
           fi
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+          [ -z "$PATCH" ] && PATCH=0
+          TAG="v$MAJOR.$MINOR.$PATCH"
+          while git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; do
+            PATCH=$((PATCH + 1))
+            TAG="v$MAJOR.$MINOR.$PATCH"
+          done
+          VERSION="$MAJOR.$MINOR.$PATCH"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release & Upload Assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.get_version.outputs.version }}
+          tag_name: ${{ steps.get_version.outputs.tag }}
           name: Release ${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.get_version.outputs.version }}
-          files: ./publish/**
+          files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
