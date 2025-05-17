@@ -25,8 +25,19 @@ jobs:
       - name: Run NUKE Build
         run: ./build.sh Clean Compile Test
 
-      - name: Publish Server
-        run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -o ./publish
+      - name: Publish Client (Windows)
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win
+
+      - name: Publish Client (MacOS)
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx
+
+      - name: Prepare release assets
+        run: |
+          mkdir release-assets
+
+          # Copy only the binaries you want to release
+          cp ./publish/win/WaterWizard.Client.exe release-assets/
+          cp ./publish/osx/WaterWizard.Client release-assets/WaterWizard.Client.BinaryMacOs.Client
 
       - name: Get and increment version if needed
         id: get_version
@@ -41,7 +52,6 @@ jobs:
           PATCH=$(echo "$VERSION" | cut -d. -f3)
           [ -z "$PATCH" ] && PATCH=0
           TAG="v$MAJOR.$MINOR.$PATCH"
-          # Loop to ensure unique tag
           while git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; do
             PATCH=$((PATCH + 1))
             TAG="v$MAJOR.$MINOR.$PATCH"
@@ -57,6 +67,6 @@ jobs:
           name: Release ${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
-          files: ./publish/*
+          files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
