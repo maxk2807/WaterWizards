@@ -97,7 +97,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 
             //Draw Card Preview if Mouse over card snippet
             Rectangle cardRec = new(centralX + cardX, cardY, effectiveCardWidth, CardHeight);
-            if (GameScreen.IsHoveringRec(cardRec))
+            if (front && GameScreen.IsHoveringRec(cardRec))
             {
                 DrawPreview(_cards[i]);
             }
