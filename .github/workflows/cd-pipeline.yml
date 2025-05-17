@@ -1,0 +1,56 @@
+name: CD Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write 
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Run NUKE Build
+        run: ./build.sh Clean Compile Test
+
+      - name: Publish Server
+        run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -o ./publish
+
+      - name: Get version from project
+        id: get_version
+        run: |
+          VERSION=$(grep -m1 '<Version>' src/WaterWizard.Server/WaterWizard.Server.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
+          if [ -z "$VERSION" ]; then
+            VERSION="v0.0.$GITHUB_RUN_NUMBER"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: Release ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          files: ./publish/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
