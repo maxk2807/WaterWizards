@@ -35,15 +35,17 @@ jobs:
           if [ -z "$VERSION" ]; then
             VERSION="0.0.$GITHUB_RUN_NUMBER"
           fi
-          TAG="v$VERSION"
-          # Check if tag exists
-          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
-            # Increment patch version
-            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+          [ -z "$PATCH" ] && PATCH=0
+          TAG="v$MAJOR.$MINOR.$PATCH"
+          # Loop to ensure unique tag
+          while git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; do
             PATCH=$((PATCH + 1))
-            VERSION="$MAJOR.$MINOR.$PATCH"
-            TAG="v$VERSION"
-          fi
+            TAG="v$MAJOR.$MINOR.$PATCH"
+          done
+          VERSION="$MAJOR.$MINOR.$PATCH"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
