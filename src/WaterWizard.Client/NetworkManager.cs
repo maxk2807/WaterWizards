@@ -26,6 +26,12 @@ public class NetworkManager
     private GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
 
+    /// <summary>
+    /// Stores the current lobby countdown seconds (null if no countdown active).
+    /// </summary>
+    public int? LobbyCountdownSeconds { get; private set; }
+
+    
     private NetworkManager() { }
 
     /// <summary>
@@ -133,6 +139,26 @@ public class NetworkManager
         }
     }
 
+    /// <summary>
+    /// Verarbeitet den Countdown für die Lobby.
+    /// </summary>
+    /// <param name="reader">Der NetPacketReader, der die Nachricht enthält.</param>
+    /// <returns></returns>
+    public void HandleLobbyCountdown(NetPacketReader reader)
+    {
+        int secondsLeft = reader.GetInt();
+        if (secondsLeft <= 0)
+        {
+            LobbyCountdownSeconds = null;
+        }
+        else
+        {
+            LobbyCountdownSeconds = secondsLeft;
+        }
+        Console.WriteLine($"[Client] Lobby countdown: {LobbyCountdownSeconds}");
+    }
+
+
     private void HandleServerReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
     {
         try
@@ -148,6 +174,9 @@ public class NetworkManager
                     break;
                 case "ChatMessage":
                     string chatMsg = reader.GetString();
+                    break;
+                case "LobbyCountdown":
+                    HandleLobbyCountdown(reader);
                     break;
                 case "PlayerJoin":
                     string playerName = reader.GetString(); // Name sent by the client
@@ -639,6 +668,9 @@ public class NetworkManager
             {
                 case "StartGame":
                     GameStateManager.Instance.SetStateToInGame();
+                    break;
+                case "LobbyCountdown":
+                    HandleLobbyCountdown(reader);
                     break;
                 case "EnterLobby":
                     string receivedSessionId = reader.GetString();

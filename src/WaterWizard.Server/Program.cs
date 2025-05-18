@@ -115,10 +115,15 @@ static class Program
                         ConnectedPlayers.Remove(playerAddress);
                         PlacementReadyPlayers.Remove(playerAddress);
                         PlayerNames.Remove(playerAddress);
-
+                        if (gameStateManager.CurrentState is LobbyState lobbyState)
+                        {
+                            lobbyState.ResetCountdown();
+                        }
                         if (ConnectedPlayers.Count == 0)
                         {
                             Log("[Server] Letzter Spieler hat die Verbindung getrennt.");
+                            gameStateManager.ChangeState(new LobbyState(server));
+
                             if (_gameSessionTimer != null && _gameSessionTimer.IsRunning)
                             {
                                 Log("[Server] Stoppe den Spiel-Timer.");

@@ -1,4 +1,5 @@
 using Raylib_cs;
+using WaterWizard.Client.gamescreen;
 
 namespace WaterWizard.Client.gamestates;
 
@@ -36,6 +37,7 @@ public class PreStartLobbyState : IGameState
         int buttonHeight = 50;
         int buttonX = (int)(availableWidth - buttonWidth) / 2;
         bool isHost = NetworkManager.Instance.IsHost();
+        PreStartLobbyTimer.DrawCountdown(manager);
         if (isHost)
         {
             Rectangle startButton = new Rectangle(buttonX, actionButtonY, buttonWidth, buttonHeight);
