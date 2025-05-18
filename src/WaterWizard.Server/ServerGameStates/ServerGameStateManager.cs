@@ -35,6 +35,6 @@ public class ServerGameStateManager
     /// </summary>
     public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, string messageType)
     {
-        _currentState?.HandleNetworkEvent(peer, reader, _server, this, messageType);
+        CurrentState?.HandleNetworkEvent(peer, reader, _server, this, messageType);
     }
 }

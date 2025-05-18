@@ -2,6 +2,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Net;
 using System.Net.Sockets;
+using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client;
@@ -900,6 +901,24 @@ public class NetworkManager
         else
         {
             Console.WriteLine("[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden.");
+        }
+    }
+
+    public void SendShipPlacement(int x, int y, int width, int height){
+        if(client != null && client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("PlaceShip");
+            writer.Put(x);
+            writer.Put(y);
+            writer.Put(width);
+            writer.Put(height);
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] PlaceShip gesendet");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
         }
     }
 }

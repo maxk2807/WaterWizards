@@ -148,25 +148,6 @@ public class DraggingShip
         //TODO: Reduce number of current ships
         Raylib.DrawRectangleRec(DraggedShipRectangle, new(30, 200, 200));
 
-        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
-        var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
-        Rectangle confirmButton = new(confirmX, confirmY, CellSize, CellSize);
-        bool confirmHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), confirmButton);
-        Raylib.DrawRectangleRec(confirmButton, confirmHovered ? Color.LightGray : Color.Gray);
-
-        float confirIconScale = CellSize * 0.8f / confirmIcon.Height;
-        float confirmIconSize = confirmIcon.Height * confirIconScale;
-        int confirmIconX = (int)(confirmX + (CellSize - confirmIconSize)/2f);
-        int confirmIconY = (int)(confirmY + (CellSize - confirmIconSize)/2f);
-        Raylib.DrawTextureEx(confirmIcon, new(confirmIconX, confirmIconY), 0, confirIconScale, Color.White);
-
-        if (confirmHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
-        {
-            SpawnShip((int)DraggedShipRectangle.X, (int)DraggedShipRectangle.Y, Math.Max(Width, Height));
-            confirming = false;
-            DraggedShipRectangle = new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
-        }
-
         var rotateX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2 - CellSize;
         var rotateY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
         Rectangle rotateButton = new(rotateX, rotateY, CellSize, CellSize);
@@ -186,6 +167,25 @@ public class DraggingShip
             DraggedShipRectangle.Width = prevHeight;
             DraggedShipRectangle.Height = prevWidth;
         }
+
+        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
+        var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
+        Rectangle confirmButton = new(confirmX, confirmY, CellSize, CellSize);
+        bool confirmHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), confirmButton);
+        Raylib.DrawRectangleRec(confirmButton, confirmHovered ? Color.LightGray : Color.Gray);
+
+        float confirIconScale = CellSize * 0.8f / confirmIcon.Height;
+        float confirmIconSize = confirmIcon.Height * confirIconScale;
+        int confirmIconX = (int)(confirmX + (CellSize - confirmIconSize)/2f);
+        int confirmIconY = (int)(confirmY + (CellSize - confirmIconSize)/2f);
+        Raylib.DrawTextureEx(confirmIcon, new(confirmIconX, confirmIconY), 0, confirIconScale, Color.White);
+
+        if (confirmHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            SpawnShip((int)DraggedShipRectangle.X, (int)DraggedShipRectangle.Y, Math.Max(Width, Height));
+            confirming = false;
+            DraggedShipRectangle = new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
+        }
     }
 
     /// <summary>
@@ -197,6 +197,9 @@ public class DraggingShip
     private void SpawnShip(int x, int y, int shipSize)
     {
         gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, (int)DraggedShipRectangle.Width, (int)DraggedShipRectangle.Height));
+        int boardX = (int)gameScreen.playerBoard.Position.X;
+        int boardY = (int)gameScreen.playerBoard.Position.Y;
+        NetworkManager.Instance.SendShipPlacement((x-boardX) / CellSize, (y-boardY) / CellSize, (int)(DraggedShipRectangle.Width / CellSize), (int)(DraggedShipRectangle.Height / CellSize));
     }
 
     /// <summary>
