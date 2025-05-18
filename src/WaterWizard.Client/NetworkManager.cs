@@ -110,6 +110,7 @@ public class NetworkManager
                                $"Player_{playerAddress.Split(':').LastOrDefault()}";
 
             RemovePlayerByAddress(playerAddress);
+            LobbyCountdownSeconds = null;
             BroadcastSystemMessage($"{playerName} disconnected ({disconnectInfo.Reason}).");
             UpdatePlayerList();
         };
@@ -577,6 +578,7 @@ public class NetworkManager
             GameStateManager.Instance.ChatLog.AddMessage(
                 $"Disconnected from server: {reasonExplanation}"
             );
+            LobbyCountdownSeconds = null;
         };
 
         clientListener.NetworkErrorEvent += (endPoint, error) =>
@@ -764,6 +766,7 @@ public class NetworkManager
         client?.Stop();
         discoveredLobbies.Clear();
         connectedPlayers.Clear();
+        LobbyCountdownSeconds = null; 
     }
 
     private void BroadcastSystemMessage(string message)

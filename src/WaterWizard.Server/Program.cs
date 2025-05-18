@@ -121,6 +121,8 @@ static class Program
                         }
                         if (ConnectedPlayers.Count == 0)
                         {
+                            BroadcastCountdownReset(server);
+
                             Log("[Server] Letzter Spieler hat die Verbindung getrennt.");
                             gameStateManager.ChangeState(new LobbyState(server));
 
@@ -272,5 +274,22 @@ static class Program
                 recipientPeer.Send(writer, DeliveryMethod.ReliableOrdered);
             }
         }
+    }
+
+    /// <summary>
+    /// Broadcastet den Countdown an alle verbundenen Spieler.
+    /// /// </summary>
+    /// <param name="secondsLeft">Die verbleibenden Sekunden des Countdowns.</param>
+    /// <returns></returns>
+    private static void BroadcastCountdownReset(NetManager server)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("LobbyCountdown");
+        writer.Put(0); // 0 means reset/hide
+        foreach (var peer in server.ConnectedPeerList)
+        {
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        Log("[Server] Broadcasted countdown reset to all clients.");
     }
 }

@@ -125,4 +125,21 @@ public class LobbyState : IServerGameState
         }
         Console.WriteLine("[Server] Countdown timer reset and reset broadcasted.");
     }
+
+    /// <summary>
+    /// Broadcastet eine Countdown-Reset-Nachricht an alle verbundenen Spieler.
+    /// </summary>
+    /// <param name="server">Der NetManager-Server.</param>
+    /// <returns></returns>
+    private static void BroadcastCountdownReset(NetManager server)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("LobbyCountdown");
+        writer.Put(0); 
+        foreach (var peer in server.ConnectedPeerList)
+        {
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        Console.WriteLine("[Server] Broadcasted countdown reset to all clients.");
+    }
 }
