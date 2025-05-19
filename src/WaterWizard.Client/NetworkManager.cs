@@ -176,7 +176,7 @@ public class NetworkManager
                     HandlePlayerReadyStatus(peer, messageType == "PlayerReady");
                     break;
                 case "ChatMessage":
-                    string chatMsg = reader.GetString();
+                    reader.GetString();
                     break;
                 case "LobbyCountdown":
                     HandleLobbyCountdown(reader);
