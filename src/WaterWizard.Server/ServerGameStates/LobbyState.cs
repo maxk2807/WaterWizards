@@ -84,7 +84,7 @@ public class LobbyState : IServerGameState
             {
                 countdownTimer?.Dispose();
                 Console.WriteLine("[Server] Countdown finished. Starting game.");
-                manager.ChangeState(new PlacementState(server)); 
+                manager.ChangeState(new PlacementState(server, manager)); 
             }
         }, null, 0, 1000);
     }

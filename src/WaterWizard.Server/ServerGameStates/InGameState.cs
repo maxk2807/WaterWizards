@@ -7,28 +7,10 @@ using LiteNetLib.Utils;
 /// <summary>
 /// Server-Spielzustand für die eigentliche Spielphase (nach Platzierung).
 /// </summary>
-public class InGameState : IServerGameState
+public class InGameState(NetManager server, GameState gameState) : IServerGameState
 {
-    private readonly NetManager server;
-    public InGameState(NetManager server) { this.server = server; }
-
-    private Dictionary<string, Cell[,]> player1;
-    private Dictionary<string, Cell[,]> player2;
-    private static readonly int boardWidthInCells = 12;
-    private static readonly int boardHeightInCells = 10;
-
-    private static Cell[,] InitBoard()
-    {
-        Cell[,] result = new Cell[12, 10];
-        for (int i = 0; i < boardWidthInCells; i++)
-        {
-            for (int j = 0; j < boardHeightInCells; j++)
-            {
-                result[i, j] = new(CellState.Empty);
-            }
-        }
-        return result;
-    }
+    private readonly NetManager server = server;
+    private readonly GameState gameState = gameState;
 
     /// <summary>
     /// Wird beim Eintritt in die Spielphase aufgerufen.
@@ -44,14 +26,6 @@ public class InGameState : IServerGameState
         }
         //TODO: Client Verbindung Spielern zuweisen
         //TODO: Boards Initialisieren
-        if (server.ConnectedPeerList.Count >= 2)
-        {
-            player1 = [];
-            player1.Add(server.ConnectedPeerList[0].ToString(), InitBoard());
-
-            player2 = [];
-            player2.Add(server.ConnectedPeerList[1].ToString(), InitBoard());
-        }
         //TODO: Handkarten Initialisieren
         //TODO: Graveyard Initialisieren
         //TODO: Kartenstapel Initialisieren
@@ -73,19 +47,15 @@ public class InGameState : IServerGameState
     {
         // Handle game-specific messages here, using messageType
         Console.WriteLine($"[InGameState] HandleNetworkEvent called for peer {peer} with messageType {messageType}. Reader position: {reader.Position}");
-        if (messageType == "PlaceShip")
-        {
-            HandleShipPlacement(peer, reader);
+        switch(messageType){
+            case "PlaceShip":
+                HandleShipPlacement(peer, reader);
+                break;
         }
-
     }
 
     private void HandleShipPlacement(NetPeer peer, NetPacketReader reader)
     {
-        int x = reader.GetInt();
-        int y = reader.GetInt();
-        int width =  reader.GetInt();
-        int height = reader.GetInt();
-        Console.WriteLine(x+" "+y+" "+width+" "+height);
+        gameState.HandleShipPlacement(peer, reader);
     }
 }

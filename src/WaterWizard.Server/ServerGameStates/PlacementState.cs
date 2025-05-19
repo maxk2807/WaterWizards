@@ -7,20 +7,23 @@ using LiteNetLib.Utils;
 /// Server-Spielzustand für die Schiffsplatzierungsphase.
 /// Wartet auf PlacementReady von allen Spielern und startet dann das Spiel.
 /// </summary>
-public class PlacementState : IServerGameState
+public class PlacementState(NetManager server, ServerGameStateManager manager) : IServerGameState
 {
     private readonly Dictionary<string, bool> placementReady = new();
-    private readonly NetManager server;
-
-    public PlacementState(NetManager server)
-    {
-        this.server = server;
-    }
+    private readonly NetManager server = server;
+    private readonly ServerGameStateManager manager = manager;
+    private GameState? GameState;
 
     /// <summary>
     /// Sendet die Nachricht zum Start der Platzierungsphase an alle Spieler.
     /// </summary>
     public void OnEnter()
+    {
+        GameState = new(server, manager);
+        NotifyClients();
+    }
+
+    private void NotifyClients()
     {
         var writer = new NetDataWriter();
         writer.Put("StartPlacementPhase");
@@ -55,12 +58,15 @@ public class PlacementState : IServerGameState
                     writer.Put("StartGame");
                     foreach (var p in serverInstance.ConnectedPeerList) // Use serverInstance passed to this method
                         p.Send(writer, DeliveryMethod.ReliableOrdered);
-                    manager.ChangeState(new InGameState(serverInstance)); // Use serverInstance
+                    manager.ChangeState(new InGameState(serverInstance, GameState!)); // Use serverInstance
                 }
                 else
                 {
                     Console.WriteLine($"[PlacementState] Waiting for other players to place ships. {placementReady.Count}/{serverInstance.ConnectedPeersCount} ready.");
                 }
+                break;
+            case "PlaceShip":
+                GameState!.HandleShipPlacement(peer, reader);
                 break;
             default:
                 Console.WriteLine($"[PlacementState] Received unhandled message type: {messageType}");

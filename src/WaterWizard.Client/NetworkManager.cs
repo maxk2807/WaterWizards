@@ -2,6 +2,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Net;
 using System.Net.Sockets;
+using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Shared;
 
@@ -198,7 +199,6 @@ public class NetworkManager
                         // UpdatePlayerList();
                     }
                     break;
-                    
                 default:
                     Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
@@ -707,6 +707,15 @@ public class NetworkManager
                     break;
                 case "StartPlacementPhase":
                     GameStateManager.Instance.SetStateToPlacementPhase();
+                    break;
+                case "ShipPosition":
+                    {
+                        int x = reader.GetInt();
+                        int y = reader.GetInt();
+                        int width = reader.GetInt();
+                        int height = reader.GetInt();
+                        Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
+                    }
                     break;
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");

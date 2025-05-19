@@ -8,9 +8,14 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     private readonly GameScreen gameScreen = gameScreen;
     private readonly ShipType type = type;
 
+    public int X = x;
+    public int Y = y;
+    public int Width = width;
+    public int Height = height;
+
     public void Draw()
     {
-        Rectangle rec = new(x,y,width,height); 
+        Rectangle rec = new(X,Y,Width,Height); 
         Raylib.DrawRectangleRec(rec, Color.DarkPurple);
     }
 }
