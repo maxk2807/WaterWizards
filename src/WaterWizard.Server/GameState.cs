@@ -25,9 +25,15 @@ public class GameState
     public List<Cards> Graveyard { get; private set; }
 
     public GameState(NetManager server, ServerGameStateManager manager)
-    {        
-        players[0] = server.ConnectedPeerList[0];
-        players[1] = server.ConnectedPeerList[1];
+    {       
+        int connectedCount = server.ConnectedPeerList.Count;
+        if (connectedCount < 1 || connectedCount > 2)
+            throw new InvalidOperationException("Game requires 1 or 2 connected players.");
+
+        players = new NetPeer[connectedCount];
+        for (int i = 0; i < connectedCount; i++)
+            players[i] = server.ConnectedPeerList[i];
+
         boards = InitBoards();
         hands = [[], []];
         ActiveCards = [];
