@@ -37,6 +37,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql.yml
+          queries: '-'
 
       - name: Build with NUKE (required by CodeQL)
         run: ./build.sh Compile
