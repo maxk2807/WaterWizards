@@ -116,16 +116,10 @@ public class GameState
             writer = new();
             writer.Put("OpponentBoughtCard");
             writer.Put(card.Type.ToString());
-            foreach(var p in server.ConnectedPeerList)
-            {
-                if(!p.Equals(peer))
-                {
-                    p.Send(writer, DeliveryMethod.ReliableOrdered);
-                    break;
-                }
-            }
+            var opponent = server.ConnectedPeerList.Find(p => !p.Equals(peer));
+            opponent?.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-        Console.WriteLine($"[Server]Player_{peer.Port} Bought Card {card.Variant}");
+        Console.WriteLine($"[Server] Player_{peer.Port} Bought Card {card.Variant}");
     }
 
     private static Cards RandomCard(List<Cards> stack)
