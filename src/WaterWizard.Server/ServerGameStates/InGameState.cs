@@ -24,14 +24,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         {
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-        //TODO: Client Verbindung Spielern zuweisen
-        //TODO: Boards Initialisieren
-        //TODO: Handkarten Initialisieren
-        //TODO: Graveyard Initialisieren
-        //TODO: Kartenstapel Initialisieren
-        //TODO: Aktive Karten Initialisieren
         //TODO: Gold und Mana Initialisieren
-        //TODO: Ship Placement Phase abwarten?
         //TODO: Auf Input von Clients warten?
     }
 
@@ -51,7 +44,15 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "PlaceShip":
                 HandleShipPlacement(peer, reader);
                 break;
+            case "BuyCard":
+                HandleCardBuying(peer, reader);
+                break;
         }
+    }
+
+    private void HandleCardBuying(NetPeer peer, NetPacketReader reader)
+    {
+        gameState.HandleCardBuying(peer, reader);
     }
 
     private void HandleShipPlacement(NetPeer peer, NetPacketReader reader)
