@@ -15,6 +15,7 @@ public class GameState
     public Cell[,] Player1 => boards[0];
     public Cell[,] Player2 => boards[1];
     public readonly List<Cards>[] hands;
+    private readonly NetManager server;
     private readonly ServerGameStateManager manager;
     public List<Cards> Player1Hand => hands[0];
     public List<Cards> Player2Hand => hands[1];
@@ -25,7 +26,7 @@ public class GameState
     public List<Cards> Graveyard { get; private set; }
 
     public GameState(NetManager server, ServerGameStateManager manager)
-    {       
+    {
         int connectedCount = server.ConnectedPeerList.Count;
         if (connectedCount < 1 || connectedCount > 2)
             throw new InvalidOperationException("Game requires 1 or 2 connected players.");
@@ -42,6 +43,7 @@ public class GameState
         DamageStack = Cards.GetCardsOfType(CardType.Damage);
         EnvironmentStack = Cards.GetCardsOfType(CardType.Environment);
         Graveyard = [];
+        this.server = server;
         this.manager = manager;
     }
 
@@ -92,5 +94,37 @@ public class GameState
         writer.Put(height);
         peer.Send(writer, DeliveryMethod.ReliableOrdered);
         Console.WriteLine("[Server] Successfull Ship Handling");
+    }
+
+    internal void HandleCardBuying(NetPeer peer, NetPacketReader reader)
+    {
+        string cardType = reader.GetString();
+        Console.WriteLine($"[Server] Trying to Buy {cardType} Card");
+        Cards? card = cardType switch
+        {
+            "Utility" => RandomCard(UtilityStack),//TODO: Actually Paying
+            "Damage" => RandomCard(DamageStack),//TODO: Actually Paying
+            "Environment" => RandomCard(EnvironmentStack),//TODO: Actually Paying
+            _ => throw new Exception("Invalid CardType: " + cardType + " . Has to be a string of either: Utility, Damage or Environment"),
+        };
+        NetDataWriter writer = new();
+        writer.Put("BoughtCard");
+        writer.Put(card.Variant.ToString());
+        peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        if(server.ConnectedPeerList.Count == 2)
+        {
+            writer = new();
+            writer.Put("OpponentBoughtCard");
+            writer.Put(card.Type.ToString());
+            var opponent = server.ConnectedPeerList.Find(p => !p.Equals(peer));
+            opponent?.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        Console.WriteLine($"[Server] Player_{peer.Port} Bought Card {card.Variant}");
+    }
+
+    private static Cards RandomCard(List<Cards> stack)
+    {
+        var index = (int)(stack.Count * Random.Shared.NextSingle());
+        return stack[index];
     }
 }

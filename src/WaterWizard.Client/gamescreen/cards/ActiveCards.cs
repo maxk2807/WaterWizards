@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.cards;
 
 public class ActiveCards(GameScreen gameScreen)
 {

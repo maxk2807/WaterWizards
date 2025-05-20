@@ -1,9 +1,12 @@
+using System.Numerics;
 using Raylib_cs;
 
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.cards;
 
 public class CardStack(GameScreen gameScreen, int x, int y)
 {
+    public int X {get; private set; } = x;
+    public int Y {get; private set; } = y;
     private List<GameCard> cards = [
         
     ];
@@ -27,11 +30,11 @@ public class CardStack(GameScreen gameScreen, int x, int y)
     {
         if (cards.Count == 0)
         {
-            Raylib.DrawRectangle(x,y, gameScreen.cardWidth, gameScreen.cardHeight, Color.Brown);
+            Raylib.DrawRectangle(X,Y, gameScreen.cardWidth, gameScreen.cardHeight, Color.Brown);
         }
         else
         {
-            cards.First().Draw(x,y,false);
+            cards.First().Draw(X,Y,false);
         }
     }
 }
