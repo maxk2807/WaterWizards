@@ -717,6 +717,14 @@ public class NetworkManager
                         Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
                     }
                     break;
+                case "BoughtCard":
+                    string cardVariant = reader.GetString();
+                    GameStateManager.Instance.GameScreen.HandleBoughtCard(cardVariant);
+                    break;
+                case "OpponentBoughtCard":
+                    string cardType = reader.GetString();
+                    GameStateManager.Instance.GameScreen.HandleOpponentBoughtCard(cardType);
+                    break;
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
@@ -924,6 +932,22 @@ public class NetworkManager
             writer.Put(height);
             client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
             Console.WriteLine("[Client] PlaceShip gesendet");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
+        }
+    }
+
+    internal void RequestCardBuy(string cardType)
+    {
+        if(client != null && client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("BuyCard");
+            writer.Put(cardType);
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] Kaufe Karte");
         }
         else
         {

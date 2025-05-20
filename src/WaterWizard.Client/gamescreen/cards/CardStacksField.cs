@@ -1,9 +1,10 @@
 using System.Runtime.CompilerServices;
 using Raylib_cs;
 
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.cards;
 
-public class CardStacksField(GameScreen gameScreen){
+public class CardStacksField(GameScreen gameScreen)
+{
     private CardStack? utilityStack;
     private CardStack? damageStack;
     private CardStack? environmentStack;
@@ -15,7 +16,8 @@ public class CardStacksField(GameScreen gameScreen){
     private int Width;
     private int Height;
 
-    public void Initialize(){
+    public void Initialize()
+    {
         Width = gameScreen.cardWidth;
         Height = gameScreen.cardHeight * 3 + (int)gameScreen.ZonePadding * 2;
         _x = (int)gameScreen.ZonePadding;
@@ -37,11 +39,35 @@ public class CardStacksField(GameScreen gameScreen){
         environmentStack.InitEnvironment();
     }
 
-    public void Draw(){
+    public void Draw()
+    {
         // Raylib.DrawRectangleLinesEx(new(X,Y,Width,Height), 1, Color.Black);
 
         utilityStack!.Draw();
         damageStack!.Draw();
         environmentStack!.Draw();
+
+        HandleBuyingCardFromStack();
+    }
+
+    private void HandleBuyingCardFromStack()
+    {
+        var mousePos = Raylib.GetMousePosition();
+        Rectangle utilityRec = new(utilityStack!.X, utilityStack.Y, gameScreen.cardWidth, gameScreen.cardHeight);
+        Rectangle damageRec = new(damageStack!.X, damageStack.Y, gameScreen.cardWidth, gameScreen.cardHeight);
+        Rectangle environmentRec = new(environmentStack!.X, environmentStack.Y, gameScreen.cardWidth, gameScreen.cardHeight);
+        var clicked = Raylib.IsMouseButtonPressed(MouseButton.Left);
+        if (Raylib.CheckCollisionPointRec(mousePos, utilityRec) && clicked)
+        {
+            NetworkManager.Instance.RequestCardBuy("Utility");
+        }
+        else if(Raylib.CheckCollisionPointRec(mousePos, damageRec) && clicked)
+        {
+            NetworkManager.Instance.RequestCardBuy("Damage");
+        }
+        else if(Raylib.CheckCollisionPointRec(mousePos, environmentRec) && clicked)
+        {
+            NetworkManager.Instance.RequestCardBuy("Environment");
+        }
     }
 }

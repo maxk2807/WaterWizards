@@ -20,6 +20,7 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
     public void OnEnter()
     {
         GameState = new(server, manager);
+        
         NotifyClients();
     }
 
