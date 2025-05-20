@@ -156,8 +156,8 @@ public class DraggingShip
 
         float rotateIconScale = CellSize * 0.7f / rotateIcon.Height;
         float rotateIconSize = rotateIcon.Height * rotateIconScale;
-        int rotateIconX = (int)(rotateX + (CellSize - rotateIconSize)/2f);
-        int rotateIconY = (int)(rotateY + (CellSize - rotateIconSize)/2f);
+        int rotateIconX = (int)(rotateX + (CellSize - rotateIconSize) / 2f);
+        int rotateIconY = (int)(rotateY + (CellSize - rotateIconSize) / 2f);
         Raylib.DrawTextureEx(rotateIcon, new(rotateIconX, rotateIconY), 0, rotateIconScale, Color.White);
 
         if (rotateHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
@@ -176,8 +176,8 @@ public class DraggingShip
 
         float confirIconScale = CellSize * 0.8f / confirmIcon.Height;
         float confirmIconSize = confirmIcon.Height * confirIconScale;
-        int confirmIconX = (int)(confirmX + (CellSize - confirmIconSize)/2f);
-        int confirmIconY = (int)(confirmY + (CellSize - confirmIconSize)/2f);
+        int confirmIconX = (int)(confirmX + (CellSize - confirmIconSize) / 2f);
+        int confirmIconY = (int)(confirmY + (CellSize - confirmIconSize) / 2f);
         Raylib.DrawTextureEx(confirmIcon, new(confirmIconX, confirmIconY), 0, confirIconScale, Color.White);
 
         if (confirmHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
@@ -199,7 +199,7 @@ public class DraggingShip
         gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, (int)DraggedShipRectangle.Width, (int)DraggedShipRectangle.Height));
         int boardX = (int)gameScreen.playerBoard.Position.X;
         int boardY = (int)gameScreen.playerBoard.Position.Y;
-        NetworkManager.Instance.SendShipPlacement((x-boardX) / CellSize, (y-boardY) / CellSize, (int)(DraggedShipRectangle.Width / CellSize), (int)(DraggedShipRectangle.Height / CellSize));
+        NetworkManager.Instance.SendShipPlacement((x - boardX) / CellSize, (y - boardY) / CellSize, (int)(DraggedShipRectangle.Width / CellSize), (int)(DraggedShipRectangle.Height / CellSize));
     }
 
     /// <summary>
@@ -238,17 +238,24 @@ public class DraggingShip
 
     /// <summary>
     /// Checks whether the Placement of ship is obstructed by being out of bounds 
-    /// of the board or //TODO: obstructed by other ships and Rocks  
+    /// of the board or obstructed by other ships //TODO: and Rocks  
     /// </summary>
-    /// <param name="rec"></param>
+    /// <param name="dragShip"></param>
     /// <returns>Whether the placement is valid or not</returns>
-    private bool IsValid(Rectangle rec)
+    private bool IsValid(Rectangle dragShip)
     {
         GameBoard board = gameScreen.playerBoard!;
-        bool isOutOfBounds = rec.X < board.Position.X || rec.Y < board.Position.Y ||
-                   rec.X + rec.Width > board.Position.X + (float)board.GridWidth * CellSize ||
-                   rec.Y + rec.Height > board.Position.Y + (float)board.GridHeight * CellSize;
-        return !isOutOfBounds;
+        bool isOutOfBounds = dragShip.X < board.Position.X || dragShip.Y < board.Position.Y ||
+                   dragShip.X + dragShip.Width > board.Position.X + (float)board.GridWidth * CellSize ||
+                   dragShip.Y + dragShip.Height > board.Position.Y + (float)board.GridHeight * CellSize;
+        bool collidesWithShips = false;
+        foreach (var ship in gameScreen.playerBoard!.Ships)
+        {
+            Rectangle shipRec = new(ship.X, ship.Y, ship.Width, ship.Height);
+            collidesWithShips = Raylib.CheckCollisionRecs(dragShip, shipRec);
+            if(collidesWithShips) break;
+        }
+        return !(isOutOfBounds || collidesWithShips);
         //TODO: Check for other ships and rocks
     }
 

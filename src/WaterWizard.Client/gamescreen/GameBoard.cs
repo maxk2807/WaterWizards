@@ -21,7 +21,7 @@ public enum CellState
 /// </summary>
 public class GameBoard
 {
-    private List<GameShip> ships = [];
+    public List<GameShip> Ships {get; private set; }= [];
 
     public int GridWidth { get; set; }
     public int GridHeight { get; set; }
@@ -56,7 +56,7 @@ public class GameBoard
     }
 
     public void putShip(GameShip ship){
-        ships.Add(ship);
+        Ships.Add(ship);
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public class GameBoard
                 }
             }
         }
-        foreach(GameShip ship in ships){
+        foreach(GameShip ship in Ships){
             ship.Draw();
         }
     }
