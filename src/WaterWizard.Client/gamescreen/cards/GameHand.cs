@@ -53,8 +53,22 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
             if (front && GameScreen.IsHoveringRec(cardRec))
             {
                 DrawPreview(_cards[i]);
+                if(Raylib.IsMouseButtonPressed(MouseButton.Left))
+                {
+                    HandleCast(_cards[i]);
+                }
             }
         }
+    }
+
+    private void HandleCast(GameCard gameCard)
+    {
+        HandleConfirmCast(gameCard);
+    }
+
+    private void HandleConfirmCast(GameCard gameCard)
+    {
+        gameScreen.opponentBoard!.StartDrawingCardAim(gameCard);
     }
 
     /// <summary>

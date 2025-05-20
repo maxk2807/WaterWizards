@@ -1,3 +1,4 @@
+using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Microsoft.VisualBasic;
@@ -126,5 +127,21 @@ public class GameState
     {
         var index = (int)(stack.Count * Random.Shared.NextSingle());
         return stack[index];
+    }
+
+    public void HandleCardCasting(NetPeer peer, NetPacketReader reader)
+    {
+        //TODO: Handle Mana Cost
+        string cardVariantString = reader.GetString();
+        int cardX = reader.GetInt();
+        int cardY = reader.GetInt();
+        if(Enum.TryParse<CardVariant>(cardVariantString, out var variant))
+        {
+            CardAbilities.HandleAbility(variant, this, new Vector2(cardX, cardY));
+        }
+        else
+        {
+            Console.WriteLine($"[Server] Casting Failed. Variant {cardVariantString} unknown");
+        }
     }
 }

@@ -47,7 +47,15 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "BuyCard":
                 HandleCardBuying(peer, reader);
                 break;
+            case "CastCard":
+                HandleCardCasting(peer, reader);
+                break;
         }
+    }
+
+    private void HandleCardCasting(NetPeer peer, NetPacketReader reader)
+    {
+        gameState.HandleCardCasting(peer, reader);
     }
 
     private void HandleCardBuying(NetPeer peer, NetPacketReader reader)

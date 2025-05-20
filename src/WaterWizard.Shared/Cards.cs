@@ -161,4 +161,24 @@ public class Cards
 
         return cards;
     }
+
+    /// <summary>
+    /// Get the Target of this Card as a Vector when it applies, otherwise (0,0)
+    /// </summary>
+    /// <returns>
+    ///     Returns the Size of the Target of the Card as a Vector2.
+    ///     Returns 0x0 Vector if target is: random, ship or battlefield.
+    /// </returns>
+    public Vector2 TargetAsVector()
+    {
+        if(Target!.Target.Contains('x') && !Target.Target.Contains("random"))
+        {
+            int i = Target.Target.IndexOf('x');
+            return new(int.Parse(Target.Target[i-1]+""), int.Parse(Target.Target[i+1]+""));
+        }
+        else
+        {
+            return new();
+        }
+    }
 }

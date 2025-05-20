@@ -1,5 +1,6 @@
 using Raylib_cs;
 using System.Numerics;
+using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
 
 namespace WaterWizard.Client.gamescreen;
@@ -10,10 +11,10 @@ namespace WaterWizard.Client.gamescreen;
 public enum CellState
 {
     Empty,
-    Ship, 
+    Ship,
     Hit,
     Miss,
-    Unknown 
+    Unknown
 }
 
 /// <summary>
@@ -21,14 +22,17 @@ public enum CellState
 /// </summary>
 public class GameBoard
 {
-    public List<GameShip> Ships {get; private set; }= [];
+    public List<GameShip> Ships { get; private set; } = [];
 
     public int GridWidth { get; set; }
     public int GridHeight { get; set; }
     public int CellSize { get; set; }
-    public Vector2 Position { get; set; } 
+    public Vector2 Position { get; set; }
 
     private readonly CellState[,] _gridStates;
+
+    private bool aiming = false;
+    private GameCard? cardToAim;
 
     /// <summary>
     /// Constructor for the GameBoard class.
@@ -55,7 +59,8 @@ public class GameBoard
         }
     }
 
-    public void putShip(GameShip ship){
+    public void putShip(GameShip ship)
+    {
         Ships.Add(ship);
     }
 
@@ -130,12 +135,17 @@ public class GameBoard
                 }
                 else if (_gridStates[x, y] == CellState.Miss)
                 {
-                        Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.White);
+                    Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.White);
                 }
             }
         }
-        foreach(GameShip ship in Ships){
+        foreach (GameShip ship in Ships)
+        {
             ship.Draw();
+        }
+        if (aiming)
+        {
+            DrawCastAim(cardToAim!);
         }
     }
 
@@ -149,12 +159,58 @@ public class GameBoard
         return state switch
         {
             CellState.Empty => Color.LightGray,
-            CellState.Ship => Color.Gray, 
+            CellState.Ship => Color.Gray,
             CellState.Hit => Color.Orange,
             CellState.Miss => Color.Blue,
             CellState.Unknown => Color.SkyBlue,
             _ => Color.Black,
         };
+    }
+
+    public void DrawCastAim(GameCard gameCard)
+    {
+        var mousePos = Raylib.GetMousePosition();
+        Vector2 aim = gameCard.card.TargetAsVector();
+        if (aim.X == 0 && aim.Y == 0)
+        {
+            //TODO: handle other types of aims
+        }
+        else
+        {
+            Point? hoveredCoords;
+            Vector2 boardPos;
+            if (gameCard.card.Target!.Ally)
+            {
+                hoveredCoords = GetCellFromScreenCoords(mousePos);
+                boardPos = Position;
+            }
+            else
+            {
+                hoveredCoords = GameStateManager.Instance.GameScreen.opponentBoard!.GetCellFromScreenCoords(mousePos);
+                boardPos = GameStateManager.Instance.GameScreen.opponentBoard!.Position;
+            }
+            if (!hoveredCoords.HasValue)
+            {
+                return;
+            }
+            Raylib.DrawText("Click again to cast Card", (int)mousePos.X, (int)mousePos.Y - 20, 20, Color.Black);
+            var onScreenX = boardPos.X + (hoveredCoords.Value.X - (float)Math.Floor(aim.X / 2f)) * CellSize;
+            var onScreenY = boardPos.Y + (hoveredCoords.Value.Y - (float)Math.Floor(aim.Y / 2f)) * CellSize;
+            var r = new Rectangle(onScreenX, onScreenY, aim.X * CellSize, aim.Y * CellSize);
+            Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
+
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                aiming = false;
+                NetworkManager.Instance.HandleCast(cardToAim!.card, hoveredCoords.Value);
+            }
+        }
+    }
+
+    public void StartDrawingCardAim(GameCard gameCard)
+    {
+        aiming = true;
+        cardToAim = gameCard;
     }
 
     /// <summary>

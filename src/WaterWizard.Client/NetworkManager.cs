@@ -33,7 +33,7 @@ public class NetworkManager
     /// </summary>
     public int? LobbyCountdownSeconds { get; private set; }
 
-    
+
     private NetworkManager() { }
 
     /// <summary>
@@ -451,7 +451,7 @@ public class NetworkManager
                 UpdateTime = 15,
                 UnconnectedMessagesEnabled = true,
                 IPv6Enabled = false,
-                NatPunchEnabled = true, 
+                NatPunchEnabled = true,
                 EnableStatistics = true
             };
 
@@ -620,7 +620,7 @@ public class NetworkManager
                 UpdateTime = 15,
                 UnconnectedMessagesEnabled = true,
                 IPv6Enabled = false,
-                NatPunchEnabled = true,  
+                NatPunchEnabled = true,
                 EnableStatistics = true
             };
 
@@ -784,7 +784,7 @@ public class NetworkManager
         client?.Stop();
         discoveredLobbies.Clear();
         connectedPlayers.Clear();
-        LobbyCountdownSeconds = null; 
+        LobbyCountdownSeconds = null;
     }
 
     private void BroadcastSystemMessage(string message)
@@ -921,8 +921,9 @@ public class NetworkManager
         }
     }
 
-    public void SendShipPlacement(int x, int y, int width, int height){
-        if(client != null && client.FirstPeer != null)
+    public void SendShipPlacement(int x, int y, int width, int height)
+    {
+        if (client != null && client.FirstPeer != null)
         {
             var writer = new NetDataWriter();
             writer.Put("PlaceShip");
@@ -941,13 +942,31 @@ public class NetworkManager
 
     internal void RequestCardBuy(string cardType)
     {
-        if(client != null && client.FirstPeer != null)
+        if (client != null && client.FirstPeer != null)
         {
             var writer = new NetDataWriter();
             writer.Put("BuyCard");
             writer.Put(cardType);
             client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
             Console.WriteLine("[Client] Kaufe Karte");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
+        }
+    }
+
+    public void HandleCast(Cards card, GameBoard.Point hoveredCoords)
+    {
+        if (client != null && client.FirstPeer != null)
+        {
+            NetDataWriter writer = new();
+            writer.Put("CastCard");
+            writer.Put(card.Variant.ToString());
+            writer.Put(hoveredCoords.X);
+            writer.Put(hoveredCoords.Y);
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.Write("[Client] Karte wirken");
         }
         else
         {
