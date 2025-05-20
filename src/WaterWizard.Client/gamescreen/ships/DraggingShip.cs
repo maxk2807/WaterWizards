@@ -120,6 +120,14 @@ public class DraggingShip
                 {
                     confirming = true;
                 }
+                else
+                {
+                    confirming = false;
+                    DraggedShipRectangle.X = Rectangle.X;
+                    DraggedShipRectangle.Y = Rectangle.Y;
+                    DraggedShipRectangle.Width = Rectangle.Width;
+                    DraggedShipRectangle.Height = Rectangle.Height;
+                }
                 dragging = false;
                 firstDown = true;
             }
@@ -129,8 +137,6 @@ public class DraggingShip
                 if (!validPlacement)
                 {
                     confirming = false;
-                    DraggedShipRectangle.X = Rectangle.X;
-                    DraggedShipRectangle.Y = Rectangle.Y;
                 }
             }
         }
