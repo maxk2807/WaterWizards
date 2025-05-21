@@ -1,7 +1,7 @@
 using Raylib_cs;
 using WaterWizard.Shared;
 
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.cards;
 
 public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 {
@@ -10,13 +10,6 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     /// </summary>
     private List<GameCard> _cards =
     [
-        //Beispielkarten
-        new(gameScreen, new(CardVariant.ArcaneMissile)),
-        new(gameScreen, new(CardVariant.Firebolt)),
-        new(gameScreen, new(CardVariant.Heal)),
-        new(gameScreen, new(CardVariant.Storm)),
-        new(gameScreen, new(CardVariant.Storm)),
-        new(gameScreen, new(CardVariant.Storm)),
     ];
 
     private int ScreenWidth => gameScreen._gameStateManager.screenWidth;

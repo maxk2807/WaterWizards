@@ -2,6 +2,8 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Net;
 using System.Net.Sockets;
+using WaterWizard.Client.gamescreen;
+using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client;
@@ -26,6 +28,12 @@ public class NetworkManager
     private GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
 
+    /// <summary>
+    /// Stores the current lobby countdown seconds (null if no countdown active).
+    /// </summary>
+    public int? LobbyCountdownSeconds { get; private set; }
+
+    
     private NetworkManager() { }
 
     /// <summary>
@@ -104,6 +112,7 @@ public class NetworkManager
                                $"Player_{playerAddress.Split(':').LastOrDefault()}";
 
             RemovePlayerByAddress(playerAddress);
+            LobbyCountdownSeconds = null;
             BroadcastSystemMessage($"{playerName} disconnected ({disconnectInfo.Reason}).");
             UpdatePlayerList();
         };
@@ -133,6 +142,26 @@ public class NetworkManager
         }
     }
 
+    /// <summary>
+    /// Verarbeitet den Countdown für die Lobby.
+    /// </summary>
+    /// <param name="reader">Der NetPacketReader, der die Nachricht enthält.</param>
+    /// <returns></returns>
+    public void HandleLobbyCountdown(NetPacketReader reader)
+    {
+        int secondsLeft = reader.GetInt();
+        if (secondsLeft <= 0)
+        {
+            LobbyCountdownSeconds = null;
+        }
+        else
+        {
+            LobbyCountdownSeconds = secondsLeft;
+        }
+        Console.WriteLine($"[Client] Lobby countdown: {LobbyCountdownSeconds}");
+    }
+
+
     private void HandleServerReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
     {
         try
@@ -147,7 +176,10 @@ public class NetworkManager
                     HandlePlayerReadyStatus(peer, messageType == "PlayerReady");
                     break;
                 case "ChatMessage":
-                    string chatMsg = reader.GetString();
+                    reader.GetString();
+                    break;
+                case "LobbyCountdown":
+                    HandleLobbyCountdown(reader);
                     break;
                 case "PlayerJoin":
                     string playerName = reader.GetString(); // Name sent by the client
@@ -167,7 +199,6 @@ public class NetworkManager
                         // UpdatePlayerList();
                     }
                     break;
-                    
                 default:
                     Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
@@ -548,6 +579,7 @@ public class NetworkManager
             GameStateManager.Instance.ChatLog.AddMessage(
                 $"Disconnected from server: {reasonExplanation}"
             );
+            LobbyCountdownSeconds = null;
         };
 
         clientListener.NetworkErrorEvent += (endPoint, error) =>
@@ -640,6 +672,9 @@ public class NetworkManager
                 case "StartGame":
                     GameStateManager.Instance.SetStateToInGame();
                     break;
+                case "LobbyCountdown":
+                    HandleLobbyCountdown(reader);
+                    break;
                 case "EnterLobby":
                     string receivedSessionId = reader.GetString();
                     if (!string.IsNullOrEmpty(receivedSessionId))
@@ -672,6 +707,23 @@ public class NetworkManager
                     break;
                 case "StartPlacementPhase":
                     GameStateManager.Instance.SetStateToPlacementPhase();
+                    break;
+                case "ShipPosition":
+                    {
+                        int x = reader.GetInt();
+                        int y = reader.GetInt();
+                        int width = reader.GetInt();
+                        int height = reader.GetInt();
+                        Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
+                    }
+                    break;
+                case "BoughtCard":
+                    string cardVariant = reader.GetString();
+                    GameStateManager.Instance.GameScreen.HandleBoughtCard(cardVariant);
+                    break;
+                case "OpponentBoughtCard":
+                    string cardType = reader.GetString();
+                    GameStateManager.Instance.GameScreen.HandleOpponentBoughtCard(cardType);
                     break;
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
@@ -732,6 +784,7 @@ public class NetworkManager
         client?.Stop();
         discoveredLobbies.Clear();
         connectedPlayers.Clear();
+        LobbyCountdownSeconds = null; 
     }
 
     private void BroadcastSystemMessage(string message)
@@ -865,6 +918,40 @@ public class NetworkManager
         else
         {
             Console.WriteLine("[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden.");
+        }
+    }
+
+    public void SendShipPlacement(int x, int y, int width, int height){
+        if(client != null && client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("PlaceShip");
+            writer.Put(x);
+            writer.Put(y);
+            writer.Put(width);
+            writer.Put(height);
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] PlaceShip gesendet");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
+        }
+    }
+
+    internal void RequestCardBuy(string cardType)
+    {
+        if(client != null && client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("BuyCard");
+            writer.Put(cardType);
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] Kaufe Karte");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
         }
     }
 }

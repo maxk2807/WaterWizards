@@ -1,6 +1,9 @@
 using System.Numerics;
+using Microsoft.VisualBasic;
 using Raylib_cs;
+using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -279,5 +282,30 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     public static bool IsHoveringRec(Rectangle rec)
     {
         return Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rec);
+    }
+
+    public void HandleBoughtCard(string variant)
+    {
+        if(Enum.TryParse<CardVariant>(variant, true, out var cardVariant))
+        {
+            playerHand!.AddCard(new(cardVariant));
+        }
+        else
+        {
+            Console.WriteLine($"[Client] CardBuy Failed. Variant {variant} unknown");
+        }
+    }
+
+    public void HandleOpponentBoughtCard(string type)
+    {
+        List<Cards> cards;
+        if(Enum.TryParse<CardType>(type, true, out var cardType) && (cards = Cards.GetCardsOfType(cardType)).Count > 0)
+        {
+            opponentHand!.AddCard(cards[0]);
+        }
+        else
+        {
+            Console.WriteLine($"[Client] CardBuy Failed. Type {type} unknown");
+        }
     }
 }

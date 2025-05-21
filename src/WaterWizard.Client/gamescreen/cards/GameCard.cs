@@ -1,7 +1,7 @@
 using Raylib_cs;
 using WaterWizard.Shared;
 
-namespace WaterWizard.Client.gamescreen;
+namespace WaterWizard.Client.gamescreen.cards;
 
 public class GameCard(GameScreen gameScreen, Cards card)
 {
