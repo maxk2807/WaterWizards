@@ -171,7 +171,7 @@ public class GameBoard
     {
         var mousePos = Raylib.GetMousePosition();
         Vector2 aim = gameCard.card.TargetAsVector();
-        if (aim.X == 0 && aim.Y == 0)
+        if ((int)aim.X == 0 && (int)aim.Y == 0)
         {
             //TODO: handle other types of aims
         }
