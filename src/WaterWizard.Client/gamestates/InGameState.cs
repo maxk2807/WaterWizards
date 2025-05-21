@@ -8,10 +8,22 @@ public class InGameState : IGameState
     {
         if (manager.GetGamePauseManager().IsGamePaused)
         {
-            Raylib.DrawRectangle(0, 0, manager.screenWidth, manager.screenHeight, new Color(0, 0, 0, 128));
+            Raylib.DrawRectangle(
+                0,
+                0,
+                manager.screenWidth,
+                manager.screenHeight,
+                new Color(0, 0, 0, 128)
+            );
             string pauseText = "PAUSED";
             int textWidth = Raylib.MeasureText(pauseText, 40);
-            Raylib.DrawText(pauseText, (manager.screenWidth - textWidth) / 2, manager.screenHeight / 2 - 20, 40, Color.Yellow);
+            Raylib.DrawText(
+                pauseText,
+                (manager.screenWidth - textWidth) / 2,
+                manager.screenHeight / 2 - 20,
+                40,
+                Color.Yellow
+            );
         }
         else
         {

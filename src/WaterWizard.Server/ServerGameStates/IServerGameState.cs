@@ -13,12 +13,20 @@ public interface IServerGameState
     /// Wird beim Eintritt in diesen State aufgerufen.
     /// </summary>
     void OnEnter();
+
     /// <summary>
     /// Wird beim Verlassen dieses States aufgerufen.
     /// </summary>
     void OnExit();
+
     /// <summary>
     /// Behandelt Netzwerkereignisse, die im aktuellen State eintreffen.
     /// </summary>
-    void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager server, ServerGameStateManager manager, string MessageType);
+    void HandleNetworkEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        NetManager server,
+        ServerGameStateManager manager,
+        string MessageType
+    );
 }

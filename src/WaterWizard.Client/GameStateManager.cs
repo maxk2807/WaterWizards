@@ -1,6 +1,6 @@
-using Raylib_cs;
 using System;
 using System.Numerics;
+using Raylib_cs;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
@@ -10,26 +10,26 @@ namespace WaterWizard.Client;
 
 public class GameStateManager
 {
+    public IGameState GetCurrentState() => currentState;
+
     private static GameStateManager? instance;
     public static GameStateManager Instance =>
-        instance ?? throw new InvalidOperationException(
-                        "GameStateManager wurde nicht initialisiert!");
+        instance
+        ?? throw new InvalidOperationException("GameStateManager wurde nicht initialisiert!");
     private readonly GameTimer gameTimer;
+
     public GameTimer GetGameTimer() => gameTimer;
+
     private readonly GamePauseManager _gamePauseManager;
+
     public GamePauseManager GetGamePauseManager() => _gamePauseManager;
+
     private GameScreen? gameScreen;
     public GameScreen GameScreen =>
-        gameScreen ?? throw new InvalidOperationException(
-                          "Game Screen wurde nicht initialisiert!");
+        gameScreen ?? throw new InvalidOperationException("Game Screen wurde nicht initialisiert!");
 
     private readonly ChatLogManager _chatLogManager;
     public ChatLogManager ChatLog => _chatLogManager;
-
-    private float titleAnimTime = 0;
-    private float titleVerticalPosition = 0;
-    private const float TITLE_ANIM_SPEED = 1.5f;
-    private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
 
     public static void Initialize(int screenWidth, int screenHeight)
     {
@@ -38,7 +38,6 @@ public class GameStateManager
             instance = new GameStateManager(screenWidth, screenHeight);
         }
     }
-
 
     private IGameState currentState;
 
@@ -50,12 +49,19 @@ public class GameStateManager
     private bool isEditingPort = false;
 
     public string GetInputText() => inputText;
+
     public string GetInputPortText() => inputPortText;
+
     public bool IsEditingIp() => isEditingIp;
+
     public bool IsEditingPort() => isEditingPort;
+
     public void SetEditingIp(bool value) => isEditingIp = value;
+
     public void SetEditingPort(bool value) => isEditingPort = value;
+
     public void SetInputText(string value) => inputText = value;
+
     public void SetInputPortText(string value) => inputPortText = value;
 
     /// <summary>
@@ -94,7 +100,7 @@ public class GameStateManager
         GameScreen.UpdateScreenSize(width, height);
     }
 
-        /// <summary>
+    /// <summary>
     /// Aktualisiert den Spielzustand und zeichnet die entsprechende
     /// Benutzeroberfläche. Diese Methode muss in jedem Frame aufgerufen werden.
     /// </summary>
@@ -135,34 +141,44 @@ public class GameStateManager
 
         currentState.UpdateAndDraw(this);
 
-        string screenInfo =
-            $"Auflösung: {screenWidth}x{screenHeight} | F11: Vollbild umschalten";
+        string screenInfo = $"Auflösung: {screenWidth}x{screenHeight} | F11: Vollbild umschalten";
         int infoWidth = Raylib.MeasureText(screenInfo, 12);
-        Raylib.DrawText(screenInfo, screenWidth - infoWidth - 10,
-                        screenHeight - 20, 12, Color.DarkGray);
+        Raylib.DrawText(
+            screenInfo,
+            screenWidth - infoWidth - 10,
+            screenHeight - 20,
+            12,
+            Color.DarkGray
+        );
 
         Raylib.EndDrawing();
     }
 
     public void SetStateToMainMenu() => currentState = new MainMenuState();
+
     public void SetStateToConnectingMenu() => currentState = new ConnectingMenuState();
+
     public void SetStateToLobbyList()
     {
         currentState = new LobbyListMenuState();
         NetworkManager.Instance.DiscoverLobbies();
     }
+
     public void SetStateToHostingMenu()
     {
         currentState = new HostingMenuState();
         NetworkManager.Instance.StartHosting();
     }
+
     public void SetStateToLobby() => currentState = new PreStartLobbyState();
+
     public void SetStateToPlacementPhase() => currentState = new PlacementPhaseState();
+
     public void SetStateToInGame()
     {
         currentState = new InGameState();
         gameTimer.Reset();
-       // GameScreen.Reset();
+        // GameScreen.Reset();
     }
 
     public void HandleTextInput()
@@ -186,20 +202,25 @@ public class GameStateManager
             key = Raylib.GetCharPressed();
         }
 
-        if ((Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) || Raylib.IsKeyPressed(KeyboardKey.Backspace)))
+        if (
+            (
+                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace)
+                || Raylib.IsKeyPressed(KeyboardKey.Backspace)
+            )
+        )
         {
             while (key > 0)
             {
                 if (isEditingIp)
                 {
-                    if ((key >= 32 && key <= 126) && inputText.Length < 45) 
+                    if ((key >= 32 && key <= 126) && inputText.Length < 45)
                     {
                         inputText += (char)key;
                     }
                 }
                 else if (isEditingPort)
                 {
-                    if ((key >= '0' && key <= '9') && inputPortText.Length < 5) 
+                    if ((key >= '0' && key <= '9') && inputPortText.Length < 5)
                     {
                         inputPortText += (char)key;
                     }
@@ -207,8 +228,10 @@ public class GameStateManager
                 key = Raylib.GetCharPressed();
             }
 
-            if (Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) || Raylib.IsKeyPressed(KeyboardKey.Backspace))
-
+            if (
+                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace)
+                || Raylib.IsKeyPressed(KeyboardKey.Backspace)
+            )
             {
                 if (isEditingIp && inputText.Length > 0)
                 {
@@ -222,12 +245,12 @@ public class GameStateManager
             else if (isEditingPort && inputPortText.Length > 0)
             {
                 isEditingIp = false;
-                isEditingPort = false; 
+                isEditingPort = false;
             }
             if (Raylib.IsKeyPressed(KeyboardKey.Escape))
             {
-                 isEditingIp = false;
-                 isEditingPort = false;
+                isEditingIp = false;
+                isEditingPort = false;
             }
         }
 
@@ -266,4 +289,3 @@ public class GameStateManager
             return new Color(v, p, q, 255);
     }
 }
-

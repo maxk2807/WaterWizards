@@ -41,16 +41,27 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
     /// <summary>
     /// Behandelt Netzwerkereignisse während der Platzierungsphase.
     /// </summary>
-    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager serverInstance, ServerGameStateManager manager, string messageType)
+    public void HandleNetworkEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        NetManager serverInstance,
+        ServerGameStateManager manager,
+        string messageType
+    )
     {
         switch (messageType)
         {
             case "PlacementReady":
                 Console.WriteLine($"[PlacementState] Received PlacementReady from {peer}");
                 placementReady[peer.ToString()] = true;
-                if (placementReady.Count == serverInstance.ConnectedPeersCount && placementReady.Values.All(r => r))
+                if (
+                    placementReady.Count == serverInstance.ConnectedPeersCount
+                    && placementReady.Values.All(r => r)
+                )
                 {
-                    Console.WriteLine("[PlacementState] All players have placed ships. Starting game.");
+                    Console.WriteLine(
+                        "[PlacementState] All players have placed ships. Starting game."
+                    );
                     GameState!.PrintAllShips();
 
                     var writer = new NetDataWriter();
@@ -103,14 +114,18 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
                 }
                 else
                 {
-                    Console.WriteLine($"[PlacementState] Waiting for other players to place ships. {placementReady.Count}/{serverInstance.ConnectedPeersCount} ready.");
+                    Console.WriteLine(
+                        $"[PlacementState] Waiting for other players to place ships. {placementReady.Count}/{serverInstance.ConnectedPeersCount} ready."
+                    );
                 }
                 break;
             case "PlaceShip":
                 GameState!.HandleShipPlacement(peer, reader);
                 break;
             default:
-                Console.WriteLine($"[PlacementState] Received unhandled message type: {messageType}");
+                Console.WriteLine(
+                    $"[PlacementState] Received unhandled message type: {messageType}"
+                );
                 break;
         }
     }

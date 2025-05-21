@@ -5,5 +5,5 @@ public enum CardType
     Damage,
     Utility,
     Environment,
-    Healing
+    Healing,
 }

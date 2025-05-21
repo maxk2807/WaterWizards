@@ -9,7 +9,6 @@ using LiteNetLib.Utils;
 /// </summary>
 public class ServerGameStateManager
 {
-    private IServerGameState? _currentState;
     public IServerGameState? CurrentState { get; private set; }
     public NetManager _server;
 
