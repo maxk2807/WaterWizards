@@ -2,6 +2,7 @@ using Raylib_cs;
 using System.Numerics;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.network;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen;
