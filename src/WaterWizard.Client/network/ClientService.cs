@@ -472,54 +472,67 @@ public class ClientService(NetworkManager manager)
                     HandlePlayerListUpdate(reader);
                     break;
                 case "TimerUpdate":
-                    float serverTimeSeconds = reader.GetFloat();
+                    try
+                    {
+                        float serverTimeSeconds = reader.GetFloat();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Lesen von TimerUpdate: {ex.Message}"
+                        );
+                    }
                     break;
                 case "ChatMessage":
-                    string senderName = reader.GetString();
-                    string chatMsg = reader.GetString();
-                    GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
+                    try
+                    {
+                        string senderName = reader.GetString();
+                        string chatMsg = reader.GetString();
+                        GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ChatMessage: {ex.Message}"
+                        );
+                    }
                     break;
                 case "SystemMessage":
-                    string systemMsg = reader.GetString();
-                    GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
+                    try
+                    {
+                        string systemMsg = reader.GetString();
+                        GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von SystemMessage: {ex.Message}"
+                        );
+                    }
                     break;
                 case "StartPlacementPhase":
                     GameStateManager.Instance.SetStateToPlacementPhase();
                     break;
                 case "ShipPosition":
+                    try
                     {
+                        var playerBoard = GameStateManager.Instance.GameScreen!.playerBoard;
+                        if (playerBoard == null)
+                        {
+                            Console.WriteLine(
+                                "[Client] Fehler: playerBoard ist null bei ShipPosition."
+                            );
+                            break;
+                        }
                         int x = reader.GetInt();
                         int y = reader.GetInt();
                         int width = reader.GetInt();
                         int height = reader.GetInt();
-                        Console.WriteLine(
-                            $"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}"
-                        );
-                    }
-                    break;
-                case "BoughtCard":
-                    string cardVariant = reader.GetString();
-                    GameStateManager.Instance.GameScreen.HandleBoughtCard(cardVariant);
-                    break;
-                case "OpponentBoughtCard":
-                    string cardType = reader.GetString();
-                    GameStateManager.Instance.GameScreen.HandleOpponentBoughtCard(cardType);
-                    break;
-                case "ShipSync":
-                    int count = reader.GetInt();
-                    GameBoard playerBoard = GameStateManager.Instance.GameScreen.playerBoard!;
-                    playerBoard.Ships.Clear();
-                    for (int i = 0; i < count; i++)
-                    {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        int width = reader.GetInt();
-                        int height = reader.GetInt();
+                        Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
                         int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
                         int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
                         int pixelWidth = width * playerBoard.CellSize;
                         int pixelHeight = height * playerBoard.CellSize;
-
                         playerBoard.putShip(
                             new GameShip(
                                 GameStateManager.Instance.GameScreen,
@@ -531,46 +544,158 @@ public class ClientService(NetworkManager manager)
                             )
                         );
                     }
-                    Console.WriteLine(
-                        $"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board."
-                    );
-
-                    GameStateManager.Instance.SetStateToInGame();
-                    Console.WriteLine(
-                        $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
-                    );
-                    break;
-
-                case "OpponentShipSync":
-                    int oppCount = reader.GetInt();
-                    GameBoard opponentBoard = GameStateManager.Instance.GameScreen.opponentBoard!;
-                    opponentBoard.Ships.Clear();
-                    for (int i = 0; i < oppCount; i++)
+                    catch (Exception ex)
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        int width = reader.GetInt();
-                        int height = reader.GetInt();
-                        int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-                        int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-                        int pixelWidth = width * opponentBoard.CellSize;
-                        int pixelHeight = height * opponentBoard.CellSize;
-                        opponentBoard.putShip(
-                            new GameShip(
-                                GameStateManager.Instance.GameScreen,
-                                pixelX,
-                                pixelY,
-                                ShipType.DEFAULT,
-                                pixelWidth,
-                                pixelHeight
-                            )
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}"
                         );
                     }
                     break;
-                default:
-                    Console.WriteLine(
-                        $"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}"
-                    );
+                case "BoughtCard":
+                    try
+                    {
+                        string cardVariant = reader.GetString();
+                        GameStateManager.Instance.GameScreen?.HandleBoughtCard(cardVariant);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von BoughtCard: {ex.Message}"
+                        );
+                    }
+                    break;
+                case "OpponentBoughtCard":
+                    try
+                    {
+                        string cardType = reader.GetString();
+                        GameStateManager.Instance.GameScreen?.HandleOpponentBoughtCard(cardType);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von OpponentBoughtCard: {ex.Message}"
+                        );
+                    }
+                    break;
+                case "ShipSync":
+                    try
+                    {
+                        int count = reader.GetInt();
+                        var playerBoard = GameStateManager.Instance.GameScreen!.playerBoard;
+                        if (playerBoard == null)
+                        {
+                            Console.WriteLine(
+                                "[Client] Fehler: playerBoard ist null bei ShipSync."
+                            );
+                            break;
+                        }
+                        playerBoard.Ships.Clear();
+                        for (int i = 0; i < count; i++)
+                        {
+                            int x = reader.GetInt();
+                            int y = reader.GetInt();
+                            int width = reader.GetInt();
+                            int height = reader.GetInt();
+                            int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
+                            int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
+                            int pixelWidth = width * playerBoard.CellSize;
+                            int pixelHeight = height * playerBoard.CellSize;
+                            playerBoard.putShip(
+                                new GameShip(
+                                    GameStateManager.Instance.GameScreen,
+                                    pixelX,
+                                    pixelY,
+                                    ShipType.DEFAULT,
+                                    pixelWidth,
+                                    pixelHeight
+                                )
+                            );
+                        }
+                        Console.WriteLine(
+                            $"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+                        );
+                        GameStateManager.Instance.SetStateToInGame();
+                        Console.WriteLine(
+                                $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+                            );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ShipSync: {ex.Message}"
+                        );
+                    }
+                    break;
+
+                case "OpponentShipSync":
+                    try
+                    {
+                        int oppCount = reader.GetInt();
+                        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
+                        if (opponentBoard == null)
+                        {
+                            Console.WriteLine(
+                                "[Client] Fehler: opponentBoard ist null bei OpponentShipSync."
+                            );
+                            break;
+                        }
+                        opponentBoard.Ships.Clear();
+                        for (int i = 0; i < oppCount; i++)
+                        {
+                            int x = reader.GetInt();
+                            int y = reader.GetInt();
+                            int width = reader.GetInt();
+                            int height = reader.GetInt();
+                            int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
+                            int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
+                            int pixelWidth = width * opponentBoard.CellSize;
+                            int pixelHeight = height * opponentBoard.CellSize;
+                            opponentBoard.putShip(
+                                new GameShip(
+                                    GameStateManager.Instance.GameScreen,
+                                    pixelX,
+                                    pixelY,
+                                    ShipType.DEFAULT,
+                                    pixelWidth,
+                                    pixelHeight
+                                )
+                            );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}"
+                        );
+                    }
+
+                    break;
+                case "ShipPlacementError":
+                    try
+                    {
+                        string errorMsg = reader.GetString();
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}"
+                        );
+                        //GameStateManager.Instance.GameScreen?.ShowPlacementError(errorMsg);
+
+                        // Sperre das Draggen für diese Größe, wenn das Limit erreicht ist
+                        var match = System.Text.RegularExpressions.Regex.Match(
+                            errorMsg,
+                            @"nur (\d+) Schiffe der Länge (\d+)"
+                        );
+                        if (match.Success)
+                        {
+                            int size = int.Parse(match.Groups[2].Value);
+                            GameStateManager.Instance.GameScreen?.MarkShipSizeLimitReached(size);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ShipPlacementError: {ex.Message}"
+                        );
+                    }
                     break;
             }
         }
@@ -580,7 +705,14 @@ public class ClientService(NetworkManager manager)
         }
         finally
         {
-            reader.Recycle();
+            try
+            {
+                reader.Recycle();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Client] Fehler beim Recyceln des Readers: {ex.Message}");
+            }
         }
     }
 
