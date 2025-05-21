@@ -2,6 +2,10 @@ namespace WaterWizard.Shared;
 
 public class CardTarget
 {
+    /// <summary>
+    /// Whether the CardTarget is "Ally", e.g. a player ship or on the player board.
+    /// Default is false: Not Ally, e.g. opponent ship, board etc. or both boards 
+    /// </summary>
     public bool Ally { get; }
     public string Target { get; }
 
