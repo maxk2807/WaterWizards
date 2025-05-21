@@ -26,5 +26,5 @@ public class CardStats
     /// Beschreibt das Zielmuster oder den Zieltyp der Karte.
     /// Beispiele: "1x1", "ship", "battlefield", "random 1x1".
     /// </summary>
-    public string Target { get; set; } = string.Empty;      // e.g. "1x1", "ship", "battlefield", etc.
+    public CardTarget Target { get; set; } = new(string.Empty);      // e.g. "1x1", "ship", "battlefield", etc.
 }

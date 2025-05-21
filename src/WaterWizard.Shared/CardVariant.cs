@@ -3,6 +3,7 @@ namespace WaterWizard.Shared;
 public enum CardVariant
 {
     // Damage Variants
+    MagicAttack,
     ArcaneMissile,
     Firebolt,
     Fireball,

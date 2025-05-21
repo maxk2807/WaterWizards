@@ -1,3 +1,4 @@
+using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Shared;
 
@@ -50,8 +51,6 @@ public class GameCard(GameScreen gameScreen, Cards card)
             Raylib.DrawTextPro(Raylib.GetFontDefault(), cardBackText, new(x+(Width-textWidth)/2f,y+(Height-10)/2f), new(textWidth, 10), rot, 10, Raylib.GetFontDefault().GlyphPadding, Color.Black);
         }
     }
-
-
 
     private Color GetColorFromCardType(bool front){
         return front 
