@@ -52,13 +52,17 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
                 {
                     Console.WriteLine("[PlacementState] All players have placed ships. Starting game.");
                     GameState!.PrintAllShips();
+
                     var writer = new NetDataWriter();
                     writer.Put("StartGame");
                     foreach (var p in serverInstance.ConnectedPeerList)
                         p.Send(writer, DeliveryMethod.ReliableOrdered);
 
-                    // Nach dem Senden von "StartGame" an alle Spieler:
-                    foreach (var p in serverInstance.ConnectedPeerList)
+                    // Kopiere die Peers in ein Array, um Collection-Änderungen zu vermeiden
+                    var peers = serverInstance.ConnectedPeerList.ToArray();
+
+                    // ShipSync für eigene Schiffe
+                    foreach (var p in peers)
                     {
                         var ships = GameState!.GetShips(p);
                         var shipWriter = new NetDataWriter();
@@ -74,6 +78,26 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
                         p.Send(shipWriter, DeliveryMethod.ReliableOrdered);
                     }
 
+                    // OpponentShipSync für gegnerische Schiffe
+                    foreach (var p in peers)
+                    {
+                        var opponent = peers.FirstOrDefault(peer2 => peer2 != p);
+                        if (opponent != null)
+                        {
+                            var oppShips = GameState!.GetShips(opponent);
+                            var oppWriter = new NetDataWriter();
+                            oppWriter.Put("OpponentShipSync");
+                            oppWriter.Put(oppShips.Count);
+                            foreach (var ship in oppShips)
+                            {
+                                oppWriter.Put(ship.X);
+                                oppWriter.Put(ship.Y);
+                                oppWriter.Put(ship.Width);
+                                oppWriter.Put(ship.Height);
+                            }
+                            p.Send(oppWriter, DeliveryMethod.ReliableOrdered);
+                        }
+                    }
                     // Bestehendes GameState-Objekt weitergeben!
                     manager.ChangeState(new InGameState(serverInstance, GameState!));
                 }
