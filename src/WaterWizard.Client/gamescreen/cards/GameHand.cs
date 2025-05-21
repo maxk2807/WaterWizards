@@ -8,9 +8,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     /// <summary>
     /// Represents the Cards on the given Hand.
     /// </summary>
-    private List<GameCard> _cards =
-    [
-    ];
+    private List<GameCard> _cards = [];
 
     private int ScreenWidth => gameScreen._gameStateManager.screenWidth;
     private int ScreenHeight => gameScreen._gameStateManager.screenHeight;
@@ -18,8 +16,8 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     private int CardHeight => gameScreen.cardHeight;
 
     /// <summary>
-    /// Render the Cards on this GameHand instance. If calling this with isOpponent true, 
-    /// the cards take on a different color to signify the back of the cards, and get rendered 
+    /// Render the Cards on this GameHand instance. If calling this with isOpponent true,
+    /// the cards take on a different color to signify the back of the cards, and get rendered
     /// on the side of the opponent.
     /// </summary>
     /// <param name="front"></param>
@@ -44,7 +42,9 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
             bool areCardsEven = _cards.Count % 2 == 0;
             cardX = areCardsEven
                 ? -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
-                : -effectiveCardWidth / 2 - _cards.Count / 2 * effectiveCardWidth + i * effectiveCardWidth;
+                : -effectiveCardWidth / 2
+                    - _cards.Count / 2 * effectiveCardWidth
+                    + i * effectiveCardWidth;
 
             _cards[i].Draw(centralX + cardX, cardY, front);
 
@@ -53,7 +53,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
             if (front && GameScreen.IsHoveringRec(cardRec))
             {
                 DrawPreview(_cards[i]);
-                if(Raylib.IsMouseButtonPressed(MouseButton.Left))
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
                 {
                     HandleCast(_cards[i]);
                 }
@@ -72,13 +72,14 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     }
 
     /// <summary>
-    /// Render the Cards on this GameHand instance with the given rotation. If calling this with isOpponent true, 
-    /// the cards take on a different color to signify the back of the cards, and get rendered 
+    /// Render the Cards on this GameHand instance with the given rotation. If calling this with isOpponent true,
+    /// the cards take on a different color to signify the back of the cards, and get rendered
     /// on the side of the opponent.
     /// </summary>
     /// <param name="front"></param>
     /// <param name="rot"></param>
-    public void DrawRotation(bool front, float rot){
+    public void DrawRotation(bool front, float rot)
+    {
         //space available for the cards to draw
         int availableHandWidth = (int)(ScreenWidth * 0.2f);
         //space the cards would take up if side by side
@@ -98,7 +99,9 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
             bool areCardsEven = _cards.Count % 2 == 0;
             cardX = areCardsEven
                 ? -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
-                : -effectiveCardWidth / 2 - _cards.Count / 2 * effectiveCardWidth + i * effectiveCardWidth;
+                : -effectiveCardWidth / 2
+                    - _cards.Count / 2 * effectiveCardWidth
+                    + i * effectiveCardWidth;
 
             _cards[i].DrawRotation(centralX + cardX, cardY, front, rot);
 

@@ -4,5 +4,5 @@ public enum CellState
 {
     Empty,
     Ship,
-    Rock
+    Rock,
 }

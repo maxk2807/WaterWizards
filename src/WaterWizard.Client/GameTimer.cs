@@ -17,15 +17,16 @@ public class GameTimer(GameStateManager gameStateManager)
     private bool _isPaused = false;
     public bool IsPaused => _isPaused;
 
-
     /// <summary>
     /// Updates the game timer. If the time limit is reached, it sets IsTimeUp to true and changes the game state.
     /// </summary>
     public void Update()
     {
-        if (_isPaused) return;
+        if (_isPaused)
+            return;
         _timerSeconds += Raylib.GetFrameTime();
-        if (IsTimeUp) return;
+        if (IsTimeUp)
+            return;
         if (GetMinutes() >= _timeLimitMinutes && _timerSeconds % 60 >= _timeLimitSeconds)
         {
             IsTimeUp = true;
@@ -44,6 +45,7 @@ public class GameTimer(GameStateManager gameStateManager)
         _isPaused = false;
         Console.WriteLine("[GameTimer] Game resumed.");
     }
+
     /// <summary>
     /// Draws the timer on the screen at the specified position with the specified font size and color.
     /// </summary>

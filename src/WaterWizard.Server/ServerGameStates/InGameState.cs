@@ -24,9 +24,17 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 
     public void OnExit() { }
 
-    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager serverInstance, ServerGameStateManager manager, string messageType)
+    public void HandleNetworkEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        NetManager serverInstance,
+        ServerGameStateManager manager,
+        string messageType
+    )
     {
-        Console.WriteLine($"[InGameState] HandleNetworkEvent called for peer {peer} with messageType {messageType}. Reader position: {reader.Position}");
+        Console.WriteLine(
+            $"[InGameState] HandleNetworkEvent called for peer {peer} with messageType {messageType}. Reader position: {reader.Position}"
+        );
         switch (messageType)
         {
             case "PlaceShip":

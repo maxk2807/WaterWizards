@@ -1,4 +1,3 @@
-
 using Raylib_cs;
 
 namespace WaterWizard.Client.gamescreen.ships;
@@ -15,7 +14,7 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
 
     public void Draw()
     {
-        Rectangle rec = new(X,Y,Width,Height); 
+        Rectangle rec = new(X, Y, Width, Height);
         Raylib.DrawRectangleRec(rec, Color.DarkPurple);
     }
 }

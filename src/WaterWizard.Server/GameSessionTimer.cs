@@ -1,6 +1,6 @@
+using System.Diagnostics;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using System.Diagnostics;
 
 namespace WaterWizard.Server;
 
@@ -61,7 +61,8 @@ public class GameSessionTimer : IDisposable
     /// </summary>
     public void Stop()
     {
-        if (!IsRunning) return;
+        if (!IsRunning)
+            return;
 
         _gameStopwatch?.Stop();
         _timerUpdateTimer?.Dispose();
@@ -76,7 +77,8 @@ public class GameSessionTimer : IDisposable
     /// <param name="peer">The peer to send the update to.</param>
     public void SendCurrentTimeToPeer(NetPeer peer)
     {
-        if (!IsRunning) return;
+        if (!IsRunning)
+            return;
 
         var writer = new NetDataWriter();
         writer.Put("TimerUpdate");
@@ -91,7 +93,8 @@ public class GameSessionTimer : IDisposable
     /// </summary>
     private void SendTimerUpdateToAll()
     {
-        if (!IsRunning || _server == null) return;
+        if (!IsRunning || _server == null)
+            return;
 
         var writer = new NetDataWriter();
         writer.Put("TimerUpdate");
@@ -101,7 +104,9 @@ public class GameSessionTimer : IDisposable
         {
             connectedPeer.Send(writer, DeliveryMethod.Unreliable);
         }
-        Log($"[GameSessionTimer] Broadcast TimerUpdate: {ElapsedSeconds:F2}s to {_server.ConnectedPeersCount} peers.");
+        Log(
+            $"[GameSessionTimer] Broadcast TimerUpdate: {ElapsedSeconds:F2}s to {_server.ConnectedPeersCount} peers."
+        );
     }
 
     /// <summary>

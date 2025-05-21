@@ -40,6 +40,7 @@ public class GameState
     {
         return manager.CurrentState is PlacementState;
     }
+
     public void AddShip(NetPeer player, PlacedShip ship)
     {
         if (!playerShips.ContainsKey(player))
@@ -55,16 +56,18 @@ public class GameState
     }
 
     public void PrintAllShips()
-{
-    foreach (var kvp in playerShips)
     {
-        Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
-        foreach (var ship in kvp.Value)
+        foreach (var kvp in playerShips)
         {
-            Console.WriteLine($"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}");
+            Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
+            foreach (var ship in kvp.Value)
+            {
+                Console.WriteLine(
+                    $"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}"
+                );
+            }
         }
     }
-}
 
     public GameState(NetManager server, ServerGameStateManager manager)
     {
@@ -77,7 +80,11 @@ public class GameState
             players[i] = server.ConnectedPeerList[i];
 
         boards = InitBoards();
-        hands = [[], []];
+        hands =
+        [
+            [],
+            [],
+        ];
         ActiveCards = [];
         UtilityStack = Cards.GetCardsOfType(CardType.Utility);
         UtilityStack.AddRange(Cards.GetCardsOfType(CardType.Healing));
@@ -120,7 +127,7 @@ public class GameState
                 { 4, 2 },
                 { 3, 2 },
                 { 2, 4 },
-                { 1, 5 }
+                { 1, 5 },
             };
 
             var playerShipList = GetShips(peer);
@@ -131,7 +138,9 @@ public class GameState
             {
                 NetDataWriter errorWriter = new();
                 errorWriter.Put("ShipPlacementError");
-                errorWriter.Put($"Du darfst nur {allowedShips.GetValueOrDefault(size, 0)} Schiffe der Länge {size} platzieren!");
+                errorWriter.Put(
+                    $"Du darfst nur {allowedShips.GetValueOrDefault(size, 0)} Schiffe der Länge {size} platzieren!"
+                );
                 peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
                 return;
             }
@@ -140,10 +149,10 @@ public class GameState
             foreach (var ship in playerShipList)
             {
                 bool overlap =
-                    x < ship.X + ship.Width &&
-                    x + width > ship.X &&
-                    y < ship.Y + ship.Height &&
-                    y + height > ship.Y;
+                    x < ship.X + ship.Width
+                    && x + width > ship.X
+                    && y < ship.Y + ship.Height
+                    && y + height > ship.Y;
                 if (overlap)
                 {
                     NetDataWriter errorWriter = new();
@@ -181,7 +190,16 @@ public class GameState
                 boards[playerIndex][x + i, y + j].CellState = CellState.Ship;
             }
         }
-        AddShip(peer, new PlacedShip { X = x, Y = y, Width = width, Height = height });
+        AddShip(
+            peer,
+            new PlacedShip
+            {
+                X = x,
+                Y = y,
+                Width = width,
+                Height = height,
+            }
+        );
 
         NetDataWriter writer = new();
         writer.Put("ShipPosition");
@@ -193,20 +211,25 @@ public class GameState
     }
 
     public void HandleAttack(NetPeer attacker, NetPeer defender, int x, int y)
-{
-    Console.WriteLine($"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})");
-    var ships = GetShips(defender);
-    foreach (var ship in ships)
     {
-        if (x >= ship.X && x < ship.X + ship.Width &&
-            y >= ship.Y && y < ship.Y + ship.Height)
+        Console.WriteLine(
+            $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
+        );
+        var ships = GetShips(defender);
+        foreach (var ship in ships)
         {
-            Console.WriteLine($"[Server] Treffer auf Schiff bei ({x},{y}) von Spieler {defender.ToString()}");
-            return;
+            if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
+            {
+                Console.WriteLine(
+                    $"[Server] Treffer auf Schiff bei ({x},{y}) von Spieler {defender.ToString()}"
+                );
+                return;
+            }
         }
+        Console.WriteLine(
+            $"[Server] Kein Schiff getroffen bei ({x},{y}) von Spieler {defender.ToString()}"
+        );
     }
-    Console.WriteLine($"[Server] Kein Schiff getroffen bei ({x},{y}) von Spieler {defender.ToString()}");
-}
 
     internal void HandleCardBuying(NetPeer peer, NetPacketReader reader)
     {
@@ -214,16 +237,20 @@ public class GameState
         Console.WriteLine($"[Server] Trying to Buy {cardType} Card");
         Cards? card = cardType switch
         {
-            "Utility" => RandomCard(UtilityStack),//TODO: Actually Paying
-            "Damage" => RandomCard(DamageStack),//TODO: Actually Paying
-            "Environment" => RandomCard(EnvironmentStack),//TODO: Actually Paying
-            _ => throw new Exception("Invalid CardType: " + cardType + " . Has to be a string of either: Utility, Damage or Environment"),
+            "Utility" => RandomCard(UtilityStack), //TODO: Actually Paying
+            "Damage" => RandomCard(DamageStack), //TODO: Actually Paying
+            "Environment" => RandomCard(EnvironmentStack), //TODO: Actually Paying
+            _ => throw new Exception(
+                "Invalid CardType: "
+                    + cardType
+                    + " . Has to be a string of either: Utility, Damage or Environment"
+            ),
         };
         NetDataWriter writer = new();
         writer.Put("BoughtCard");
         writer.Put(card.Variant.ToString());
         peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        if(server.ConnectedPeerList.Count == 2)
+        if (server.ConnectedPeerList.Count == 2)
         {
             writer = new();
             writer.Put("OpponentBoughtCard");
@@ -246,9 +273,8 @@ public class GameState
         string cardVariantString = reader.GetString();
         int cardX = reader.GetInt();
         int cardY = reader.GetInt();
-        if(Enum.TryParse<CardVariant>(cardVariantString, out var variant))
+        if (Enum.TryParse<CardVariant>(cardVariantString, out var variant))
         {
-
             // Gegner finden
             var defender = server.ConnectedPeerList.Find(p => !p.Equals(peer));
             if (defender != null)
@@ -258,7 +284,7 @@ public class GameState
             else
             {
                 Console.WriteLine("[Server] Kein Gegner gefunden für CardCast.");
-            }        
+            }
         }
         else
         {

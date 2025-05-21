@@ -20,7 +20,13 @@ public static class PreStartLobbyTimer
         {
             string countdownText = $"Game starts in {countdown.Value}...";
             int countdownWidth = Raylib.MeasureText(countdownText, 40);
-            Raylib.DrawText(countdownText, (manager.screenWidth - countdownWidth) / 2, manager.screenHeight / 2, 40, Color.Red);
+            Raylib.DrawText(
+                countdownText,
+                (manager.screenWidth - countdownWidth) / 2,
+                manager.screenHeight / 2,
+                40,
+                Color.Red
+            );
         }
     }
 }
