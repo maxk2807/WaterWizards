@@ -1,8 +1,0 @@
-name: "Custom CodeQL Configuration"
-
-queries:
-  - uses: security-and-quality
-    query-filters: 
-    - include:
-      severity: [ "error", "warning" ]
-      tags: [ "code-quality" ]
