@@ -725,6 +725,45 @@ public class NetworkManager
                     string cardType = reader.GetString();
                     GameStateManager.Instance.GameScreen.HandleOpponentBoughtCard(cardType);
                     break;
+                case "ShipSync":
+                    int count = reader.GetInt();
+                    GameBoard playerBoard = GameStateManager.Instance.GameScreen.playerBoard!;
+                    playerBoard.Ships.Clear();
+                    for (int i = 0; i < count; i++)
+                    {
+                        int x = reader.GetInt();
+                        int y = reader.GetInt();
+                        int width = reader.GetInt();
+                        int height = reader.GetInt();
+                        int pixelX = (int) playerBoard.Position.X + x * playerBoard.CellSize;
+                        int pixelY = (int) playerBoard.Position.Y + y * playerBoard.CellSize;
+                        int pixelWidth = width * playerBoard.CellSize;
+                        int pixelHeight = height * playerBoard.CellSize;
+
+                        playerBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));                    }
+                        Console.WriteLine($"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
+                        
+                        GameStateManager.Instance.SetStateToInGame();
+                        Console.WriteLine($"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
+                    break;
+
+                case "OpponentShipSync":
+                    int oppCount = reader.GetInt();
+                    GameBoard opponentBoard = GameStateManager.Instance.GameScreen.opponentBoard!;
+                    opponentBoard.Ships.Clear();
+                    for (int i = 0; i < oppCount; i++)
+                    {
+                        int x = reader.GetInt();
+                        int y = reader.GetInt();
+                        int width = reader.GetInt();
+                        int height = reader.GetInt();
+                        int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
+                        int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
+                        int pixelWidth = width * opponentBoard.CellSize;
+                        int pixelHeight = height * opponentBoard.CellSize;
+                        opponentBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));
+                    }
+                    break;
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
@@ -973,4 +1012,17 @@ public class NetworkManager
             Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
         }
     }
+
+    public void SendAttack(int x, int y)
+{
+    if (client != null && client.FirstPeer != null)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("Attack");
+        writer.Put(x);
+        writer.Put(y);
+        client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+        Console.WriteLine($"[Client] Attack initiated at ({x}, {y})");
+    }
+}
 }

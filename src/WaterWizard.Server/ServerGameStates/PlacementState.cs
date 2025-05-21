@@ -20,7 +20,6 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
     public void OnEnter()
     {
         GameState = new(server, manager);
-        
         NotifyClients();
     }
 
@@ -42,24 +41,65 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
     /// <summary>
     /// Behandelt Netzwerkereignisse während der Platzierungsphase.
     /// </summary>
-     public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager serverInstance, ServerGameStateManager manager, string messageType)
+    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager serverInstance, ServerGameStateManager manager, string messageType)
     {
-        // messageType is already passed, no need to reader.GetString() again if Program.cs did it.
-        // string messageType = reader.GetString(); // This would be wrong if Program.cs already read it.
         switch (messageType)
         {
             case "PlacementReady":
                 Console.WriteLine($"[PlacementState] Received PlacementReady from {peer}");
                 placementReady[peer.ToString()] = true;
-                // Check if all connected players (not just those who sent PlacementReady) are ready
                 if (placementReady.Count == serverInstance.ConnectedPeersCount && placementReady.Values.All(r => r))
                 {
                     Console.WriteLine("[PlacementState] All players have placed ships. Starting game.");
+                    GameState!.PrintAllShips();
+
                     var writer = new NetDataWriter();
                     writer.Put("StartGame");
-                    foreach (var p in serverInstance.ConnectedPeerList) // Use serverInstance passed to this method
+                    foreach (var p in serverInstance.ConnectedPeerList)
                         p.Send(writer, DeliveryMethod.ReliableOrdered);
-                    manager.ChangeState(new InGameState(serverInstance, GameState!)); // Use serverInstance
+
+                    // Kopiere die Peers in ein Array, um Collection-Änderungen zu vermeiden
+                    var peers = serverInstance.ConnectedPeerList.ToArray();
+
+                    // ShipSync für eigene Schiffe
+                    foreach (var p in peers)
+                    {
+                        var ships = GameState!.GetShips(p);
+                        var shipWriter = new NetDataWriter();
+                        shipWriter.Put("ShipSync");
+                        shipWriter.Put(ships.Count);
+                        foreach (var ship in ships)
+                        {
+                            shipWriter.Put(ship.X);
+                            shipWriter.Put(ship.Y);
+                            shipWriter.Put(ship.Width);
+                            shipWriter.Put(ship.Height);
+                        }
+                        p.Send(shipWriter, DeliveryMethod.ReliableOrdered);
+                    }
+
+                    // OpponentShipSync für gegnerische Schiffe
+                    foreach (var p in peers)
+                    {
+                        var opponent = peers.FirstOrDefault(peer2 => peer2 != p);
+                        if (opponent != null)
+                        {
+                            var oppShips = GameState!.GetShips(opponent);
+                            var oppWriter = new NetDataWriter();
+                            oppWriter.Put("OpponentShipSync");
+                            oppWriter.Put(oppShips.Count);
+                            foreach (var ship in oppShips)
+                            {
+                                oppWriter.Put(ship.X);
+                                oppWriter.Put(ship.Y);
+                                oppWriter.Put(ship.Width);
+                                oppWriter.Put(ship.Height);
+                            }
+                            p.Send(oppWriter, DeliveryMethod.ReliableOrdered);
+                        }
+                    }
+                    // Bestehendes GameState-Objekt weitergeben!
+                    manager.ChangeState(new InGameState(serverInstance, GameState!));
                 }
                 else
                 {

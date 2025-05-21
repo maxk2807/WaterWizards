@@ -6,6 +6,14 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
+public class PlacedShip
+{
+    public int X { get; set; }
+    public int Y { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
+}
+
 /// <summary>
 /// Represents the true Gamestate of the Game as it is on the Server.
 /// Includes: 
@@ -60,6 +68,34 @@ public class GameState
     public List<Cards> DamageStack { get; private set; }
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
+
+    private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
+
+    public void AddShip(NetPeer player, PlacedShip ship)
+    {
+        if (!playerShips.ContainsKey(player))
+            playerShips[player] = new List<PlacedShip>();
+        playerShips[player].Add(ship);
+    }
+
+    public IReadOnlyList<PlacedShip> GetShips(NetPeer player)
+    {
+        if (playerShips.TryGetValue(player, out var ships))
+            return ships;
+        return [];
+    }
+
+    public void PrintAllShips()
+{
+    foreach (var kvp in playerShips)
+    {
+        Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
+        foreach (var ship in kvp.Value)
+        {
+            Console.WriteLine($"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}");
+        }
+    }
+}
 
     /// <summary>
     /// A new Gamestate.
@@ -140,6 +176,7 @@ public class GameState
                 cell.CellState = CellState.Ship;
             }
         }
+        AddShip(peer, new PlacedShip { X = x, Y = y, Width = width, Height = height });
 
         NetDataWriter writer = new();
         writer.Put("ShipPosition");
@@ -150,6 +187,23 @@ public class GameState
         peer.Send(writer, DeliveryMethod.ReliableOrdered);
         Console.WriteLine("[Server] Successfull Ship Handling");
     }
+
+  
+    public void HandleAttack(NetPeer attacker, NetPeer defender, int x, int y)
+{
+    Console.WriteLine($"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})");
+    var ships = GetShips(defender);
+    foreach (var ship in ships)
+    {
+        if (x >= ship.X && x < ship.X + ship.Width &&
+            y >= ship.Y && y < ship.Y + ship.Height)
+        {
+            Console.WriteLine($"[Server] Treffer auf Schiff bei ({x},{y}) von Spieler {defender.ToString()}");
+            return;
+        }
+    }
+    Console.WriteLine($"[Server] Kein Schiff getroffen bei ({x},{y}) von Spieler {defender.ToString()}");
+}
 
     /// <summary>
     /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
@@ -209,7 +263,17 @@ public class GameState
         int cardY = reader.GetInt();
         if(Enum.TryParse<CardVariant>(cardVariantString, out var variant))
         {
-            CardAbilities.HandleAbility(variant, this, new Vector2(cardX, cardY));
+
+            // Gegner finden
+            var defender = server.ConnectedPeerList.Find(p => !p.Equals(peer));
+            if (defender != null)
+            {
+                CardAbilities.HandleAbility(variant, this, new Vector2(cardX, cardY), defender);
+            }
+            else
+            {
+                Console.WriteLine("[Server] Kein Gegner gefunden für CardCast.");
+            }        
         }
         else
         {

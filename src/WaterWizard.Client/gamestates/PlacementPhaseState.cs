@@ -25,7 +25,7 @@ public class PlacementPhaseState : IGameState
         if (hoverReady && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             WaterWizard.Client.NetworkManager.Instance.SendPlacementReady();
-            manager.SetStateToInGame();
+            //manager.SetStateToInGame();
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.L))
