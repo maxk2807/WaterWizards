@@ -161,7 +161,7 @@ public class GameStateManager
     {
         currentState = new InGameState();
         gameTimer.Reset();
-        GameScreen.Reset();
+       // GameScreen.Reset();
     }
 
     public void HandleTextInput()
