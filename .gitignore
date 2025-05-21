@@ -6,23 +6,3 @@ obj
 .env
 .vs
 .nuke/temp/
-
-# Ignore DocFX build output
-_site/
-_intermediate/
-docfx.console.*.log
-
-# Ignore DocFX cache and temp files
-.temp/
-.cache/
-*.tmp
-
-# Ignore user-specific files
-*.user
-*.suo
-
-# Ignore OS and editor files
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
