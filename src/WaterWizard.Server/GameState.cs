@@ -1,12 +1,47 @@
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using Microsoft.VisualBasic;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
+/// <summary>
+/// Represents the true Gamestate of the Game as it is on the Server.
+/// Includes: 
+/// <list type="table">
+///     <item>
+///         <term>Players</term>
+///         <description>The <see cref="NetPeer"/>s of the connected players</description>
+///     </item>
+///     <item>
+///         <term>Boards</term>
+///         <description>The Gameboards of the Players, in the Form of 2D <see cref="Cell"/> Arrays.</description>
+///     </item>
+///     <item>
+///         <term>Hands</term>
+///         <description>The Hands of Cards of the Players, in the Form of <see cref="Cards"/> Lists</description>
+///     </item>
+///     <item>
+///         <term>Active Cards</term>
+///         <description>The Cards that were played are currently exercising an Active Effect</description>
+///     </item>
+///     <item>
+///         <term>Stacks</term>
+///         <description>
+///             <see cref="UtilityStack"/>, <see cref="DamageStack"/> and <see cref="EnvironmentStack"/>. 
+///             <see cref="Cards"/> Lists that are filled with the Cards of the <see cref="CardType"/>s 
+///             <see cref="CardType.Healing"/> + <see cref="CardType.Utility"/>, <see cref="CardType.Damage"/>
+///             and <see cref="CardType.Environment"/> respectively.
+///         </description>
+///     </item>
+///     <item>
+///         <term>Graveyard</term>
+///         <description>The Cards that were already played go here. <see cref="Cards"/> List</description>
+///     </item>
+/// </list>
+/// <para>Also Handles Ship Placements, Card Buying and Casting, Mana and Gold generation. etc. </para>
+/// </summary>
 public class GameState
 {
     private NetPeer[] players = new NetPeer[2];
@@ -26,6 +61,12 @@ public class GameState
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
 
+    /// <summary>
+    /// Represents the GameState
+    /// </summary>
+    /// <param name="server"></param>
+    /// <param name="manager"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public GameState(NetManager server, ServerGameStateManager manager)
     {
         int connectedCount = server.ConnectedPeerList.Count;
