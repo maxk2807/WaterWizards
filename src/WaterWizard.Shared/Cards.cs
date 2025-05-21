@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace WaterWizard.Shared;
 
 using System;
@@ -147,18 +149,18 @@ public class Cards
         Console.WriteLine();
     }
 
+    /// <summary>
+    /// Get all Cards that correspond to the CardType <see cref="type"/>.
+    /// First Find All Variants with the given type, then creates a new List
+    /// of Cards from those <see cref="CardVariant"/>s.
+    /// </summary>
+    /// <param name="type">The <see cref="CardType"/> using which the Cards get filtered</param>
+    /// <returns>A new List of Cards that all correspond to the CardType given</returns>
     public static List<Cards> GetCardsOfType(CardType type)
     {
         List<Cards> cards = [];
-        var cardVariants = cardTypeMapping.Where((variantTypePair) =>
-        {
-            return variantTypePair.Value == type;
-        });
-        foreach (var variant in cardVariants)
-        {
-            cards.Add(new(variant.Key));
-        }
-
+        var cardVariants = cardTypeMapping.Where(kVPair => kVPair.Value == type);
+        cards.AddRange(from variant in cardVariants select new Cards(variant.Key));
         return cards;
     }
 
@@ -166,8 +168,11 @@ public class Cards
     /// Get the Target of this Card as a Vector when it applies, otherwise (0,0)
     /// </summary>
     /// <returns>
-    ///     Returns the Size of the Target of the Card as a Vector2.
-    ///     Returns 0x0 Vector if target is: random, ship or battlefield.
+    /// Returns the Size of the Target of the Card as a Vector2.
+    /// <para/>
+    /// or
+    /// <para/>
+    /// Returns 0x0 Vector if target is: random, ship or battlefield.
     /// </returns>
     public Vector2 TargetAsVector()
     {
