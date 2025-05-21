@@ -1,7 +1,6 @@
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using Microsoft.VisualBasic;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
 
@@ -15,6 +14,42 @@ public class PlacedShip
     public int Height { get; set; }
 }
 
+/// <summary>
+/// Represents the true Gamestate of the Game as it is on the Server.
+/// Includes: 
+/// <list type="table">
+///     <item>
+///         <term>Players</term>
+///         <description>The <see cref="NetPeer"/>s of the connected players</description>
+///     </item>
+///     <item>
+///         <term>Boards</term>
+///         <description>The Gameboards of the Players, in the Form of 2D <see cref="Cell"/> Arrays.</description>
+///     </item>
+///     <item>
+///         <term>Hands</term>
+///         <description>The Hands of Cards of the Players, in the Form of <see cref="Cards"/> Lists</description>
+///     </item>
+///     <item>
+///         <term>Active Cards</term>
+///         <description>The Cards that were played are currently exercising an Active Effect</description>
+///     </item>
+///     <item>
+///         <term>Stacks</term>
+///         <description>
+///             <see cref="UtilityStack"/>, <see cref="DamageStack"/> and <see cref="EnvironmentStack"/>. 
+///             <see cref="Cards"/> Lists that are filled with the Cards of the <see cref="CardType"/>s 
+///             <see cref="CardType.Healing"/> + <see cref="CardType.Utility"/>, <see cref="CardType.Damage"/>
+///             and <see cref="CardType.Environment"/> respectively.
+///         </description>
+///     </item>
+///     <item>
+///         <term>Graveyard</term>
+///         <description>The Cards that were already played go here. <see cref="Cards"/> List</description>
+///     </item>
+/// </list>
+/// <para>Also Handles Ship Placements, Card Buying and Casting, Mana and Gold generation. etc. </para>
+/// </summary>
 public class GameState
 {
     private NetPeer[] players = new NetPeer[2];
@@ -62,13 +97,17 @@ public class GameState
             Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
             foreach (var ship in kvp.Value)
             {
-                Console.WriteLine(
-                    $"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}"
-                );
+                Console.WriteLine($"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}");
             }
         }
     }
 
+    /// <summary>
+    /// A new Gamestate.
+    /// </summary>
+    /// <param name="server">Corresponding NetManager server to access Clients (Players)</param>
+    /// <param name="manager">Corresponding <see cref="ServerGameStateManager"/></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public GameState(NetManager server, ServerGameStateManager manager)
     {
         int connectedCount = server.ConnectedPeerList.Count;
@@ -80,11 +119,7 @@ public class GameState
             players[i] = server.ConnectedPeerList[i];
 
         boards = InitBoards();
-        hands =
-        [
-            [],
-            [],
-        ];
+        hands = [[], []];
         ActiveCards = [];
         UtilityStack = Cards.GetCardsOfType(CardType.Utility);
         UtilityStack.AddRange(Cards.GetCardsOfType(CardType.Healing));
@@ -95,6 +130,13 @@ public class GameState
         this.manager = manager;
     }
 
+    /// <summary>
+    /// Initializes the Boards
+    /// </summary>
+    /// <returns>
+    /// 3D Cell Array where the First Dimension is a 2 Element Array
+    /// where the Elements correspond to the 2 Players 
+    /// </returns>
     private static Cell[][,] InitBoards()
     {
         Cell[,] player1Board = new Cell[boardWidth, boardHeight];
@@ -110,6 +152,12 @@ public class GameState
         return [player1Board, player2Board];
     }
 
+    /// <summary>
+    /// Handles the Placement of the ships. Receives the Position of the ship placement 
+    /// from the Client. Validates placement and sends error messages if invalid.
+    /// </summary>
+    /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
+    /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
     public void HandleShipPlacement(NetPeer peer, NetPacketReader reader)
     {
         int x = reader.GetInt();
@@ -231,7 +279,13 @@ public class GameState
         );
     }
 
-    internal void HandleCardBuying(NetPeer peer, NetPacketReader reader)
+    /// <summary>
+    /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
+    /// of the <see cref="CardType"/> given in <paramref name="reader"/>
+    /// </summary>
+    /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
+    /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
+    public void HandleCardBuying(NetPeer peer, NetPacketReader reader)
     {
         string cardType = reader.GetString();
         Console.WriteLine($"[Server] Trying to Buy {cardType} Card");
@@ -267,6 +321,12 @@ public class GameState
         return stack[index];
     }
 
+    /// <summary>
+    /// Handles the Casting of Cards from the <see cref="NetPeer"/>s hand. //TODO: handle Mana Cost.
+    /// Calls the Ability in <see cref="CardAbilities"/>
+    /// </summary>
+    /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
+    /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
     public void HandleCardCasting(NetPeer peer, NetPacketReader reader)
     {
         //TODO: Handle Mana Cost
