@@ -53,19 +53,34 @@ public class CardStacksField(GameScreen gameScreen)
     private void HandleBuyingCardFromStack()
     {
         var mousePos = Raylib.GetMousePosition();
-        Rectangle utilityRec = new(utilityStack!.X, utilityStack.Y, gameScreen.cardWidth, gameScreen.cardHeight);
-        Rectangle damageRec = new(damageStack!.X, damageStack.Y, gameScreen.cardWidth, gameScreen.cardHeight);
-        Rectangle environmentRec = new(environmentStack!.X, environmentStack.Y, gameScreen.cardWidth, gameScreen.cardHeight);
+        Rectangle utilityRec = new(
+            utilityStack!.X,
+            utilityStack.Y,
+            gameScreen.cardWidth,
+            gameScreen.cardHeight
+        );
+        Rectangle damageRec = new(
+            damageStack!.X,
+            damageStack.Y,
+            gameScreen.cardWidth,
+            gameScreen.cardHeight
+        );
+        Rectangle environmentRec = new(
+            environmentStack!.X,
+            environmentStack.Y,
+            gameScreen.cardWidth,
+            gameScreen.cardHeight
+        );
         var clicked = Raylib.IsMouseButtonPressed(MouseButton.Left);
         if (Raylib.CheckCollisionPointRec(mousePos, utilityRec) && clicked)
         {
             NetworkManager.Instance.RequestCardBuy("Utility");
         }
-        else if(Raylib.CheckCollisionPointRec(mousePos, damageRec) && clicked)
+        else if (Raylib.CheckCollisionPointRec(mousePos, damageRec) && clicked)
         {
             NetworkManager.Instance.RequestCardBuy("Damage");
         }
-        else if(Raylib.CheckCollisionPointRec(mousePos, environmentRec) && clicked)
+        else if (Raylib.CheckCollisionPointRec(mousePos, environmentRec) && clicked)
         {
             NetworkManager.Instance.RequestCardBuy("Environment");
         }

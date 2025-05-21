@@ -1,8 +1,8 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace WaterWizard.Shared
 {
@@ -35,7 +35,7 @@ namespace WaterWizard.Shared
                 using var client = new HttpClient();
                 // Abrufen der �ffentlichen IP-Adresse von einem externen Dienst
                 var response = client.GetStringAsync("https://api.ipify.org").Result;
-                if(response == null)
+                if (response == null)
                 {
                     return "funktioniert nicht";
                 }

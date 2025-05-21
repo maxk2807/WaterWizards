@@ -1,7 +1,7 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using WaterWizard.Shared;
 using WaterWizard.Server.ServerGameStates;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
@@ -16,6 +16,7 @@ static class Program
     {
         Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {message}");
     }
+
     static void Main()
     {
         Log("WaterWizards Server wird gestartet...");
@@ -24,7 +25,7 @@ static class Program
         var server = new NetManager(listener)
         {
             AutoRecycle = true,
-            UnconnectedMessagesEnabled = true
+            UnconnectedMessagesEnabled = true,
         };
 
         _gameSessionTimer = new GameSessionTimer(server);
@@ -33,7 +34,9 @@ static class Program
         gameStateManager.ChangeState(new LobbyState(server));
 
         string localIp = NetworkUtils.GetLocalIPAddress();
-        string publicIp = Environment.GetEnvironmentVariable("PUBLIC_ADDRESS") ?? NetworkUtils.GetPublicIPAddress();
+        string publicIp =
+            Environment.GetEnvironmentVariable("PUBLIC_ADDRESS")
+            ?? NetworkUtils.GetPublicIPAddress();
         Console.WriteLine($"Server erfolgreich auf Port 7777 gestartet");
         Console.WriteLine($"Verbinde dich mit der IP-Adresse: {publicIp}:7777");
         Console.WriteLine($"localIp: {localIp}:7777");
@@ -81,7 +84,9 @@ static class Program
                     listener.ConnectionRequestEvent += request =>
                     {
                         request.Accept();
-                        Log($"[Server] Client verbunden (ohne Schlüssel): {request.RemoteEndPoint}");
+                        Log(
+                            $"[Server] Client verbunden (ohne Schlüssel): {request.RemoteEndPoint}"
+                        );
                     };
 
                     listener.PeerConnectedEvent += peer =>
@@ -146,7 +151,7 @@ static class Program
                         try
                         {
                             string messageType = reader.GetString();
-                            Log($"[Server] Received: {messageType} from {peer}"); 
+                            Log($"[Server] Received: {messageType} from {peer}");
 
                             switch (messageType)
                             {
@@ -161,32 +166,49 @@ static class Program
                                     if (ConnectedPlayers.ContainsKey(peer.ToString()))
                                     {
                                         ConnectedPlayers[peer.ToString()] = true;
-                                        Log($"[Server] Player {PlayerNames.GetValueOrDefault(peer.ToString(), peer.ToString())} is Ready.");
+                                        Log(
+                                            $"[Server] Player {PlayerNames.GetValueOrDefault(peer.ToString(), peer.ToString())} is Ready."
+                                        );
                                         SendPlayerList(server);
-                                        (gameStateManager.CurrentState as LobbyState)?.CheckAllPlayersReady(gameStateManager);
+                                        (
+                                            gameStateManager.CurrentState as LobbyState
+                                        )?.CheckAllPlayersReady(gameStateManager);
                                     }
                                     else
                                     {
-                                        Log($"[Server] Warning: Received PlayerReady from unknown peer {peer}");
+                                        Log(
+                                            $"[Server] Warning: Received PlayerReady from unknown peer {peer}"
+                                        );
                                     }
                                     break;
                                 case "PlayerNotReady":
                                     if (ConnectedPlayers.ContainsKey(peer.ToString()))
                                     {
                                         ConnectedPlayers[peer.ToString()] = false;
-                                        Log($"[Server] Player {PlayerNames.GetValueOrDefault(peer.ToString(), peer.ToString())} is Not Ready.");
+                                        Log(
+                                            $"[Server] Player {PlayerNames.GetValueOrDefault(peer.ToString(), peer.ToString())} is Not Ready."
+                                        );
                                         SendPlayerList(server);
                                         // Optionally, call CheckAllPlayersReady here too, though it's less likely to start the game.
-                                        (gameStateManager.CurrentState as LobbyState)?.CheckAllPlayersReady(gameStateManager);
+                                        (
+                                            gameStateManager.CurrentState as LobbyState
+                                        )?.CheckAllPlayersReady(gameStateManager);
                                     }
                                     else
                                     {
-                                        Log($"[Server] Warning: Received PlayerNotReady from unknown peer {peer}");
+                                        Log(
+                                            $"[Server] Warning: Received PlayerNotReady from unknown peer {peer}"
+                                        );
                                     }
                                     break;
                                 case "ChatMessage":
                                     string chatMsg = reader.GetString();
-                                    string senderName = PlayerNames.TryGetValue(peer.ToString(), out var name) ? name : $"Player_{peer.Port}";
+                                    string senderName = PlayerNames.TryGetValue(
+                                        peer.ToString(),
+                                        out var name
+                                    )
+                                        ? name
+                                        : $"Player_{peer.Port}";
                                     BroadcastChatMessage(server, peer, senderName, chatMsg);
                                     break;
                                 default:
@@ -226,7 +248,11 @@ static class Program
         }
     }
 
-    private static void BroadcastMessage(NetManager? server, NetDataWriter writer, DeliveryMethod deliveryMethod)
+    private static void BroadcastMessage(
+        NetManager? server,
+        NetDataWriter writer,
+        DeliveryMethod deliveryMethod
+    )
     {
         if (server == null)
             return;
@@ -247,7 +273,11 @@ static class Program
         foreach (var kvp in ConnectedPlayers)
         {
             writer.Put(kvp.Key);
-            writer.Put(PlayerNames.TryGetValue(kvp.Key, out var name) ? name : $"Player_{kvp.Key.Split(':').LastOrDefault()}");
+            writer.Put(
+                PlayerNames.TryGetValue(kvp.Key, out var name)
+                    ? name
+                    : $"Player_{kvp.Key.Split(':').LastOrDefault()}"
+            );
             writer.Put(kvp.Value);
         }
 
@@ -255,7 +285,12 @@ static class Program
         Log($"[Server] Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet");
     }
 
-    private static void BroadcastChatMessage(NetManager? server, NetPeer senderPeer, string senderDisplayName, string message)
+    private static void BroadcastChatMessage(
+        NetManager? server,
+        NetPeer senderPeer,
+        string senderDisplayName,
+        string message
+    )
     {
         if (server == null)
             return;
@@ -265,7 +300,9 @@ static class Program
         writer.Put(senderDisplayName);
         writer.Put(message);
 
-        Log($"[Server] Sende Chat-Nachricht von [{senderDisplayName}] an andere Spieler: {message}");
+        Log(
+            $"[Server] Sende Chat-Nachricht von [{senderDisplayName}] an andere Spieler: {message}"
+        );
 
         foreach (var recipientPeer in server.ConnectedPeerList)
         {

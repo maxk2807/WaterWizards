@@ -5,23 +5,24 @@ namespace WaterWizard.Client.gamescreen.cards;
 
 public class CardStack(GameScreen gameScreen, int x, int y)
 {
-    public int X {get; private set; } = x;
-    public int Y {get; private set; } = y;
-    private List<GameCard> cards = [
-        
-    ];
+    public int X { get; private set; } = x;
+    public int Y { get; private set; } = y;
+    private List<GameCard> cards = [];
 
-    public void InitDamage(){
+    public void InitDamage()
+    {
         //later calls to Network to get correct Cards
         cards.Add(new(gameScreen, new(Shared.CardVariant.Firebolt)));
     }
 
-    public void InitUtility(){
+    public void InitUtility()
+    {
         //later calls to Network to get correct Cards
         cards.Add(new(gameScreen, new(Shared.CardVariant.Heal)));
     }
 
-    public void InitEnvironment(){
+    public void InitEnvironment()
+    {
         //later calls to Network to get correct Cards
         cards.Add(new(gameScreen, new(Shared.CardVariant.Thunder)));
     }
@@ -30,11 +31,11 @@ public class CardStack(GameScreen gameScreen, int x, int y)
     {
         if (cards.Count == 0)
         {
-            Raylib.DrawRectangle(X,Y, gameScreen.cardWidth, gameScreen.cardHeight, Color.Brown);
+            Raylib.DrawRectangle(X, Y, gameScreen.cardWidth, gameScreen.cardHeight, Color.Brown);
         }
         else
         {
-            cards.First().Draw(X,Y,false);
+            cards.First().Draw(X, Y, false);
         }
     }
 }

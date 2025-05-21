@@ -31,21 +31,21 @@ public class ShipField(GameScreen gameScreen)
         height = CellSize * 4;
         ship = new(gameScreen, shipX, shipY, width, height, 2);
         Ships.Add(ship, 2);
-        
+
         shipX = X + ZonePadding + CellSize * 2;
         //same shipY
         width = CellSize;
         height = CellSize * 3;
         ship = new(gameScreen, shipX, shipY, width, height, 2);
         Ships.Add(ship, 2);
-        
+
         //same shipX
         shipY = Y + CellSize * 3 + ZonePadding / 2;
         width = CellSize;
         height = CellSize * 2;
         ship = new(gameScreen, shipX, shipY, width, height, 4);
         Ships.Add(ship, 4);
-        
+
         shipX = X + ZonePadding / 2 + CellSize;
         shipY = Y + CellSize * 4 + ZonePadding / 2;
         width = CellSize;

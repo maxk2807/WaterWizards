@@ -1,5 +1,3 @@
 namespace WaterWizard.Shared;
 
-public class Ship{
-    
-}
+public class Ship { }

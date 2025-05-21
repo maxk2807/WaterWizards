@@ -1,7 +1,7 @@
-using LiteNetLib;
-using LiteNetLib.Utils;
 using System.Net;
 using System.Net.Sockets;
+using LiteNetLib;
+using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Shared;
@@ -20,7 +20,6 @@ public class NetworkManager
     private NetManager? client;
     private EventBasedNetListener? serverListener;
     private EventBasedNetListener? clientListener;
-    private readonly bool isPlayerConnected = false;
     private readonly int hostPort = 7777;
 
     private bool clientReady = false;
@@ -32,7 +31,6 @@ public class NetworkManager
     /// Stores the current lobby countdown seconds (null if no countdown active).
     /// </summary>
     public int? LobbyCountdownSeconds { get; private set; }
-
 
     private NetworkManager() { }
 
@@ -51,7 +49,7 @@ public class NetworkManager
             server = new NetManager(serverListener)
             {
                 AutoRecycle = true,
-                UnconnectedMessagesEnabled = true
+                UnconnectedMessagesEnabled = true,
             };
 
             if (!server.Start(hostPort))
@@ -76,7 +74,8 @@ public class NetworkManager
 
     private void SetupServerEventHandlers()
     {
-        if (serverListener == null) return;
+        if (serverListener == null)
+            return;
 
         serverListener.ConnectionRequestEvent += request => request.Accept();
 
@@ -87,7 +86,8 @@ public class NetworkManager
             Console.WriteLine($"Client {peer} verbunden");
 
             string playerAddress = peer.ToString();
-            string playerName = $"Player_{playerAddress.Split(':').LastOrDefault() ?? playerAddress}";
+            string playerName =
+                $"Player_{playerAddress.Split(':').LastOrDefault() ?? playerAddress}";
 
             if (!PlayerExists(playerAddress))
             {
@@ -108,8 +108,9 @@ public class NetworkManager
             Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
 
             string playerAddress = peer.ToString();
-            string playerName = connectedPlayers.FirstOrDefault(p => p.Address == playerAddress)?.Name ??
-                               $"Player_{playerAddress.Split(':').LastOrDefault()}";
+            string playerName =
+                connectedPlayers.FirstOrDefault(p => p.Address == playerAddress)?.Name
+                ?? $"Player_{playerAddress.Split(':').LastOrDefault()}";
 
             RemovePlayerByAddress(playerAddress);
             LobbyCountdownSeconds = null;
@@ -120,7 +121,11 @@ public class NetworkManager
         serverListener.NetworkReceiveEvent += HandleServerReceiveEvent;
     }
 
-    private void HandleUnconnectedMessage(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType msgType)
+    private void HandleUnconnectedMessage(
+        IPEndPoint remoteEndPoint,
+        NetPacketReader reader,
+        UnconnectedMessageType msgType
+    )
     {
         try
         {
@@ -138,7 +143,9 @@ public class NetworkManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Host] Fehler bei Verarbeitung unverbundener Nachricht: {ex.Message}");
+            Console.WriteLine(
+                $"[Host] Fehler bei Verarbeitung unverbundener Nachricht: {ex.Message}"
+            );
         }
     }
 
@@ -161,8 +168,12 @@ public class NetworkManager
         Console.WriteLine($"[Client] Lobby countdown: {LobbyCountdownSeconds}");
     }
 
-
-    private void HandleServerReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
+    private void HandleServerReceiveEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        byte channelNumber,
+        DeliveryMethod deliveryMethod
+    )
     {
         try
         {
@@ -183,7 +194,9 @@ public class NetworkManager
                     break;
                 case "PlayerJoin":
                     string playerName = reader.GetString(); // Name sent by the client
-                    var playerToUpdate = connectedPlayers.FirstOrDefault(p => p.Address == peer.ToString());
+                    var playerToUpdate = connectedPlayers.FirstOrDefault(p =>
+                        p.Address == peer.ToString()
+                    );
                     if (playerToUpdate != null)
                     {
                         playerToUpdate.Name = playerName;
@@ -192,15 +205,23 @@ public class NetworkManager
                     else
                     {
                         // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
-                        Console.WriteLine($"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}");
+                        Console.WriteLine(
+                            $"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}"
+                        );
                         // Optionally, handle this by adding the player if it's a valid scenario,
                         // though players are typically added during PeerConnectedEvent.
                         // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
                         // UpdatePlayerList();
                     }
                     break;
+                case "ShipPlacementError":
+                    string errorMsg = reader.GetString();
+                    Console.WriteLine($"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}");
+                    break;
                 default:
-                    Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
+                    Console.WriteLine(
+                        $"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}"
+                    );
                     break;
             }
         }
@@ -220,7 +241,9 @@ public class NetworkManager
         if (player != null)
         {
             player.IsReady = isReady;
-            Console.WriteLine($"[Host] Spieler {player.Name} ist jetzt {(isReady ? "bereit" : "nicht bereit")}");
+            Console.WriteLine(
+                $"[Host] Spieler {player.Name} ist jetzt {(isReady ? "bereit" : "nicht bereit")}"
+            );
             UpdatePlayerList();
         }
         else
@@ -246,7 +269,8 @@ public class NetworkManager
 
     private void UpdatePlayerList()
     {
-        if (server == null) return;
+        if (server == null)
+            return;
 
         var writer = new NetDataWriter();
         writer.Put("PlayerList");
@@ -257,7 +281,9 @@ public class NetworkManager
             writer.Put(player.Address);
             writer.Put(player.Name);
             writer.Put(player.IsReady);
-            Console.WriteLine($"[Host] Spieler: {player.Name}, Status: {(player.IsReady ? "bereit" : "nicht bereit")}");
+            Console.WriteLine(
+                $"[Host] Spieler: {player.Name}, Status: {(player.IsReady ? "bereit" : "nicht bereit")}"
+            );
         }
 
         foreach (var peer in server.ConnectedPeerList)
@@ -275,7 +301,9 @@ public class NetworkManager
     {
         if (IsHost())
         {
-            Console.WriteLine("[Client] Suche nach entfernten Lobbies (lokale Lobby wird ausgeblendet)...");
+            Console.WriteLine(
+                "[Client] Suche nach entfernten Lobbies (lokale Lobby wird ausgeblendet)..."
+            );
         }
         else
         {
@@ -292,10 +320,7 @@ public class NetworkManager
         CleanupClientIfRunning();
 
         clientListener = new EventBasedNetListener();
-        client = new NetManager(clientListener)
-        {
-            UnconnectedMessagesEnabled = true
-        };
+        client = new NetManager(clientListener) { UnconnectedMessagesEnabled = true };
 
         if (!client.Start())
         {
@@ -315,7 +340,11 @@ public class NetworkManager
         }
     }
 
-    private void HandleLobbyInfoResponse(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
+    private void HandleLobbyInfoResponse(
+        IPEndPoint remoteEndPoint,
+        NetPacketReader reader,
+        UnconnectedMessageType messageType
+    )
     {
         try
         {
@@ -325,9 +354,13 @@ public class NetworkManager
                 string lobbyName = reader.GetString();
                 int playerCount = reader.GetInt();
 
-                Console.WriteLine($"[Client] Lobby found: '{lobbyName}' with {playerCount} players at {remoteEndPoint}");
+                Console.WriteLine(
+                    $"[Client] Lobby found: '{lobbyName}' with {playerCount} players at {remoteEndPoint}"
+                );
 
-                var existingLobby = discoveredLobbies.FirstOrDefault(l => l.IP == remoteEndPoint.ToString());
+                var existingLobby = discoveredLobbies.FirstOrDefault(l =>
+                    l.IP == remoteEndPoint.ToString()
+                );
                 if (existingLobby != null)
                 {
                     existingLobby.Name = lobbyName;
@@ -335,7 +368,9 @@ public class NetworkManager
                 }
                 else
                 {
-                    discoveredLobbies.Add(new LobbyInfo(remoteEndPoint.ToString(), lobbyName, playerCount));
+                    discoveredLobbies.Add(
+                        new LobbyInfo(remoteEndPoint.ToString(), lobbyName, playerCount)
+                    );
                 }
             }
         }
@@ -347,7 +382,8 @@ public class NetworkManager
 
     private void SendDiscoveryRequests()
     {
-        if (client == null || !client.IsRunning) return;
+        if (client == null || !client.IsRunning)
+            return;
 
         var req = new NetDataWriter();
         req.Put("DiscoverLobbies");
@@ -356,7 +392,10 @@ public class NetworkManager
 
         try
         {
-            client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Parse("208.77.246.27"), hostPort));
+            client.SendUnconnectedMessage(
+                req,
+                new IPEndPoint(IPAddress.Parse("208.77.246.27"), hostPort)
+            );
             Console.WriteLine("[Client] Discovery request sent to 208.77.246.27");
 
             client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Loopback, hostPort));
@@ -400,21 +439,31 @@ public class NetworkManager
     {
         string localIpAddress = NetworkUtils.GetLocalIPAddress();
         var existingLocalLobby = discoveredLobbies.FirstOrDefault(l =>
-            l.IP.Contains("127.0.0.1") ||
-            l.IP.Contains("localhost") ||
-            l.IP.Contains(localIpAddress));
+            l.IP.Contains("127.0.0.1")
+            || l.IP.Contains("localhost")
+            || l.IP.Contains(localIpAddress)
+        );
 
         if (existingLocalLobby == null)
         {
-            discoveredLobbies.Add(new LobbyInfo($"{localIpAddress}:{hostPort}",
-                "WaterWizards Lobby (Lokal)", connectedPlayers.Count));
+            discoveredLobbies.Add(
+                new LobbyInfo(
+                    $"{localIpAddress}:{hostPort}",
+                    "WaterWizards Lobby (Lokal)",
+                    connectedPlayers.Count
+                )
+            );
             Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugefügt");
         }
     }
 
     public void ConnectToServer(string ip, int port = 7777)
     {
-        if (client != null && client.FirstPeer != null && client.FirstPeer.ConnectionState == ConnectionState.Connected)
+        if (
+            client != null
+            && client.FirstPeer != null
+            && client.FirstPeer.ConnectionState == ConnectionState.Connected
+        )
         {
             Console.WriteLine("[Client] Bereits mit dem Server verbunden.");
             return;
@@ -437,10 +486,14 @@ public class NetworkManager
                     connectionPort = specifiedPort;
                 }
 
-                Console.WriteLine($"[Client] Extracted IP: {cleanIp}, Port: {connectionPort} from {ip}");
+                Console.WriteLine(
+                    $"[Client] Extracted IP: {cleanIp}, Port: {connectionPort} from {ip}"
+                );
             }
 
-            Console.WriteLine($"Versuche, eine Verbindung zum Server herzustellen: IP={cleanIp}, Port={connectionPort}");
+            Console.WriteLine(
+                $"Versuche, eine Verbindung zum Server herzustellen: IP={cleanIp}, Port={connectionPort}"
+            );
 
             clientListener = new EventBasedNetListener();
             client = new NetManager(clientListener)
@@ -452,13 +505,15 @@ public class NetworkManager
                 UnconnectedMessagesEnabled = true,
                 IPv6Enabled = false,
                 NatPunchEnabled = true,
-                EnableStatistics = true
+                EnableStatistics = true,
             };
 
             if (!client.Start())
             {
                 Console.WriteLine("[Client] Fehler beim Starten des Network Clients");
-                GameStateManager.Instance.ChatLog.AddMessage("[Error] Failed to start network client");
+                GameStateManager.Instance.ChatLog.AddMessage(
+                    "[Error] Failed to start network client"
+                );
                 return;
             }
 
@@ -473,8 +528,12 @@ public class NetworkManager
                     var reply = ping.Send(cleanIp, 2000);
                     if (reply.Status == System.Net.NetworkInformation.IPStatus.Success)
                     {
-                        Console.WriteLine($"[Client] Server at {cleanIp} is pingable. Latency: {reply.RoundtripTime}ms");
-                        GameStateManager.Instance.ChatLog.AddMessage($"Server at {cleanIp} is reachable. Attempting connection...");
+                        Console.WriteLine(
+                            $"[Client] Server at {cleanIp} is pingable. Latency: {reply.RoundtripTime}ms"
+                        );
+                        GameStateManager.Instance.ChatLog.AddMessage(
+                            $"Server at {cleanIp} is reachable. Attempting connection..."
+                        );
                         pingAttemptFailed = false;
                     }
                 }
@@ -486,7 +545,9 @@ public class NetworkManager
 
             if (pingAttemptFailed)
             {
-                GameStateManager.Instance.ChatLog.AddMessage($"Warning: Server at {cleanIp} did not respond to ping. Trying connection anyway...");
+                GameStateManager.Instance.ChatLog.AddMessage(
+                    $"Warning: Server at {cleanIp} did not respond to ping. Trying connection anyway..."
+                );
             }
 
             client.Connect(cleanIp, connectionPort, "WaterWizardClient");
@@ -502,23 +563,30 @@ public class NetworkManager
 
                 client.PollEvents();
 
-                bool isConnected = client.FirstPeer != null &&
-                                   client.FirstPeer.ConnectionState == ConnectionState.Connected;
+                bool isConnected =
+                    client.FirstPeer != null
+                    && client.FirstPeer.ConnectionState == ConnectionState.Connected;
 
                 if (isConnected)
                 {
                     connectionTimer.Stop();
-                    Console.WriteLine($"[Client] Connected to server after {connectionAttempts} attempts");
+                    Console.WriteLine(
+                        $"[Client] Connected to server after {connectionAttempts} attempts"
+                    );
                 }
                 else if (connectionAttempts >= maxAttempts)
                 {
                     connectionTimer.Stop();
                     Console.WriteLine($"[Client] Failed to connect after {maxAttempts} attempts");
 
-                    GameStateManager.Instance.ChatLog.AddMessage($"Connection to server at {cleanIp}:{connectionPort} failed. Please check:");
+                    GameStateManager.Instance.ChatLog.AddMessage(
+                        $"Connection to server at {cleanIp}:{connectionPort} failed. Please check:"
+                    );
                     GameStateManager.Instance.ChatLog.AddMessage("1. Is the server running?");
                     GameStateManager.Instance.ChatLog.AddMessage("2. Is the IP address correct?");
-                    GameStateManager.Instance.ChatLog.AddMessage("3. Is port 7777 open in the server's firewall?");
+                    GameStateManager.Instance.ChatLog.AddMessage(
+                        "3. Is port 7777 open in the server's firewall?"
+                    );
 
                     TryDirectConnection(cleanIp, connectionPort);
                 }
@@ -537,41 +605,45 @@ public class NetworkManager
         {
             Console.WriteLine($"Fehler beim Verbinden mit dem Server: {ex.Message}");
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
-            GameStateManager.Instance.ChatLog.AddMessage($"Error connecting to server: {ex.Message}");
+            GameStateManager.Instance.ChatLog.AddMessage(
+                $"Error connecting to server: {ex.Message}"
+            );
         }
     }
 
     private void TryDirectConnection(string ip, int port)
     {
-        GameStateManager.Instance.ChatLog.AddMessage("Attempting direct connection as last resort...");
+        GameStateManager.Instance.ChatLog.AddMessage(
+            "Attempting direct connection as last resort..."
+        );
         ConnectToServerDirect(ip, port);
     }
 
-
-
     private void SetupClientEventHandlers()
     {
-        if (clientListener == null) return;
+        if (clientListener == null)
+            return;
 
         clientListener.PeerConnectedEvent += peer =>
         {
             Console.WriteLine($"[Client] Erfolgreich mit dem Server verbunden: {peer}");
 
-            GameStateManager.Instance.ChatLog.AddMessage(
-                $"Connected to server at {peer}"
-            );
+            GameStateManager.Instance.ChatLog.AddMessage($"Connected to server at {peer}");
         };
 
         clientListener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
         {
-            Console.WriteLine($"[Client] Verbindung zum Server verloren: {peer}, Grund: {disconnectInfo.Reason}");
+            Console.WriteLine(
+                $"[Client] Verbindung zum Server verloren: {peer}, Grund: {disconnectInfo.Reason}"
+            );
 
             string reasonExplanation = disconnectInfo.Reason switch
             {
-                DisconnectReason.ConnectionFailed => "Could not establish connection (firewall or server offline?)",
+                DisconnectReason.ConnectionFailed =>
+                    "Could not establish connection (firewall or server offline?)",
                 DisconnectReason.Timeout => "Connection timed out (network issues?)",
                 DisconnectReason.RemoteConnectionClose => "Server closed the connection",
-                _ => disconnectInfo.Reason.ToString()
+                _ => disconnectInfo.Reason.ToString(),
             };
 
             Console.WriteLine($"[Client] Disconnect explanation: {reasonExplanation}");
@@ -587,17 +659,17 @@ public class NetworkManager
             Console.WriteLine($"[Client] Netzwerkfehler bei Verbindung zu {endPoint}: {error}");
             string errorExplanation = error switch
             {
-                SocketError.HostUnreachable => "Host unreachable (check firewall settings or if server is online)",
-                SocketError.ConnectionRefused => "Connection refused (server may be running but rejecting connections)",
+                SocketError.HostUnreachable =>
+                    "Host unreachable (check firewall settings or if server is online)",
+                SocketError.ConnectionRefused =>
+                    "Connection refused (server may be running but rejecting connections)",
                 SocketError.TimedOut => "Connection timed out (network issues)",
-                _ => error.ToString()
+                _ => error.ToString(),
             };
 
             Console.WriteLine($"[Client] Error explanation: {errorExplanation}");
 
-            GameStateManager.Instance.ChatLog.AddMessage(
-                $"Network error: {errorExplanation}"
-            );
+            GameStateManager.Instance.ChatLog.AddMessage($"Network error: {errorExplanation}");
         };
 
         clientListener.NetworkReceiveEvent += HandleClientReceiveEvent;
@@ -621,7 +693,7 @@ public class NetworkManager
                 UnconnectedMessagesEnabled = true,
                 IPv6Enabled = false,
                 NatPunchEnabled = true,
-                EnableStatistics = true
+                EnableStatistics = true,
             };
 
             if (!client.Start())
@@ -644,8 +716,10 @@ public class NetworkManager
                     client.PollEvents();
                     System.Threading.Thread.Sleep(100);
 
-                    if (client.FirstPeer != null &&
-                        client.FirstPeer.ConnectionState == ConnectionState.Connected)
+                    if (
+                        client.FirstPeer != null
+                        && client.FirstPeer.ConnectionState == ConnectionState.Connected
+                    )
                     {
                         Console.WriteLine("[Client] Direct connection successful!");
                         return;
@@ -660,7 +734,12 @@ public class NetworkManager
         }
     }
 
-    private void HandleClientReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
+    private void HandleClientReceiveEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        byte channelNumber,
+        DeliveryMethod deliveryMethod
+    )
     {
         try
         {
@@ -672,9 +751,11 @@ public class NetworkManager
                 case "StartGame":
                     GameStateManager.Instance.SetStateToInGame();
                     break;
+
                 case "LobbyCountdown":
                     HandleLobbyCountdown(reader);
                     break;
+
                 case "EnterLobby":
                     string receivedSessionId = reader.GetString();
                     if (!string.IsNullOrEmpty(receivedSessionId))
@@ -685,87 +766,247 @@ public class NetworkManager
                     {
                         var joinWriter = new NetDataWriter();
                         joinWriter.Put("PlayerJoin");
-                        joinWriter.Put(Environment.UserName); // oder eigenen Namen aus UI
+                        joinWriter.Put(Environment.UserName);
                         client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
                     }
                     GameStateManager.Instance.SetStateToLobby();
                     break;
+
                 case "PlayerList":
                     HandlePlayerListUpdate(reader);
                     break;
+
                 case "TimerUpdate":
-                    float serverTimeSeconds = reader.GetFloat();
+                    try
+                    {
+                        float serverTimeSeconds = reader.GetFloat();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Lesen von TimerUpdate: {ex.Message}"
+                        );
+                    }
                     break;
+
                 case "ChatMessage":
-                    string senderName = reader.GetString();
-                    string chatMsg = reader.GetString();
-                    GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
+                    try
+                    {
+                        string senderName = reader.GetString();
+                        string chatMsg = reader.GetString();
+                        GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ChatMessage: {ex.Message}"
+                        );
+                    }
                     break;
+
                 case "SystemMessage":
-                    string systemMsg = reader.GetString();
-                    GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
+                    try
+                    {
+                        string systemMsg = reader.GetString();
+                        GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von SystemMessage: {ex.Message}"
+                        );
+                    }
                     break;
+
                 case "StartPlacementPhase":
                     GameStateManager.Instance.SetStateToPlacementPhase();
                     break;
+
                 case "ShipPosition":
+                    try
                     {
+                        var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
+                        if (playerBoard == null)
+                        {
+                            Console.WriteLine(
+                                "[Client] Fehler: playerBoard ist null bei ShipPosition."
+                            );
+                            break;
+                        }
                         int x = reader.GetInt();
                         int y = reader.GetInt();
                         int width = reader.GetInt();
                         int height = reader.GetInt();
-                        Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
-                    }
-                    break;
-                case "BoughtCard":
-                    string cardVariant = reader.GetString();
-                    GameStateManager.Instance.GameScreen.HandleBoughtCard(cardVariant);
-                    break;
-                case "OpponentBoughtCard":
-                    string cardType = reader.GetString();
-                    GameStateManager.Instance.GameScreen.HandleOpponentBoughtCard(cardType);
-                    break;
-                case "ShipSync":
-                    int count = reader.GetInt();
-                    GameBoard playerBoard = GameStateManager.Instance.GameScreen.playerBoard!;
-                    playerBoard.Ships.Clear();
-                    for (int i = 0; i < count; i++)
-                    {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        int width = reader.GetInt();
-                        int height = reader.GetInt();
-                        int pixelX = (int) playerBoard.Position.X + x * playerBoard.CellSize;
-                        int pixelY = (int) playerBoard.Position.Y + y * playerBoard.CellSize;
+                        int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
+                        int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
                         int pixelWidth = width * playerBoard.CellSize;
                         int pixelHeight = height * playerBoard.CellSize;
+                        playerBoard.putShip(
+                            new GameShip(
+                                GameStateManager.Instance.GameScreen,
+                                pixelX,
+                                pixelY,
+                                ShipType.DEFAULT,
+                                pixelWidth,
+                                pixelHeight
+                            )
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}"
+                        );
+                    }
+                    break;
 
-                        playerBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));                    }
-                        Console.WriteLine($"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
-                        
+                case "BoughtCard":
+                    try
+                    {
+                        string cardVariant = reader.GetString();
+                        GameStateManager.Instance.GameScreen?.HandleBoughtCard(cardVariant);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von BoughtCard: {ex.Message}"
+                        );
+                    }
+                    break;
+
+                case "OpponentBoughtCard":
+                    try
+                    {
+                        string cardType = reader.GetString();
+                        GameStateManager.Instance.GameScreen?.HandleOpponentBoughtCard(cardType);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von OpponentBoughtCard: {ex.Message}"
+                        );
+                    }
+                    break;
+
+                case "ShipSync":
+                    try
+                    {
+                        int count = reader.GetInt();
+                        var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
+                        if (playerBoard == null)
+                        {
+                            Console.WriteLine(
+                                "[Client] Fehler: playerBoard ist null bei ShipSync."
+                            );
+                            break;
+                        }
+                        playerBoard.Ships.Clear();
+                        for (int i = 0; i < count; i++)
+                        {
+                            int x = reader.GetInt();
+                            int y = reader.GetInt();
+                            int width = reader.GetInt();
+                            int height = reader.GetInt();
+                            int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
+                            int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
+                            int pixelWidth = width * playerBoard.CellSize;
+                            int pixelHeight = height * playerBoard.CellSize;
+                            playerBoard.putShip(
+                                new GameShip(
+                                    GameStateManager.Instance.GameScreen,
+                                    pixelX,
+                                    pixelY,
+                                    ShipType.DEFAULT,
+                                    pixelWidth,
+                                    pixelHeight
+                                )
+                            );
+                        }
+                        Console.WriteLine(
+                            $"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+                        );
                         GameStateManager.Instance.SetStateToInGame();
-                        Console.WriteLine($"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
+                        Console.WriteLine(
+                            $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ShipSync: {ex.Message}"
+                        );
+                    }
                     break;
 
                 case "OpponentShipSync":
-                    int oppCount = reader.GetInt();
-                    GameBoard opponentBoard = GameStateManager.Instance.GameScreen.opponentBoard!;
-                    opponentBoard.Ships.Clear();
-                    for (int i = 0; i < oppCount; i++)
+                    try
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        int width = reader.GetInt();
-                        int height = reader.GetInt();
-                        int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-                        int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-                        int pixelWidth = width * opponentBoard.CellSize;
-                        int pixelHeight = height * opponentBoard.CellSize;
-                        opponentBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));
+                        int oppCount = reader.GetInt();
+                        var opponentBoard = GameStateManager.Instance.GameScreen?.opponentBoard;
+                        if (opponentBoard == null)
+                        {
+                            Console.WriteLine(
+                                "[Client] Fehler: opponentBoard ist null bei OpponentShipSync."
+                            );
+                            break;
+                        }
+                        opponentBoard.Ships.Clear();
+                        for (int i = 0; i < oppCount; i++)
+                        {
+                            int x = reader.GetInt();
+                            int y = reader.GetInt();
+                            int width = reader.GetInt();
+                            int height = reader.GetInt();
+                            int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
+                            int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
+                            int pixelWidth = width * opponentBoard.CellSize;
+                            int pixelHeight = height * opponentBoard.CellSize;
+                            opponentBoard.putShip(
+                                new GameShip(
+                                    GameStateManager.Instance.GameScreen,
+                                    pixelX,
+                                    pixelY,
+                                    ShipType.DEFAULT,
+                                    pixelWidth,
+                                    pixelHeight
+                                )
+                            );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}"
+                        );
                     }
                     break;
-                default:
-                    Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
+
+                case "ShipPlacementError":
+                    try
+                    {
+                        string errorMsg = reader.GetString();
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}"
+                        );
+                        //GameStateManager.Instance.GameScreen?.ShowPlacementError(errorMsg);
+
+                        // Sperre das Draggen für diese Größe, wenn das Limit erreicht ist
+                        var match = System.Text.RegularExpressions.Regex.Match(
+                            errorMsg,
+                            @"nur (\d+) Schiffe der Länge (\d+)"
+                        );
+                        if (match.Success)
+                        {
+                            int size = int.Parse(match.Groups[2].Value);
+                            GameStateManager.Instance.GameScreen?.MarkShipSizeLimitReached(size);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ShipPlacementError: {ex.Message}"
+                        );
+                    }
                     break;
             }
         }
@@ -775,7 +1016,14 @@ public class NetworkManager
         }
         finally
         {
-            reader.Recycle();
+            try
+            {
+                reader.Recycle();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Client] Fehler beim Recyceln des Readers: {ex.Message}");
+            }
         }
     }
 
@@ -793,7 +1041,9 @@ public class NetworkManager
                 string name = reader.GetString();
                 bool isReady = reader.GetBool();
                 connectedPlayers.Add(new Player(address) { Name = name, IsReady = isReady });
-                Console.WriteLine($"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}");
+                Console.WriteLine(
+                    $"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}"
+                );
             }
         }
         catch (Exception ex)
@@ -804,8 +1054,13 @@ public class NetworkManager
 
     public int GetHostPort() => hostPort;
 
-    public bool IsPlayerConnected() => server != null && server.IsRunning && server.ConnectedPeersCount > 0 ||
-                                     (client != null && client.FirstPeer != null && client.FirstPeer.ConnectionState == ConnectionState.Connected);
+    public bool IsPlayerConnected() =>
+        server != null && server.IsRunning && server.ConnectedPeersCount > 0
+        || (
+            client != null
+            && client.FirstPeer != null
+            && client.FirstPeer.ConnectionState == ConnectionState.Connected
+        );
 
     /// <summary>
     /// Verarbeitet eingehende und ausgehende Netzwerkereignisse.
@@ -828,7 +1083,8 @@ public class NetworkManager
 
     private void BroadcastSystemMessage(string message)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
         var writer = new NetDataWriter();
         writer.Put("SystemMessage");
         writer.Put(message);
@@ -838,7 +1094,8 @@ public class NetworkManager
 
     private void BroadcastChatMessage(string senderName, string message)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
         var writer = new NetDataWriter();
         writer.Put("ChatMessage");
         writer.Put(senderName);
@@ -849,7 +1106,8 @@ public class NetworkManager
 
     public void SendToAllClients(string message)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
 
         var writer = new NetDataWriter();
         writer.Put(message);
@@ -891,7 +1149,9 @@ public class NetworkManager
         }
         else
         {
-            Console.WriteLine("[Client] Kein Server verbunden, Nachricht konnte nicht gesendet werden.");
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, Nachricht konnte nicht gesendet werden."
+            );
         }
     }
 
@@ -924,7 +1184,11 @@ public class NetworkManager
     /// <param name="message">The chat message text.</param>
     public void SendChatMessage(string message)
     {
-        if (client == null || client.FirstPeer == null || client.FirstPeer.ConnectionState != ConnectionState.Connected)
+        if (
+            client == null
+            || client.FirstPeer == null
+            || client.FirstPeer.ConnectionState != ConnectionState.Connected
+        )
         {
             Console.WriteLine("[Client] Cannot send chat message: Not connected to a server.");
             return;
@@ -956,7 +1220,9 @@ public class NetworkManager
         }
         else
         {
-            Console.WriteLine("[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden.");
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden."
+            );
         }
     }
 
@@ -975,7 +1241,9 @@ public class NetworkManager
         }
         else
         {
-            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
+            );
         }
     }
 
@@ -991,7 +1259,9 @@ public class NetworkManager
         }
         else
         {
-            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
+            );
         }
     }
 
@@ -1009,20 +1279,22 @@ public class NetworkManager
         }
         else
         {
-            Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
+            );
         }
     }
 
     public void SendAttack(int x, int y)
-{
-    if (client != null && client.FirstPeer != null)
     {
-        var writer = new NetDataWriter();
-        writer.Put("Attack");
-        writer.Put(x);
-        writer.Put(y);
-        client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-        Console.WriteLine($"[Client] Attack initiated at ({x}, {y})");
+        if (client != null && client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("Attack");
+            writer.Put(x);
+            writer.Put(y);
+            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine($"[Client] Attack initiated at ({x}, {y})");
+        }
     }
-}
 }
