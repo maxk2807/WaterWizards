@@ -1,4 +1,4 @@
-name: NUKE Build CI 
+name: NUKE Build CI
 
 on:
   push:
