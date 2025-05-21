@@ -9,6 +9,7 @@ namespace WaterWizard.Client;
 
 public class GameStateManager
 {
+    public IGameState GetCurrentState() => currentState;
     private static GameStateManager? instance;
     public static GameStateManager Instance =>
         instance ?? throw new InvalidOperationException(

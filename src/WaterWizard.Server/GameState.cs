@@ -36,6 +36,10 @@ public class GameState
 
     private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
 
+    private bool IsPlacementPhase()
+    {
+        return manager.CurrentState is PlacementState;
+    }
     public void AddShip(NetPeer player, PlacedShip ship)
     {
         if (!playerShips.ContainsKey(player))
@@ -106,10 +110,53 @@ public class GameState
         int width = reader.GetInt();
         int height = reader.GetInt();
 
-        Console.WriteLine(x + " " + y + " " + width + " " + height);
+        int size = Math.Max(width, height);
 
+        if (IsPlacementPhase())
+        {
+            var allowedShips = new Dictionary<int, int>
+            {
+                { 5, 1 },
+                { 4, 2 },
+                { 3, 2 },
+                { 2, 4 },
+                { 1, 5 }
+            };
+
+            var playerShipList = GetShips(peer);
+            int alreadyPlaced = playerShipList.Count(s => Math.Max(s.Width, s.Height) == size);
+
+            // 1. Zu viele Schiffe dieser Länge?
+            if (!allowedShips.ContainsKey(size) || alreadyPlaced >= allowedShips[size])
+            {
+                NetDataWriter errorWriter = new();
+                errorWriter.Put("ShipPlacementError");
+                errorWriter.Put($"Du darfst nur {allowedShips.GetValueOrDefault(size, 0)} Schiffe der Länge {size} platzieren!");
+                peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
+                return;
+            }
+
+            // 2. Überlappung mit eigenen Schiffen verhindern
+            foreach (var ship in playerShipList)
+            {
+                bool overlap =
+                    x < ship.X + ship.Width &&
+                    x + width > ship.X &&
+                    y < ship.Y + ship.Height &&
+                    y + height > ship.Y;
+                if (overlap)
+                {
+                    NetDataWriter errorWriter = new();
+                    errorWriter.Put("ShipPlacementError");
+                    errorWriter.Put("Schiffe dürfen sich nicht überlappen!");
+                    peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
+                    return;
+                }
+            }
+        }
+
+        // 3. Felder auf dem Board prüfen
         int playerIndex = Array.IndexOf(players, peer);
-
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -117,9 +164,21 @@ public class GameState
                 var cell = boards[playerIndex][x + i, y + j];
                 if (cell.CellState != CellState.Empty)
                 {
-                    Console.WriteLine("[Server Error] Cell at [" + x + "," + y + "] not Empty, can't place Ship");
+                    NetDataWriter errorWriter = new();
+                    errorWriter.Put("ShipPlacementError");
+                    errorWriter.Put("Feld ist bereits belegt!");
+                    peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
+                    return;
                 }
-                cell.CellState = CellState.Ship;
+            }
+        }
+
+        // Schiff platzieren
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                boards[playerIndex][x + i, y + j].CellState = CellState.Ship;
             }
         }
         AddShip(peer, new PlacedShip { X = x, Y = y, Width = width, Height = height });
@@ -131,7 +190,6 @@ public class GameState
         writer.Put(width);
         writer.Put(height);
         peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        Console.WriteLine("[Server] Successfull Ship Handling");
     }
 
     public void HandleAttack(NetPeer attacker, NetPeer defender, int x, int y)

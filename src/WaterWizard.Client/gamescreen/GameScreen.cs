@@ -10,7 +10,9 @@ namespace WaterWizard.Client.gamescreen;
 public class GameScreen(GameStateManager gameStateManager, int screenWidth, int screenHeight, GameTimer gameTimer)
 {
     public readonly GameStateManager _gameStateManager = gameStateManager;
-
+    private string? placementErrorMessage;
+    private DateTime? placementErrorTimestamp;
+        
     public GameBoard? playerBoard, opponentBoard;
     public GameHand? playerHand, opponentHand;
     public ActiveCards? activeCards;
@@ -49,6 +51,18 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     {
         shipField = new(this);
         shipField.Initialize();
+    }
+
+    private HashSet<int> shipSizeLimitReached = new();
+
+    public void MarkShipSizeLimitReached(int size)
+    {
+        shipSizeLimitReached.Add(size);
+    }
+
+    public bool IsShipSizeLimitReached(int size)
+    {
+        return shipSizeLimitReached.Contains(size);
     }
 
     private void InitializeCardStacksField()

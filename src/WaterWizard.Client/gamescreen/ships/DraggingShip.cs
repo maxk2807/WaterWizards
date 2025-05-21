@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Client.gamestates;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
@@ -38,12 +39,35 @@ public class DraggingShip
     /// </summary>
     private int CellSize => gameScreen.playerBoard!.CellSize;
 
+    private static readonly Dictionary<int, int> PlacementLimits = new()
+    {
+        { 5, 1 },
+        { 4, 2 },
+        { 3, 2 },
+        { 2, 4 },
+        { 1, 5 }
+    };
+
+    private bool IsShipSizeLimitReached(int size)
+    {
+        // Prüfe, ob die Platzierungsphase aktiv ist
+        if (GameStateManager.Instance.GetCurrentState() is not PlacementPhaseState)
+            return false;
+
+        // Prüfe, ob das Limit serverseitig gemeldet wurde
+        if (gameScreen.IsShipSizeLimitReached(size))
+            return true;
+
+        int placed = gameScreen.playerBoard!.Ships.Count(s => Math.Max(s.Width, s.Height) == size);
+        return PlacementLimits.TryGetValue(size, out int limit) && placed >= limit;
+    }
+
     /// <summary>
     /// This class represents a type of Ship on the <see cref="ShipField"/> that can be dragged 
     /// onto the Board to place. Once placed, the dragged <see cref="DraggingShip"/> spawns 
     /// a normal Ship on that location.
     /// In the beginning, there are 1 Ship of length 5, 2 Ships of length 4, 2 Ships of length 3,
-    /// 4 ships of length 2 and 5 ships of length 5. Further Ships can be summoned with the cards.
+    /// 4 ships of length 2 and 5 ships of length 1. Further Ships can be summoned with the cards.
     /// The number of ships is indicated by the number written in the middle
     /// </summary>
     /// <param name="gameScreen"></param>
@@ -71,10 +95,18 @@ public class DraggingShip
     public void Draw()
     {
         Rectangle rec = new(X, Y, Width, Height);
-        Raylib.DrawRectangleRec(rec, Color.DarkPurple);
+
+        // Wenn das Limit erreicht ist, Schiff ausgegraut zeichnen
+        int size = Math.Max(Width / CellSize, Height / CellSize);
+        bool limitReached = IsShipSizeLimitReached(size);
+        Color shipColor = limitReached ? Color.Gray : Color.DarkPurple;
+
+        Raylib.DrawRectangleRec(rec, shipColor);
         Raylib.DrawText(currentNumber.ToString(), X + Width / 2, Y + Height / 2, 10, Color.White);
 
-        HandleDragging();
+        // Nur Dragging erlauben, wenn das Limit nicht erreicht ist
+        if (!limitReached)
+            HandleDragging();
     }
 
     /// <summary>
@@ -101,8 +133,13 @@ public class DraggingShip
             {
                 if (hovering)
                 {
-                    dragging = true;
-                    offset = new(Raylib.GetMousePosition().X - DraggedShipRectangle.X, Raylib.GetMousePosition().Y - DraggedShipRectangle.Y);
+                    // Prüfe hier nochmal das Limit, falls sich der Zustand geändert hat
+                    int size = Math.Max(Width / CellSize, Height / CellSize);
+                    if (!IsShipSizeLimitReached(size))
+                    {
+                        dragging = true;
+                        offset = new(Raylib.GetMousePosition().X - DraggedShipRectangle.X, Raylib.GetMousePosition().Y - DraggedShipRectangle.Y);
+                    }
                 }
                 firstDown = false;
             }
@@ -150,8 +187,6 @@ public class DraggingShip
     /// </summary>
     private void HandleConfirm()
     {
-        //TODO: Create buttons for confirmation and rotation of ship
-        //TODO: Reduce number of current ships
         Raylib.DrawRectangleRec(DraggedShipRectangle, new(30, 200, 200));
 
         var rotateX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2 - CellSize;
@@ -202,7 +237,7 @@ public class DraggingShip
     /// <param name="shipSize"></param>
     private void SpawnShip(int x, int y, int shipSize)
     {
-        gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, (int)DraggedShipRectangle.Width, (int)DraggedShipRectangle.Height));
+        //gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, (int)DraggedShipRectangle.Width, (int)DraggedShipRectangle.Height));
         int boardX = (int)gameScreen.playerBoard.Position.X;
         int boardY = (int)gameScreen.playerBoard.Position.Y;
         NetworkManager.Instance.SendShipPlacement((x - boardX) / CellSize, (y - boardY) / CellSize, (int)(DraggedShipRectangle.Width / CellSize), (int)(DraggedShipRectangle.Height / CellSize));

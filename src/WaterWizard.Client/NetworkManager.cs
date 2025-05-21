@@ -199,6 +199,10 @@ public class NetworkManager
                         // UpdatePlayerList();
                     }
                     break;
+                case "ShipPlacementError":
+                    string errorMsg = reader.GetString();
+                    Console.WriteLine($"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}");
+                    break;
                 default:
                     Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
@@ -660,74 +664,142 @@ public class NetworkManager
         }
     }
 
-    private void HandleClientReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
+ private void HandleClientReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
+{
+    try
     {
-        try
-        {
-            string messageType = reader.GetString();
-            Console.WriteLine($"[Client] Nachricht vom Server empfangen: {messageType}");
+        string messageType = reader.GetString();
+        Console.WriteLine($"[Client] Nachricht vom Server empfangen: {messageType}");
 
-            switch (messageType)
-            {
-                case "StartGame":
-                    GameStateManager.Instance.SetStateToInGame();
-                    break;
-                case "LobbyCountdown":
-                    HandleLobbyCountdown(reader);
-                    break;
-                case "EnterLobby":
-                    string receivedSessionId = reader.GetString();
-                    if (!string.IsNullOrEmpty(receivedSessionId))
-                        sessionId = new GameSessionId(receivedSessionId);
-                    Console.WriteLine("[Client] Betrete die Lobby...");
-                    // Sende eigenen Namen an den Server
-                    if (client != null && client.FirstPeer != null)
-                    {
-                        var joinWriter = new NetDataWriter();
-                        joinWriter.Put("PlayerJoin");
-                        joinWriter.Put(Environment.UserName); // oder eigenen Namen aus UI
-                        client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
-                    }
-                    GameStateManager.Instance.SetStateToLobby();
-                    break;
-                case "PlayerList":
-                    HandlePlayerListUpdate(reader);
-                    break;
-                case "TimerUpdate":
+        switch (messageType)
+        {
+            case "StartGame":
+                GameStateManager.Instance.SetStateToInGame();
+                break;
+
+            case "LobbyCountdown":
+                HandleLobbyCountdown(reader);
+                break;
+
+            case "EnterLobby":
+                string receivedSessionId = reader.GetString();
+                if (!string.IsNullOrEmpty(receivedSessionId))
+                    sessionId = new GameSessionId(receivedSessionId);
+                Console.WriteLine("[Client] Betrete die Lobby...");
+                // Sende eigenen Namen an den Server
+                if (client != null && client.FirstPeer != null)
+                {
+                    var joinWriter = new NetDataWriter();
+                    joinWriter.Put("PlayerJoin");
+                    joinWriter.Put(Environment.UserName);
+                    client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
+                }
+                GameStateManager.Instance.SetStateToLobby();
+                break;
+
+            case "PlayerList":
+                HandlePlayerListUpdate(reader);
+                break;
+
+            case "TimerUpdate":
+                try
+                {
                     float serverTimeSeconds = reader.GetFloat();
-                    break;
-                case "ChatMessage":
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Lesen von TimerUpdate: {ex.Message}");
+                }
+                break;
+
+            case "ChatMessage":
+                try
+                {
                     string senderName = reader.GetString();
                     string chatMsg = reader.GetString();
                     GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {chatMsg}");
-                    break;
-                case "SystemMessage":
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten von ChatMessage: {ex.Message}");
+                }
+                break;
+
+            case "SystemMessage":
+                try
+                {
                     string systemMsg = reader.GetString();
                     GameStateManager.Instance.ChatLog.AddMessage($"[System] {systemMsg}");
-                    break;
-                case "StartPlacementPhase":
-                    GameStateManager.Instance.SetStateToPlacementPhase();
-                    break;
-                case "ShipPosition":
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten von SystemMessage: {ex.Message}");
+                }
+                break;
+
+            case "StartPlacementPhase":
+                GameStateManager.Instance.SetStateToPlacementPhase();
+                break;
+
+            case "ShipPosition":
+                try
+                {
+                    var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
+                    if (playerBoard == null)
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        int width = reader.GetInt();
-                        int height = reader.GetInt();
-                        Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
+                        Console.WriteLine("[Client] Fehler: playerBoard ist null bei ShipPosition.");
+                        break;
                     }
-                    break;
-                case "BoughtCard":
+                    int x = reader.GetInt();
+                    int y = reader.GetInt();
+                    int width = reader.GetInt();
+                    int height = reader.GetInt();
+                    int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
+                    int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
+                    int pixelWidth = width * playerBoard.CellSize;
+                    int pixelHeight = height * playerBoard.CellSize;
+                    playerBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}");
+                }
+                break;
+
+            case "BoughtCard":
+                try
+                {
                     string cardVariant = reader.GetString();
-                    GameStateManager.Instance.GameScreen.HandleBoughtCard(cardVariant);
-                    break;
-                case "OpponentBoughtCard":
+                    GameStateManager.Instance.GameScreen?.HandleBoughtCard(cardVariant);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten von BoughtCard: {ex.Message}");
+                }
+                break;
+
+            case "OpponentBoughtCard":
+                try
+                {
                     string cardType = reader.GetString();
-                    GameStateManager.Instance.GameScreen.HandleOpponentBoughtCard(cardType);
-                    break;
-                case "ShipSync":
+                    GameStateManager.Instance.GameScreen?.HandleOpponentBoughtCard(cardType);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten von OpponentBoughtCard: {ex.Message}");
+                }
+                break;
+
+            case "ShipSync":
+                try
+                {
                     int count = reader.GetInt();
-                    GameBoard playerBoard = GameStateManager.Instance.GameScreen.playerBoard!;
+                    var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
+                    if (playerBoard == null)
+                    {
+                        Console.WriteLine("[Client] Fehler: playerBoard ist null bei ShipSync.");
+                        break;
+                    }
                     playerBoard.Ships.Clear();
                     for (int i = 0; i < count; i++)
                     {
@@ -735,21 +807,32 @@ public class NetworkManager
                         int y = reader.GetInt();
                         int width = reader.GetInt();
                         int height = reader.GetInt();
-                        int pixelX = (int) playerBoard.Position.X + x * playerBoard.CellSize;
-                        int pixelY = (int) playerBoard.Position.Y + y * playerBoard.CellSize;
+                        int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
+                        int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
                         int pixelWidth = width * playerBoard.CellSize;
                         int pixelHeight = height * playerBoard.CellSize;
+                        playerBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));
+                    }
+                    Console.WriteLine($"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
+                    GameStateManager.Instance.SetStateToInGame();
+                    Console.WriteLine($"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten von ShipSync: {ex.Message}");
+                }
+                break;
 
-                        playerBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));                    }
-                        Console.WriteLine($"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
-                        
-                        GameStateManager.Instance.SetStateToInGame();
-                        Console.WriteLine($"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
-                    break;
-
-                case "OpponentShipSync":
+            case "OpponentShipSync":
+                try
+                {
                     int oppCount = reader.GetInt();
-                    GameBoard opponentBoard = GameStateManager.Instance.GameScreen.opponentBoard!;
+                    var opponentBoard = GameStateManager.Instance.GameScreen?.opponentBoard;
+                    if (opponentBoard == null)
+                    {
+                        Console.WriteLine("[Client] Fehler: opponentBoard ist null bei OpponentShipSync.");
+                        break;
+                    }
                     opponentBoard.Ships.Clear();
                     for (int i = 0; i < oppCount; i++)
                     {
@@ -763,22 +846,51 @@ public class NetworkManager
                         int pixelHeight = height * opponentBoard.CellSize;
                         opponentBoard.putShip(new GameShip(GameStateManager.Instance.GameScreen, pixelX, pixelY, ShipType.DEFAULT, pixelWidth, pixelHeight));
                     }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}");
+                }
+                break;
+
+            case "ShipPlacementError":
+                try
+                    {
+                        string errorMsg = reader.GetString();
+                        Console.WriteLine($"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}");
+                        //GameStateManager.Instance.GameScreen?.ShowPlacementError(errorMsg);
+
+                        // Sperre das Draggen für diese Größe, wenn das Limit erreicht ist
+                        var match = System.Text.RegularExpressions.Regex.Match(errorMsg, @"nur (\d+) Schiffe der Länge (\d+)");
+                        if (match.Success)
+                        {
+                            int size = int.Parse(match.Groups[2].Value);
+                            GameStateManager.Instance.GameScreen?.MarkShipSizeLimitReached(size);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Client] Fehler beim Verarbeiten von ShipPlacementError: {ex.Message}");
+                    }
                     break;
-                default:
-                    Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
-                    break;
-            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Client] Fehler beim Verarbeiten der Nachricht: {ex.Message}");
-        }
-        finally
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Client] Fehler beim Verarbeiten der Nachricht: {ex.Message}");
+    }
+    finally
+    {
+        try
         {
             reader.Recycle();
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Fehler beim Recyceln des Readers: {ex.Message}");
+        }
     }
-
+}
     private void HandlePlayerListUpdate(NetDataReader reader)
     {
         try
