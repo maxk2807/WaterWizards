@@ -2,20 +2,9 @@ using Raylib_cs;
 using System.Numerics;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen;
-
-/// <summary>
-/// CellState enum represents the possible states of a cell in the game board.
-/// </summary>
-public enum CellState
-{
-    Empty,
-    Ship,
-    Hit,
-    Miss,
-    Unknown
-}
 
 /// <summary>
 /// GameBoard class represents the game board for the battleship game.
