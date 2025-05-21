@@ -25,6 +25,11 @@ public class GameState
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
 
+    public Mana Player1Mana { get; private set; } = new();
+    public Mana Player2Mana { get; private set; } = new();
+    public int Player1Gold { get; private set; } = 0;
+    public int Player2Gold { get; private set; } = 0;
+
     public GameState(NetManager server, ServerGameStateManager manager)
     {
         int connectedCount = server.ConnectedPeerList.Count;

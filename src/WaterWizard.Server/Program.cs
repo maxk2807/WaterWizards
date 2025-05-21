@@ -2,9 +2,6 @@
 using LiteNetLib.Utils;
 using WaterWizard.Shared;
 using WaterWizard.Server.ServerGameStates;
-using WaterWizard.Server.Logging;
-using WaterWizard.Server.Services;
-using WaterWizard.Server.Models;
 
 namespace WaterWizard.Server;
 
@@ -14,10 +11,6 @@ static class Program
     private static readonly Dictionary<string, bool> PlacementReadyPlayers = [];
     private static readonly Dictionary<string, string> PlayerNames = [];
     private static GameSessionTimer? _gameSessionTimer;
-
-// FIXME: playerpeers -> playerNames []; SERVER?? -> netmanager; gameDataLogger??
-    static ManaUpdateService manaService = new ManaUpdateService(gameDataLogger, server, playerPeers);
-    static PeriodicManaUpdater manaUpdater = new PeriodicManaUpdater(manaService);
 
 
     private static void Log(string message)
