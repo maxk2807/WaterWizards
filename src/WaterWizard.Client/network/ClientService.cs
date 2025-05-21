@@ -6,318 +6,21 @@ using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Shared;
 
-namespace WaterWizard.Client;
+namespace WaterWizard.Client.network;
 
-public class NetworkManager
+public class ClientService(NetworkManager manager)
 {
-    private static NetworkManager? instance;
-    public static NetworkManager Instance => instance ??= new NetworkManager();
-
-    private readonly List<Player> connectedPlayers = [];
-    private readonly List<LobbyInfo> discoveredLobbies = [];
-
-    private NetManager? server;
     private NetManager? client;
-    private EventBasedNetListener? serverListener;
     private EventBasedNetListener? clientListener;
-    private readonly int hostPort = 7777;
-
     private bool clientReady = false;
+    public List<Player> ConnectedPlayers { get; private set; } = [];
 
     private GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
 
-    /// <summary>
-    /// Stores the current lobby countdown seconds (null if no countdown active).
-    /// </summary>
-    public int? LobbyCountdownSeconds { get; private set; }
-
-    private NetworkManager() { }
-
-    /// <summary>
-    /// Startet einen Spielserver auf dem lokalen Rechner mit dem konfigurierten Port.
-    /// Initialisiert die Netzwerkkomponenten und registriert Event-Handler fuer Clientverbindungen.
-    /// </summary>
-    public void StartHosting()
+    public void InitializeClientForDiscovery()
     {
-        try
-        {
-            CleanupClientIfRunning();
-            discoveredLobbies.Clear();
-
-            serverListener = new EventBasedNetListener();
-            server = new NetManager(serverListener)
-            {
-                AutoRecycle = true,
-                UnconnectedMessagesEnabled = true,
-            };
-
-            if (!server.Start(hostPort))
-            {
-                Console.WriteLine("Server konnte nicht gestartet werden!");
-                return;
-            }
-
-            connectedPlayers.Clear();
-            connectedPlayers.Add(new Player("Host") { Name = "Host (You)", IsReady = false });
-
-            sessionId = new GameSessionId();
-
-            Console.WriteLine($"Server gestartet auf Port {hostPort}");
-            SetupServerEventHandlers();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Fehler beim Hosten: {ex.Message}");
-        }
-    }
-
-    private void SetupServerEventHandlers()
-    {
-        if (serverListener == null)
-            return;
-
-        serverListener.ConnectionRequestEvent += request => request.Accept();
-
-        serverListener.NetworkReceiveUnconnectedEvent += HandleUnconnectedMessage;
-
-        serverListener.PeerConnectedEvent += peer =>
-        {
-            Console.WriteLine($"Client {peer} verbunden");
-
-            string playerAddress = peer.ToString();
-            string playerName =
-                $"Player_{playerAddress.Split(':').LastOrDefault() ?? playerAddress}";
-
-            if (!PlayerExists(playerAddress))
-            {
-                connectedPlayers.Add(new Player(playerAddress) { Name = playerName });
-            }
-
-            var writer = new NetDataWriter();
-            writer.Put("EnterLobby");
-            writer.Put(sessionId != null ? sessionId.ToString() : string.Empty);
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
-
-            BroadcastSystemMessage($"{playerName} connected.");
-            UpdatePlayerList();
-        };
-
-        serverListener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
-        {
-            Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
-
-            string playerAddress = peer.ToString();
-            string playerName =
-                connectedPlayers.FirstOrDefault(p => p.Address == playerAddress)?.Name
-                ?? $"Player_{playerAddress.Split(':').LastOrDefault()}";
-
-            RemovePlayerByAddress(playerAddress);
-            LobbyCountdownSeconds = null;
-            BroadcastSystemMessage($"{playerName} disconnected ({disconnectInfo.Reason}).");
-            UpdatePlayerList();
-        };
-
-        serverListener.NetworkReceiveEvent += HandleServerReceiveEvent;
-    }
-
-    private void HandleUnconnectedMessage(
-        IPEndPoint remoteEndPoint,
-        NetPacketReader reader,
-        UnconnectedMessageType msgType
-    )
-    {
-        try
-        {
-            string message = reader.GetString();
-            if (message == "DiscoverLobbies")
-            {
-                Console.WriteLine($"[Host] Lobby-Suchanfrage von {remoteEndPoint} erhalten");
-
-                var response = new NetDataWriter();
-                response.Put("LobbyInfo");
-                response.Put("WaterWizards Lobby");
-                response.Put(connectedPlayers.Count);
-                server?.SendUnconnectedMessage(response, remoteEndPoint);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(
-                $"[Host] Fehler bei Verarbeitung unverbundener Nachricht: {ex.Message}"
-            );
-        }
-    }
-
-    /// <summary>
-    /// Verarbeitet den Countdown für die Lobby.
-    /// </summary>
-    /// <param name="reader">Der NetPacketReader, der die Nachricht enthält.</param>
-    /// <returns></returns>
-    public void HandleLobbyCountdown(NetPacketReader reader)
-    {
-        int secondsLeft = reader.GetInt();
-        if (secondsLeft <= 0)
-        {
-            LobbyCountdownSeconds = null;
-        }
-        else
-        {
-            LobbyCountdownSeconds = secondsLeft;
-        }
-        Console.WriteLine($"[Client] Lobby countdown: {LobbyCountdownSeconds}");
-    }
-
-    private void HandleServerReceiveEvent(
-        NetPeer peer,
-        NetPacketReader reader,
-        byte channelNumber,
-        DeliveryMethod deliveryMethod
-    )
-    {
-        try
-        {
-            string messageType = reader.GetString();
-            Console.WriteLine($"[Host] Nachricht von Client {peer} erhalten: {messageType}");
-
-            switch (messageType)
-            {
-                case "PlayerReady":
-                case "PlayerNotReady":
-                    HandlePlayerReadyStatus(peer, messageType == "PlayerReady");
-                    break;
-                case "ChatMessage":
-                    reader.GetString();
-                    break;
-                case "LobbyCountdown":
-                    HandleLobbyCountdown(reader);
-                    break;
-                case "PlayerJoin":
-                    string playerName = reader.GetString(); // Name sent by the client
-                    var playerToUpdate = connectedPlayers.FirstOrDefault(p =>
-                        p.Address == peer.ToString()
-                    );
-                    if (playerToUpdate != null)
-                    {
-                        playerToUpdate.Name = playerName;
-                        UpdatePlayerList(); // Broadcast the updated player list to all clients
-                    }
-                    else
-                    {
-                        // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
-                        Console.WriteLine(
-                            $"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}"
-                        );
-                        // Optionally, handle this by adding the player if it's a valid scenario,
-                        // though players are typically added during PeerConnectedEvent.
-                        // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
-                        // UpdatePlayerList();
-                    }
-                    break;
-                case "ShipPlacementError":
-                    string errorMsg = reader.GetString();
-                    Console.WriteLine($"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}");
-                    break;
-                default:
-                    Console.WriteLine(
-                        $"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}"
-                    );
-                    break;
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Host] Fehler beim Verarbeiten der Nachricht: {ex.Message}");
-        }
-        finally
-        {
-            reader.Recycle();
-        }
-    }
-
-    private void HandlePlayerReadyStatus(NetPeer peer, bool isReady)
-    {
-        var player = connectedPlayers.FirstOrDefault(p => p.Address == peer.ToString());
-        if (player != null)
-        {
-            player.IsReady = isReady;
-            Console.WriteLine(
-                $"[Host] Spieler {player.Name} ist jetzt {(isReady ? "bereit" : "nicht bereit")}"
-            );
-            UpdatePlayerList();
-        }
-        else
-        {
-            Console.WriteLine($"[Host] Spieler mit Adresse {peer} nicht gefunden!");
-        }
-    }
-
-    private bool PlayerExists(string address)
-    {
-        return connectedPlayers.Any(p => p.Address == address);
-    }
-
-    private void RemovePlayerByAddress(string address)
-    {
-        connectedPlayers.RemoveAll(p => p.Address == address);
-    }
-
-    public bool IsHost()
-    {
-        return server != null && server.IsRunning;
-    }
-
-    private void UpdatePlayerList()
-    {
-        if (server == null)
-            return;
-
-        var writer = new NetDataWriter();
-        writer.Put("PlayerList");
-        writer.Put(connectedPlayers.Count);
-
-        foreach (var player in connectedPlayers)
-        {
-            writer.Put(player.Address);
-            writer.Put(player.Name);
-            writer.Put(player.IsReady);
-            Console.WriteLine(
-                $"[Host] Spieler: {player.Name}, Status: {(player.IsReady ? "bereit" : "nicht bereit")}"
-            );
-        }
-
-        foreach (var peer in server.ConnectedPeerList)
-        {
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        }
-
-        Console.WriteLine($"[Host] Spielerliste mit {connectedPlayers.Count} Spielern gesendet.");
-    }
-
-    /// <summary>
-    /// Starts discovering available server lobbies on the network.
-    /// </summary>
-    public void DiscoverLobbies()
-    {
-        if (IsHost())
-        {
-            Console.WriteLine(
-                "[Client] Suche nach entfernten Lobbies (lokale Lobby wird ausgeblendet)..."
-            );
-        }
-        else
-        {
-            discoveredLobbies.Clear();
-            Console.WriteLine("[Client] Suche nach verfügbaren Lobbies...");
-        }
-
-        InitializeClientForDiscovery();
-        SendDiscoveryRequests();
-    }
-
-    private void InitializeClientForDiscovery()
-    {
-        CleanupClientIfRunning();
+        CleanupIfRunning();
 
         clientListener = new EventBasedNetListener();
         client = new NetManager(clientListener) { UnconnectedMessagesEnabled = true };
@@ -331,13 +34,33 @@ public class NetworkManager
         clientListener.NetworkReceiveUnconnectedEvent += HandleLobbyInfoResponse;
     }
 
-    private void CleanupClientIfRunning()
+    public void CleanupIfRunning()
     {
         if (client != null && client.IsRunning)
         {
             client.Stop();
             client = null;
         }
+    }
+
+    public bool IsServerConnected() =>
+        client != null
+        && client.FirstPeer != null
+        && client.FirstPeer.ConnectionState == ConnectionState.Connected;
+
+    public void PollEvents()
+    {
+        client?.PollEvents();
+    }
+
+    public void Shutdown()
+    {
+        client?.Stop();
+    }
+
+    public bool IsClientReady()
+    {
+        return clientReady;
     }
 
     private void HandleLobbyInfoResponse(
@@ -358,7 +81,7 @@ public class NetworkManager
                     $"[Client] Lobby found: '{lobbyName}' with {playerCount} players at {remoteEndPoint}"
                 );
 
-                var existingLobby = discoveredLobbies.FirstOrDefault(l =>
+                var existingLobby = manager.discoveredLobbies.FirstOrDefault(l =>
                     l.IP == remoteEndPoint.ToString()
                 );
                 if (existingLobby != null)
@@ -368,7 +91,7 @@ public class NetworkManager
                 }
                 else
                 {
-                    discoveredLobbies.Add(
+                    manager.discoveredLobbies.Add(
                         new LobbyInfo(remoteEndPoint.ToString(), lobbyName, playerCount)
                     );
                 }
@@ -380,7 +103,7 @@ public class NetworkManager
         }
     }
 
-    private void SendDiscoveryRequests()
+    public void SendDiscoveryRequests()
     {
         if (client == null || !client.IsRunning)
             return;
@@ -388,17 +111,20 @@ public class NetworkManager
         var req = new NetDataWriter();
         req.Put("DiscoverLobbies");
 
-        client.SendBroadcast(req, hostPort);
+        client.SendBroadcast(req, manager.hostPort);
 
         try
         {
             client.SendUnconnectedMessage(
                 req,
-                new IPEndPoint(IPAddress.Parse("208.77.246.27"), hostPort)
+                new IPEndPoint(IPAddress.Parse("208.77.246.27"), manager.hostPort)
             );
             Console.WriteLine("[Client] Discovery request sent to 208.77.246.27");
 
-            client.SendUnconnectedMessage(req, new IPEndPoint(IPAddress.Loopback, hostPort));
+            client.SendUnconnectedMessage(
+                req,
+                new IPEndPoint(IPAddress.Loopback, manager.hostPort)
+            );
             Console.WriteLine("[Client] Discovery request sent to localhost");
         }
         catch (Exception ex)
@@ -410,11 +136,6 @@ public class NetworkManager
     }
 
     /// <summary>
-    /// Returns the list of discovered lobbies.
-    /// </summary>
-    public List<LobbyInfo> GetDiscoveredLobbies() => discoveredLobbies;
-
-    /// <summary>
     /// Refreshes the list of discovered lobbies.
     /// </summary>
     public void RefreshLobbies()
@@ -424,36 +145,14 @@ public class NetworkManager
             SendDiscoveryRequests();
             Console.WriteLine("[Client] Lobby-Liste aktualisiert");
 
-            if (IsHost())
+            if (manager.hostService.IsRunning())
             {
-                AddLocalLobbyToDiscoveredList();
+                manager.hostService.AddLocalLobbyToDiscoveredList();
             }
         }
         else
         {
-            DiscoverLobbies();
-        }
-    }
-
-    private void AddLocalLobbyToDiscoveredList()
-    {
-        string localIpAddress = NetworkUtils.GetLocalIPAddress();
-        var existingLocalLobby = discoveredLobbies.FirstOrDefault(l =>
-            l.IP.Contains("127.0.0.1")
-            || l.IP.Contains("localhost")
-            || l.IP.Contains(localIpAddress)
-        );
-
-        if (existingLocalLobby == null)
-        {
-            discoveredLobbies.Add(
-                new LobbyInfo(
-                    $"{localIpAddress}:{hostPort}",
-                    "WaterWizards Lobby (Lokal)",
-                    connectedPlayers.Count
-                )
-            );
-            Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugefügt");
+            manager.DiscoverLobbies();
         }
     }
 
@@ -469,7 +168,7 @@ public class NetworkManager
             return;
         }
 
-        CleanupClientIfRunning();
+        CleanupIfRunning();
 
         try
         {
@@ -611,14 +310,6 @@ public class NetworkManager
         }
     }
 
-    private void TryDirectConnection(string ip, int port)
-    {
-        GameStateManager.Instance.ChatLog.AddMessage(
-            "Attempting direct connection as last resort..."
-        );
-        ConnectToServerDirect(ip, port);
-    }
-
     private void SetupClientEventHandlers()
     {
         if (clientListener == null)
@@ -651,7 +342,7 @@ public class NetworkManager
             GameStateManager.Instance.ChatLog.AddMessage(
                 $"Disconnected from server: {reasonExplanation}"
             );
-            LobbyCountdownSeconds = null;
+            manager.LobbyCountdownSeconds = null;
         };
 
         clientListener.NetworkErrorEvent += (endPoint, error) =>
@@ -675,13 +366,21 @@ public class NetworkManager
         clientListener.NetworkReceiveEvent += HandleClientReceiveEvent;
     }
 
+    private void TryDirectConnection(string ip, int port)
+    {
+        GameStateManager.Instance.ChatLog.AddMessage(
+            "Attempting direct connection as last resort..."
+        );
+        ConnectToServerDirect(ip, port);
+    }
+
     public void ConnectToServerDirect(string ip, int port)
     {
         try
         {
             Console.WriteLine($"[Client] Attempting direct connection to {ip}:{port}...");
 
-            CleanupClientIfRunning();
+            CleanupIfRunning();
 
             clientListener = new EventBasedNetListener();
             client = new NetManager(clientListener)
@@ -751,11 +450,9 @@ public class NetworkManager
                 case "StartGame":
                     GameStateManager.Instance.SetStateToInGame();
                     break;
-
                 case "LobbyCountdown":
-                    HandleLobbyCountdown(reader);
+                    manager.HandleLobbyCountdown(reader);
                     break;
-
                 case "EnterLobby":
                     string receivedSessionId = reader.GetString();
                     if (!string.IsNullOrEmpty(receivedSessionId))
@@ -766,16 +463,14 @@ public class NetworkManager
                     {
                         var joinWriter = new NetDataWriter();
                         joinWriter.Put("PlayerJoin");
-                        joinWriter.Put(Environment.UserName);
+                        joinWriter.Put(Environment.UserName); // oder eigenen Namen aus UI
                         client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
                     }
                     GameStateManager.Instance.SetStateToLobby();
                     break;
-
                 case "PlayerList":
                     HandlePlayerListUpdate(reader);
                     break;
-
                 case "TimerUpdate":
                     try
                     {
@@ -788,7 +483,6 @@ public class NetworkManager
                         );
                     }
                     break;
-
                 case "ChatMessage":
                     try
                     {
@@ -803,7 +497,6 @@ public class NetworkManager
                         );
                     }
                     break;
-
                 case "SystemMessage":
                     try
                     {
@@ -817,15 +510,13 @@ public class NetworkManager
                         );
                     }
                     break;
-
                 case "StartPlacementPhase":
                     GameStateManager.Instance.SetStateToPlacementPhase();
                     break;
-
                 case "ShipPosition":
                     try
                     {
-                        var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
+                        var playerBoard = GameStateManager.Instance.GameScreen!.playerBoard;
                         if (playerBoard == null)
                         {
                             Console.WriteLine(
@@ -837,6 +528,7 @@ public class NetworkManager
                         int y = reader.GetInt();
                         int width = reader.GetInt();
                         int height = reader.GetInt();
+                        Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
                         int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
                         int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
                         int pixelWidth = width * playerBoard.CellSize;
@@ -859,7 +551,6 @@ public class NetworkManager
                         );
                     }
                     break;
-
                 case "BoughtCard":
                     try
                     {
@@ -873,7 +564,6 @@ public class NetworkManager
                         );
                     }
                     break;
-
                 case "OpponentBoughtCard":
                     try
                     {
@@ -887,12 +577,11 @@ public class NetworkManager
                         );
                     }
                     break;
-
                 case "ShipSync":
                     try
                     {
                         int count = reader.GetInt();
-                        var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
+                        var playerBoard = GameStateManager.Instance.GameScreen!.playerBoard;
                         if (playerBoard == null)
                         {
                             Console.WriteLine(
@@ -927,8 +616,8 @@ public class NetworkManager
                         );
                         GameStateManager.Instance.SetStateToInGame();
                         Console.WriteLine(
-                            $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
-                        );
+                                $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+                            );
                     }
                     catch (Exception ex)
                     {
@@ -942,7 +631,7 @@ public class NetworkManager
                     try
                     {
                         int oppCount = reader.GetInt();
-                        var opponentBoard = GameStateManager.Instance.GameScreen?.opponentBoard;
+                        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
                         if (opponentBoard == null)
                         {
                             Console.WriteLine(
@@ -979,8 +668,8 @@ public class NetworkManager
                             $"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}"
                         );
                     }
-                    break;
 
+                    break;
                 case "ShipPlacementError":
                     try
                     {
@@ -1033,14 +722,14 @@ public class NetworkManager
         {
             int count = reader.GetInt();
             Console.WriteLine($"[Client] Empfange Spielerliste mit {count} Spielern.");
-            connectedPlayers.Clear();
+            ConnectedPlayers.Clear();
 
             for (int i = 0; i < count; i++)
             {
                 string address = reader.GetString();
                 string name = reader.GetString();
                 bool isReady = reader.GetBool();
-                connectedPlayers.Add(new Player(address) { Name = name, IsReady = isReady });
+                ConnectedPlayers.Add(new Player(address) { Name = name, IsReady = isReady });
                 Console.WriteLine(
                     $"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}"
                 );
@@ -1050,82 +739,6 @@ public class NetworkManager
         {
             Console.WriteLine($"[Client] Fehler beim Verarbeiten der Spielerliste: {ex.Message}");
         }
-    }
-
-    public int GetHostPort() => hostPort;
-
-    public bool IsPlayerConnected() =>
-        server != null && server.IsRunning && server.ConnectedPeersCount > 0
-        || (
-            client != null
-            && client.FirstPeer != null
-            && client.FirstPeer.ConnectionState == ConnectionState.Connected
-        );
-
-    /// <summary>
-    /// Verarbeitet eingehende und ausgehende Netzwerkereignisse.
-    /// Muss aufgerufen werden, um Nachrichten zu empfangen und zu senden.
-    /// </summary>
-    public void PollEvents()
-    {
-        server?.PollEvents();
-        client?.PollEvents();
-    }
-
-    public void Shutdown()
-    {
-        server?.Stop();
-        client?.Stop();
-        discoveredLobbies.Clear();
-        connectedPlayers.Clear();
-        LobbyCountdownSeconds = null;
-    }
-
-    private void BroadcastSystemMessage(string message)
-    {
-        if (server == null)
-            return;
-        var writer = new NetDataWriter();
-        writer.Put("SystemMessage");
-        writer.Put(message);
-        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
-        GameStateManager.Instance.ChatLog.AddMessage($"[System] {message}");
-    }
-
-    private void BroadcastChatMessage(string senderName, string message)
-    {
-        if (server == null)
-            return;
-        var writer = new NetDataWriter();
-        writer.Put("ChatMessage");
-        writer.Put(senderName);
-        writer.Put(message);
-        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
-        GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {message}");
-    }
-
-    public void SendToAllClients(string message)
-    {
-        if (server == null)
-            return;
-
-        var writer = new NetDataWriter();
-        writer.Put(message);
-
-        foreach (var peer in server.ConnectedPeerList)
-        {
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        }
-    }
-
-    public List<Player> GetConnectedPlayers()
-    {
-        return connectedPlayers;
-    }
-
-    public bool IsClientReady()
-    {
-        return clientReady;
     }
 
     public void ToggleReadyStatus()
@@ -1153,29 +766,6 @@ public class NetworkManager
                 "[Client] Kein Server verbunden, Nachricht konnte nicht gesendet werden."
             );
         }
-    }
-
-    public void BroadcastStartGame()
-    {
-        if (!IsHost() || server == null)
-        {
-            Console.WriteLine("[NetworkManager] Only the host can start the game.");
-            return;
-        }
-
-        if (!connectedPlayers.All(p => p.IsReady))
-        {
-            Console.WriteLine("[NetworkManager] Cannot start game, not all players are ready.");
-            BroadcastSystemMessage("Cannot start game, not all players are ready.");
-            return;
-        }
-
-        var writer = new NetDataWriter();
-        writer.Put("StartGame");
-        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
-        Console.WriteLine("[Host] Sent StartGame command to all clients.");
-
-        GameStateManager.Instance.SetStateToInGame();
     }
 
     /// <summary>
@@ -1247,7 +837,7 @@ public class NetworkManager
         }
     }
 
-    internal void RequestCardBuy(string cardType)
+    public void RequestCardBuy(string cardType)
     {
         if (client != null && client.FirstPeer != null)
         {

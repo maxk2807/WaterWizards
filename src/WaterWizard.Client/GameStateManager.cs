@@ -3,6 +3,7 @@ using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamestates;
+using WaterWizard.Client.network;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client;

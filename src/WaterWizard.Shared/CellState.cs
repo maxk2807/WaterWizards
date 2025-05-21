@@ -7,5 +7,5 @@ public enum CellState
     Rock,
     Hit,
     Miss,
-    Unknown
+    Unknown,
 }
