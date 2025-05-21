@@ -15,30 +15,38 @@ public class Cards
     /// Der übergeordnete Typ der Karte (z. B. Damage, Utility, Environment, Healing).
     /// </summary>
     public CardType Type { get; private set; }
+
     /// <summary>
     /// Die spezifische Variante der Karte innerhalb ihres Typs.
     /// </summary>
     public CardVariant Variant { get; private set; }
+
     /// <summary>
     /// Der Mana-Wert, der zum Ausspielen dieser Karte erforderlich ist.
     /// </summary>
     public int Mana { get; private set; }
+
     // TODO: Mana class einbeziehen
 
     /// <summary>
     /// Die Zeit (in Sekunden oder als „instant“), die zum Wirken der Karte benötigt wird.
     /// </summary>
     public string? CastTime { get; private set; }
+
     /// <summary>
     /// Die Dauer (in Sekunden, „instant“ oder „permanent“) des Karteneffekts.
     /// </summary>
     public string? Duration { get; private set; }
+
     /// <summary>
     /// Gibt an, welches Ziel die Karte betrifft (z. B. „1x1“, „ship“, „battlefield“).
     /// </summary>
     public CardTarget? Target { get; private set; }
 
-    private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<CardVariant, CardType>
+    private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<
+        CardVariant,
+        CardType
+    >
     {
         // Damage Variants
         { CardVariant.MagicAttack, CardType.Damage },
@@ -47,7 +55,6 @@ public class Cards
         { CardVariant.Fireball, CardType.Damage },
         { CardVariant.GreedHit, CardType.Damage },
         { CardVariant.FrostBolt, CardType.Damage },
-
         // Utility Variants
         { CardVariant.HoveringEye, CardType.Utility },
         { CardVariant.SummonShip, CardType.Utility },
@@ -56,56 +63,260 @@ public class Cards
         { CardVariant.ConeOfCold, CardType.Utility },
         { CardVariant.MinorIllusion, CardType.Utility },
         { CardVariant.Polymorph, CardType.Utility },
-
         // Environment Variants
         { CardVariant.Thunder, CardType.Environment },
         { CardVariant.Storm, CardType.Environment },
         { CardVariant.SpawnRocks, CardType.Environment },
         { CardVariant.RiseSun, CardType.Environment },
         { CardVariant.CallWind, CardType.Environment },
-
         // Healing Variants
         { CardVariant.Heal, CardType.Healing },
         { CardVariant.Mending, CardType.Healing },
         { CardVariant.MassMending, CardType.Healing },
         { CardVariant.PerfectMending, CardType.Healing },
-        { CardVariant.Lifesteal, CardType.Healing }
+        { CardVariant.Lifesteal, CardType.Healing },
     };
 
-    private static readonly Dictionary<CardVariant, CardStats> cardStatsMapping = new Dictionary<CardVariant, CardStats>
+    private static readonly Dictionary<CardVariant, CardStats> cardStatsMapping = new Dictionary<
+        CardVariant,
+        CardStats
+    >
     {
         // Damage
-        { CardVariant.MagicAttack, new CardStats { Mana = 1, CastTime = "instant", Duration = "instant", Target = new("1x1") } },
-        { CardVariant.ArcaneMissile, new CardStats { Mana = 2, CastTime = "instant", Duration = "instant", Target = new("random 1x1") } },
-        { CardVariant.Firebolt,      new CardStats { Mana = 2, CastTime = "instant", Duration = "instant", Target = new("2x1") } },
-        { CardVariant.Fireball,      new CardStats { Mana = 7, CastTime = "3",       Duration = "instant", Target = new("3x3") } },
-        { CardVariant.GreedHit,      new CardStats { Mana = 5, CastTime = "2",       Duration = "instant", Target = new("random 1x1") } },
-        { CardVariant.FrostBolt,     new CardStats { Mana = 2, CastTime = "instant", Duration = "3",       Target = new("1x1") } },
-
+        {
+            CardVariant.MagicAttack,
+            new CardStats
+            {
+                Mana = 1,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new("1x1"),
+            }
+        },
+        {
+            CardVariant.ArcaneMissile,
+            new CardStats
+            {
+                Mana = 2,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new("random 1x1"),
+            }
+        },
+        {
+            CardVariant.Firebolt,
+            new CardStats
+            {
+                Mana = 2,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new("2x1"),
+            }
+        },
+        {
+            CardVariant.Fireball,
+            new CardStats
+            {
+                Mana = 7,
+                CastTime = "3",
+                Duration = "instant",
+                Target = new("3x3"),
+            }
+        },
+        {
+            CardVariant.GreedHit,
+            new CardStats
+            {
+                Mana = 5,
+                CastTime = "2",
+                Duration = "instant",
+                Target = new("random 1x1"),
+            }
+        },
+        {
+            CardVariant.FrostBolt,
+            new CardStats
+            {
+                Mana = 2,
+                CastTime = "instant",
+                Duration = "3",
+                Target = new("1x1"),
+            }
+        },
         // Utility
-        { CardVariant.HoveringEye,   new CardStats { Mana = 2, CastTime = "instant", Duration = "permanent", Target = new("1x1") } },
-        { CardVariant.SummonShip,    new CardStats { Mana = 10, CastTime = "4",      Duration = "permanent", Target = new("ship") } },
-        { CardVariant.Teleport,      new CardStats { Mana = 5, CastTime = "1",       Duration = "permanent", Target = new(true, "ship") } },
-        { CardVariant.Paralize,      new CardStats { Mana = 4, CastTime = "instant", Duration = "2",         Target = new("ship") } },
-        { CardVariant.ConeOfCold,   new CardStats { Mana = 5, CastTime = "2",       Duration = "5",         Target = new("3x3") } },
-        { CardVariant.MinorIllusion, new CardStats { Mana = 3, CastTime = "instant", Duration = "10",        Target = new("1x1") } },
-        { CardVariant.Polymorph,     new CardStats { Mana = 3, CastTime = "3",       Duration = "permanent", Target = new("ship") } },
-
+        {
+            CardVariant.HoveringEye,
+            new CardStats
+            {
+                Mana = 2,
+                CastTime = "instant",
+                Duration = "permanent",
+                Target = new("1x1"),
+            }
+        },
+        {
+            CardVariant.SummonShip,
+            new CardStats
+            {
+                Mana = 10,
+                CastTime = "4",
+                Duration = "permanent",
+                Target = new("ship"),
+            }
+        },
+        {
+            CardVariant.Teleport,
+            new CardStats
+            {
+                Mana = 5,
+                CastTime = "1",
+                Duration = "permanent",
+                Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.Paralize,
+            new CardStats
+            {
+                Mana = 4,
+                CastTime = "instant",
+                Duration = "2",
+                Target = new("ship"),
+            }
+        },
+        {
+            CardVariant.ConeOfCold,
+            new CardStats
+            {
+                Mana = 5,
+                CastTime = "2",
+                Duration = "5",
+                Target = new("3x3"),
+            }
+        },
+        {
+            CardVariant.MinorIllusion,
+            new CardStats
+            {
+                Mana = 3,
+                CastTime = "instant",
+                Duration = "10",
+                Target = new("1x1"),
+            }
+        },
+        {
+            CardVariant.Polymorph,
+            new CardStats
+            {
+                Mana = 3,
+                CastTime = "3",
+                Duration = "permanent",
+                Target = new("ship"),
+            }
+        },
         // Environment
-        { CardVariant.Thunder,       new CardStats { Mana = 6, CastTime = "instant", Duration = "5",         Target = new("battlefield") } },
-        { CardVariant.Storm,         new CardStats { Mana = 6, CastTime = "instant", Duration = "permanent", Target = new("battlefield") } },
-        { CardVariant.SpawnRocks,    new CardStats { Mana = 5, CastTime = "instant", Duration = "permanent", Target = new("random 1x1") } },
-        { CardVariant.RiseSun,       new CardStats { Mana = 4, CastTime = "instant", Duration = "permanent", Target = new("battlefield") } },
-        { CardVariant.CallWind,      new CardStats { Mana = 4, CastTime = "instant", Duration = "instant",   Target = new("ship") } },
-
+        {
+            CardVariant.Thunder,
+            new CardStats
+            {
+                Mana = 6,
+                CastTime = "instant",
+                Duration = "5",
+                Target = new("battlefield"),
+            }
+        },
+        {
+            CardVariant.Storm,
+            new CardStats
+            {
+                Mana = 6,
+                CastTime = "instant",
+                Duration = "permanent",
+                Target = new("battlefield"),
+            }
+        },
+        {
+            CardVariant.SpawnRocks,
+            new CardStats
+            {
+                Mana = 5,
+                CastTime = "instant",
+                Duration = "permanent",
+                Target = new("random 1x1"),
+            }
+        },
+        {
+            CardVariant.RiseSun,
+            new CardStats
+            {
+                Mana = 4,
+                CastTime = "instant",
+                Duration = "permanent",
+                Target = new("battlefield"),
+            }
+        },
+        {
+            CardVariant.CallWind,
+            new CardStats
+            {
+                Mana = 4,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new("ship"),
+            }
+        },
         // Healing
-        { CardVariant.Heal,          new CardStats { Mana = 4, CastTime = "instant", Duration = "instant",   Target = new(true, "ship") } },
-        { CardVariant.Mending,       new CardStats { Mana = 2, CastTime = "1",      Duration = "6",         Target = new(true, "ship") } },
-        { CardVariant.MassMending,   new CardStats { Mana = 6, CastTime = "3",      Duration = "instant",   Target = new(true, "ship") } },
-        { CardVariant.PerfectMending,new CardStats { Mana = 6, CastTime = "2",      Duration = "instant",   Target = new(true, "ship") } },
-        { CardVariant.Lifesteal,     new CardStats { Mana = 4, CastTime = "instant", Duration = "instant",   Target = new(true, "ship") } }
+        {
+            CardVariant.Heal,
+            new CardStats
+            {
+                Mana = 4,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.Mending,
+            new CardStats
+            {
+                Mana = 2,
+                CastTime = "1",
+                Duration = "6",
+                Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.MassMending,
+            new CardStats
+            {
+                Mana = 6,
+                CastTime = "3",
+                Duration = "instant",
+                Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.PerfectMending,
+            new CardStats
+            {
+                Mana = 6,
+                CastTime = "2",
+                Duration = "instant",
+                Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.Lifesteal,
+            new CardStats
+            {
+                Mana = 4,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new(true, "ship"),
+            }
+        },
     };
-
 
     /// <summary>
     /// Erstellt eine neue Karteninstanz anhand der angegebenen Kartenvariante.
@@ -133,7 +344,6 @@ public class Cards
             throw new ArgumentException("No stats defined for this card variant.");
         }
     }
-
 
     /// <summary>
     /// Gibt die aktuellen Kartendaten auf der Konsole aus (Debug-Zwecke).
@@ -176,10 +386,10 @@ public class Cards
     /// </returns>
     public Vector2 TargetAsVector()
     {
-        if(Target!.Target.Contains('x') && !Target.Target.Contains("random"))
+        if (Target!.Target.Contains('x') && !Target.Target.Contains("random"))
         {
             int i = Target.Target.IndexOf('x');
-            return new(int.Parse(Target.Target[i-1]+""), int.Parse(Target.Target[i+1]+""));
+            return new(int.Parse(Target.Target[i - 1] + ""), int.Parse(Target.Target[i + 1] + ""));
         }
         else
         {

@@ -16,10 +16,14 @@ public class NetworkManager
 
     private readonly bool isPlayerConnected = false;
     public readonly int hostPort = 7777;
-    
+
     public int? LobbyCountdownSeconds { get; set; }
 
-    private NetworkManager() { hostService = new(this); clientService = new(this); }
+    private NetworkManager()
+    {
+        hostService = new(this);
+        clientService = new(this);
+    }
 
     /// <summary>
     /// Starts discovering available server lobbies on the network.
@@ -28,7 +32,9 @@ public class NetworkManager
     {
         if (hostService.IsRunning())
         {
-            Console.WriteLine("[Client] Suche nach entfernten Lobbies (lokale Lobby wird ausgeblendet)...");
+            Console.WriteLine(
+                "[Client] Suche nach entfernten Lobbies (lokale Lobby wird ausgeblendet)..."
+            );
         }
         else
         {
@@ -47,8 +53,8 @@ public class NetworkManager
 
     public int GetHostPort() => hostPort;
 
-    public bool IsPlayerConnected() => hostService.ArePlayersConnected() ||
-                                     clientService.IsServerConnected();
+    public bool IsPlayerConnected() =>
+        hostService.ArePlayersConnected() || clientService.IsServerConnected();
 
     /// <summary>
     /// Verarbeitet den Countdown für die Lobby.
@@ -114,10 +120,10 @@ public class NetworkManager
 
     public List<Player> GetConnectedPlayers()
     {
-        if(hostService.IsRunning())
+        if (hostService.IsRunning())
             return hostService.ConnectedPlayers;
         return clientService.ConnectedPlayers;
-    }   
+    }
 
     public bool IsHost()
     {

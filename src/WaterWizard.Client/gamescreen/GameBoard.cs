@@ -1,5 +1,5 @@
-using Raylib_cs;
 using System.Numerics;
+using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.network;
@@ -85,9 +85,10 @@ public class GameBoard
 
     public bool IsPointOutside(Vector2 screenPos)
     {
-        return screenPos.X < Position.X || screenPos.Y < Position.Y ||
-                    screenPos.X >= Position.X + (float)GridWidth * CellSize ||
-                    screenPos.Y >= Position.Y + (float)GridHeight * CellSize;
+        return screenPos.X < Position.X
+            || screenPos.Y < Position.Y
+            || screenPos.X >= Position.X + (float)GridWidth * CellSize
+            || screenPos.Y >= Position.Y + (float)GridHeight * CellSize;
     }
 
     /// <summary>
@@ -102,7 +103,9 @@ public class GameBoard
             Point? clickedCell = GetCellFromScreenCoords(mousePos);
             if (clickedCell.HasValue)
             {
-                Console.WriteLine($"Clicked on cell: ({clickedCell.Value.X}, {clickedCell.Value.Y})");
+                Console.WriteLine(
+                    $"Clicked on cell: ({clickedCell.Value.X}, {clickedCell.Value.Y})"
+                );
                 // TODO: Add logic to handle the click (e.g., send attack to server)
                 if (_gridStates[clickedCell.Value.X, clickedCell.Value.Y] == CellState.Unknown)
                 {
@@ -133,11 +136,21 @@ public class GameBoard
 
                 if (_gridStates[x, y] == CellState.Hit)
                 {
-                    Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.Red);
+                    Raylib.DrawCircle(
+                        posX + CellSize / 2,
+                        posY + CellSize / 2,
+                        (float)CellSize / 4,
+                        Color.Red
+                    );
                 }
                 else if (_gridStates[x, y] == CellState.Miss)
                 {
-                    Raylib.DrawCircle(posX + CellSize / 2, posY + CellSize / 2, (float)CellSize / 4, Color.White);
+                    Raylib.DrawCircle(
+                        posX + CellSize / 2,
+                        posY + CellSize / 2,
+                        (float)CellSize / 4,
+                        Color.White
+                    );
                 }
             }
         }
@@ -188,16 +201,27 @@ public class GameBoard
             }
             else
             {
-                hoveredCoords = GameStateManager.Instance.GameScreen.opponentBoard!.GetCellFromScreenCoords(mousePos);
+                hoveredCoords =
+                    GameStateManager.Instance.GameScreen.opponentBoard!.GetCellFromScreenCoords(
+                        mousePos
+                    );
                 boardPos = GameStateManager.Instance.GameScreen.opponentBoard!.Position;
             }
             if (!hoveredCoords.HasValue)
             {
                 return;
             }
-            Raylib.DrawText("Click again to cast Card", (int)mousePos.X, (int)mousePos.Y - 20, 20, Color.Black);
-            var onScreenX = boardPos.X + (hoveredCoords.Value.X - (float)Math.Floor(aim.X / 2f)) * CellSize;
-            var onScreenY = boardPos.Y + (hoveredCoords.Value.Y - (float)Math.Floor(aim.Y / 2f)) * CellSize;
+            Raylib.DrawText(
+                "Click again to cast Card",
+                (int)mousePos.X,
+                (int)mousePos.Y - 20,
+                20,
+                Color.Black
+            );
+            var onScreenX =
+                boardPos.X + (hoveredCoords.Value.X - (float)Math.Floor(aim.X / 2f)) * CellSize;
+            var onScreenY =
+                boardPos.Y + (hoveredCoords.Value.Y - (float)Math.Floor(aim.Y / 2f)) * CellSize;
             var r = new Rectangle(onScreenX, onScreenY, aim.X * CellSize, aim.Y * CellSize);
             Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
 

@@ -16,7 +16,7 @@ public class PlacedShip
 
 /// <summary>
 /// Represents the true Gamestate of the Game as it is on the Server.
-/// Includes: 
+/// Includes:
 /// <list type="table">
 ///     <item>
 ///         <term>Players</term>
@@ -37,8 +37,8 @@ public class PlacedShip
 ///     <item>
 ///         <term>Stacks</term>
 ///         <description>
-///             <see cref="UtilityStack"/>, <see cref="DamageStack"/> and <see cref="EnvironmentStack"/>. 
-///             <see cref="Cards"/> Lists that are filled with the Cards of the <see cref="CardType"/>s 
+///             <see cref="UtilityStack"/>, <see cref="DamageStack"/> and <see cref="EnvironmentStack"/>.
+///             <see cref="Cards"/> Lists that are filled with the Cards of the <see cref="CardType"/>s
 ///             <see cref="CardType.Healing"/> + <see cref="CardType.Utility"/>, <see cref="CardType.Damage"/>
 ///             and <see cref="CardType.Environment"/> respectively.
 ///         </description>
@@ -97,7 +97,9 @@ public class GameState
             Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
             foreach (var ship in kvp.Value)
             {
-                Console.WriteLine($"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}");
+                Console.WriteLine(
+                    $"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}"
+                );
             }
         }
     }
@@ -119,7 +121,11 @@ public class GameState
             players[i] = server.ConnectedPeerList[i];
 
         boards = InitBoards();
-        hands = [[], []];
+        hands =
+        [
+            [],
+            [],
+        ];
         ActiveCards = [];
         UtilityStack = Cards.GetCardsOfType(CardType.Utility);
         UtilityStack.AddRange(Cards.GetCardsOfType(CardType.Healing));
@@ -135,7 +141,7 @@ public class GameState
     /// </summary>
     /// <returns>
     /// 3D Cell Array where the First Dimension is a 2 Element Array
-    /// where the Elements correspond to the 2 Players 
+    /// where the Elements correspond to the 2 Players
     /// </returns>
     private static Cell[][,] InitBoards()
     {
@@ -153,7 +159,7 @@ public class GameState
     }
 
     /// <summary>
-    /// Handles the Placement of the ships. Receives the Position of the ship placement 
+    /// Handles the Placement of the ships. Receives the Position of the ship placement
     /// from the Client. Validates placement and sends error messages if invalid.
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>

@@ -9,7 +9,7 @@ public class HostService(NetworkManager manager)
 {
     private NetManager? server;
     private EventBasedNetListener? serverListener;
-    public List<Player> ConnectedPlayers {get; private set; } = [];
+    public List<Player> ConnectedPlayers { get; private set; } = [];
 
     private GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
@@ -29,7 +29,7 @@ public class HostService(NetworkManager manager)
             server = new NetManager(serverListener)
             {
                 AutoRecycle = true,
-                UnconnectedMessagesEnabled = true
+                UnconnectedMessagesEnabled = true,
             };
 
             if (!server.Start(manager.hostPort))
@@ -54,7 +54,8 @@ public class HostService(NetworkManager manager)
 
     private void SetupServerEventHandlers()
     {
-        if (serverListener == null) return;
+        if (serverListener == null)
+            return;
 
         serverListener.ConnectionRequestEvent += request => request.Accept();
 
@@ -65,7 +66,8 @@ public class HostService(NetworkManager manager)
             Console.WriteLine($"Client {peer} verbunden");
 
             string playerAddress = peer.ToString();
-            string playerName = $"Player_{playerAddress.Split(':').LastOrDefault() ?? playerAddress}";
+            string playerName =
+                $"Player_{playerAddress.Split(':').LastOrDefault() ?? playerAddress}";
 
             if (!PlayerExists(playerAddress))
             {
@@ -86,8 +88,9 @@ public class HostService(NetworkManager manager)
             Console.WriteLine($"Client {peer} getrennt: {disconnectInfo.Reason}");
 
             string playerAddress = peer.ToString();
-            string playerName = ConnectedPlayers.FirstOrDefault(p => p.Address == playerAddress)?.Name ??
-                               $"Player_{playerAddress.Split(':').LastOrDefault()}";
+            string playerName =
+                ConnectedPlayers.FirstOrDefault(p => p.Address == playerAddress)?.Name
+                ?? $"Player_{playerAddress.Split(':').LastOrDefault()}";
 
             RemovePlayerByAddress(playerAddress);
             manager.LobbyCountdownSeconds = null;
@@ -98,7 +101,11 @@ public class HostService(NetworkManager manager)
         serverListener.NetworkReceiveEvent += HandleServerReceiveEvent;
     }
 
-    private void HandleUnconnectedMessage(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType msgType)
+    private void HandleUnconnectedMessage(
+        IPEndPoint remoteEndPoint,
+        NetPacketReader reader,
+        UnconnectedMessageType msgType
+    )
     {
         try
         {
@@ -116,7 +123,9 @@ public class HostService(NetworkManager manager)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Host] Fehler bei Verarbeitung unverbundener Nachricht: {ex.Message}");
+            Console.WriteLine(
+                $"[Host] Fehler bei Verarbeitung unverbundener Nachricht: {ex.Message}"
+            );
         }
     }
 
@@ -135,7 +144,12 @@ public class HostService(NetworkManager manager)
         return server != null && server.IsRunning;
     }
 
-    private void HandleServerReceiveEvent(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
+    private void HandleServerReceiveEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        byte channelNumber,
+        DeliveryMethod deliveryMethod
+    )
     {
         try
         {
@@ -156,7 +170,9 @@ public class HostService(NetworkManager manager)
                     break;
                 case "PlayerJoin":
                     string playerName = reader.GetString(); // Name sent by the client
-                    var playerToUpdate = ConnectedPlayers.FirstOrDefault(p => p.Address == peer.ToString());
+                    var playerToUpdate = ConnectedPlayers.FirstOrDefault(p =>
+                        p.Address == peer.ToString()
+                    );
                     if (playerToUpdate != null)
                     {
                         playerToUpdate.Name = playerName;
@@ -165,7 +181,9 @@ public class HostService(NetworkManager manager)
                     else
                     {
                         // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
-                        Console.WriteLine($"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}");
+                        Console.WriteLine(
+                            $"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}"
+                        );
                         // Optionally, handle this by adding the player if it's a valid scenario,
                         // though players are typically added during PeerConnectedEvent.
                         // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
@@ -173,7 +191,9 @@ public class HostService(NetworkManager manager)
                     }
                     break;
                 default:
-                    Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
+                    Console.WriteLine(
+                        $"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}"
+                    );
                     break;
             }
         }
@@ -193,7 +213,9 @@ public class HostService(NetworkManager manager)
         if (player != null)
         {
             player.IsReady = isReady;
-            Console.WriteLine($"[Host] Spieler {player.Name} ist jetzt {(isReady ? "bereit" : "nicht bereit")}");
+            Console.WriteLine(
+                $"[Host] Spieler {player.Name} ist jetzt {(isReady ? "bereit" : "nicht bereit")}"
+            );
             UpdatePlayerList();
         }
         else
@@ -204,7 +226,8 @@ public class HostService(NetworkManager manager)
 
     private void UpdatePlayerList()
     {
-        if (server == null) return;
+        if (server == null)
+            return;
 
         var writer = new NetDataWriter();
         writer.Put("PlayerList");
@@ -215,7 +238,9 @@ public class HostService(NetworkManager manager)
             writer.Put(player.Address);
             writer.Put(player.Name);
             writer.Put(player.IsReady);
-            Console.WriteLine($"[Host] Spieler: {player.Name}, Status: {(player.IsReady ? "bereit" : "nicht bereit")}");
+            Console.WriteLine(
+                $"[Host] Spieler: {player.Name}, Status: {(player.IsReady ? "bereit" : "nicht bereit")}"
+            );
         }
 
         foreach (var peer in server.ConnectedPeerList)
@@ -228,7 +253,8 @@ public class HostService(NetworkManager manager)
 
     private void BroadcastSystemMessage(string message)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
         var writer = new NetDataWriter();
         writer.Put("SystemMessage");
         writer.Put(message);
@@ -238,7 +264,8 @@ public class HostService(NetworkManager manager)
 
     private void BroadcastChatMessage(string senderName, string message)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
         var writer = new NetDataWriter();
         writer.Put("ChatMessage");
         writer.Put(senderName);
@@ -247,10 +274,10 @@ public class HostService(NetworkManager manager)
         GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {message}");
     }
 
-
     public void SendToAllClients(string message)
     {
-        if (server == null) return;
+        if (server == null)
+            return;
 
         var writer = new NetDataWriter();
         writer.Put(message);
@@ -284,7 +311,8 @@ public class HostService(NetworkManager manager)
         GameStateManager.Instance.SetStateToInGame();
     }
 
-    public bool ArePlayersConnected() => server != null && server.IsRunning && server.ConnectedPeersCount > 0;
+    public bool ArePlayersConnected() =>
+        server != null && server.IsRunning && server.ConnectedPeersCount > 0;
 
     public void PollEvents()
     {
@@ -301,14 +329,20 @@ public class HostService(NetworkManager manager)
     {
         string localIpAddress = NetworkUtils.GetLocalIPAddress();
         var existingLocalLobby = manager.discoveredLobbies.FirstOrDefault(l =>
-            l.IP.Contains("127.0.0.1") ||
-            l.IP.Contains("localhost") ||
-            l.IP.Contains(localIpAddress));
+            l.IP.Contains("127.0.0.1")
+            || l.IP.Contains("localhost")
+            || l.IP.Contains(localIpAddress)
+        );
 
         if (existingLocalLobby == null)
         {
-            manager.discoveredLobbies.Add(new LobbyInfo($"{localIpAddress}:{manager.hostPort}",
-                "WaterWizards Lobby (Lokal)", ConnectedPlayers.Count));
+            manager.discoveredLobbies.Add(
+                new LobbyInfo(
+                    $"{localIpAddress}:{manager.hostPort}",
+                    "WaterWizards Lobby (Lokal)",
+                    ConnectedPlayers.Count
+                )
+            );
             Console.WriteLine("[Client] Lokale Lobby manuell zur Liste hinzugefügt");
         }
     }
