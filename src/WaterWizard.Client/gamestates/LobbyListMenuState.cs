@@ -1,4 +1,5 @@
 using Raylib_cs;
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
@@ -12,12 +13,24 @@ public class LobbyListMenuState : IGameState
     private void DrawLobbyListMenu(GameStateManager manager)
     {
         int titleWidth = Raylib.MeasureText("Verfügbare Lobbies", 30);
-        Raylib.DrawText("Verfügbare Lobbies", (manager.screenWidth - titleWidth) / 2, manager.screenHeight / 10, 30, Color.DarkBlue);
+        Raylib.DrawText(
+            "Verfügbare Lobbies",
+            (manager.screenWidth - titleWidth) / 2,
+            manager.screenHeight / 10,
+            30,
+            Color.DarkBlue
+        );
         var lobbies = NetworkManager.Instance.GetDiscoveredLobbies();
         if (lobbies.Count == 0)
         {
             int noLobbiesWidth = Raylib.MeasureText("Suche nach verfügbaren Lobbies...", 20);
-            Raylib.DrawText("Suche nach verfügbaren Lobbies...", (manager.screenWidth - noLobbiesWidth) / 2, manager.screenHeight / 3, 20, Color.DarkGray);
+            Raylib.DrawText(
+                "Suche nach verfügbaren Lobbies...",
+                (manager.screenWidth - noLobbiesWidth) / 2,
+                manager.screenHeight / 3,
+                20,
+                Color.DarkGray
+            );
         }
         else
         {
@@ -44,7 +57,13 @@ public class LobbyListMenuState : IGameState
                     }
                 }
                 Raylib.DrawText(lobby.Name, tableX, yPos, 18, Color.Black);
-                Raylib.DrawText($"{lobby.PlayerCount}", tableX + headerSpacing, yPos, 18, Color.Black);
+                Raylib.DrawText(
+                    $"{lobby.PlayerCount}",
+                    tableX + headerSpacing,
+                    yPos,
+                    18,
+                    Color.Black
+                );
                 Rectangle joinBtn = new Rectangle(tableX + tableWidth - 100, yPos - 5, 100, 30);
                 bool hoverJoin = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinBtn);
                 Raylib.DrawRectangleRec(joinBtn, hoverJoin ? Color.DarkGreen : Color.Green);
@@ -60,12 +79,23 @@ public class LobbyListMenuState : IGameState
         int margin = 20;
         int buttonHeight = 40;
         int buttonWidth = 120;
-        Rectangle backButton = new Rectangle(margin, manager.screenHeight - buttonHeight - margin, buttonWidth, buttonHeight);
+        Rectangle backButton = new Rectangle(
+            margin,
+            manager.screenHeight - buttonHeight - margin,
+            buttonWidth,
+            buttonHeight
+        );
         bool hoverBack = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton);
         Raylib.DrawRectangleRec(backButton, hoverBack ? new Color(100, 100, 100, 255) : Color.Gray);
         string backText = "Zurück";
         int backTextWidth = Raylib.MeasureText(backText, 20);
-        Raylib.DrawText(backText, (int)backButton.X + (buttonWidth - backTextWidth) / 2, (int)backButton.Y + (buttonHeight - 20) / 2, 20, Color.White);
+        Raylib.DrawText(
+            backText,
+            (int)backButton.X + (buttonWidth - backTextWidth) / 2,
+            (int)backButton.Y + (buttonHeight - 20) / 2,
+            20,
+            Color.White
+        );
         if (hoverBack && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             NetworkManager.Instance.Shutdown();
@@ -74,21 +104,52 @@ public class LobbyListMenuState : IGameState
         string refreshText = "Aktualisieren";
         int refreshTextWidth = Raylib.MeasureText(refreshText, 20);
         int refreshButtonWidth = refreshTextWidth + 40;
-        Rectangle refreshButton = new Rectangle(manager.screenWidth - refreshButtonWidth - margin, manager.screenHeight - buttonHeight - margin, refreshButtonWidth, buttonHeight);
+        Rectangle refreshButton = new Rectangle(
+            manager.screenWidth - refreshButtonWidth - margin,
+            manager.screenHeight - buttonHeight - margin,
+            refreshButtonWidth,
+            buttonHeight
+        );
         bool hoverRefresh = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), refreshButton);
-        Raylib.DrawRectangleRec(refreshButton, hoverRefresh ? new Color(70, 120, 70, 255) : new Color(60, 160, 60, 255));
-        Raylib.DrawText(refreshText, (int)refreshButton.X + (refreshButtonWidth - refreshTextWidth) / 2, (int)refreshButton.Y + (buttonHeight - 20) / 2, 20, Color.White);
+        Raylib.DrawRectangleRec(
+            refreshButton,
+            hoverRefresh ? new Color(70, 120, 70, 255) : new Color(60, 160, 60, 255)
+        );
+        Raylib.DrawText(
+            refreshText,
+            (int)refreshButton.X + (refreshButtonWidth - refreshTextWidth) / 2,
+            (int)refreshButton.Y + (buttonHeight - 20) / 2,
+            20,
+            Color.White
+        );
         if (hoverRefresh && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             NetworkManager.Instance.RefreshLobbies();
         }
         int manualBtnWidth = 300;
-        Rectangle manualIpButton = new Rectangle((float)(manager.screenWidth - manualBtnWidth) / 2, manager.screenHeight - buttonHeight - margin, manualBtnWidth, buttonHeight);
-        bool hoverManualIp = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), manualIpButton);
-        Raylib.DrawRectangleRec(manualIpButton, hoverManualIp ? new Color(70, 70, 200, 255) : Color.Blue);
+        Rectangle manualIpButton = new Rectangle(
+            (float)(manager.screenWidth - manualBtnWidth) / 2,
+            manager.screenHeight - buttonHeight - margin,
+            manualBtnWidth,
+            buttonHeight
+        );
+        bool hoverManualIp = Raylib.CheckCollisionPointRec(
+            Raylib.GetMousePosition(),
+            manualIpButton
+        );
+        Raylib.DrawRectangleRec(
+            manualIpButton,
+            hoverManualIp ? new Color(70, 70, 200, 255) : Color.Blue
+        );
         string manualText = "Manuell verbinden";
         int manualTextWidth = Raylib.MeasureText(manualText, 20);
-        Raylib.DrawText(manualText, (int)manualIpButton.X + (manualBtnWidth - manualTextWidth) / 2, (int)manualIpButton.Y + (buttonHeight - 20) / 2, 20, Color.White);
+        Raylib.DrawText(
+            manualText,
+            (int)manualIpButton.X + (manualBtnWidth - manualTextWidth) / 2,
+            (int)manualIpButton.Y + (buttonHeight - 20) / 2,
+            20,
+            Color.White
+        );
         if (hoverManualIp && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             manager.SetStateToConnectingMenu();

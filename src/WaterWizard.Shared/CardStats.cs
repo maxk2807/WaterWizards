@@ -14,17 +14,17 @@ public class CardStats
     /// Gibt an, wie lange es dauert, bis der Effekt der Karte ausgelöst wird.
     /// Werte können z. B. "instant" oder eine Zeit in Sekunden (als Text) sein.
     /// </summary>
-    public string CastTime { get; set; } = string.Empty;   // e.g. "instant" or seconds
+    public string CastTime { get; set; } = string.Empty; // e.g. "instant" or seconds
 
     /// <summary>
     /// Gibt an, wie lange der Effekt der Karte aktiv bleibt.
     /// Werte können "instant", "permanent" oder eine Zeit in Sekunden (als Text) sein.
     /// </summary>
-    public string Duration { get; set; } = string.Empty;   // e.g. "instant", "permanent" or seconds
+    public string Duration { get; set; } = string.Empty; // e.g. "instant", "permanent" or seconds
 
     /// <summary>
     /// Beschreibt das Zielmuster oder den Zieltyp der Karte.
     /// Beispiele: "1x1", "ship", "battlefield", "random 1x1".
     /// </summary>
-    public string Target { get; set; } = string.Empty;      // e.g. "1x1", "ship", "battlefield", etc.
+    public CardTarget Target { get; set; } = new(string.Empty); // e.g. "1x1", "ship", "battlefield", etc.
 }

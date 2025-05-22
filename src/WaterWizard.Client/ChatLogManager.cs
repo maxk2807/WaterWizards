@@ -1,5 +1,5 @@
 using Raylib_cs;
-
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client;
 
@@ -61,7 +61,10 @@ public class ChatLogManager
         }
         else
         {
-            if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _inputArea) && Raylib.IsMouseButtonReleased(MouseButton.Left))
+            if (
+                Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _inputArea)
+                && Raylib.IsMouseButtonReleased(MouseButton.Left)
+            )
             {
                 _isTyping = true;
             }
@@ -69,10 +72,17 @@ public class ChatLogManager
 
         float wheelMove = Raylib.GetMouseWheelMove();
         float epsilon = 0.0001f;
-        if (Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _chatArea) && Math.Abs(wheelMove) > epsilon)
+        if (
+            Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), _chatArea)
+            && Math.Abs(wheelMove) > epsilon
+        )
         {
             _scrollOffset -= wheelMove * _lineHeight * 3;
-            _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, (_messages.Count * (float)_lineHeight) - _chatArea.Height));
+            _scrollOffset = Math.Clamp(
+                _scrollOffset,
+                0,
+                Math.Max(0, (_messages.Count * (float)_lineHeight) - _chatArea.Height)
+            );
         }
     }
 
@@ -90,7 +100,12 @@ public class ChatLogManager
         Raylib.DrawRectangleRec(_chatArea, new Color(245, 245, 245, 220));
         Raylib.DrawRectangleLinesEx(_chatArea, 1, Color.DarkGray);
 
-        Raylib.BeginScissorMode((int)_chatArea.X, (int)_chatArea.Y, (int)_chatArea.Width, (int)_chatArea.Height);
+        Raylib.BeginScissorMode(
+            (int)_chatArea.X,
+            (int)_chatArea.Y,
+            (int)_chatArea.Width,
+            (int)_chatArea.Height
+        );
 
         int startY = (int)(_chatArea.Y - _scrollOffset + 5);
         for (int i = 0; i < _messages.Count; i++)
@@ -106,16 +121,34 @@ public class ChatLogManager
 
         Raylib.DrawRectangleRec(_inputArea, Color.White);
         Raylib.DrawRectangleLinesEx(_inputArea, 1, _isTyping ? Color.Blue : Color.DarkGray);
-        Raylib.DrawText(_currentInput, (int)_inputArea.X + 5, (int)_inputArea.Y + 7, 16, Color.Black);
+        Raylib.DrawText(
+            _currentInput,
+            (int)_inputArea.X + 5,
+            (int)_inputArea.Y + 7,
+            16,
+            Color.Black
+        );
 
         if (_isTyping && (int)(Raylib.GetTime() * 2) % 2 == 0)
         {
             int textWidth = Raylib.MeasureText(_currentInput, 16);
-            Raylib.DrawText("|", (int)_inputArea.X + 5 + textWidth, (int)_inputArea.Y + 7, 16, Color.Black);
+            Raylib.DrawText(
+                "|",
+                (int)_inputArea.X + 5 + textWidth,
+                (int)_inputArea.Y + 7,
+                16,
+                Color.Black
+            );
         }
         else if (!_isTyping && string.IsNullOrWhiteSpace(_currentInput))
         {
-            Raylib.DrawText("Click here to type...", (int)_inputArea.X + 5, (int)_inputArea.Y + 7, 16, Color.Gray);
+            Raylib.DrawText(
+                "Click here to type...",
+                (int)_inputArea.X + 5,
+                (int)_inputArea.Y + 7,
+                16,
+                Color.Gray
+            );
         }
     }
 }

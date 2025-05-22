@@ -11,13 +11,17 @@ public class LobbyState : IServerGameState
     private readonly NetManager server;
     private Timer? countdownTimer;
     private int countdownSeconds = 5;
-    
-    public LobbyState(NetManager server) { this.server = server; }
+
+    public LobbyState(NetManager server)
+    {
+        this.server = server;
+    }
 
     /// <summary>
     /// Wird beim Eintritt in die Lobby aufgerufen.
     /// </summary>
-    public void OnEnter() { /* TODO: Lobby-Logik */ }
+    public void OnEnter() { /* TODO: Lobby-Logik */
+    }
 
     /// <summary>
     /// Wird beim Verlassen des States aufgerufen (hier leer).
@@ -27,9 +31,17 @@ public class LobbyState : IServerGameState
     /// <summary>
     /// Behandelt Netzwerkereignisse während der Lobby-Phase.
     /// </summary>
-    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager server, ServerGameStateManager manager, string MessageType)
+    public void HandleNetworkEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        NetManager server,
+        ServerGameStateManager manager,
+        string MessageType
+    )
     {
-        Console.WriteLine($"[LobbyState] HandleNetworkEvent called for peer {peer} with messageType {MessageType}. Reader position: {reader.Position}");
+        Console.WriteLine(
+            $"[LobbyState] HandleNetworkEvent called for peer {peer} with messageType {MessageType}. Reader position: {reader.Position}"
+        );
         // TODO: Implement network event handling for the lobby
         // For example, receiving "PlayerReady" messages and then calling CheckAllPlayersReady
         if (MessageType == "PlayerReady")
@@ -42,7 +54,10 @@ public class LobbyState : IServerGameState
 
     public void CheckAllPlayersReady(ServerGameStateManager manager)
     {
-        if (Program.ConnectedPlayers.Count > 0 && Program.ConnectedPlayers.Values.All(ready => ready))
+        if (
+            Program.ConnectedPlayers.Count > 0
+            && Program.ConnectedPlayers.Values.All(ready => ready)
+        )
         {
             Console.WriteLine("[Server] All players are ready. Transitioning to Placement State.");
             StartCountdown(manager);
@@ -50,7 +65,9 @@ public class LobbyState : IServerGameState
         else
         {
             int readyCount = Program.ConnectedPlayers.Values.Count(ready => ready);
-            Console.WriteLine($"[Server] Waiting for players: {readyCount}/{Program.ConnectedPlayers.Count} ready.");
+            Console.WriteLine(
+                $"[Server] Waiting for players: {readyCount}/{Program.ConnectedPlayers.Count} ready."
+            );
             if (countdownTimer != null)
             {
                 ResetCountdown();
@@ -73,20 +90,25 @@ public class LobbyState : IServerGameState
     {
         countdownSeconds = 5;
         countdownTimer?.Dispose();
-        countdownTimer = new Timer(_ =>
-        {
-            if (countdownSeconds > 0)
+        countdownTimer = new Timer(
+            _ =>
             {
-                BroadcastCountdown(countdownSeconds);
-                countdownSeconds--;
-            }
-            else
-            {
-                countdownTimer?.Dispose();
-                Console.WriteLine("[Server] Countdown finished. Starting game.");
-                manager.ChangeState(new PlacementState(server, manager)); 
-            }
-        }, null, 0, 1000);
+                if (countdownSeconds > 0)
+                {
+                    BroadcastCountdown(countdownSeconds);
+                    countdownSeconds--;
+                }
+                else
+                {
+                    countdownTimer?.Dispose();
+                    Console.WriteLine("[Server] Countdown finished. Starting game.");
+                    manager.ChangeState(new PlacementState(server, manager));
+                }
+            },
+            null,
+            0,
+            1000
+        );
     }
 
     /// <summary>
@@ -118,7 +140,7 @@ public class LobbyState : IServerGameState
 
         var writer = new NetDataWriter();
         writer.Put("LobbyCountdown");
-        writer.Put(0); 
+        writer.Put(0);
         foreach (var peer in server.ConnectedPeerList)
         {
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
@@ -135,7 +157,7 @@ public class LobbyState : IServerGameState
     {
         var writer = new NetDataWriter();
         writer.Put("LobbyCountdown");
-        writer.Put(0); 
+        writer.Put(0);
         foreach (var peer in server.ConnectedPeerList)
         {
             peer.Send(writer, DeliveryMethod.ReliableOrdered);

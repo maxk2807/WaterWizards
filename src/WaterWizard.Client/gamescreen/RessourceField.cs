@@ -48,7 +48,19 @@ public class RessourceField(GameScreen gameScreen)
 
     public void Draw()
     {
-        Raylib.DrawText(goldString, (int)GoldRec.X, (int)GoldRec.Y, (int)GoldRec.Height, Color.Black);
-        Raylib.DrawText(manaString, (int)ManaRec.X, (int)ManaRec.Y, (int)ManaRec.Height, Color.Black);
+        Raylib.DrawText(
+            goldString,
+            (int)GoldRec.X,
+            (int)GoldRec.Y,
+            (int)GoldRec.Height,
+            Color.Black
+        );
+        Raylib.DrawText(
+            manaString,
+            (int)ManaRec.X,
+            (int)ManaRec.Y,
+            (int)ManaRec.Height,
+            Color.Black
+        );
     }
 }

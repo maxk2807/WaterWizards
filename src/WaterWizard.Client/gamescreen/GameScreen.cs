@@ -1,18 +1,25 @@
 using System.Numerics;
-using Microsoft.VisualBasic;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.network;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen;
 
-public class GameScreen(GameStateManager gameStateManager, int screenWidth, int screenHeight, GameTimer gameTimer)
+public class GameScreen(
+    GameStateManager gameStateManager,
+    int screenWidth,
+    int screenHeight,
+    GameTimer gameTimer
+)
 {
     public readonly GameStateManager _gameStateManager = gameStateManager;
 
-    public GameBoard? playerBoard, opponentBoard;
-    public GameHand? playerHand, opponentHand;
+    public GameBoard? playerBoard,
+        opponentBoard;
+    public GameHand? playerHand,
+        opponentHand;
     public ActiveCards? activeCards;
     public CardStacksField? cardStacksField;
     public ShipField? shipField;
@@ -51,6 +58,18 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         shipField.Initialize();
     }
 
+    private HashSet<int> shipSizeLimitReached = new();
+
+    public void MarkShipSizeLimitReached(int size)
+    {
+        shipSizeLimitReached.Add(size);
+    }
+
+    public bool IsShipSizeLimitReached(int size)
+    {
+        return shipSizeLimitReached.Contains(size);
+    }
+
     private void InitializeCardStacksField()
     {
         cardStacksField = new(this);
@@ -58,7 +77,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     }
 
     /// <summary>
-    /// Initializes the Hands of Cards of both the Player and the opponent, 
+    /// Initializes the Hands of Cards of both the Player and the opponent,
     /// assigning the central position that the GameHand will be rendered around.
     /// </summary>
     private void InitializeHands()
@@ -126,7 +145,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
     /// <summary>
     /// Draws the Boards, Hands (of cards), timer and graveyard based on the size of the screen.
-    /// Also Draws other elements for navigation and handles inputs for these and for a rudimentary attack. 
+    /// Also Draws other elements for navigation and handles inputs for these and for a rudimentary attack.
     /// </summary>
     /// <param name="currentScreenWidth"></param>
     /// <param name="currentScreenHeight"></param>
@@ -160,7 +179,16 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         float graveyardHeight = cardHeight + outerBufferHeight * 2;
         float graveyardX = playerBoard.Position.X - graveyardWidth - ZonePadding;
         float graveyardY = (currentScreenHeight - graveyardHeight) / 2f;
-        DrawGraveyard(graveyardWidth, graveyardHeight, graveyardX, graveyardY, cardWidth, cardHeight, outerBufferWidth, outerBufferHeight);
+        DrawGraveyard(
+            graveyardWidth,
+            graveyardHeight,
+            graveyardX,
+            graveyardY,
+            cardWidth,
+            cardHeight,
+            outerBufferWidth,
+            outerBufferHeight
+        );
 
         DrawActiveCards();
 
@@ -172,27 +200,56 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         GameBoard.Point? clickedCell = opponentBoard.Update();
         if (clickedCell.HasValue)
         {
-            Console.WriteLine($"Attack initiated at ({clickedCell.Value.X}, {clickedCell.Value.Y})");
+            NetworkManager.Instance.SendAttack(clickedCell.Value.X, clickedCell.Value.Y);
+            Console.WriteLine(
+                $"Attack initiated at ({clickedCell.Value.X}, {clickedCell.Value.Y})"
+            );
             // TODO: Send attack command
         }
 
         // Draw board titles (rest of the code is mostly the same as previous fix)
         opponentBoard.Draw();
-        Rectangle opponentBoardRectangle = new(opponentBoard.Position, boardPixelWidth, boardPixelHeight);
-        bool hoverOpponentBoard = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), opponentBoardRectangle);
+        Rectangle opponentBoardRectangle = new(
+            opponentBoard.Position,
+            boardPixelWidth,
+            boardPixelHeight
+        );
+        bool hoverOpponentBoard = Raylib.CheckCollisionPointRec(
+            Raylib.GetMousePosition(),
+            opponentBoardRectangle
+        );
         if (!hoverOpponentBoard)
         {
             int opponentTitleWidth = Raylib.MeasureText("Opponent's Board", 15);
-            Raylib.DrawText("Opponent's Board", (int)opponentBoard.Position.X + (boardPixelWidth - opponentTitleWidth) / 2, (int)opponentBoard.Position.Y + 15, 15, Color.Black);
+            Raylib.DrawText(
+                "Opponent's Board",
+                (int)opponentBoard.Position.X + (boardPixelWidth - opponentTitleWidth) / 2,
+                (int)opponentBoard.Position.Y + 15,
+                15,
+                Color.Black
+            );
         }
 
         playerBoard.Draw();
-        Rectangle playerBoardRectangle = new(playerBoard.Position, boardPixelWidth, boardPixelHeight);
-        bool hoverPlayerBoard = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), playerBoardRectangle);
+        Rectangle playerBoardRectangle = new(
+            playerBoard.Position,
+            boardPixelWidth,
+            boardPixelHeight
+        );
+        bool hoverPlayerBoard = Raylib.CheckCollisionPointRec(
+            Raylib.GetMousePosition(),
+            playerBoardRectangle
+        );
         if (!hoverPlayerBoard)
         {
             int playerTitleWidth = Raylib.MeasureText("Your Board", 15);
-            Raylib.DrawText("Your Board", (int)playerBoard.Position.X + (boardPixelWidth - playerTitleWidth) / 2, (int)playerBoard.Position.Y + 15, 15, Color.Black);
+            Raylib.DrawText(
+                "Your Board",
+                (int)playerBoard.Position.X + (boardPixelWidth - playerTitleWidth) / 2,
+                (int)playerBoard.Position.Y + 15,
+                15,
+                Color.Black
+            );
         }
 
         DrawShipField();
@@ -200,7 +257,12 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         // Draw Back Button
         int backButtonWidth = 100;
         int backButtonHeight = 30;
-        Rectangle backButton = new Rectangle(ZonePadding, currentScreenHeight - backButtonHeight - ZonePadding, backButtonWidth, backButtonHeight);
+        Rectangle backButton = new Rectangle(
+            ZonePadding,
+            currentScreenHeight - backButtonHeight - ZonePadding,
+            backButtonWidth,
+            backButtonHeight
+        );
         bool hoverBack = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), backButton);
         Raylib.DrawRectangleRec(backButton, hoverBack ? Color.DarkGray : Color.Gray);
         Raylib.DrawText("Back", (int)backButton.X + 30, (int)backButton.Y + 5, 20, Color.White);
@@ -210,7 +272,6 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
             NetworkManager.Instance.Shutdown();
             _gameStateManager.SetStateToMainMenu();
         }
-        
     }
 
     private void DrawRessourceField()
@@ -241,16 +302,36 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     }
 
     // Update DrawGraveyard signature to accept local cardWidth/Height
-    private static void DrawGraveyard(float graveyardWidth, float graveyardHeight, float graveyardX, float graveyardY, int cardWidth, int cardHeight, float outerBufferWidth, float outerBufferHeight)
+    private static void DrawGraveyard(
+        float graveyardWidth,
+        float graveyardHeight,
+        float graveyardX,
+        float graveyardY,
+        int cardWidth,
+        int cardHeight,
+        float outerBufferWidth,
+        float outerBufferHeight
+    )
     {
         Rectangle outerZone = new(graveyardX, graveyardY, graveyardWidth, graveyardHeight);
         // Use passed-in cardWidth/Height
-        Rectangle cardZone = new(graveyardX + outerBufferWidth, graveyardY + outerBufferHeight, cardWidth, cardHeight);
+        Rectangle cardZone = new(
+            graveyardX + outerBufferWidth,
+            graveyardY + outerBufferHeight,
+            cardWidth,
+            cardHeight
+        );
         int lineThickness = 2;
         Raylib.DrawRectangleRec(outerZone, Color.DarkGray);
         Raylib.DrawRectangleLinesEx(outerZone, 2, Color.Black);
         Raylib.DrawRectangleRec(cardZone, Color.LightGray);
-        Raylib.DrawText("Graveyard", (int)outerZone.X + lineThickness, (int)outerZone.Y + lineThickness, 10, Color.White);
+        Raylib.DrawText(
+            "Graveyard",
+            (int)outerZone.X + lineThickness,
+            (int)outerZone.Y + lineThickness,
+            10,
+            Color.White
+        );
     }
 
     public void UpdateScreenSize(int width, int height)
@@ -268,8 +349,18 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
         }
         else
         {
-            playerBoard = new(playerBoard.GridWidth, playerBoard.GridHeight, playerBoard.CellSize, playerBoard.Position);
-            opponentBoard = new(opponentBoard.GridWidth, opponentBoard.GridHeight, opponentBoard.CellSize, opponentBoard.Position);
+            playerBoard = new(
+                playerBoard.GridWidth,
+                playerBoard.GridHeight,
+                playerBoard.CellSize,
+                playerBoard.Position
+            );
+            opponentBoard = new(
+                opponentBoard.GridWidth,
+                opponentBoard.GridHeight,
+                opponentBoard.CellSize,
+                opponentBoard.Position
+            );
         }
         InitializeHands();
     }
@@ -286,7 +377,7 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
 
     public void HandleBoughtCard(string variant)
     {
-        if(Enum.TryParse<CardVariant>(variant, true, out var cardVariant))
+        if (Enum.TryParse<CardVariant>(variant, true, out var cardVariant))
         {
             playerHand!.AddCard(new(cardVariant));
         }
@@ -299,7 +390,10 @@ public class GameScreen(GameStateManager gameStateManager, int screenWidth, int 
     public void HandleOpponentBoughtCard(string type)
     {
         List<Cards> cards;
-        if(Enum.TryParse<CardType>(type, true, out var cardType) && (cards = Cards.GetCardsOfType(cardType)).Count > 0)
+        if (
+            Enum.TryParse<CardType>(type, true, out var cardType)
+            && (cards = Cards.GetCardsOfType(cardType)).Count > 0
+        )
         {
             opponentHand!.AddCard(cards[0]);
         }

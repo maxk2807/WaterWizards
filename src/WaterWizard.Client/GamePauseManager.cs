@@ -47,7 +47,6 @@ public class GamePauseManager
             _gameTimer.Pause();
             _isGameEffectivelyPaused = true;
             Console.WriteLine("[GamePauseManager] Game paused.");
-
         }
     }
 
@@ -61,7 +60,6 @@ public class GamePauseManager
             _gameTimer.Resume();
             _isGameEffectivelyPaused = false;
             Console.WriteLine("[GamePauseManager] Game resumed.");
-
         }
     }
 }

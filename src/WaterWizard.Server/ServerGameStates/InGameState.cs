@@ -12,51 +12,63 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     private readonly NetManager server = server;
     private readonly GameState gameState = gameState;
 
-    /// <summary>
-    /// Wird beim Eintritt in die Spielphase aufgerufen.
-    /// </summary>
     public void OnEnter()
     {
-        /* TODO: Spielstart-Logik */
         var writer = new NetDataWriter();
         writer.Put("StartInGamePhase");
         foreach (var peer in server.ConnectedPeerList)
         {
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-        //TODO: Gold und Mana Initialisieren
-        //TODO: Auf Input von Clients warten?
     }
 
-    /// <summary>
-    /// Wird beim Verlassen des States aufgerufen (hier leer).
-    /// </summary>
     public void OnExit() { }
 
-    /// <summary>
-    /// Behandelt Netzwerkereignisse während der Spielphase.
-    /// </summary>
-    public void HandleNetworkEvent(NetPeer peer, NetPacketReader reader, NetManager serverInstance, ServerGameStateManager manager, string messageType)
+    public void HandleNetworkEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        NetManager serverInstance,
+        ServerGameStateManager manager,
+        string messageType
+    )
     {
-        // Handle game-specific messages here, using messageType
-        Console.WriteLine($"[InGameState] HandleNetworkEvent called for peer {peer} with messageType {messageType}. Reader position: {reader.Position}");
-        switch(messageType){
+        Console.WriteLine(
+            $"[InGameState] HandleNetworkEvent called for peer {peer} with messageType {messageType}. Reader position: {reader.Position}"
+        );
+        switch (messageType)
+        {
             case "PlaceShip":
-                HandleShipPlacement(peer, reader);
+                gameState.HandleShipPlacement(peer, reader);
                 break;
             case "BuyCard":
-                HandleCardBuying(peer, reader);
+                gameState.HandleCardBuying(peer, reader);
+                break;
+            case "CastCard":
+                gameState.HandleCardCasting(peer, reader);
+                break;
+            case "Attack":
+                int x = reader.GetInt();
+                int y = reader.GetInt();
+                Console.WriteLine($"[Server] Attack received at ({x}, {y}) from {peer}");
+                var defender = FindOpponent(peer);
+                if (defender != null)
+                    gameState.HandleAttack(peer, defender, x, y);
+                else
+                    Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
+                break;
+            default:
+                Console.WriteLine($"[InGameState] Unbekannter Nachrichtentyp: {messageType}");
                 break;
         }
     }
 
-    private void HandleCardBuying(NetPeer peer, NetPacketReader reader)
+    private NetPeer? FindOpponent(NetPeer attacker)
     {
-        gameState.HandleCardBuying(peer, reader);
-    }
-
-    private void HandleShipPlacement(NetPeer peer, NetPacketReader reader)
-    {
-        gameState.HandleShipPlacement(peer, reader);
+        foreach (var peer in server.ConnectedPeerList)
+        {
+            if (!peer.Equals(attacker))
+                return peer;
+        }
+        return null;
     }
 }

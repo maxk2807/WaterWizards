@@ -1,4 +1,5 @@
 using Raylib_cs;
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
@@ -11,7 +12,7 @@ public class PlacementPhaseState : IGameState
         int textWidth = Raylib.MeasureText(infoText, 30);
         int textY = (int)(manager.screenHeight * 0.036f);
         Raylib.DrawText(infoText, (manager.screenWidth - textWidth) / 2, textY, 30, Color.Red);
-        
+
         int buttonWidth = 200;
         int buttonHeight = 50;
         int buttonX = (manager.screenWidth - buttonWidth) / 2;
@@ -21,11 +22,17 @@ public class PlacementPhaseState : IGameState
         Raylib.DrawRectangleRec(readyButton, hoverReady ? Color.DarkGreen : Color.Green);
         string readyText = "Fertig";
         int readyTextWidth = Raylib.MeasureText(readyText, 24);
-        Raylib.DrawText(readyText, buttonX + (buttonWidth - readyTextWidth) / 2, buttonY + (buttonHeight - 24) / 2, 24, Color.White);
+        Raylib.DrawText(
+            readyText,
+            buttonX + (buttonWidth - readyTextWidth) / 2,
+            buttonY + (buttonHeight - 24) / 2,
+            24,
+            Color.White
+        );
         if (hoverReady && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
-            WaterWizard.Client.NetworkManager.Instance.SendPlacementReady();
-            manager.SetStateToInGame();
+            NetworkManager.Instance.SendPlacementReady();
+            //manager.SetStateToInGame();
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.L))
