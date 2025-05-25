@@ -69,6 +69,8 @@ public class GameState
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
 
+    private Timer activationTimer;
+
     private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
 
     private bool IsPlacementPhase()
@@ -134,6 +136,12 @@ public class GameState
         Graveyard = [];
         this.server = server;
         this.manager = manager;
+
+        activationTimer = new Timer(
+            _ => UpdateActiveCards(500),
+            null,
+            0,
+            500);
     }
 
     /// <summary>
@@ -356,5 +364,35 @@ public class GameState
         {
             Console.WriteLine($"[Server] Casting Failed. Variant {cardVariantString} unknown");
         }
+    }
+
+    internal void CardActivation(CardVariant variant, int duration)
+    {
+        ActiveCards.Add(new(variant)
+        {
+            remainingDuration = duration
+        });
+    }
+
+    private void UpdateActiveCards(float passedTime)
+    {
+        List<Cards> toDelete = [];
+        NetDataWriter writer = new();
+        writer.Put("ActiveCards");
+        foreach (Cards card in ActiveCards)
+        {
+            card.remainingDuration -= passedTime;
+            if (card.remainingDuration <= 0)
+            {
+                toDelete.Add(card);
+            }
+            else
+            {
+                writer.Put(card.Variant.ToString());
+                CardAbilities.HandleActivationEffect(card, passedTime);
+            }
+        }
+        server.ConnectedPeerList.ForEach(_ => _.Send(writer, DeliveryMethod.ReliableOrdered));
+        bool success = toDelete.All(ActiveCards.Remove);
     }
 }

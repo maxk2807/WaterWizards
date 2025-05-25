@@ -697,6 +697,25 @@ public class ClientService(NetworkManager manager)
                         );
                     }
                     break;
+                case "ActiveCards":
+                    try
+                    {
+                        List<Cards> activeCards = [];
+                        while (!reader.EndOfData)
+                        {
+                            var variant = reader.GetString();
+                            activeCards.Add(new(Enum.Parse<CardVariant>(variant)));
+                        }
+
+                        GameStateManager.Instance.GameScreen.activeCards!.UpdateActiveCards(activeCards);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ActiveCardsError: {ex.Message}"
+                        );
+                    }
+                    break;
             }
         }
         catch (Exception ex)

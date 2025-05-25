@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
@@ -22,10 +23,6 @@ public class ActiveCards(GameScreen gameScreen)
         Y = (ScreenHeight - Height) / 2;
         _cards = new(gameScreen, X + Width / 2, Y + Height / 2 - gameScreen.cardHeight / 2);
         _cards.EmptyHand();
-        _cards.AddCard(new(Shared.CardVariant.FrostBolt));
-        _cards.AddCard(new(Shared.CardVariant.FrostBolt));
-        _cards.AddCard(new(Shared.CardVariant.FrostBolt));
-        _cards.AddCard(new(Shared.CardVariant.HoveringEye));
     }
 
     public void Draw()
@@ -36,6 +33,12 @@ public class ActiveCards(GameScreen gameScreen)
         Raylib.DrawText("Active Cards", (int)outerRec.X + 2, (int)outerRec.Y + 2, 15, Color.Black);
 
         _cards?.Draw(true);
+    }
+
+    internal void UpdateActiveCards(List<Cards> activeCards)
+    {
+        _cards!.EmptyHand();
+        activeCards.ForEach(_cards.AddCard);
     }
 
     private class ActiveCardsHand(GameScreen gameScreen, int centralX, int cardY)
