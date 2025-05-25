@@ -39,5 +39,8 @@ public class ActiveCards(GameScreen gameScreen)
     }
 
     private class ActiveCardsHand(GameScreen gameScreen, int centralX, int cardY)
-        : GameHand(gameScreen, centralX, cardY) { }
+        : GameHand(gameScreen, centralX, cardY)
+    {
+        internal override void HandleCast(GameCard gameCard) {/*Can't cast active cards*/}
+    }
 }

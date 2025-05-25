@@ -61,7 +61,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
         }
     }
 
-    private void HandleCast(GameCard gameCard)
+    internal virtual void HandleCast(GameCard gameCard)
     {
         HandleConfirmCast(gameCard);
     }
