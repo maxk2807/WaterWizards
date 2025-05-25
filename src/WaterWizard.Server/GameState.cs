@@ -468,5 +468,38 @@ public class GameState
         }
         
         Console.WriteLine($"[Server] Game Over! Winner: {winner}, Loser: {loser}");
+        
+        var gameOverTimer = new Timer(_ =>
+        {
+            Console.WriteLine("[Server] Transitioning back to lobby after game over...");
+            manager.ChangeState(new LobbyState(server));
+            
+            foreach (var playerKey in Program.ConnectedPlayers.Keys.ToList())
+            {
+                Program.ConnectedPlayers[playerKey] = false;
+            }
+            Program.PlacementReadyPlayers.Clear();
+            
+            playerShips.Clear();
+            Console.WriteLine("[Server] Ship placements cleared for next game.");
+            
+            var playerListWriter = new NetDataWriter();
+            playerListWriter.Put("PlayerList");
+            playerListWriter.Put(Program.ConnectedPlayers.Count);
+            foreach (var kvp in Program.ConnectedPlayers)
+            {
+                string playerName = Program.PlayerNames.GetValueOrDefault(kvp.Key, "Unknown");
+                playerListWriter.Put(kvp.Key);
+                playerListWriter.Put(playerName);
+                playerListWriter.Put(kvp.Value);
+            }
+            
+            foreach (var peer in server.ConnectedPeerList)
+            {
+                peer.Send(playerListWriter, DeliveryMethod.ReliableOrdered);
+            }
+            
+            Console.WriteLine("[Server] Players reset to not ready, returned to lobby.");
+        }, null, 5000, Timeout.Infinite); 
     }
 }

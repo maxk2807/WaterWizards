@@ -513,6 +513,23 @@ public class ClientService(NetworkManager manager)
                 case "StartPlacementPhase":
                     GameStateManager.Instance.SetStateToPlacementPhase();
                     break;
+                case "GameOver":
+                    string result = reader.GetString();
+                    Console.WriteLine($"[Client] Game Over: {result}");
+                    
+                    GameStateManager.Instance.ChatLog.AddMessage($"Game Over: {result}");
+                    GameStateManager.Instance.ChatLog.AddMessage("Returning to lobby in 5 seconds...");
+                    
+                    var clientTimer = new System.Timers.Timer(5000);
+                    clientTimer.Elapsed += (s, e) =>
+                    {
+                        clientTimer.Stop();
+                        clientTimer.Dispose();
+                        GameStateManager.Instance.SetStateToLobby();
+                        Console.WriteLine("[Client] Transitioned back to lobby after game over");
+                    };
+                    clientTimer.Start();
+                    break;
                 case "ShipPosition":
                     try
                     {
