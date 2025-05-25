@@ -500,6 +500,9 @@ public class GameState
             }
             
             Console.WriteLine("[Server] Players reset to not ready, returned to lobby.");
+            
+            // Dispose of the timer after the operation is complete
+            ((Timer)_).Dispose();
         }, null, 5000, Timeout.Infinite); 
     }
 }
