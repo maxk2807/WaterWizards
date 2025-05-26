@@ -368,15 +368,17 @@ public class GameState
 
     internal void CardActivation(CardVariant variant, int duration)
     {
+        Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
         ActiveCards.Add(new(variant)
         {
-            remainingDuration = duration
+            remainingDuration = duration * 1000f
         });
     }
 
     private void UpdateActiveCards(float passedTime)
     {
         List<Cards> toDelete = [];
+        List<Cards> toSend = [];
         NetDataWriter writer = new();
         writer.Put("ActiveCards");
         foreach (Cards card in ActiveCards)
@@ -388,11 +390,13 @@ public class GameState
             }
             else
             {
-                writer.Put(card.Variant.ToString());
+                toSend.Add(card);
                 CardAbilities.HandleActivationEffect(card, passedTime);
             }
         }
-        server.ConnectedPeerList.ForEach(_ => _.Send(writer, DeliveryMethod.ReliableOrdered));
+        writer.Put(toSend.Count);
+        toSend.ForEach(card => writer.Put(card.Variant.ToString()));
+        server.ConnectedPeerList.ForEach(client => client.Send(writer, DeliveryMethod.ReliableOrdered));
         bool success = toDelete.All(ActiveCards.Remove);
     }
 }

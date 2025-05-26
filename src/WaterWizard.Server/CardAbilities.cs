@@ -30,12 +30,14 @@ public static class CardAbilities
             case "instant":
                 break;
             case "permanent":
+                Console.WriteLine($"[Server] Activated Card: {variant}");
                 break;
             default:
                 try
                 {
                     int duration = int.Parse(durationString);
                     gameState.CardActivation(variant, duration);
+                    Console.WriteLine($"[Server] Activated Card: {variant}");
                     break;
                 }
                 catch (Exception ex)

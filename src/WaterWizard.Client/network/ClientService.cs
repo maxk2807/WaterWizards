@@ -700,11 +700,13 @@ public class ClientService(NetworkManager manager)
                 case "ActiveCards":
                     try
                     {
+                        var activeCardsNum = reader.GetInt();
                         List<Cards> activeCards = [];
-                        while (!reader.EndOfData)
+                        for (int i = 0; i < activeCardsNum; i++)
                         {
                             var variant = reader.GetString();
                             activeCards.Add(new(Enum.Parse<CardVariant>(variant)));
+                            Console.WriteLine($"[Client] ActivateCard received: {variant}");
                         }
 
                         GameStateManager.Instance.GameScreen.activeCards!.UpdateActiveCards(activeCards);
