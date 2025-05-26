@@ -43,4 +43,10 @@ public class CardTarget
         Ally = false;
         Target = target;
     }
+
+    public override string ToString()
+    {
+        string targetType = Ally ? "Ally" : "Opponent";
+        return $"{targetType} - {Target}";
+    }
 }

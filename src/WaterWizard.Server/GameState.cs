@@ -6,13 +6,7 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
-public class PlacedShip
-{
-    public int X { get; set; }
-    public int Y { get; set; }
-    public int Width { get; set; }
-    public int Height { get; set; }
-}
+
 
 /// <summary>
 /// Represents the true Gamestate of the Game as it is on the Server.
@@ -264,27 +258,6 @@ public class GameState
         peer.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 
-    public void HandleAttack(NetPeer attacker, NetPeer defender, int x, int y)
-    {
-        Console.WriteLine(
-            $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
-        );
-        var ships = GetShips(defender);
-        foreach (var ship in ships)
-        {
-            if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
-            {
-                Console.WriteLine(
-                    $"[Server] Treffer auf Schiff bei ({x},{y}) von Spieler {defender.ToString()}"
-                );
-                return;
-            }
-        }
-        Console.WriteLine(
-            $"[Server] Kein Schiff getroffen bei ({x},{y}) von Spieler {defender.ToString()}"
-        );
-    }
-
     /// <summary>
     /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
     /// of the <see cref="CardType"/> given in <paramref name="reader"/>
@@ -356,5 +329,182 @@ public class GameState
         {
             Console.WriteLine($"[Server] Casting Failed. Variant {cardVariantString} unknown");
         }
+    }
+
+    /// <summary>
+    /// Handles the attack from one player to another.
+    /// Checks if the attack hits a ship and updates the game state accordingly.
+    /// If a ship is hit, it checks if the ship is destroyed and sends the result to both players.
+    /// </summary>
+    /// <param name="attacker">The player who initiated the attack</param>
+    /// <param name="defender">The player who was attacked</param>
+    /// <param name="x">The x-coordinate of the attack</param>
+    /// <param name="y">The y-coordinate of the attack</param>
+    public void HandleAttack(NetPeer attacker, NetPeer defender, int x, int y)
+    {
+        Console.WriteLine(
+            $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
+        );
+        
+        var ships = GetShips(defender);
+        bool hit = false;
+        PlacedShip? hitShip = null;
+        
+        foreach (var ship in ships)
+        {
+            if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
+            {
+                hit = true;
+                hitShip = ship;
+                
+                bool newDamage = ship.DamageCell(x, y);
+                
+                if (newDamage)
+                {
+                    Console.WriteLine($"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})");
+                    
+                    if (ship.IsDestroyed)
+                    {
+                        Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
+                }
+                break;
+            }
+        }
+        
+        if (!hit)
+        {
+            Console.WriteLine($"[Server] Miss at ({x},{y})");
+        }
+        
+        /// <summary>
+        /// Sends the result of the attack to both players.
+        /// /// </summary>
+        /// <param name="attacker">The player who initiated the attack</param>
+        /// <param name="defender">The player who was attacked</param>
+        /// <param name="x">The x-coordinate of the attack</param>
+        /// <param name="y">The y-coordinate of the attack</param>
+        /// <param name="hit">Whether the attack hit a ship</param>
+        /// <param name="shipDestroyed">Whether the ship was destroyed</param>
+        SendAttackResult(attacker, defender, x, y, hit, hitShip?.IsDestroyed ?? false);
+        
+        if (hit && hitShip?.IsDestroyed == true)
+        {
+            CheckGameOver();
+        }
+    }
+
+    /// <summary>
+    /// Sends the result of an attack to both players.
+    /// </summary>
+    /// <param name="attacker">The player who initiated the attack</param>
+    /// <param name="defender">The player who was attacked</param>
+    /// <param name="x">The x-coordinate of the attack</param>
+    /// <param name="y">The y-coordinate of the attack</param>
+    /// <param name="hit">Whether the attack hit a ship</param>
+    /// <param name="shipDestroyed">Whether the ship was destroyed</param>
+    private void SendAttackResult(NetPeer attacker, NetPeer defender, int x, int y, bool hit, bool shipDestroyed)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("AttackResult");
+        writer.Put(x);
+        writer.Put(y);
+        writer.Put(hit);
+        writer.Put(shipDestroyed);
+        
+        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
+        defender.Send(writer, DeliveryMethod.ReliableOrdered);
+        
+        Console.WriteLine($"[Server] Attack result sent: hit={hit}, destroyed={shipDestroyed}");
+    }
+
+    /// <summary>
+    /// Checks if all ships of a player are destroyed.
+    /// </summary>
+    /// <param name="player">The player to check</param>
+    public bool AreAllShipsDestroyed(NetPeer player)
+    {
+        var ships = GetShips(player);
+        return ships.Count > 0 && ships.All(ship => ship.IsDestroyed);
+    }
+
+    /// <summary>
+    /// Checks if the game is over by checking if any player's ships are all destroyed.
+    /// If so, it broadcasts the game over message to all players.
+    /// </summary>
+    public void CheckGameOver()
+    {
+        foreach (var player in players)
+        {
+            if (player != null && AreAllShipsDestroyed(player))
+            {
+                var winner = players.FirstOrDefault(p => p != player);
+                if (winner != null)
+                {
+                    BroadcastGameOver(winner, player);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Broadcasts the game over message to all players.
+    /// </summary>
+    /// <param name="winner">The winning player</param>
+    /// <param name="loser">The losing player</param>
+    private void BroadcastGameOver(NetPeer winner, NetPeer loser)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("GameOver");
+        writer.Put("Winner"); 
+        
+        foreach (var peer in server.ConnectedPeerList)
+        {
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        
+        Console.WriteLine($"[Server] Game Over! Winner: {winner}, Loser: {loser}");
+        
+        var gameOverTimer = new Timer(_ =>
+        {
+            Console.WriteLine("[Server] Transitioning back to lobby after game over...");
+            manager.ChangeState(new LobbyState(server));
+            
+            foreach (var playerKey in Program.ConnectedPlayers.Keys.ToList())
+            {
+                Program.ConnectedPlayers[playerKey] = false;
+            }
+            Program.PlacementReadyPlayers.Clear();
+            
+            playerShips.Clear();
+            Console.WriteLine("[Server] Ship placements cleared for next game.");
+            
+            var playerListWriter = new NetDataWriter();
+            playerListWriter.Put("PlayerList");
+            playerListWriter.Put(Program.ConnectedPlayers.Count);
+            foreach (var kvp in Program.ConnectedPlayers)
+            {
+                string playerName = Program.PlayerNames.GetValueOrDefault(kvp.Key, "Unknown");
+                playerListWriter.Put(kvp.Key);
+                playerListWriter.Put(playerName);
+                playerListWriter.Put(kvp.Value);
+            }
+            
+            foreach (var peer in server.ConnectedPeerList)
+            {
+                peer.Send(playerListWriter, DeliveryMethod.ReliableOrdered);
+            }
+            
+            Console.WriteLine("[Server] Players reset to not ready, returned to lobby.");
+            
+            if (_ is Timer timer)
+            {
+                timer.Dispose();
+            }
+        }, null, 5000, Timeout.Infinite); 
     }
 }
