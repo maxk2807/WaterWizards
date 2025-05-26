@@ -8,8 +8,8 @@ namespace WaterWizard.Server;
 static class Program
 {
     public static readonly Dictionary<string, bool> ConnectedPlayers = [];
-    private static readonly Dictionary<string, bool> PlacementReadyPlayers = [];
-    private static readonly Dictionary<string, string> PlayerNames = [];
+    public static readonly Dictionary<string, bool> PlacementReadyPlayers = [];
+    public static readonly Dictionary<string, string> PlayerNames = [];
     private static GameSessionTimer? _gameSessionTimer;
 
     private static void Log(string message)

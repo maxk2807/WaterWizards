@@ -277,6 +277,11 @@ public class DraggingShip
     /// <param name="shipSize"></param>
     private void SpawnShip(int x, int y, int shipSize)
     {
+        if (gameScreen.playerBoard == null)
+        {
+            Console.WriteLine("Warning: playerBoard is null, cannot spawn ship");
+            return;
+        }
         //gameScreen.playerBoard!.putShip(new(gameScreen, x, y, ShipType.DEFAULT, (int)DraggedShipRectangle.Width, (int)DraggedShipRectangle.Height));
         int boardX = (int)gameScreen.playerBoard.Position.X;
         int boardY = (int)gameScreen.playerBoard.Position.Y;
