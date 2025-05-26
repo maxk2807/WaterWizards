@@ -705,7 +705,12 @@ public class ClientService(NetworkManager manager)
                         for (int i = 0; i < activeCardsNum; i++)
                         {
                             var variant = reader.GetString();
-                            activeCards.Add(new(Enum.Parse<CardVariant>(variant)));
+                            var remainingDuration = reader.GetFloat();
+                            Cards card = new(Enum.Parse<CardVariant>(variant))
+                            {
+                                remainingDuration = remainingDuration
+                            };
+                            activeCards.Add(card);
                             Console.WriteLine($"[Client] ActivateCard received: {variant}");
                         }
 

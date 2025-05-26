@@ -1,5 +1,6 @@
 using Raylib_cs;
 using WaterWizard.Shared;
+using static WaterWizard.Client.gamescreen.cards.ActiveCards;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
@@ -8,7 +9,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     /// <summary>
     /// Represents the Cards on the given Hand.
     /// </summary>
-    private List<GameCard> _cards = [];
+    public List<GameCard> Cards { get; private set; } = [];
 
     private int ScreenWidth => gameScreen._gameStateManager.screenWidth;
     private int ScreenHeight => gameScreen._gameStateManager.screenHeight;
@@ -21,17 +22,17 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     /// on the side of the opponent.
     /// </summary>
     /// <param name="front"></param>
-    public void Draw(bool front)
+    public virtual void Draw(bool front)
     {
         //space available for the cards to draw
         int availableHandWidth = (int)(ScreenWidth * 0.2f);
         //space the cards would take up if side by side
-        int totalCardWidth = _cards.Count * CardWidth;
+        int totalCardWidth = Cards.Count * CardWidth;
         //difference between these two spaces
         int excess = totalCardWidth - availableHandWidth;
         //calculate based on difference, how much cards need to be compressed
-        int offset = excess > 0 ? excess / _cards.Count : 0;
-        for (int i = 0; i < _cards.Count; i++)
+        int offset = excess > 0 ? excess / Cards.Count : 0;
+        for (int i = 0; i < Cards.Count; i++)
         {
             int cardX;
             //actual width of rendered cards, after compression
@@ -39,24 +40,29 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 
             // calculate card position based on:
             // are cards even, how many cards, i, how much overlap
-            bool areCardsEven = _cards.Count % 2 == 0;
+            bool areCardsEven = Cards.Count % 2 == 0;
             cardX = areCardsEven
-                ? -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
+                ? -(Cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
                 : -effectiveCardWidth / 2
-                    - _cards.Count / 2 * effectiveCardWidth
+                    - Cards.Count / 2 * effectiveCardWidth
                     + i * effectiveCardWidth;
 
-            _cards[i].Draw(centralX + cardX, cardY, front);
+            Cards[i].Draw(centralX + cardX, cardY, front);
+            
+            DrawCardPreview(front, i, cardX, effectiveCardWidth);
+        }
+    }
 
-            //Draw Card Preview if Mouse over card snippet
-            Rectangle cardRec = new(centralX + cardX, cardY, effectiveCardWidth, CardHeight);
-            if (front && GameScreen.IsHoveringRec(cardRec))
+    private void DrawCardPreview(bool front, int i, int cardX, int effectiveCardWidth)
+    {
+        //Draw Card Preview if Mouse over card snippet
+        Rectangle cardRec = new(centralX + cardX, cardY, effectiveCardWidth, CardHeight);
+        if (front && GameScreen.IsHoveringRec(cardRec))
+        {
+            DrawPreview(Cards[i]);
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
-                DrawPreview(_cards[i]);
-                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
-                {
-                    HandleCast(_cards[i]);
-                }
+                HandleCast(Cards[i]);
             }
         }
     }
@@ -83,12 +89,12 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
         //space available for the cards to draw
         int availableHandWidth = (int)(ScreenWidth * 0.2f);
         //space the cards would take up if side by side
-        int totalCardWidth = _cards.Count * CardWidth;
+        int totalCardWidth = Cards.Count * CardWidth;
         //difference between these two spaces
         int excess = totalCardWidth - availableHandWidth;
         //calculate based on difference, how much cards need to be compressed
-        int offset = excess > 0 ? excess / _cards.Count : 0;
-        for (int i = 0; i < _cards.Count; i++)
+        int offset = excess > 0 ? excess / Cards.Count : 0;
+        for (int i = 0; i < Cards.Count; i++)
         {
             int cardX;
             //actual width of rendered cards, after compression
@@ -96,20 +102,20 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 
             // calculate card position based on:
             // are cards even, how many cards, i, how much overlap
-            bool areCardsEven = _cards.Count % 2 == 0;
+            bool areCardsEven = Cards.Count % 2 == 0;
             cardX = areCardsEven
-                ? -(_cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
+                ? -(Cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
                 : -effectiveCardWidth / 2
-                    - _cards.Count / 2 * effectiveCardWidth
+                    - Cards.Count / 2 * effectiveCardWidth
                     + i * effectiveCardWidth;
 
-            _cards[i].DrawRotation(centralX + cardX, cardY, front, rot);
+            Cards[i].DrawRotation(centralX + cardX, cardY, front, rot);
 
             //Draw Card Preview if Mouse over card snippet
             Rectangle cardRec = new(centralX + cardX, cardY, effectiveCardWidth, CardHeight);
             if (front && GameScreen.IsHoveringRec(cardRec))
             {
-                DrawPreview(_cards[i]);
+                DrawPreview(Cards[i]);
             }
         }
     }
@@ -128,11 +134,11 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 
     public void AddCard(Cards card)
     {
-        _cards.Add(new(gameScreen, card));
+        Cards.Add(new(gameScreen, card));
     }
 
     public void EmptyHand()
     {
-        _cards.Clear();
+        Cards.Clear();
     }
 }

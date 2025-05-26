@@ -44,6 +44,45 @@ public class ActiveCards(GameScreen gameScreen)
     private class ActiveCardsHand(GameScreen gameScreen, int centralX, int cardY)
         : GameHand(gameScreen, centralX, cardY)
     {
+        private readonly GameScreen gameScreen = gameScreen;
+        private readonly int centralX = centralX;
+        private readonly int cardY = cardY;
+
         internal override void HandleCast(GameCard gameCard) {/*Can't cast active cards*/}
+
+        public override void Draw(bool front)
+        {
+            int availableHandWidth = (int)(gameScreen._gameStateManager.screenWidth * 0.2f);
+            int totalCardWidth = Cards.Count * gameScreen.cardWidth;
+            int excess = totalCardWidth - availableHandWidth;
+            int offset = excess > 0 ? excess / Cards.Count : 0;
+            for (int i = 0; i < Cards.Count; i++)
+            {
+                int cardX;
+                int effectiveCardWidth = gameScreen.cardWidth - offset;
+                bool areCardsEven = Cards.Count % 2 == 0;
+                cardX = areCardsEven
+                    ? -(Cards.Count / 2 * effectiveCardWidth) + i * effectiveCardWidth
+                    : -effectiveCardWidth / 2
+                        - Cards.Count / 2 * effectiveCardWidth
+                        + i * effectiveCardWidth;
+
+                Cards[i].Draw(centralX + cardX, cardY, front);
+
+                var card = Cards[i].card;
+                int radius = 15;
+                Raylib.DrawCircleLines(centralX + cardX + radius, cardY + radius, radius, Color.Black);
+                if (int.TryParse(card.Duration, System.Globalization.NumberStyles.Integer, null, out int totalDuration))
+                {
+                    float relativePassed = card.remainingDuration / (totalDuration * 1000f);
+                    int degrees = (int)(relativePassed * 360);
+                    Raylib.DrawCircleSector(new(centralX + cardX + radius, cardY + radius), radius, 0, degrees, 100, Color.Black);
+                }
+                else
+                {
+                    Raylib.DrawCircleSector(new(centralX + cardX + radius, cardY + radius), radius, 0, 360, 100, Color.Black);
+                }
+            }
+        }
     }
 }

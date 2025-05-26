@@ -378,7 +378,7 @@ public class GameState
     private void UpdateActiveCards(float passedTime)
     {
         List<Cards> toDelete = [];
-        List<Cards> toSend = [];
+        Dictionary<Cards, float> toSend = [];
         NetDataWriter writer = new();
         writer.Put("ActiveCards");
         foreach (Cards card in ActiveCards)
@@ -390,12 +390,16 @@ public class GameState
             }
             else
             {
-                toSend.Add(card);
+                toSend.Add(card, card.remainingDuration);
                 CardAbilities.HandleActivationEffect(card, passedTime);
             }
         }
         writer.Put(toSend.Count);
-        toSend.ForEach(card => writer.Put(card.Variant.ToString()));
+        foreach (var pair in toSend)
+        {
+            writer.Put(pair.Key.Variant.ToString());
+            writer.Put(pair.Value);
+        }
         server.ConnectedPeerList.ForEach(client => client.Send(writer, DeliveryMethod.ReliableOrdered));
         bool success = toDelete.All(ActiveCards.Remove);
     }
