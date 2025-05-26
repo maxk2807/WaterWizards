@@ -97,10 +97,10 @@ public class DraggingShip
         this.currentNumber = currentNumber;
         DraggedShipRectangle = new(x, y, width, height);
         rotateIcon = TextureManager.LoadTexture(
-            "Assets/icons8-rotate-48.png"
+            "src/WaterWizard.Client/Assets/icons8-rotate-48.png"
         );
         confirmIcon = TextureManager.LoadTexture(
-            "Assets/icons8-tick-60.png"
+            "src/WaterWizard.Client/Assets/icons8-tick-60.png"
         );
     }
 
