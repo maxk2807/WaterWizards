@@ -255,7 +255,7 @@ public class ClientService(NetworkManager manager)
             int connectionAttempts = 0;
             const int maxAttempts = 20;
 
-            System.Timers.Timer connectionTimer = new System.Timers.Timer(500);
+            System.Timers.Timer connectionTimer = new(500);
             connectionTimer.Elapsed += (s, e) =>
             {
                 connectionAttempts++;
@@ -474,7 +474,7 @@ public class ClientService(NetworkManager manager)
                 case "TimerUpdate":
                     try
                     {
-                        float serverTimeSeconds = reader.GetFloat();
+                        reader.GetFloat();
                     }
                     catch (Exception ex)
                     {
