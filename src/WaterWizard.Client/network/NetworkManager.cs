@@ -14,7 +14,6 @@ public class NetworkManager
 
     public readonly List<LobbyInfo> discoveredLobbies = [];
 
-    private readonly bool isPlayerConnected = false;
     public readonly int hostPort = 7777;
 
     public int? LobbyCountdownSeconds { get; set; }

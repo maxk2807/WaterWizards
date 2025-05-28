@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <Content Include="Assets\icons8-rotate-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
