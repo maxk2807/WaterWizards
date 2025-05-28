@@ -15,8 +15,8 @@ public class PlacementPhaseState : IGameState
 
         int buttonWidth = 200;
         int buttonHeight = 50;
-        //ToDO: Fix the button when clicking it it shouldn't click a cell
-        //that's why it's moved to the right
+        //TODO: Fix the button when clicking it it shouldn't click a cell
+        //that's why it's moved to the left
         int buttonX = (manager.screenWidth - buttonWidth) / 8;
         int buttonY = textY + (int)(manager.screenHeight * 0.15f);
         Rectangle readyButton = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
