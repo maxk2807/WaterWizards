@@ -42,7 +42,6 @@ public class LobbyState : IServerGameState
         Console.WriteLine(
             $"[LobbyState] HandleNetworkEvent called for peer {peer} with messageType {MessageType}. Reader position: {reader.Position}"
         );
-        // TODO: Implement network event handling for the lobby
         // For example, receiving "PlayerReady" messages and then calling CheckAllPlayersReady
         if (MessageType == "PlayerReady")
         {

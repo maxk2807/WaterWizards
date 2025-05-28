@@ -63,6 +63,8 @@ public class GameState
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
 
+    private Timer activationTimer;
+
     private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
 
     private bool IsPlacementPhase()
@@ -128,6 +130,12 @@ public class GameState
         Graveyard = [];
         this.server = server;
         this.manager = manager;
+
+        activationTimer = new Timer(
+            _ => UpdateActiveCards(500),
+            null,
+            0,
+            500);
     }
 
     /// <summary>
@@ -331,6 +339,44 @@ public class GameState
         }
     }
 
+    internal void CardActivation(CardVariant variant, int duration)
+    {
+        Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
+        ActiveCards.Add(new(variant)
+        {
+            remainingDuration = duration * 1000f
+        });
+    }
+
+    private void UpdateActiveCards(float passedTime)
+    {
+        List<Cards> toDelete = [];
+        Dictionary<Cards, float> toSend = [];
+        NetDataWriter writer = new();
+        writer.Put("ActiveCards");
+        foreach (Cards card in ActiveCards)
+        {
+            card.remainingDuration -= passedTime;
+            if (card.remainingDuration <= 0)
+            {
+                toDelete.Add(card);
+            }
+            else
+            {
+                toSend.Add(card, card.remainingDuration);
+                CardAbilities.HandleActivationEffect(card, passedTime);
+            }
+        }
+        writer.Put(toSend.Count);
+        foreach (var pair in toSend)
+        {
+            writer.Put(pair.Key.Variant.ToString());
+            writer.Put(pair.Value);
+        }
+        server.ConnectedPeerList.ForEach(client => client.Send(writer, DeliveryMethod.ReliableOrdered));
+        bool success = toDelete.All(ActiveCards.Remove);
+    }
+
     /// <summary>
     /// Handles the attack from one player to another.
     /// Checks if the attack hits a ship and updates the game state accordingly.
@@ -345,42 +391,49 @@ public class GameState
         Console.WriteLine(
             $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
         );
-        
+
         var ships = GetShips(defender);
         bool hit = false;
         PlacedShip? hitShip = null;
-        
+
         foreach (var ship in ships)
         {
             if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
             {
                 hit = true;
                 hitShip = ship;
-                
+
                 bool newDamage = ship.DamageCell(x, y);
-                
+
                 if (newDamage)
                 {
                     Console.WriteLine($"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})");
-                    
+
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
+                        SendShipReveal(attacker, ship);
+                    }
+                    else
+                    {
+                        SendCellReveal(attacker, x, y, true);
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
+                    SendCellReveal(attacker, x, y, true);
                 }
                 break;
             }
         }
-        
+
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
+            SendCellReveal(attacker, x, y, false);
         }
-        
+
         /// <summary>
         /// Sends the result of the attack to both players.
         /// /// </summary>
@@ -391,11 +444,44 @@ public class GameState
         /// <param name="hit">Whether the attack hit a ship</param>
         /// <param name="shipDestroyed">Whether the ship was destroyed</param>
         SendAttackResult(attacker, defender, x, y, hit, hitShip?.IsDestroyed ?? false);
-        
+
         if (hit && hitShip?.IsDestroyed == true)
         {
             CheckGameOver();
         }
+    }
+
+    /// <summary>
+    /// Reveals a specific cell to the attacker (hit or miss)
+    /// </summary>
+    /// <param name="attacker"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="isHit"></param>
+    private void SendCellReveal(NetPeer attacker, int x, int y, bool isHit)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("CellReveal");
+        writer.Put(x);
+        writer.Put(y);
+        writer.Put(isHit);
+        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
+
+        Console.WriteLine($"[Server] Cell reveal sent to {attacker}: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+    }
+
+
+    private void SendShipReveal(NetPeer attacker, PlacedShip ship)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("ShipReveal");
+        writer.Put(ship.X);
+        writer.Put(ship.Y);
+        writer.Put(ship.Width);
+        writer.Put(ship.Height);
+        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
+        
+        Console.WriteLine($"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height}");
     }
 
     /// <summary>
@@ -415,10 +501,10 @@ public class GameState
         writer.Put(y);
         writer.Put(hit);
         writer.Put(shipDestroyed);
-        
+
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
         defender.Send(writer, DeliveryMethod.ReliableOrdered);
-        
+
         Console.WriteLine($"[Server] Attack result sent: hit={hit}, destroyed={shipDestroyed}");
     }
 
@@ -506,5 +592,6 @@ public class GameState
                 timer.Dispose();
             }
         }, null, 5000, Timeout.Infinite); 
+
     }
 }

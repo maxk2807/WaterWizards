@@ -644,29 +644,85 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
 
-                case "OpponentShipSync":
+                // case "OpponentShipSync":
+                //     try
+                //     {
+                //         int oppCount = reader.GetInt();
+                //         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
+                //         if (opponentBoard == null)
+                //         {
+                //             Console.WriteLine(
+                //                 "[Client] Fehler: opponentBoard ist null bei OpponentShipSync."
+                //             );
+                //             break;
+                //         }
+                //         opponentBoard.Ships.Clear();
+                //         for (int i = 0; i < oppCount; i++)
+                //         {
+                //             int x = reader.GetInt();
+                //             int y = reader.GetInt();
+                //             int width = reader.GetInt();
+                //             int height = reader.GetInt();
+                //             int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
+                //             int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
+                //             int pixelWidth = width * opponentBoard.CellSize;
+                //             int pixelHeight = height * opponentBoard.CellSize;
+                //             opponentBoard.putShip(
+                //                 new GameShip(
+                //                     GameStateManager.Instance.GameScreen,
+                //                     pixelX,
+                //                     pixelY,
+                //                     ShipType.DEFAULT,
+                //                     pixelWidth,
+                //                     pixelHeight
+                //                 )
+                //             );
+                //         }
+                //     }
+                //     catch (Exception ex)
+                //     {
+                //         Console.WriteLine(
+                //             $"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}"
+                //         );
+                //     }
+                //
+                //    break;
+                case "CellReveal":
                     try
                     {
-                        int oppCount = reader.GetInt();
+                        int x = reader.GetInt();
+                        int y = reader.GetInt();
+                        bool isHit = reader.GetBool();
+
                         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-                        if (opponentBoard == null)
+                        if (opponentBoard != null)
                         {
-                            Console.WriteLine(
-                                "[Client] Fehler: opponentBoard ist null bei OpponentShipSync."
-                            );
-                            break;
+                            opponentBoard.SetCellState(x, y, isHit ? gamescreen.CellState.Hit : gamescreen.CellState.Miss);
+                            Console.WriteLine($"[Client] Cell revealed: ({x},{y}) = {(isHit ? "hit" : "miss")}");
                         }
-                        opponentBoard.Ships.Clear();
-                        for (int i = 0; i < oppCount; i++)
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Client] Error processing CellReveal: {ex.Message}");
+                    }
+                    break;
+
+                case "ShipReveal":
+                    try
+                    {
+                        int x = reader.GetInt();
+                        int y = reader.GetInt();
+                        int width = reader.GetInt();
+                        int height = reader.GetInt();
+                        
+                        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
+                        if (opponentBoard != null)
                         {
-                            int x = reader.GetInt();
-                            int y = reader.GetInt();
-                            int width = reader.GetInt();
-                            int height = reader.GetInt();
                             int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
                             int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
                             int pixelWidth = width * opponentBoard.CellSize;
                             int pixelHeight = height * opponentBoard.CellSize;
+                            
                             opponentBoard.putShip(
                                 new GameShip(
                                     GameStateManager.Instance.GameScreen,
@@ -677,15 +733,14 @@ public class ClientService(NetworkManager manager)
                                     pixelHeight
                                 )
                             );
+                            
+                            Console.WriteLine($"[Client] Ship revealed: ({x},{y}) size {width}x{height}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(
-                            $"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}"
-                        );
+                        Console.WriteLine($"[Client] Error processing ShipReveal: {ex.Message}");
                     }
-
                     break;
                 case "ShipPlacementError":
                     try
@@ -711,6 +766,32 @@ public class ClientService(NetworkManager manager)
                     {
                         Console.WriteLine(
                             $"[Client] Fehler beim Verarbeiten von ShipPlacementError: {ex.Message}"
+                        );
+                    }
+                    break;
+                case "ActiveCards":
+                    try
+                    {
+                        var activeCardsNum = reader.GetInt();
+                        List<Cards> activeCards = [];
+                        for (int i = 0; i < activeCardsNum; i++)
+                        {
+                            var variant = reader.GetString();
+                            var remainingDuration = reader.GetFloat();
+                            Cards card = new(Enum.Parse<CardVariant>(variant))
+                            {
+                                remainingDuration = remainingDuration
+                            };
+                            activeCards.Add(card);
+                            Console.WriteLine($"[Client] ActivateCard received: {variant}");
+                        }
+
+                        GameStateManager.Instance.GameScreen.activeCards!.UpdateActiveCards(activeCards);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ActiveCardsError: {ex.Message}"
                         );
                     }
                     break;
