@@ -648,49 +648,6 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
 
-                // case "OpponentShipSync":
-                //     try
-                //     {
-                //         int oppCount = reader.GetInt();
-                //         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-                //         if (opponentBoard == null)
-                //         {
-                //             Console.WriteLine(
-                //                 "[Client] Fehler: opponentBoard ist null bei OpponentShipSync."
-                //             );
-                //             break;
-                //         }
-                //         opponentBoard.Ships.Clear();
-                //         for (int i = 0; i < oppCount; i++)
-                //         {
-                //             int x = reader.GetInt();
-                //             int y = reader.GetInt();
-                //             int width = reader.GetInt();
-                //             int height = reader.GetInt();
-                //             int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-                //             int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-                //             int pixelWidth = width * opponentBoard.CellSize;
-                //             int pixelHeight = height * opponentBoard.CellSize;
-                //             opponentBoard.putShip(
-                //                 new GameShip(
-                //                     GameStateManager.Instance.GameScreen,
-                //                     pixelX,
-                //                     pixelY,
-                //                     ShipType.DEFAULT,
-                //                     pixelWidth,
-                //                     pixelHeight
-                //                 )
-                //             );
-                //         }
-                //     }
-                //     catch (Exception ex)
-                //     {
-                //         Console.WriteLine(
-                //             $"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}"
-                //         );
-                //     }
-                //
-                //    break;
                 case "CellReveal":
                     try
                     {

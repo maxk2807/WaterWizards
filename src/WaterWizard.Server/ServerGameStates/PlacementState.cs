@@ -89,28 +89,6 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
                         p.Send(shipWriter, DeliveryMethod.ReliableOrdered);
                     }
 
-                    //ToDO --> Auskommentiert
-                    // OpponentShipSync für gegnerische Schiffe
-                    // foreach (var p in peers)
-                    // {
-                    //     var opponent = peers.FirstOrDefault(peer2 => peer2 != p);
-                    //     if (opponent != null)
-                    //     {
-                    //         var oppShips = GameState!.GetShips(opponent);
-                    //         var oppWriter = new NetDataWriter();
-                    //         oppWriter.Put("OpponentShipSync");
-                    //         oppWriter.Put(oppShips.Count);
-                    //         foreach (var ship in oppShips)
-                    //         {
-                    //             oppWriter.Put(ship.X);
-                    //             oppWriter.Put(ship.Y);
-                    //             oppWriter.Put(ship.Width);
-                    //             oppWriter.Put(ship.Height);
-                    //         }
-                    //         p.Send(oppWriter, DeliveryMethod.ReliableOrdered);
-                    //     }
-                    // }
-                    // Bestehendes GameState-Objekt weitergeben!
                     manager.ChangeState(new InGameState(serverInstance, GameState!));
                 }
                 else
