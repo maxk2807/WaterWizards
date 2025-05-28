@@ -375,6 +375,7 @@ public class GameState
         }
         server.ConnectedPeerList.ForEach(client => client.Send(writer, DeliveryMethod.ReliableOrdered));
         bool success = toDelete.All(ActiveCards.Remove);
+    }
 
     /// <summary>
     /// Handles the attack from one player to another.
@@ -390,24 +391,24 @@ public class GameState
         Console.WriteLine(
             $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
         );
-        
+
         var ships = GetShips(defender);
         bool hit = false;
         PlacedShip? hitShip = null;
-        
+
         foreach (var ship in ships)
         {
             if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
             {
                 hit = true;
                 hitShip = ship;
-                
+
                 bool newDamage = ship.DamageCell(x, y);
-                
+
                 if (newDamage)
                 {
                     Console.WriteLine($"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})");
-                    
+
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
@@ -420,12 +421,12 @@ public class GameState
                 break;
             }
         }
-        
+
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
         }
-        
+
         /// <summary>
         /// Sends the result of the attack to both players.
         /// /// </summary>
@@ -436,7 +437,7 @@ public class GameState
         /// <param name="hit">Whether the attack hit a ship</param>
         /// <param name="shipDestroyed">Whether the ship was destroyed</param>
         SendAttackResult(attacker, defender, x, y, hit, hitShip?.IsDestroyed ?? false);
-        
+
         if (hit && hitShip?.IsDestroyed == true)
         {
             CheckGameOver();
