@@ -48,7 +48,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
                     + i * effectiveCardWidth;
 
             Cards[i].Draw(centralX + cardX, cardY, front);
-            
+
             DrawCardPreview(front, i, cardX, effectiveCardWidth);
         }
     }

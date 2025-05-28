@@ -29,12 +29,12 @@ public static class LobbyManager
     /// Logs all active lobbies.
     /// /// </summary>
     public static void LogAllLobbies()
+    {
+        foreach (var lobby in LobbyManager.GetAllLobbies())
         {
-            foreach (var lobby in LobbyManager.GetAllLobbies())
-            {
-                Console.WriteLine($"Lobby SessionId: {lobby.SessionId}");
-            }
+            Console.WriteLine($"Lobby SessionId: {lobby.SessionId}");
         }
+    }
 }
 
 public class Lobby
