@@ -402,4 +402,33 @@ public class GameScreen(
             Console.WriteLine($"[Client] CardBuy Failed. Type {type} unknown");
         }
     }
+
+    /// <summary>
+    /// Resets the GameScreen for a new game.
+    /// </summary>
+    public void ResetForNewGame()
+    {
+        playerBoard?.ClearBoard();
+        opponentBoard?.ClearBoard();
+
+        playerHand?.EmptyHand();
+        opponentHand?.EmptyHand();
+
+        activeCards?.UpdateActiveCards([]);
+
+        shipSizeLimitReached.Clear();
+
+        Console.WriteLine("[Client][GameScreen] Reset for new game completed");
+    }
+
+    /// <summary>
+    /// Resets the Boards of the GameScreen, clearing all ships and cell states.
+    /// </summary>
+    public void ResetBoards()
+    {
+        playerBoard?.ClearBoard();
+        opponentBoard?.ClearBoard();
+
+        Console.WriteLine("[Client][GameScreen] Boards reset");
+    }
 }

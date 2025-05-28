@@ -288,4 +288,11 @@ public class GameStateManager
         else
             return new Color(v, p, q, 255);
     }
+
+    public void ResetGame()
+    {
+        gameScreen?.ResetForNewGame();
+        
+        Console.WriteLine("[Client][GameStateManager] Game reset completed");
+    }
 }

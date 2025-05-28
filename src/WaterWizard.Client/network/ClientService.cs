@@ -528,6 +528,8 @@ public class ClientService(NetworkManager manager)
                         "Returning to lobby in 5 seconds..."
                     );
 
+                    GameStateManager.Instance.GameScreen?.ResetForNewGame();
+
                     var clientTimer = new System.Timers.Timer(5000);
                     clientTimer.Elapsed += (s, e) =>
                     {
@@ -537,6 +539,10 @@ public class ClientService(NetworkManager manager)
                         Console.WriteLine("[Client] Transitioned back to lobby after game over");
                     };
                     clientTimer.Start();
+                    break;
+                case "ResetGame":
+                    Console.WriteLine("[Client] Received game reset command from server");
+                    GameStateManager.Instance.ResetGame();
                     break;
                 case "ShipPosition":
                     try
