@@ -464,6 +464,10 @@ public class ClientService(NetworkManager manager)
                     if (!string.IsNullOrEmpty(receivedSessionId))
                         sessionId = new GameSessionId(receivedSessionId);
                     Console.WriteLine("[Client] Betrete die Lobby...");
+
+                    GameStateManager.Instance.ResetGame();
+
+
                     // Sende eigenen Namen an den Server
                     if (client != null && client.FirstPeer != null)
                     {
@@ -811,9 +815,14 @@ public class ClientService(NetworkManager manager)
                 string name = reader.GetString();
                 bool isReady = reader.GetBool();
                 ConnectedPlayers.Add(new Player(address) { Name = name, IsReady = isReady });
-                Console.WriteLine(
-                    $"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}"
-                );
+                Console.WriteLine($"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}");
+            }
+
+            if (ConnectedPlayers.Count == 0)
+            {
+                GameStateManager.Instance.ResetGame();
+                GameStateManager.Instance.SetStateToLobby();
+                Console.WriteLine($"[Client] 0 Spieler - GameScreen und Boards zurückgesetzt.");
             }
         }
         catch (Exception ex)
