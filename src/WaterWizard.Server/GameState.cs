@@ -412,11 +412,17 @@ public class GameState
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
+                        SendShipReveal(attacker, ship);
+                    }
+                    else
+                    {
+                        SendCellReveal(attacker, x, y, true);
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
+                    SendCellReveal(attacker, x, y, true);
                 }
                 break;
             }
@@ -425,6 +431,7 @@ public class GameState
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
+            SendCellReveal(attacker, x, y, false);
         }
 
         /// <summary>
@@ -445,6 +452,39 @@ public class GameState
     }
 
     /// <summary>
+    /// Reveals a specific cell to the attacker (hit or miss)
+    /// </summary>
+    /// <param name="attacker"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="isHit"></param>
+    private void SendCellReveal(NetPeer attacker, int x, int y, bool isHit)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("CellReveal");
+        writer.Put(x);
+        writer.Put(y);
+        writer.Put(isHit);
+        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
+
+        Console.WriteLine($"[Server] Cell reveal sent to {attacker}: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+    }
+
+
+    private void SendShipReveal(NetPeer attacker, PlacedShip ship)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("ShipReveal");
+        writer.Put(ship.X);
+        writer.Put(ship.Y);
+        writer.Put(ship.Width);
+        writer.Put(ship.Height);
+        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
+        
+        Console.WriteLine($"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height}");
+    }
+
+    /// <summary>
     /// Sends the result of an attack to both players.
     /// </summary>
     /// <param name="attacker">The player who initiated the attack</param>
@@ -461,10 +501,10 @@ public class GameState
         writer.Put(y);
         writer.Put(hit);
         writer.Put(shipDestroyed);
-        
+
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
         defender.Send(writer, DeliveryMethod.ReliableOrdered);
-        
+
         Console.WriteLine($"[Server] Attack result sent: hit={hit}, destroyed={shipDestroyed}");
     }
 

@@ -245,4 +245,12 @@ public class GameBoard
     /// <param name="X">X-Coordinate</param>
     /// <param name="Y">Y-Coordinate</param>
     public readonly record struct Point(int X, int Y);
+
+    public void SetCellState(int x, int y, CellState state)
+    {
+        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+        {
+            _gridStates[x, y] = state;
+        }
+    }
 }
