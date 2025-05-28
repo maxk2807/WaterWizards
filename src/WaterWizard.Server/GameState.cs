@@ -63,6 +63,8 @@ public class GameState
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
 
+    private Timer activationTimer;
+
     private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
 
     private bool IsPlacementPhase()
@@ -128,6 +130,12 @@ public class GameState
         Graveyard = [];
         this.server = server;
         this.manager = manager;
+
+        activationTimer = new Timer(
+            _ => UpdateActiveCards(500),
+            null,
+            0,
+            500);
     }
 
     /// <summary>
@@ -331,6 +339,44 @@ public class GameState
         }
     }
 
+    internal void CardActivation(CardVariant variant, int duration)
+    {
+        Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
+        ActiveCards.Add(new(variant)
+        {
+            remainingDuration = duration * 1000f
+        });
+    }
+
+    private void UpdateActiveCards(float passedTime)
+    {
+        List<Cards> toDelete = [];
+        Dictionary<Cards, float> toSend = [];
+        NetDataWriter writer = new();
+        writer.Put("ActiveCards");
+        foreach (Cards card in ActiveCards)
+        {
+            card.remainingDuration -= passedTime;
+            if (card.remainingDuration <= 0)
+            {
+                toDelete.Add(card);
+            }
+            else
+            {
+                toSend.Add(card, card.remainingDuration);
+                CardAbilities.HandleActivationEffect(card, passedTime);
+            }
+        }
+        writer.Put(toSend.Count);
+        foreach (var pair in toSend)
+        {
+            writer.Put(pair.Key.Variant.ToString());
+            writer.Put(pair.Value);
+        }
+        server.ConnectedPeerList.ForEach(client => client.Send(writer, DeliveryMethod.ReliableOrdered));
+        bool success = toDelete.All(ActiveCards.Remove);
+    }
+
     /// <summary>
     /// Handles the attack from one player to another.
     /// Checks if the attack hits a ship and updates the game state accordingly.
@@ -345,24 +391,24 @@ public class GameState
         Console.WriteLine(
             $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
         );
-        
+
         var ships = GetShips(defender);
         bool hit = false;
         PlacedShip? hitShip = null;
-        
+
         foreach (var ship in ships)
         {
             if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
             {
                 hit = true;
                 hitShip = ship;
-                
+
                 bool newDamage = ship.DamageCell(x, y);
-                
+
                 if (newDamage)
                 {
                     Console.WriteLine($"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})");
-                    
+
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
@@ -375,12 +421,12 @@ public class GameState
                 break;
             }
         }
-        
+
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
         }
-        
+
         /// <summary>
         /// Sends the result of the attack to both players.
         /// /// </summary>
@@ -391,7 +437,7 @@ public class GameState
         /// <param name="hit">Whether the attack hit a ship</param>
         /// <param name="shipDestroyed">Whether the ship was destroyed</param>
         SendAttackResult(attacker, defender, x, y, hit, hitShip?.IsDestroyed ?? false);
-        
+
         if (hit && hitShip?.IsDestroyed == true)
         {
             CheckGameOver();
@@ -506,5 +552,6 @@ public class GameState
                 timer.Dispose();
             }
         }, null, 5000, Timeout.Infinite); 
+
     }
 }

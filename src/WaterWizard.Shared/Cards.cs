@@ -37,6 +37,7 @@ public class Cards
     /// Die Dauer (in Sekunden, „instant“ oder „permanent“) des Karteneffekts.
     /// </summary>
     public string? Duration { get; private set; }
+    public float remainingDuration = 0;
 
     /// <summary>
     /// Gibt an, welches Ziel die Karte betrifft (z. B. „1x1“, „ship“, „battlefield“).

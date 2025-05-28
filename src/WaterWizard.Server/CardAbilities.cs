@@ -24,6 +24,41 @@ public static class CardAbilities
                 PrintCardArea(variant, targetCoords, gameState, defender);
                 break;
         }
+        var durationString = new Cards(variant).Duration!;
+        switch (durationString)
+        {
+            case "instant":
+                break;
+            case "permanent":
+                Console.WriteLine($"[Server] Activated Card: {variant}");
+                break;
+            default:
+                try
+                {
+                    int duration = int.Parse(durationString);
+                    gameState.CardActivation(variant, duration);
+                    Console.WriteLine($"[Server] Activated Card: {variant}");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw;
+                }
+        }
+    }
+
+    /// <summary>
+    /// Handles permanent or over time effects of Cards. For consistent results, the degree of effect is dependant on 
+    /// the time passed, i.e. for over time effects, if 1% of the total duration passed, the effect is 1% whatever 
+    /// effect the Card has.
+    /// </summary>
+    /// <param name="card">The Card whose effect gets activated</param>
+    /// <param name="passedTime">The time since last activation of the card. 0 if first time. Direct relationship 
+    /// between degree of effect and passed time needs to be implemented.</param>
+    internal static void HandleActivationEffect(Cards card, float passedTime)
+    {
+        Console.WriteLine($"[Server] Effect of Card {card.Variant} got activated. {passedTime} since last activation");
     }
 
     private static void PrintCardArea(
