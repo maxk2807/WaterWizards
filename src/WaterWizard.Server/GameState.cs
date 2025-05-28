@@ -6,8 +6,6 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
-
-
 /// <summary>
 /// Represents the true Gamestate of the Game as it is on the Server.
 /// Includes:
@@ -131,11 +129,7 @@ public class GameState
         this.server = server;
         this.manager = manager;
 
-        activationTimer = new Timer(
-            _ => UpdateActiveCards(500),
-            null,
-            0,
-            500);
+        activationTimer = new Timer(_ => UpdateActiveCards(500), null, 0, 500);
     }
 
     /// <summary>
@@ -342,10 +336,7 @@ public class GameState
     internal void CardActivation(CardVariant variant, int duration)
     {
         Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
-        ActiveCards.Add(new(variant)
-        {
-            remainingDuration = duration * 1000f
-        });
+        ActiveCards.Add(new(variant) { remainingDuration = duration * 1000f });
     }
 
     private void UpdateActiveCards(float passedTime)
@@ -373,7 +364,9 @@ public class GameState
             writer.Put(pair.Key.Variant.ToString());
             writer.Put(pair.Value);
         }
-        server.ConnectedPeerList.ForEach(client => client.Send(writer, DeliveryMethod.ReliableOrdered));
+        server.ConnectedPeerList.ForEach(client =>
+            client.Send(writer, DeliveryMethod.ReliableOrdered)
+        );
         bool success = toDelete.All(ActiveCards.Remove);
     }
 
@@ -407,7 +400,9 @@ public class GameState
 
                 if (newDamage)
                 {
-                    Console.WriteLine($"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})");
+                    Console.WriteLine(
+                        $"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})"
+                    );
 
                     if (ship.IsDestroyed)
                     {
@@ -467,9 +462,10 @@ public class GameState
         writer.Put(isHit);
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
 
-        Console.WriteLine($"[Server] Cell reveal sent to {attacker}: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+        Console.WriteLine(
+            $"[Server] Cell reveal sent to {attacker}: ({x},{y}) = {(isHit ? "hit" : "miss")}"
+        );
     }
-
 
     private void SendShipReveal(NetPeer attacker, PlacedShip ship)
     {
@@ -480,8 +476,10 @@ public class GameState
         writer.Put(ship.Width);
         writer.Put(ship.Height);
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
-        
-        Console.WriteLine($"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height}");
+
+        Console.WriteLine(
+            $"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height}"
+        );
     }
 
     /// <summary>
@@ -493,7 +491,14 @@ public class GameState
     /// <param name="y">The y-coordinate of the attack</param>
     /// <param name="hit">Whether the attack hit a ship</param>
     /// <param name="shipDestroyed">Whether the ship was destroyed</param>
-    private void SendAttackResult(NetPeer attacker, NetPeer defender, int x, int y, bool hit, bool shipDestroyed)
+    private void SendAttackResult(
+        NetPeer attacker,
+        NetPeer defender,
+        int x,
+        int y,
+        bool hit,
+        bool shipDestroyed
+    )
     {
         var writer = new NetDataWriter();
         writer.Put("AttackResult");
@@ -546,52 +551,56 @@ public class GameState
     {
         var writer = new NetDataWriter();
         writer.Put("GameOver");
-        writer.Put("Winner"); 
-        
+        writer.Put("Winner");
+
         foreach (var peer in server.ConnectedPeerList)
         {
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-        
-        Console.WriteLine($"[Server] Game Over! Winner: {winner}, Loser: {loser}");
-        
-        var gameOverTimer = new Timer(_ =>
-        {
-            Console.WriteLine("[Server] Transitioning back to lobby after game over...");
-            manager.ChangeState(new LobbyState(server));
-            
-            foreach (var playerKey in Program.ConnectedPlayers.Keys.ToList())
-            {
-                Program.ConnectedPlayers[playerKey] = false;
-            }
-            Program.PlacementReadyPlayers.Clear();
-            
-            playerShips.Clear();
-            Console.WriteLine("[Server] Ship placements cleared for next game.");
-            
-            var playerListWriter = new NetDataWriter();
-            playerListWriter.Put("PlayerList");
-            playerListWriter.Put(Program.ConnectedPlayers.Count);
-            foreach (var kvp in Program.ConnectedPlayers)
-            {
-                string playerName = Program.PlayerNames.GetValueOrDefault(kvp.Key, "Unknown");
-                playerListWriter.Put(kvp.Key);
-                playerListWriter.Put(playerName);
-                playerListWriter.Put(kvp.Value);
-            }
-            
-            foreach (var peer in server.ConnectedPeerList)
-            {
-                peer.Send(playerListWriter, DeliveryMethod.ReliableOrdered);
-            }
-            
-            Console.WriteLine("[Server] Players reset to not ready, returned to lobby.");
-            
-            if (_ is Timer timer)
-            {
-                timer.Dispose();
-            }
-        }, null, 5000, Timeout.Infinite); 
 
+        Console.WriteLine($"[Server] Game Over! Winner: {winner}, Loser: {loser}");
+
+        var gameOverTimer = new Timer(
+            _ =>
+            {
+                Console.WriteLine("[Server] Transitioning back to lobby after game over...");
+                manager.ChangeState(new LobbyState(server));
+
+                foreach (var playerKey in Program.ConnectedPlayers.Keys.ToList())
+                {
+                    Program.ConnectedPlayers[playerKey] = false;
+                }
+                Program.PlacementReadyPlayers.Clear();
+
+                playerShips.Clear();
+                Console.WriteLine("[Server] Ship placements cleared for next game.");
+
+                var playerListWriter = new NetDataWriter();
+                playerListWriter.Put("PlayerList");
+                playerListWriter.Put(Program.ConnectedPlayers.Count);
+                foreach (var kvp in Program.ConnectedPlayers)
+                {
+                    string playerName = Program.PlayerNames.GetValueOrDefault(kvp.Key, "Unknown");
+                    playerListWriter.Put(kvp.Key);
+                    playerListWriter.Put(playerName);
+                    playerListWriter.Put(kvp.Value);
+                }
+
+                foreach (var peer in server.ConnectedPeerList)
+                {
+                    peer.Send(playerListWriter, DeliveryMethod.ReliableOrdered);
+                }
+
+                Console.WriteLine("[Server] Players reset to not ready, returned to lobby.");
+
+                if (_ is Timer timer)
+                {
+                    timer.Dispose();
+                }
+            },
+            null,
+            5000,
+            Timeout.Infinite
+        );
     }
 }

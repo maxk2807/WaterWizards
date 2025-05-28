@@ -522,10 +522,12 @@ public class ClientService(NetworkManager manager)
                 case "GameOver":
                     string result = reader.GetString();
                     Console.WriteLine($"[Client] Game Over: {result}");
-                    
+
                     GameStateManager.Instance.ChatLog.AddMessage($"Game Over: {result}");
-                    GameStateManager.Instance.ChatLog.AddMessage("Returning to lobby in 5 seconds...");
-                    
+                    GameStateManager.Instance.ChatLog.AddMessage(
+                        "Returning to lobby in 5 seconds..."
+                    );
+
                     var clientTimer = new System.Timers.Timer(5000);
                     clientTimer.Elapsed += (s, e) =>
                     {
@@ -551,7 +553,9 @@ public class ClientService(NetworkManager manager)
                         int y = reader.GetInt();
                         int width = reader.GetInt();
                         int height = reader.GetInt();
-                        Console.WriteLine($"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}");
+                        Console.WriteLine(
+                            $"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}"
+                        );
                         int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
                         int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
                         int pixelWidth = width * playerBoard.CellSize;
@@ -639,8 +643,8 @@ public class ClientService(NetworkManager manager)
                         );
                         GameStateManager.Instance.SetStateToInGame();
                         Console.WriteLine(
-                                $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
-                            );
+                            $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+                        );
                     }
                     catch (Exception ex)
                     {
@@ -650,49 +654,6 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
 
-                // case "OpponentShipSync":
-                //     try
-                //     {
-                //         int oppCount = reader.GetInt();
-                //         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-                //         if (opponentBoard == null)
-                //         {
-                //             Console.WriteLine(
-                //                 "[Client] Fehler: opponentBoard ist null bei OpponentShipSync."
-                //             );
-                //             break;
-                //         }
-                //         opponentBoard.Ships.Clear();
-                //         for (int i = 0; i < oppCount; i++)
-                //         {
-                //             int x = reader.GetInt();
-                //             int y = reader.GetInt();
-                //             int width = reader.GetInt();
-                //             int height = reader.GetInt();
-                //             int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-                //             int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-                //             int pixelWidth = width * opponentBoard.CellSize;
-                //             int pixelHeight = height * opponentBoard.CellSize;
-                //             opponentBoard.putShip(
-                //                 new GameShip(
-                //                     GameStateManager.Instance.GameScreen,
-                //                     pixelX,
-                //                     pixelY,
-                //                     ShipType.DEFAULT,
-                //                     pixelWidth,
-                //                     pixelHeight
-                //                 )
-                //             );
-                //         }
-                //     }
-                //     catch (Exception ex)
-                //     {
-                //         Console.WriteLine(
-                //             $"[Client] Fehler beim Verarbeiten von OpponentShipSync: {ex.Message}"
-                //         );
-                //     }
-                //
-                //    break;
                 case "CellReveal":
                     try
                     {
@@ -703,8 +664,14 @@ public class ClientService(NetworkManager manager)
                         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
                         if (opponentBoard != null)
                         {
-                            opponentBoard.SetCellState(x, y, isHit ? gamescreen.CellState.Hit : gamescreen.CellState.Miss);
-                            Console.WriteLine($"[Client] Cell revealed: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+                            opponentBoard.SetCellState(
+                                x,
+                                y,
+                                isHit ? gamescreen.CellState.Hit : gamescreen.CellState.Miss
+                            );
+                            Console.WriteLine(
+                                $"[Client] Cell revealed: ({x},{y}) = {(isHit ? "hit" : "miss")}"
+                            );
                         }
                     }
                     catch (Exception ex)
@@ -720,7 +687,7 @@ public class ClientService(NetworkManager manager)
                         int y = reader.GetInt();
                         int width = reader.GetInt();
                         int height = reader.GetInt();
-                        
+
                         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
                         if (opponentBoard != null)
                         {
@@ -728,7 +695,7 @@ public class ClientService(NetworkManager manager)
                             int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
                             int pixelWidth = width * opponentBoard.CellSize;
                             int pixelHeight = height * opponentBoard.CellSize;
-                            
+
                             opponentBoard.putShip(
                                 new GameShip(
                                     GameStateManager.Instance.GameScreen,
@@ -739,8 +706,10 @@ public class ClientService(NetworkManager manager)
                                     pixelHeight
                                 )
                             );
-                            
-                            Console.WriteLine($"[Client] Ship revealed: ({x},{y}) size {width}x{height}");
+
+                            Console.WriteLine(
+                                $"[Client] Ship revealed: ({x},{y}) size {width}x{height}"
+                            );
                         }
                     }
                     catch (Exception ex)
@@ -786,13 +755,15 @@ public class ClientService(NetworkManager manager)
                             var remainingDuration = reader.GetFloat();
                             Cards card = new(Enum.Parse<CardVariant>(variant))
                             {
-                                remainingDuration = remainingDuration
+                                remainingDuration = remainingDuration,
                             };
                             activeCards.Add(card);
                             Console.WriteLine($"[Client] ActivateCard received: {variant}");
                         }
 
-                        GameStateManager.Instance.GameScreen.activeCards!.UpdateActiveCards(activeCards);
+                        GameStateManager.Instance.GameScreen.activeCards!.UpdateActiveCards(
+                            activeCards
+                        );
                     }
                     catch (Exception ex)
                     {
