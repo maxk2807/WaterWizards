@@ -123,6 +123,12 @@ public class ClientService(NetworkManager manager)
 
             client.SendUnconnectedMessage(
                 req,
+                new IPEndPoint(IPAddress.Parse("91.99.94.11"), manager.hostPort)
+            );
+            Console.WriteLine("[Client] Discovery request sent to 91.99.94.11");
+
+            client.SendUnconnectedMessage(
+                req,
                 new IPEndPoint(IPAddress.Loopback, manager.hostPort)
             );
             Console.WriteLine("[Client] Discovery request sent to localhost");
