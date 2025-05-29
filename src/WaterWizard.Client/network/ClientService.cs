@@ -464,6 +464,10 @@ public class ClientService(NetworkManager manager)
                     if (!string.IsNullOrEmpty(receivedSessionId))
                         sessionId = new GameSessionId(receivedSessionId);
                     Console.WriteLine("[Client] Betrete die Lobby...");
+
+                    GameStateManager.Instance.ResetGame();
+
+
                     // Sende eigenen Namen an den Server
                     if (client != null && client.FirstPeer != null)
                     {
@@ -528,6 +532,8 @@ public class ClientService(NetworkManager manager)
                         "Returning to lobby in 5 seconds..."
                     );
 
+                    GameStateManager.Instance.GameScreen?.ResetForNewGame();
+
                     var clientTimer = new System.Timers.Timer(5000);
                     clientTimer.Elapsed += (s, e) =>
                     {
@@ -537,6 +543,10 @@ public class ClientService(NetworkManager manager)
                         Console.WriteLine("[Client] Transitioned back to lobby after game over");
                     };
                     clientTimer.Start();
+                    break;
+                case "ResetGame":
+                    Console.WriteLine("[Client] Received game reset command from server");
+                    GameStateManager.Instance.ResetGame();
                     break;
                 case "ShipPosition":
                     try
@@ -805,9 +815,14 @@ public class ClientService(NetworkManager manager)
                 string name = reader.GetString();
                 bool isReady = reader.GetBool();
                 ConnectedPlayers.Add(new Player(address) { Name = name, IsReady = isReady });
-                Console.WriteLine(
-                    $"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}"
-                );
+                Console.WriteLine($"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}");
+            }
+
+            if (ConnectedPlayers.Count == 0)
+            {
+                GameStateManager.Instance.ResetGame();
+                GameStateManager.Instance.SetStateToLobby();
+                Console.WriteLine($"[Client] 0 Spieler - GameScreen und Boards zurückgesetzt.");
             }
         }
         catch (Exception ex)

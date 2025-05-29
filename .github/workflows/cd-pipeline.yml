@@ -26,10 +26,16 @@ jobs:
         run: ./build.sh Clean Compile Test
 
       - name: Publish Client (Windows)
-        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-client
+
+      - name: Publish Server (Windows)
+        run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-server
 
       - name: Publish Client (MacOS)
-        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx-client
+
+      - name: Publish Server (MacOS)
+        run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx-server
 
       - name: Prepare release assets
         run: |

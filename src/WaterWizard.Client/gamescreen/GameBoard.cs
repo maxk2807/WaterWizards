@@ -253,4 +253,37 @@ public class GameBoard
             _gridStates[x, y] = state;
         }
     }
+
+    /// <summary>
+    /// Clears the game board, removing all ships and resetting cell states to Unknown.
+    /// </summary>
+    public void ClearBoard()
+    {
+        Ships.Clear();
+        for (int x = 0; x < GridWidth; x++)
+        {
+            for (int y = 0; y < GridHeight; y++)
+            {
+                _gridStates[x, y] = CellState.Unknown;
+            }
+        }
+        aiming = false;
+        cardToAim = null;
+
+        Console.WriteLine("[Client][GameBoard]GameBoard cleared.");
+    }
+
+    /// <summary>
+    /// Resets the cell states to Unknown without clearing the ships.
+    /// </summary>
+    public void ResetCellStates()
+    {
+        for (int x = 0; x < GridWidth; x++)
+        {
+            for (int y = 0; y < GridHeight; y++)
+            {
+                _gridStates[x, y] = CellState.Unknown;
+            }
+        }
+    }
 }
