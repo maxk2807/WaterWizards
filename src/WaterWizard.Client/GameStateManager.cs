@@ -298,6 +298,11 @@ public class GameStateManager
         gameTimer.Reset();
     }
 
+    /// <summary>
+    /// Sets the game state to Game Over.
+    /// </summary>
+    /// <param name="isWinner">True if the current player won the game, false if they lost.</param>
+    /// <param name="winnerMessage">Optional message to display on the game over screen providing additional context about the game result.</param>
     public void SetStateToGameOver(bool isWinner, string winnerMessage = "")
     {
         currentState = new GameOverState(isWinner, winnerMessage);

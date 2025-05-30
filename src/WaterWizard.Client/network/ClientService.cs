@@ -526,7 +526,7 @@ public class ClientService(NetworkManager manager)
                 case "GameOver":
                     try
                     {
-                        manager.HandleGameOverMessage(reader);
+                        NetworkManager.HandleGameOverMessage(reader);
                     }
                     catch (Exception ex)
                     {
