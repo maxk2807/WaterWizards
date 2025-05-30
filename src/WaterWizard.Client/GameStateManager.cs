@@ -294,8 +294,13 @@ public class GameStateManager
     /// </summary>
     public void ResetGame()
     {
-        gameScreen?.ResetForNewGame();
+        GameScreen?.ResetForNewGame();
+        gameTimer.Reset();
+    }
 
-        Console.WriteLine("[Client][GameStateManager] Game reset completed");
+    public void SetStateToGameOver(bool isWinner, string winnerMessage = "")
+    {
+        currentState = new GameOverState(isWinner, winnerMessage);
+        gameTimer.Pause();
     }
 }

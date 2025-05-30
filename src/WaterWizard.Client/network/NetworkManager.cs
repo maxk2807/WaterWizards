@@ -163,4 +163,20 @@ public class NetworkManager
     {
         clientService.SendPlacementReady();
     }
+
+    public void HandleGameOverMessage(NetPacketReader reader)
+    {
+        string result = reader.GetString();
+        bool isWinner = DetermineIfPlayerIsWinner(result);
+        string winnerMessage = isWinner ? "Congratulations! You won!" : "Better luck next time!";
+
+        GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
+    }
+
+    private bool DetermineIfPlayerIsWinner(string result)
+    {
+        // You'll need to implement this based on how your server sends the result
+        // For now, this is a placeholder
+        return result.Contains("win") || result.Contains("victory");
+    }
 }

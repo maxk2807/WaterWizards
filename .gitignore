@@ -6,3 +6,4 @@ obj
 .env
 .vs
 .nuke/temp/
+.vscode

@@ -5,7 +5,7 @@ namespace WaterWizard.Client.gamestates;
 public class InGameState : IGameState
 {
     public void UpdateAndDraw(GameStateManager manager)
-    {
+    {       
         if (manager.GetGamePauseManager().IsGamePaused)
         {
             Raylib.DrawRectangle(
@@ -31,7 +31,7 @@ public class InGameState : IGameState
         }
     }
 
-    private void DrawGameScreen(GameStateManager manager)
+    private static void DrawGameScreen(GameStateManager manager)
     {
         manager.GameScreen.Draw(manager.screenWidth, manager.screenHeight);
     }
