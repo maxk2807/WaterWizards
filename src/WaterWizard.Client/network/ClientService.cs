@@ -524,25 +524,14 @@ public class ClientService(NetworkManager manager)
                     GameStateManager.Instance.SetStateToPlacementPhase();
                     break;
                 case "GameOver":
-                    string result = reader.GetString();
-                    Console.WriteLine($"[Client] Game Over: {result}");
-
-                    GameStateManager.Instance.ChatLog.AddMessage($"Game Over: {result}");
-                    GameStateManager.Instance.ChatLog.AddMessage(
-                        "Returning to lobby in 5 seconds..."
-                    );
-
-                    GameStateManager.Instance.GameScreen?.ResetForNewGame();
-
-                    var clientTimer = new System.Timers.Timer(5000);
-                    clientTimer.Elapsed += (s, e) =>
+                    try
                     {
-                        clientTimer.Stop();
-                        clientTimer.Dispose();
-                        GameStateManager.Instance.SetStateToLobby();
-                        Console.WriteLine("[Client] Transitioned back to lobby after game over");
-                    };
-                    clientTimer.Start();
+                        NetworkManager.HandleGameOverMessage(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Client] Error handling game over: {ex.Message}");
+                    }
                     break;
                 case "ResetGame":
                     Console.WriteLine("[Client] Received game reset command from server");

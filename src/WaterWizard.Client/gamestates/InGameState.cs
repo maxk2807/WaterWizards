@@ -4,6 +4,10 @@ namespace WaterWizard.Client.gamestates;
 
 public class InGameState : IGameState
 {
+    /// <summary>
+    /// Updates the game state and draws the game screen or pause overlay based on the game pause status.
+    /// </summary>
+    /// <param name="manager">The GameStateManager instance that provides access to game components, screen dimensions, pause state, and rendering systems.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         if (manager.GetGamePauseManager().IsGamePaused)
@@ -31,7 +35,11 @@ public class InGameState : IGameState
         }
     }
 
-    private void DrawGameScreen(GameStateManager manager)
+    /// <summary>
+    /// Draws the game screen, including the game state and any relevant UI elements.
+    /// </summary>
+    /// <param name="manager">The GameStateManager instance that provides access to game components, screen dimensions, pause state, and rendering systems.</param>
+    private static void DrawGameScreen(GameStateManager manager)
     {
         manager.GameScreen.Draw(manager.screenWidth, manager.screenHeight);
     }

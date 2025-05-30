@@ -163,4 +163,29 @@ public class NetworkManager
     {
         clientService.SendPlacementReady();
     }
+
+    /// <summary>
+    /// Handles the game over message received from the server.
+    /// </summary>
+    /// <param name="reader">A NetPacketReader containing the serialized game over data from the server. Contains a string indicating the game result</param>
+    public static void HandleGameOverMessage(NetPacketReader reader)
+    {
+        string result = reader.GetString();
+        bool isWinner = DetermineIfPlayerIsWinner(result);
+        string winnerMessage = isWinner ? "Congratulations! You won!" : "Better luck next time!";
+
+        GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
+    }
+
+    /// <summary>
+    /// Determines if the player is the winner based on the game result string.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns>The game result string received from the server containing winner information or game outcome details.</param>
+    /// <returns>True if the current player won the game, false otherwise.</returns>
+    private static bool DetermineIfPlayerIsWinner(string result)
+    {
+        // TODO: Add logic to determine who the winner is
+        return result.Contains("win") || result.Contains("victory");
+    }
 }
