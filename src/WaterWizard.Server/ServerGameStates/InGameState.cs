@@ -11,6 +11,8 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 {
     private readonly NetManager server = server;
     private readonly GameState gameState = gameState;
+    
+    private System.Timers.Timer? manaTimer;
 
     /// <summary>
     /// Wird beim Eintritt in die Spielphase aufgerufen.
@@ -26,12 +28,41 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         }
         //TODO: Gold und Mana Initialisieren
         //TODO: Auf Input von Clients warten?
+        // Mana-Timer starten
+        manaTimer = new System.Timers.Timer(10_000);
+        manaTimer.Elapsed += (sender, e) => UpdateMana();
+        manaTimer.AutoReset = true;
+        manaTimer.Start();
+    }
+
+
+
+    private void UpdateMana()
+    {
+        gameState.Player1Mana.Add(1);
+        gameState.Player2Mana.Add(1);
+
+        for (int i = 0; i < server.ConnectedPeersCount; i++)
+        {
+            var peer = server.ConnectedPeerList[i];
+            var writer = new NetDataWriter();
+            writer.Put("UpdateMana");
+            writer.Put(i); // Spielerindex
+            writer.Put(i == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana);
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+
+        Console.WriteLine($"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}");
     }
 
     /// <summary>
     /// Wird beim Verlassen des States aufgerufen (hier leer).
     /// </summary>
-    public void OnExit() { }
+    public void OnExit()
+    { 
+        manaTimer?.Stop();
+        manaTimer?.Dispose();
+    }
 
     /// <summary>
     /// Behandelt Netzwerkereignisse während der Spielphase.

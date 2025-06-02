@@ -82,7 +82,7 @@ public class Cards
         { CardVariant.SummonShip,    new CardStats { Mana = 10, CastTime = "4",      Duration = "permanent", Target = "ship" } },
         { CardVariant.Teleport,      new CardStats { Mana = 5, CastTime = "1",       Duration = "permanent", Target = "ship" } },
         { CardVariant.Paralize,      new CardStats { Mana = 4, CastTime = "instant", Duration = "2",         Target = "ship" } },
-        { CardVariant.ConeOfCold,   new CardStats { Mana = 5, CastTime = "2",       Duration = "5",         Target = "3x3" } },
+        { CardVariant.ConeOfCold,    new CardStats { Mana = 5, CastTime = "2",       Duration = "5",         Target = "3x3" } },
         { CardVariant.MinorIllusion, new CardStats { Mana = 3, CastTime = "instant", Duration = "10",        Target = "1x1" } },
         { CardVariant.Polymorph,     new CardStats { Mana = 3, CastTime = "3",       Duration = "permanent", Target = "ship" } },
 

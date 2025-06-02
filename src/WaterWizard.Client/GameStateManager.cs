@@ -25,6 +25,41 @@ public class GameStateManager
     private readonly ChatLogManager _chatLogManager;
     public ChatLogManager ChatLog => _chatLogManager;
 
+    // ManaSync
+    private int player1Mana;
+    private int player2Mana;
+
+    public void SetMana(int playerIndex, int mana)
+    {
+        if (playerIndex == 0)
+            player1Mana = mana;
+        else if (playerIndex == 1)
+            player2Mana = mana;
+    }
+
+    public int GetMana(int playerIndex)
+    {
+        return playerIndex == 0 ? player1Mana : player2Mana;
+    }
+
+    // GoldSync
+    private int player1Gold;
+    private int player2Gold;
+
+    public void SetGold(int playerIndex, int gold)
+    {
+        if (playerIndex == 0)
+            player1Gold = gold;
+        else if (playerIndex == 1)
+            player2Gold = gold;
+    }
+
+    public int GetGold(int playerIndex)
+    {
+        return playerIndex == 0 ? player1Gold : player2Gold;
+    }
+
+
     private float titleAnimTime = 0;
     private float titleVerticalPosition = 0;
     private const float TITLE_ANIM_SPEED = 1.5f;

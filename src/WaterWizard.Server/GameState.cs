@@ -30,6 +30,26 @@ public class GameState
     public int Player1Gold { get; private set; } = 0;
     public int Player2Gold { get; private set; } = 0;
 
+    public void SetGold(int playerIndex, int amount)
+    {
+        if (playerIndex == 0)
+            Player1Gold = amount;
+        else if (playerIndex == 1)
+            Player2Gold = amount;
+    }
+
+
+// für HandleCardBuying() gut verwendbar
+    public void SyncGoldToClient(int playerIndex)
+    {
+        var peer = GetPlayer(playerIndex);
+        var writer = new NetDataWriter();
+        writer.Put("UpdateGold");
+        writer.Put(playerIndex);
+        writer.Put(playerIndex == 0 ? Player1Gold : Player2Gold);
+        peer.Send(writer, DeliveryMethod.ReliableOrdered);
+    }
+
     public GameState(NetManager server, ServerGameStateManager manager)
     {
         int connectedCount = server.ConnectedPeerList.Count;
