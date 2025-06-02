@@ -552,7 +552,7 @@ public class GameState
         // Send to winner
         var winnerWriter = new NetDataWriter();
         winnerWriter.Put("GameOver");
-        winnerWriter.Put("Victory"); // Clear indication this player won
+        winnerWriter.Put("Victory");
         winner.Send(winnerWriter, DeliveryMethod.ReliableOrdered);
 
         // Send to loser
