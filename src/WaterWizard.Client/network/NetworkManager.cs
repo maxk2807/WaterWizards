@@ -173,15 +173,9 @@ public class NetworkManager
         string result = reader.GetString();
         bool isWinner = DetermineIfPlayerIsWinner(result);
         
-        string winnerMessage;
-        if (isWinner)
-        {
-            winnerMessage = "Congratulations! You emerged victorious!";
-        }
-        else
-        {
-            winnerMessage = "You fought well, but victory slipped away. Better luck next time!";
-        }
+        string winnerMessage = isWinner
+            ? "Congratulations! You emerged victorious!"
+            : "You fought well, but victory slipped away. Better luck next time!";
 
         Console.WriteLine($"[Client] Game Over - Result: {result}, IsWinner: {isWinner}");
         GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
