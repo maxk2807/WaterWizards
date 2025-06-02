@@ -549,14 +549,17 @@ public class GameState
     /// <param name="loser">The losing player</param>
     private void BroadcastGameOver(NetPeer winner, NetPeer loser)
     {
-        var writer = new NetDataWriter();
-        writer.Put("GameOver");
-        writer.Put("Winner");
+        // Send to winner
+        var winnerWriter = new NetDataWriter();
+        winnerWriter.Put("GameOver");
+        winnerWriter.Put("Victory"); // Clear indication this player won
+        winner.Send(winnerWriter, DeliveryMethod.ReliableOrdered);
 
-        foreach (var peer in server.ConnectedPeerList)
-        {
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        }
+        // Send to loser
+        var loserWriter = new NetDataWriter();
+        loserWriter.Put("GameOver");
+        loserWriter.Put("Defeat");
+        loser.Send(loserWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine($"[Server] Game Over! Winner: {winner}, Loser: {loser}");
 
