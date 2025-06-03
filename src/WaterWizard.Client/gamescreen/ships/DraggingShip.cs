@@ -132,7 +132,7 @@ public class DraggingShip
     /// <para/>
     /// Checks if the placement of the ship is valid, i.e. not obstructed or out of bounds
     /// <para/>
-    /// Handles the placement of the ship //TODO: with the Confirm Mechanic
+    /// Handles the placement of the ship with the Confirm Mechanic
     /// </summary>
     private void HandleDragging()
     {
@@ -202,13 +202,13 @@ public class DraggingShip
 
     /// <summary>
     /// Handles the Confirm Mechanic of Ship Placement.
-    /// //TODO: Renders the Ship Outline and offers
+    /// Renders the Ship Outline and offers
     /// Buttons to rotate the ship as well as a Confirm button.
     /// Spawns the <see cref="GameShip"/> upon Confirming
     /// </summary>
     private void HandleConfirm()
     {
-        Raylib.DrawRectangleRec(DraggedShipRectangle, new(30, 200, 200));
+        Raylib.DrawRectangleRec(DraggedShipRectangle, validPlacement ? new(30, 200, 200) : new(255, 0, 0));
 
         var rotateX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2 - CellSize;
         var rotateY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
@@ -234,6 +234,7 @@ public class DraggingShip
             var prevHeight = DraggedShipRectangle.Height;
             DraggedShipRectangle.Width = prevHeight;
             DraggedShipRectangle.Height = prevWidth;
+            validPlacement = IsValid(DraggedShipRectangle);
         }
 
         var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
@@ -243,21 +244,24 @@ public class DraggingShip
             Raylib.GetMousePosition(),
             confirmButton
         );
-        Raylib.DrawRectangleRec(confirmButton, confirmHovered ? Color.LightGray : Color.Gray);
+        if (validPlacement)
+        {
+            Raylib.DrawRectangleRec(confirmButton, confirmHovered ? Color.LightGray : Color.Gray);
 
-        float confirIconScale = CellSize * 0.8f / confirmIcon.Height;
-        float confirmIconSize = confirmIcon.Height * confirIconScale;
-        int confirmIconX = (int)(confirmX + (CellSize - confirmIconSize) / 2f);
-        int confirmIconY = (int)(confirmY + (CellSize - confirmIconSize) / 2f);
-        Raylib.DrawTextureEx(
-            confirmIcon,
-            new(confirmIconX, confirmIconY),
-            0,
-            confirIconScale,
-            Color.White
-        );
+            float confirIconScale = CellSize * 0.8f / confirmIcon.Height;
+            float confirmIconSize = confirmIcon.Height * confirIconScale;
+            int confirmIconX = (int)(confirmX + (CellSize - confirmIconSize) / 2f);
+            int confirmIconY = (int)(confirmY + (CellSize - confirmIconSize) / 2f);
+            Raylib.DrawTextureEx(
+                confirmIcon,
+                new(confirmIconX, confirmIconY),
+                0,
+                confirIconScale,
+                Color.White
+            );
+        }
 
-        if (confirmHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        if (validPlacement && confirmHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
             SpawnShip(
                 (int)DraggedShipRectangle.X,
