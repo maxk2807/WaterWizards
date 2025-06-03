@@ -172,20 +172,41 @@ public class NetworkManager
     {
         string result = reader.GetString();
         bool isWinner = DetermineIfPlayerIsWinner(result);
-        string winnerMessage = isWinner ? "Congratulations! You won!" : "Better luck next time!";
+        
+        string winnerMessage = isWinner
+            ? "Congratulations! You emerged victorious!"
+            : "You fought well, but victory slipped away. Better luck next time!";
 
+        Console.WriteLine($"[Client] Game Over - Result: {result}, IsWinner: {isWinner}");
         GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
     }
 
     /// <summary>
     /// Determines if the player is the winner based on the game result string.
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns>The game result string received from the server containing winner information or game outcome details.</param>
+    /// <param name="result">The game result string received from the server containing winner information or game outcome details.</param>
     /// <returns>True if the current player won the game, false otherwise.</returns>
     private static bool DetermineIfPlayerIsWinner(string result)
     {
-        // TODO: Add logic to determine who the winner is
-        return result.Contains("win") || result.Contains("victory");
-    }
+        if (result.Equals("Victory", StringComparison.OrdinalIgnoreCase) ||
+            result.Contains("win", StringComparison.OrdinalIgnoreCase) ||
+            result.Contains("victory", StringComparison.OrdinalIgnoreCase) ||
+            result.Contains("won", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (result.Equals("Defeat", StringComparison.OrdinalIgnoreCase) ||
+            result.Contains("lose", StringComparison.OrdinalIgnoreCase) ||
+            result.Contains("lost", StringComparison.OrdinalIgnoreCase) ||
+            result.Contains("defeat", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        Console.WriteLine($"[Client] Unclear game result: {result}. Assuming defeat.");
+        return false;
+
+
+    }    
 }
