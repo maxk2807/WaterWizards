@@ -199,25 +199,6 @@ public class NetworkManager
                         // UpdatePlayerList();
                     }
                     break;
-                case "UpdateMana":
-                {
-                    int playerIndex = reader.GetInt();
-                    int mana = reader.GetInt();
-                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {mana} Mana.");
-
-                    GameStateManager.Instance.SetMana(playerIndex, mana);
-                    break;
-                }
-                case "UpdateGold":
-                {
-                    int playerIndex = reader.GetInt();
-                    int gold = reader.GetInt();
-                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {gold} Gold.");
-
-                    GameStateManager.Instance.SetGold(playerIndex, gold);
-                    // TODO: UI-Anzeige für Gold aktualisieren
-                    break;
-                }
                 default:
                     Console.WriteLine($"[Host] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
@@ -744,6 +725,26 @@ public class NetworkManager
                     string cardType = reader.GetString();
                     GameStateManager.Instance.GameScreen.HandleOpponentBoughtCard(cardType);
                     break;
+                case "UpdateMana":
+                {
+                    int playerIndex = reader.GetInt();
+                    int mana = reader.GetInt();
+                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {mana} Mana.");
+
+                    GameStateManager.Instance.SetMana(playerIndex, mana);
+                    GameStateManager.Instance.GameScreen.ressourceField!.ManaFieldUpdate();
+                    break;
+                }
+                case "UpdateGold":
+                {
+                    int playerIndex = reader.GetInt();
+                    int gold = reader.GetInt();
+                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {gold} Gold.");
+
+                    GameStateManager.Instance.SetGold(playerIndex, gold);
+                    // TODO: UI-Anzeige für Gold aktualisieren
+                    break;
+                }
                 default:
                     Console.WriteLine($"[Client] Unbekannter Nachrichtentyp empfangen: {messageType}");
                     break;
