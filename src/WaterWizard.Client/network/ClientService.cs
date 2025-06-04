@@ -771,6 +771,27 @@ public class ClientService(NetworkManager manager)
                         );
                     }
                     break;
+                case "UpdateMana":
+                {
+                    int playerIndex = reader.GetInt();
+                    int mana = reader.GetInt();
+                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {mana} Mana.");
+
+                    var ressourceField = GameStateManager.Instance.GameScreen.ressourceField!;
+                    ressourceField.SetMana(mana);
+                    ressourceField.ManaFieldUpdate();
+                    break;
+                }
+                case "UpdateGold":
+                {
+                    int playerIndex = reader.GetInt();
+                    int gold = reader.GetInt();
+                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {gold} Gold.");
+
+                    GameStateManager.Instance.SetGold(playerIndex, gold);
+                    // TODO: UI-Anzeige für Gold aktualisieren
+                    break;
+                }
             }
         }
         catch (Exception ex)

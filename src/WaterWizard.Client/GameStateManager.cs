@@ -31,22 +31,7 @@ public class GameStateManager
     private readonly ChatLogManager _chatLogManager;
     public ChatLogManager ChatLog => _chatLogManager;
 
-    // ManaSync
-    private int player1Mana;
-    private int player2Mana;
-
-    public void SetMana(int playerIndex, int mana)
-    {
-        if (playerIndex == 0)
-            player1Mana = mana;
-        else if (playerIndex == 1)
-            player2Mana = mana;
-    }
-
-    public int GetMana(int playerIndex)
-    {
-        return playerIndex == 0 ? player1Mana : player2Mana;
-    }
+    
 
     // GoldSync
     private int player1Gold = 0;

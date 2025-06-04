@@ -61,10 +61,47 @@ public class GameState
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
 
+    private Timer activationTimer;
+    private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
+
+    
     public Mana Player1Mana { get; private set; } = new();
     public Mana Player2Mana { get; private set; } = new();
     public int Player1Gold { get; private set; } = 0;
     public int Player2Gold { get; private set; } = 0;
+
+    private bool IsPlacementPhase()
+    {
+        return manager.CurrentState is PlacementState;
+    }
+
+    public void AddShip(NetPeer player, PlacedShip ship)
+    {
+        if (!playerShips.ContainsKey(player))
+            playerShips[player] = new List<PlacedShip>();
+        playerShips[player].Add(ship);
+    }
+
+    public IReadOnlyList<PlacedShip> GetShips(NetPeer player)
+    {
+        if (playerShips.TryGetValue(player, out var ships))
+            return ships;
+        return [];
+    }
+
+    public void PrintAllShips()
+    {
+        foreach (var kvp in playerShips)
+        {
+            Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
+            foreach (var ship in kvp.Value)
+            {
+                Console.WriteLine(
+                    $"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}"
+                );
+            }
+        }
+    }
 
     public void SetGold(int playerIndex, int amount)
     {

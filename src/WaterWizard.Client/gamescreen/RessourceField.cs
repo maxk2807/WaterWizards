@@ -45,9 +45,14 @@ public class RessourceField(GameScreen gameScreen)
 
         ManaRec = new(manaX, manaY, manaWidth, manaFontSize);
     }
+    
+    public void SetMana(int mana)
+    {
+        Mana = mana;
+    }
 
-    public void ManaFieldUpdate() {
-        Mana = GameStateManager.Instance.GetMana(0); // oder 1, je nach Kontext
+    public void ManaFieldUpdate()
+    {
         manaString = Mana.ToString() + " Mana";
 
         int manaFontSize = 30;
