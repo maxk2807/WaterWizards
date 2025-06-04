@@ -38,7 +38,12 @@ public class GameState
             Player2Gold = amount;
     }
 
-
+    /// <summary>
+    /// Returns the NetPeer instance for the given player index (0 or 1).
+    /// </summary>
+    /// <param name="index">The index of the player (0 = Player 1, 1 = Player 2).</param>
+    /// <returns>The NetPeer associated with the specified player index.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if no player is assigned at the given index.</exception>
     public NetPeer GetPlayer(int index)
     {
         if (index < 0 || index >= players.Length || players[index] == null)
