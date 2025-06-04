@@ -39,6 +39,14 @@ public class GameState
     }
 
 
+    public NetPeer GetPlayer(int index)
+    {
+        if (index < 0 || index >= players.Length || players[index] == null)
+            throw new InvalidOperationException($"No player at index {index}");
+
+        return players[index];
+    }
+
 // für HandleCardBuying() gut verwendbar
     public void SyncGoldToClient(int playerIndex)
     {
