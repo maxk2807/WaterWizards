@@ -52,7 +52,7 @@ public class GameState
         return players[index];
     }
 
-// für HandleCardBuying() gut verwendbar
+// TODO: für HandleCardBuying() gut verwendbar
     public void SyncGoldToClient(int playerIndex)
     {
         var peer = GetPlayer(playerIndex);
