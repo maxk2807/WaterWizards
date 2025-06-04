@@ -43,8 +43,8 @@ public class GameStateManager
     }
 
     // GoldSync
-    private int player1Gold;
-    private int player2Gold;
+    private int player1Gold = 0;
+    private int player2Gold = 0;
 
     public void SetGold(int playerIndex, int gold)
     {
@@ -179,7 +179,7 @@ public class GameStateManager
     }
 
     public void SetStateToMainMenu() => currentState = new MainMenuState();
-    public void SetStateToConnectingMenu() => currentState = new ConnectingMenuState();
+    public void SetStateToConnectingMenu() => currentState =  new ConnectingMenuState();
     public void SetStateToLobbyList()
     {
         currentState = new LobbyListMenuState();
