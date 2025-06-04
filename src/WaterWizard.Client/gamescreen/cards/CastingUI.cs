@@ -30,6 +30,21 @@ public class CastingUI
         Vector2 aim = gameCard.card.TargetAsVector();
         if ((int)aim.X == 0 && (int)aim.Y == 0)
         {
+            var txt = $"Click to cast {gameCard.card.Variant}";
+            var txtWidth = Raylib.MeasureText(txt, 20);
+            Raylib.DrawText(
+                txt,
+                (int)mousePos.X - (txtWidth / 2),
+                (int)mousePos.Y - 20,
+                20,
+                Color.Black
+            );
+            
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                aiming = false;
+                NetworkManager.Instance.HandleCast(cardToAim!.card, new());
+            }
         }
         else
         {
