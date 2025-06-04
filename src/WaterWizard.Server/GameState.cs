@@ -61,49 +61,44 @@ public class GameState
     public List<Cards> EnvironmentStack { get; private set; }
     public List<Cards> Graveyard { get; private set; }
 
-    private Timer activationTimer;
+    public Mana Player1Mana { get; private set; } = new();
+    public Mana Player2Mana { get; private set; } = new();
+    public int Player1Gold { get; private set; } = 0;
+    public int Player2Gold { get; private set; } = 0;
 
-    private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
-
-    private bool IsPlacementPhase()
+    public void SetGold(int playerIndex, int amount)
     {
-        return manager.CurrentState is PlacementState;
-    }
-
-    public void AddShip(NetPeer player, PlacedShip ship)
-    {
-        if (!playerShips.ContainsKey(player))
-            playerShips[player] = new List<PlacedShip>();
-        playerShips[player].Add(ship);
-    }
-
-    public IReadOnlyList<PlacedShip> GetShips(NetPeer player)
-    {
-        if (playerShips.TryGetValue(player, out var ships))
-            return ships;
-        return [];
-    }
-
-    public void PrintAllShips()
-    {
-        foreach (var kvp in playerShips)
-        {
-            Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
-            foreach (var ship in kvp.Value)
-            {
-                Console.WriteLine(
-                    $"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}"
-                );
-            }
-        }
+        if (playerIndex == 0)
+            Player1Gold = amount;
+        else if (playerIndex == 1)
+            Player2Gold = amount;
     }
 
     /// <summary>
-    /// A new Gamestate.
+    /// Returns the NetPeer instance for the given player index (0 or 1).
     /// </summary>
-    /// <param name="server">Corresponding NetManager server to access Clients (Players)</param>
-    /// <param name="manager">Corresponding <see cref="ServerGameStateManager"/></param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="index">The index of the player (0 = Player 1, 1 = Player 2).</param>
+    /// <returns>The NetPeer associated with the specified player index.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if no player is assigned at the given index.</exception>
+    public NetPeer GetPlayer(int index)
+    {
+        if (index < 0 || index >= players.Length || players[index] == null)
+            throw new InvalidOperationException($"No player at index {index}");
+
+        return players[index];
+    }
+
+// TODO: für HandleCardBuying() gut verwendbar
+    public void SyncGoldToClient(int playerIndex)
+    {
+        var peer = GetPlayer(playerIndex);
+        var writer = new NetDataWriter();
+        writer.Put("UpdateGold");
+        writer.Put(playerIndex);
+        writer.Put(playerIndex == 0 ? Player1Gold : Player2Gold);
+        peer.Send(writer, DeliveryMethod.ReliableOrdered);
+    }
+
     public GameState(NetManager server, ServerGameStateManager manager)
     {
         int connectedCount = server.ConnectedPeerList.Count;
