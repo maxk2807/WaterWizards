@@ -53,7 +53,7 @@ public class RessourceField(GameScreen gameScreen)
 
     public void ManaFieldUpdate()
     {
-        manaString = Mana.ToString() + " Mana";
+        manaString = Mana + " Mana";
 
         int manaFontSize = 30;
         int manaWidth = Raylib.MeasureText(manaString, manaFontSize);
