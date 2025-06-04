@@ -9,7 +9,7 @@ namespace WaterWizardTests
         public void Gold_InitialAmount_IsZero()
         {
             // Arrange & Act
-            var gold = new Coin();
+            var gold = new Gold();
 
             // Assert
             Assert.Equal(0, gold.Amount);
@@ -19,7 +19,7 @@ namespace WaterWizardTests
         public void Gold_Update_IncreasesAmountBasedOnMerchantShips()
         {
             // Arrange
-            var gold = new Coin();
+            var gold = new Gold();
 
             // Act
             gold.Update(2.0, 3); // 2 seconds elapsed, 3 merchant ships
@@ -32,7 +32,7 @@ namespace WaterWizardTests
         public void Gold_Update_DoesNotIncreaseAmountBeforeTickInterval()
         {
             // Arrange
-            var gold = new Coin();
+            var gold = new Gold();
 
             // Act
             gold.Update(1.0, 2); // Only 1 second elapsed, 2 merchant ships
@@ -45,7 +45,7 @@ namespace WaterWizardTests
         public void Gold_Spend_DecreasesAmount_WhenEnoughGold()
         {
             // Arrange
-            var gold = new Coin();
+            var gold = new Gold();
             gold.Update(2.0, 2); // Generate 3 gold (1 base + 2 from ships)
 
             // Act
@@ -60,7 +60,7 @@ namespace WaterWizardTests
         public void Gold_Spend_ReturnsFalse_WhenNotEnoughGold()
         {
             // Arrange
-            var gold = new Coin();
+            var gold = new Gold();
 
             // Act
             var result = gold.Spend(5);

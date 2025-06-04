@@ -12,6 +12,7 @@ static class Program
     public static readonly Dictionary<string, string> PlayerNames = [];
     private static GameSessionTimer? _gameSessionTimer;
 
+
     private static void Log(string message)
     {
         Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {message}");
