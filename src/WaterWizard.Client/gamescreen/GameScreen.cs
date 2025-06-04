@@ -272,6 +272,8 @@ public class GameScreen(
             NetworkManager.Instance.Shutdown();
             _gameStateManager.SetStateToMainMenu();
         }
+
+        CastingUI.Instance.Draw();
     }
 
     private void DrawRessourceField()
