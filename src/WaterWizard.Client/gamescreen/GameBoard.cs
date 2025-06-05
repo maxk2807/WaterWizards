@@ -2,22 +2,10 @@ using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
-using WaterWizard.Client.network;
-using WaterWizard.Shared;
+using WaterWizard.Client.Gamescreen;
 
 namespace WaterWizard.Client.gamescreen;
 
-/// <summary>
-/// CellState enum represents the possible states of a cell in the game board.
-/// </summary>
-public enum CellState
-{
-    Empty,
-    Ship,
-    Hit,
-    Miss,
-    Unknown,
-}
 
 /// <summary>
 /// GameBoard class represents the game board for the battleship game.
@@ -128,12 +116,11 @@ public class GameBoard
             {
                 int posX = (int)Position.X + x * CellSize;
                 int posY = (int)Position.Y + y * CellSize;
-
-                Color cellColor = GetColorForState(_gridStates[x, y]);
-                Raylib.DrawRectangle(posX, posY, CellSize, CellSize, cellColor);
-
-                Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, Color.DarkGray);
-
+                
+                Raylib.DrawRectangle(posX, posY, CellSize, CellSize, Color.SkyBlue);
+                
+                Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, Color.Gray);
+                
                 if (_gridStates[x, y] == CellState.Hit)
                 {
                     Raylib.DrawCircle(
@@ -154,6 +141,7 @@ public class GameBoard
                 }
             }
         }
+        
         foreach (GameShip ship in Ships)
         {
             ship.Draw();
@@ -224,6 +212,15 @@ public class GameBoard
             {
                 _gridStates[x, y] = CellState.Unknown;
             }
+        }
+    }
+
+    // Add method to mark cells as hit by enemy
+    public void MarkCellAsHit(int x, int y, bool wasHit)
+    {
+        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+        {
+            _gridStates[x, y] = wasHit ? CellState.Hit : CellState.Miss;
         }
     }
 }

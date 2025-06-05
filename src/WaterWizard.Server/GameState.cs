@@ -532,17 +532,25 @@ public class GameState
         bool shipDestroyed
     )
     {
-        var writer = new NetDataWriter();
-        writer.Put("AttackResult");
-        writer.Put(x);
-        writer.Put(y);
-        writer.Put(hit);
-        writer.Put(shipDestroyed);
+        var attackerWriter = new NetDataWriter();
+        attackerWriter.Put("AttackResult");
+        attackerWriter.Put(x);
+        attackerWriter.Put(y);
+        attackerWriter.Put(hit);
+        attackerWriter.Put(shipDestroyed);
+        attackerWriter.Put(false); 
+        attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
-        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
-        defender.Send(writer, DeliveryMethod.ReliableOrdered);
+        var defenderWriter = new NetDataWriter();
+        defenderWriter.Put("AttackResult");
+        defenderWriter.Put(x);
+        defenderWriter.Put(y);
+        defenderWriter.Put(hit);
+        defenderWriter.Put(shipDestroyed);
+        defenderWriter.Put(true); 
+        defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
-        Console.WriteLine($"[Server] Attack result sent: hit={hit}, destroyed={shipDestroyed}");
+        Console.WriteLine($"[Server] Attack result sent: attacker sees result, defender sees damage");
     }
 
     /// <summary>
