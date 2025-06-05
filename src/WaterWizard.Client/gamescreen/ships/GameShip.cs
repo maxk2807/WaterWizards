@@ -42,7 +42,7 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
             Raylib.DrawCircle(
                 pixelX + cellSize / 2,
                 pixelY + cellSize / 2,
-                cellSize / 4,
+                cellSize / 4f,
                 Color.Red
             );
         }
