@@ -1,7 +1,9 @@
 using System;
 using System.Numerics;
+using LiteNetLib;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen;
+using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
@@ -31,7 +33,7 @@ public class GameStateManager
     private readonly ChatLogManager _chatLogManager;
     public ChatLogManager ChatLog => _chatLogManager;
 
-    
+
 
     // GoldSync
     private int player1Gold = 0;

@@ -124,7 +124,7 @@ public class LobbyListMenuState : IGameState
         );
         if (hoverRefresh && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
-            NetworkManager.Instance.RefreshLobbies();
+            LobbyHandler.RefreshLobbies();
         }
         int manualBtnWidth = 300;
         Rectangle manualIpButton = new Rectangle(

@@ -10,8 +10,8 @@ namespace WaterWizard.Client.network;
 
 public class ClientService(NetworkManager manager)
 {
-    private NetManager? client;
-    private EventBasedNetListener? clientListener;
+    public NetManager? client;
+    public EventBasedNetListener? clientListener;
     private bool clientReady = false;
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
@@ -31,7 +31,8 @@ public class ClientService(NetworkManager manager)
             return;
         }
 
-        clientListener.NetworkReceiveUnconnectedEvent += HandleLobbyInfoResponse;
+        clientListener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader, messageType) =>
+            LobbyHandler.HandleLobbyInfoResponse(manager, remoteEndPoint, reader, messageType);
     }
 
     public void CleanupIfRunning()
@@ -61,105 +62,6 @@ public class ClientService(NetworkManager manager)
     public bool IsClientReady()
     {
         return clientReady;
-    }
-
-    private void HandleLobbyInfoResponse(
-        IPEndPoint remoteEndPoint,
-        NetPacketReader reader,
-        UnconnectedMessageType messageType
-    )
-    {
-        try
-        {
-            string msgType = reader.GetString();
-            if (msgType == "LobbyInfo")
-            {
-                string lobbyName = reader.GetString();
-                int playerCount = reader.GetInt();
-
-                Console.WriteLine(
-                    $"[Client] Lobby found: '{lobbyName}' with {playerCount} players at {remoteEndPoint}"
-                );
-
-                var existingLobby = manager.discoveredLobbies.FirstOrDefault(l =>
-                    l.IP == remoteEndPoint.ToString()
-                );
-                if (existingLobby != null)
-                {
-                    existingLobby.Name = lobbyName;
-                    existingLobby.PlayerCount = playerCount;
-                }
-                else
-                {
-                    manager.discoveredLobbies.Add(
-                        new LobbyInfo(remoteEndPoint.ToString(), lobbyName, playerCount)
-                    );
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Client] Error processing lobby info: {ex.Message}");
-        }
-    }
-
-    public void SendDiscoveryRequests()
-    {
-        if (client == null || !client.IsRunning)
-            return;
-
-        var req = new NetDataWriter();
-        req.Put("DiscoverLobbies");
-
-        client.SendBroadcast(req, manager.hostPort);
-
-        try
-        {
-            client.SendUnconnectedMessage(
-                req,
-                new IPEndPoint(IPAddress.Parse("208.77.246.27"), manager.hostPort)
-            );
-            Console.WriteLine("[Client] Discovery request sent to 208.77.246.27");
-
-            client.SendUnconnectedMessage(
-                req,
-                new IPEndPoint(IPAddress.Parse("91.99.94.11"), manager.hostPort)
-            );
-            Console.WriteLine("[Client] Discovery request sent to 91.99.94.11");
-
-            client.SendUnconnectedMessage(
-                req,
-                new IPEndPoint(IPAddress.Loopback, manager.hostPort)
-            );
-            Console.WriteLine("[Client] Discovery request sent to localhost");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Client] Error sending discovery requests: {ex.Message}");
-        }
-
-        Console.WriteLine("[Client] Lobby discovery requests sent");
-    }
-
-    /// <summary>
-    /// Refreshes the list of discovered lobbies.
-    /// </summary>
-    public void RefreshLobbies()
-    {
-        if (client != null && client.IsRunning)
-        {
-            SendDiscoveryRequests();
-            Console.WriteLine("[Client] Lobby-Liste aktualisiert");
-
-            if (manager.hostService.IsRunning())
-            {
-                manager.hostService.AddLocalLobbyToDiscoveredList();
-            }
-        }
-        else
-        {
-            manager.DiscoverLobbies();
-        }
     }
 
     public void ConnectToServer(string ip, int port = 7777)
@@ -293,7 +195,7 @@ public class ClientService(NetworkManager manager)
                         "3. Is port 7777 open in the server's firewall?"
                     );
 
-                    TryDirectConnection(cleanIp, connectionPort);
+                    LobbyHandler.TryDirectConnection(cleanIp, connectionPort);
                 }
                 else
                 {
@@ -316,7 +218,7 @@ public class ClientService(NetworkManager manager)
         }
     }
 
-    private void SetupClientEventHandlers()
+    public void SetupClientEventHandlers()
     {
         if (clientListener == null)
             return;
@@ -372,73 +274,6 @@ public class ClientService(NetworkManager manager)
         clientListener.NetworkReceiveEvent += HandleClientReceiveEvent;
     }
 
-    private void TryDirectConnection(string ip, int port)
-    {
-        GameStateManager.Instance.ChatLog.AddMessage(
-            "Attempting direct connection as last resort..."
-        );
-        ConnectToServerDirect(ip, port);
-    }
-
-    public void ConnectToServerDirect(string ip, int port)
-    {
-        try
-        {
-            Console.WriteLine($"[Client] Attempting direct connection to {ip}:{port}...");
-
-            CleanupIfRunning();
-
-            clientListener = new EventBasedNetListener();
-            client = new NetManager(clientListener)
-            {
-                ReconnectDelay = 500,
-                MaxConnectAttempts = 10,
-                DisconnectTimeout = 10000,
-                UpdateTime = 15,
-                UnconnectedMessagesEnabled = true,
-                IPv6Enabled = false,
-                NatPunchEnabled = true,
-                EnableStatistics = true,
-            };
-
-            if (!client.Start())
-            {
-                Console.WriteLine("[Client] Failed to start network client for direct connection");
-                return;
-            }
-
-            SetupClientEventHandlers();
-
-            // Try connection with a key (sometimes helps with certain NAT configurations)
-            client.Connect(ip, port, "WaterWizardClientDirect");
-            Console.WriteLine($"[Client] Direct connection request sent to {ip}:{port}");
-
-            // Actively poll events to process connection
-            System.Threading.Tasks.Task.Run(() =>
-            {
-                for (int i = 0; i < 100; i++) // Poll for 10 seconds
-                {
-                    client.PollEvents();
-                    System.Threading.Thread.Sleep(100);
-
-                    if (
-                        client.FirstPeer != null
-                        && client.FirstPeer.ConnectionState == ConnectionState.Connected
-                    )
-                    {
-                        Console.WriteLine("[Client] Direct connection successful!");
-                        return;
-                    }
-                }
-                Console.WriteLine("[Client] Direct connection attempt timed out");
-            });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Client] Error in direct connection attempt: {ex.Message}");
-        }
-    }
-
     private void HandleClientReceiveEvent(
         NetPeer peer,
         NetPacketReader reader,
@@ -467,13 +302,11 @@ public class ClientService(NetworkManager manager)
 
                     GameStateManager.Instance.ResetGame();
 
-
-                    // Sende eigenen Namen an den Server
                     if (client != null && client.FirstPeer != null)
                     {
                         var joinWriter = new NetDataWriter();
                         joinWriter.Put("PlayerJoin");
-                        joinWriter.Put(Environment.UserName); // oder eigenen Namen aus UI
+                        joinWriter.Put(Environment.UserName); 
                         client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
                     }
                     GameStateManager.Instance.SetStateToLobby();
@@ -540,41 +373,11 @@ public class ClientService(NetworkManager manager)
                 case "ShipPosition":
                     try
                     {
-                        var playerBoard = GameStateManager.Instance.GameScreen!.playerBoard;
-                        if (playerBoard == null)
-                        {
-                            Console.WriteLine(
-                                "[Client] Fehler: playerBoard ist null bei ShipPosition."
-                            );
-                            break;
-                        }
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        int width = reader.GetInt();
-                        int height = reader.GetInt();
-                        Console.WriteLine(
-                            $"[Client] Schiff Platziert auf: {messageType} {x} {y} {width} {height}"
-                        );
-                        int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
-                        int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
-                        int pixelWidth = width * playerBoard.CellSize;
-                        int pixelHeight = height * playerBoard.CellSize;
-                        playerBoard.putShip(
-                            new GameShip(
-                                GameStateManager.Instance.GameScreen,
-                                pixelX,
-                                pixelY,
-                                ShipType.DEFAULT,
-                                pixelWidth,
-                                pixelHeight
-                            )
-                        );
+                        HandleShips.HandleShipPosition(messageType, reader);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(
-                            $"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}"
-                        );
+                        Console.WriteLine($"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}");
                     }
                     break;
                 case "BoughtCard":
@@ -606,44 +409,7 @@ public class ClientService(NetworkManager manager)
                 case "ShipSync":
                     try
                     {
-                        int count = reader.GetInt();
-                        var playerBoard = GameStateManager.Instance.GameScreen!.playerBoard;
-                        if (playerBoard == null)
-                        {
-                            Console.WriteLine(
-                                "[Client] Fehler: playerBoard ist null bei ShipSync."
-                            );
-                            break;
-                        }
-                        playerBoard.Ships.Clear();
-                        for (int i = 0; i < count; i++)
-                        {
-                            int x = reader.GetInt();
-                            int y = reader.GetInt();
-                            int width = reader.GetInt();
-                            int height = reader.GetInt();
-                            int pixelX = (int)playerBoard.Position.X + x * playerBoard.CellSize;
-                            int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
-                            int pixelWidth = width * playerBoard.CellSize;
-                            int pixelHeight = height * playerBoard.CellSize;
-                            playerBoard.putShip(
-                                new GameShip(
-                                    GameStateManager.Instance.GameScreen,
-                                    pixelX,
-                                    pixelY,
-                                    ShipType.DEFAULT,
-                                    pixelWidth,
-                                    pixelHeight
-                                )
-                            );
-                        }
-                        Console.WriteLine(
-                            $"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board."
-                        );
-                        GameStateManager.Instance.SetStateToInGame();
-                        Console.WriteLine(
-                            $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
-                        );
+                        HandleShips.HandleShipSync(reader);
                     }
                     catch (Exception ex)
                     {

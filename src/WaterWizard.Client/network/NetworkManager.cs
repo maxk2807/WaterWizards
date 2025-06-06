@@ -42,7 +42,7 @@ public class NetworkManager
         }
 
         clientService.InitializeClientForDiscovery();
-        clientService.SendDiscoveryRequests();
+        LobbyHandler.SendDiscoveryRequests(Instance);
     }
 
     /// <summary>
@@ -147,11 +147,6 @@ public class NetworkManager
     internal void ConnectToServer(string ip, int port)
     {
         clientService.ConnectToServer(ip, port);
-    }
-
-    internal void RefreshLobbies()
-    {
-        clientService.RefreshLobbies();
     }
 
     internal void SendChatMessage(string message)
