@@ -129,6 +129,7 @@ public class ServerConnection
                 if (isConnected)
                 {
                     connectionTimer.Stop();
+                    connectionTimer.Dispose();
                     Console.WriteLine(
                         $"[Client] Connected to server after {connectionAttempts} attempts"
                     );
@@ -136,6 +137,7 @@ public class ServerConnection
                 else if (connectionAttempts >= maxAttempts)
                 {
                     connectionTimer.Stop();
+                    connectionTimer.Dispose();
                     Console.WriteLine($"[Client] Failed to connect after {maxAttempts} attempts");
 
                     GameStateManager.Instance.ChatLog.AddMessage(
