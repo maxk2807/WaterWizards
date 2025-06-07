@@ -172,11 +172,11 @@ public class HandleShips
     /// <summary>
     /// Sends a ship placement message to the server with the specified coordinates and dimensions.
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    /// <param name="manager"></param>
+    /// <param name="x">The x-coordinate (in grid cells) where the ship should be placed.</param>
+    /// <param name="y">The y-coordinate (in grid cells) where the ship should be placed.</param>
+    /// <param name="width">The width (in grid cells) of the ship to be placed.</param>
+    /// <param name="height">The height (in grid cells) of the ship to be placed.</param>
+    /// <param name="manager">The NetworkManager instance used to send the placement message to the server.</param>
     public static void SendShipPlacement(int x, int y, int width, int height, NetworkManager manager)
     {
         if (manager.clientService.client != null && manager.clientService.client.FirstPeer != null)

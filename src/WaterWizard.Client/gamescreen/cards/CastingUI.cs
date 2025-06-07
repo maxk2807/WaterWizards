@@ -43,7 +43,7 @@ public class CastingUI
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
                 aiming = false;
-                NetworkManager.Instance.HandleCast(cardToAim!.card, new());
+                NetworkManager.HandleCast(cardToAim!.card, new());
             }
         }
         else
@@ -86,7 +86,7 @@ public class CastingUI
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
                 aiming = false;
-                NetworkManager.Instance.HandleCast(cardToAim!.card, hoveredCoords.Value);
+                NetworkManager.HandleCast(cardToAim!.card, hoveredCoords.Value);
             }
         }
     }

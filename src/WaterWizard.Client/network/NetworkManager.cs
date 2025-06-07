@@ -9,20 +9,18 @@ public class NetworkManager
 {
     private static NetworkManager? instance;
     public static NetworkManager Instance => instance ??= new NetworkManager();
-
     public HostService hostService { get; private set; }
     public ClientService clientService { get; private set; }
-
+    public ServerConnection ServerConnection { get; private set; }
     public readonly List<LobbyInfo> discoveredLobbies = [];
-
     public readonly int hostPort = 7777;
-
     public int? LobbyCountdownSeconds { get; set; }
 
     private NetworkManager()
     {
         hostService = new(this);
         clientService = new(this);
+        ServerConnection = new ServerConnection();
     }
 
     /// <summary>
@@ -103,19 +101,22 @@ public class NetworkManager
         HandleShips.SendShipPlacement(x, y, width, height, Instance);
     }
 
-    public void RequestCardBuy(string cardType)
+    public static void RequestCardBuy(string cardType)
     {
-        clientService.RequestCardBuy(cardType);
+        var handleCards = new HandleCards();
+        handleCards.RequestCardBuy(cardType);
     }
 
-    public void HandleCast(Cards card, GameBoard.Point hoveredCoords)
+    public static void HandleCast(Cards card, GameBoard.Point hoveredCoords)
     {
-        clientService.HandleCast(card, hoveredCoords);
+        var handleCards = new HandleCards();
+        handleCards.HandleCast(card, hoveredCoords);
     }
 
-    public void SendAttack(int x, int y)
+    public static void SendAttack(int x, int y)
     {
-        clientService.SendAttack(x, y);
+        var handleAttacks = new HandleAttacks();
+        handleAttacks.SendAttack(x, y);
     }
 
     public List<Player> GetConnectedPlayers()
@@ -147,12 +148,12 @@ public class NetworkManager
 
     internal void ConnectToServer(string ip, int port)
     {
-        clientService.ConnectToServer(ip, port);
+        ServerConnection.ConnectToServer(ip, port);
     }
 
     internal void SendChatMessage(string message)
     {
-        clientService.SendChatMessage(message);
+        ChatHandler.SendChatMessage(message, Instance);
     }
 
     /// <summary>

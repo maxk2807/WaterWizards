@@ -2,9 +2,14 @@ using System.Net;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.network;
+using WaterWizard.Shared;
+
 
 namespace WaterWizard.Client.gamescreen.handler;
 
+/// <summary>
+/// Handles lobby-related messages and operations for the client.
+/// </summary>
 public static class LobbyHandler
 {
     internal static void RefreshLobbies()
@@ -99,6 +104,7 @@ public static class LobbyHandler
     /// <summary>
     /// Refreshes the list of discovered lobbies.
     /// </summary>
+    /// <param name="manager">The NetworkManager instance</param>
     public static void RefreshLobbies(NetworkManager manager)
     {
         if (manager.clientService.client != null && manager.clientService.client.IsRunning)
@@ -156,14 +162,12 @@ public static class LobbyHandler
 
             clientService.SetupClientEventHandlers();
 
-            // Try connection with a key (sometimes helps with certain NAT configurations)
             manager.clientService.client.Connect(ip, port, "WaterWizardClientDirect");
             Console.WriteLine($"[Client] Direct connection request sent to {ip}:{port}");
 
-            // Actively poll events to process connection
             Task.Run(() =>
             {
-                for (int i = 0; i < 100; i++) // Poll for 10 seconds
+                for (int i = 0; i < 100; i++)
                 {
                     manager.clientService.client.PollEvents();
                     Thread.Sleep(100);
@@ -184,5 +188,28 @@ public static class LobbyHandler
         {
             Console.WriteLine($"[Client] Error in direct connection attempt: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Handles entering the lobby after a successful connection.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the session ID</param>
+    public static void EnterLobby(NetPacketReader reader)
+    {
+        string receivedSessionId = reader.GetString();
+        if (!string.IsNullOrEmpty(receivedSessionId))
+            NetworkManager.Instance.clientService.sessionId = new GameSessionId(receivedSessionId);
+        Console.WriteLine("[Client] Betrete die Lobby...");
+
+        GameStateManager.Instance.ResetGame();
+
+        if (NetworkManager.Instance.clientService.client != null && NetworkManager.Instance.clientService.client.FirstPeer != null)
+        {
+            var joinWriter = new NetDataWriter();
+            joinWriter.Put("PlayerJoin");
+            joinWriter.Put(Environment.UserName);
+            NetworkManager.Instance.clientService.client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
+        }
+        GameStateManager.Instance.SetStateToLobby();
     }
 }

@@ -14,7 +14,7 @@ public class ClientService(NetworkManager manager)
     public bool clientReady = false;
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
-    private GameSessionId? sessionId;
+    public GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
 
     public void InitializeClientForDiscovery()
@@ -61,160 +61,6 @@ public class ClientService(NetworkManager manager)
     public bool IsClientReady()
     {
         return clientReady;
-    }
-
-    public void ConnectToServer(string ip, int port = 7777)
-    {
-        if (
-            client != null
-            && client.FirstPeer != null
-            && client.FirstPeer.ConnectionState == ConnectionState.Connected
-        )
-        {
-            Console.WriteLine("[Client] Bereits mit dem Server verbunden.");
-            return;
-        }
-
-        CleanupIfRunning();
-
-        try
-        {
-            string cleanIp = ip;
-            int connectionPort = port;
-
-            if (ip.Contains(":"))
-            {
-                var parts = ip.Split(':');
-                cleanIp = parts[0];
-
-                if (parts.Length > 1 && int.TryParse(parts[1], out int specifiedPort))
-                {
-                    connectionPort = specifiedPort;
-                }
-
-                Console.WriteLine(
-                    $"[Client] Extracted IP: {cleanIp}, Port: {connectionPort} from {ip}"
-                );
-            }
-
-            Console.WriteLine(
-                $"Versuche, eine Verbindung zum Server herzustellen: IP={cleanIp}, Port={connectionPort}"
-            );
-
-            clientListener = new EventBasedNetListener();
-            client = new NetManager(clientListener)
-            {
-                ReconnectDelay = 500,
-                MaxConnectAttempts = 10,
-                DisconnectTimeout = 10000,
-                UpdateTime = 15,
-                UnconnectedMessagesEnabled = true,
-                IPv6Enabled = false,
-                NatPunchEnabled = true,
-                EnableStatistics = true,
-            };
-
-            if (!client.Start())
-            {
-                Console.WriteLine("[Client] Fehler beim Starten des Network Clients");
-                GameStateManager.Instance.ChatLog.AddMessage(
-                    "[Error] Failed to start network client"
-                );
-                return;
-            }
-
-            SetupClientEventHandlers();
-
-            bool pingAttemptFailed = true;
-
-            try
-            {
-                using (var ping = new System.Net.NetworkInformation.Ping())
-                {
-                    var reply = ping.Send(cleanIp, 2000);
-                    if (reply.Status == System.Net.NetworkInformation.IPStatus.Success)
-                    {
-                        Console.WriteLine(
-                            $"[Client] Server at {cleanIp} is pingable. Latency: {reply.RoundtripTime}ms"
-                        );
-                        GameStateManager.Instance.ChatLog.AddMessage(
-                            $"Server at {cleanIp} is reachable. Attempting connection..."
-                        );
-                        pingAttemptFailed = false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Client] Ping failed: {ex.Message}");
-            }
-
-            if (pingAttemptFailed)
-            {
-                GameStateManager.Instance.ChatLog.AddMessage(
-                    $"Warning: Server at {cleanIp} did not respond to ping. Trying connection anyway..."
-                );
-            }
-
-            client.Connect(cleanIp, connectionPort, "WaterWizardClient");
-            Console.WriteLine($"Verbindungsanfrage gesendet an {cleanIp}:{connectionPort}...");
-
-            int connectionAttempts = 0;
-            const int maxAttempts = 20;
-
-            System.Timers.Timer connectionTimer = new(500);
-            connectionTimer.Elapsed += (s, e) =>
-            {
-                connectionAttempts++;
-
-                client.PollEvents();
-
-                bool isConnected =
-                    client.FirstPeer != null
-                    && client.FirstPeer.ConnectionState == ConnectionState.Connected;
-
-                if (isConnected)
-                {
-                    connectionTimer.Stop();
-                    Console.WriteLine(
-                        $"[Client] Connected to server after {connectionAttempts} attempts"
-                    );
-                }
-                else if (connectionAttempts >= maxAttempts)
-                {
-                    connectionTimer.Stop();
-                    Console.WriteLine($"[Client] Failed to connect after {maxAttempts} attempts");
-
-                    GameStateManager.Instance.ChatLog.AddMessage(
-                        $"Connection to server at {cleanIp}:{connectionPort} failed. Please check:"
-                    );
-                    GameStateManager.Instance.ChatLog.AddMessage("1. Is the server running?");
-                    GameStateManager.Instance.ChatLog.AddMessage("2. Is the IP address correct?");
-                    GameStateManager.Instance.ChatLog.AddMessage(
-                        "3. Is port 7777 open in the server's firewall?"
-                    );
-
-                    LobbyHandler.TryDirectConnection(cleanIp, connectionPort);
-                }
-                else
-                {
-                    if (connectionAttempts % 5 == 0)
-                    {
-                        Console.WriteLine($"[Client] Connection attempt #{connectionAttempts}...");
-                    }
-                }
-            };
-
-            connectionTimer.Start();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Fehler beim Verbinden mit dem Server: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-            GameStateManager.Instance.ChatLog.AddMessage(
-                $"Error connecting to server: {ex.Message}"
-            );
-        }
     }
 
     public void SetupClientEventHandlers()
@@ -294,21 +140,7 @@ public class ClientService(NetworkManager manager)
                     manager.HandleLobbyCountdown(reader);
                     break;
                 case "EnterLobby":
-                    string receivedSessionId = reader.GetString();
-                    if (!string.IsNullOrEmpty(receivedSessionId))
-                        sessionId = new GameSessionId(receivedSessionId);
-                    Console.WriteLine("[Client] Betrete die Lobby...");
-
-                    GameStateManager.Instance.ResetGame();
-
-                    if (client != null && client.FirstPeer != null)
-                    {
-                        var joinWriter = new NetDataWriter();
-                        joinWriter.Put("PlayerJoin");
-                        joinWriter.Put(Environment.UserName);
-                        client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
-                    }
-                    GameStateManager.Instance.SetStateToLobby();
+                    LobbyHandler.EnterLobby(reader);
                     break;
                 case "PlayerList":
                     HandlePlayer.HandlePlayerListUpdate(reader);
@@ -499,89 +331,6 @@ public class ClientService(NetworkManager manager)
             {
                 Console.WriteLine($"[Client] Fehler beim Recyceln des Readers: {ex.Message}");
             }
-        }
-    }
-
-    /// <summary>
-    /// Sends a chat message from the client to the server/host.
-    /// </summary>
-    /// <param name="message">The chat message text.</param>
-    public void SendChatMessage(string message)
-    {
-        if (
-            client == null
-            || client.FirstPeer == null
-            || client.FirstPeer.ConnectionState != ConnectionState.Connected
-        )
-        {
-            Console.WriteLine("[Client] Cannot send chat message: Not connected to a server.");
-            return;
-        }
-
-        try
-        {
-            var writer = new NetDataWriter();
-            writer.Put("ChatMessage");
-            writer.Put(message);
-            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            // Zeige die eigene Nachricht sofort im Chatfenster an
-            GameStateManager.Instance.ChatLog.AddMessage($"{Environment.UserName}: {message}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Client] Error sending chat message: {ex.Message}");
-        }
-    }
-
-
-    public void RequestCardBuy(string cardType)
-    {
-        if (client != null && client.FirstPeer != null)
-        {
-            var writer = new NetDataWriter();
-            writer.Put("BuyCard");
-            writer.Put(cardType);
-            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine("[Client] Kaufe Karte");
-        }
-        else
-        {
-            Console.WriteLine(
-                "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
-            );
-        }
-    }
-
-    public void HandleCast(Cards card, GameBoard.Point hoveredCoords)
-    {
-        if (client != null && client.FirstPeer != null)
-        {
-            NetDataWriter writer = new();
-            writer.Put("CastCard");
-            writer.Put(card.Variant.ToString());
-            writer.Put(hoveredCoords.X);
-            writer.Put(hoveredCoords.Y);
-            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.Write("[Client] Karte wirken");
-        }
-        else
-        {
-            Console.WriteLine(
-                "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
-            );
-        }
-    }
-
-    public void SendAttack(int x, int y)
-    {
-        if (client != null && client.FirstPeer != null)
-        {
-            var writer = new NetDataWriter();
-            writer.Put("Attack");
-            writer.Put(x);
-            writer.Put(y);
-            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine($"[Client] Attack initiated at ({x}, {y})");
         }
     }
 }

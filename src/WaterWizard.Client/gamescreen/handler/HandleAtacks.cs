@@ -1,4 +1,6 @@
 using LiteNetLib;
+using LiteNetLib.Utils;
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
 
@@ -7,6 +9,8 @@ namespace WaterWizard.Client.gamescreen.handler;
 /// </summary>
 public class HandleAttacks
 {
+    readonly ClientService clientService = NetworkManager.Instance.clientService;
+    
     /// <summary>
     /// Handles the attack result message received from the server.
     /// </summary>
@@ -64,6 +68,24 @@ public class HandleAttacks
                 opponentBoard.SetCellState(x, y, hit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss);
                 Console.WriteLine($"[Client] Our attack at ({x},{y}): {(hit ? "HIT" : "MISS")}");
             }
+        }
+    }
+
+    /// <summary>
+    /// Requests the server to initiate an attack at the specified coordinates.
+    /// </summary>
+    /// <param name="x">The X coordinate of the attack.</param>
+    /// <param name="y">The Y coordinate of the attack.</param>
+    public void SendAttack(int x, int y)
+    {
+        if (clientService.client != null && clientService.client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("Attack");
+            writer.Put(x);
+            writer.Put(y);
+            clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine($"[Client] Attack initiated at ({x}, {y})");
         }
     }
 }
