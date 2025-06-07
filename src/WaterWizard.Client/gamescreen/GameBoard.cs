@@ -117,27 +117,43 @@ public class GameBoard
                 int posX = (int)Position.X + x * CellSize;
                 int posY = (int)Position.Y + y * CellSize;
                 
-                Raylib.DrawRectangle(posX, posY, CellSize, CellSize, Color.SkyBlue);
+                Color backgroundColor = _gridStates[x, y] switch
+                {
+                    CellState.Hit => new Color(220, 50, 50, 255),    
+                    CellState.Miss => new Color(100, 150, 220, 255), 
+                    _ => Color.SkyBlue                              
+                };
                 
+                Raylib.DrawRectangle(posX, posY, CellSize, CellSize, backgroundColor);
                 Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, Color.Gray);
                 
                 if (_gridStates[x, y] == CellState.Hit)
                 {
-                    Raylib.DrawCircle(
-                        posX + CellSize / 2,
-                        posY + CellSize / 2,
-                        (float)CellSize / 4,
-                        Color.Red
+                    int centerX = posX + CellSize / 2;
+                    int centerY = posY + CellSize / 2;
+                    int markSize = CellSize / 3;
+                    
+                    Raylib.DrawLineEx(
+                        new Vector2(centerX - markSize, centerY - markSize),
+                        new Vector2(centerX + markSize, centerY + markSize),
+                        3.0f,
+                        Color.White
+                    );
+                    Raylib.DrawLineEx(
+                        new Vector2(centerX + markSize, centerY - markSize),
+                        new Vector2(centerX - markSize, centerY + markSize),
+                        3.0f,
+                        Color.White
                     );
                 }
                 else if (_gridStates[x, y] == CellState.Miss)
                 {
-                    Raylib.DrawCircle(
-                        posX + CellSize / 2,
-                        posY + CellSize / 2,
-                        (float)CellSize / 4,
-                        Color.White
-                    );
+                    int centerX = posX + CellSize / 2;
+                    int centerY = posY + CellSize / 2;
+                    float radius = (float)CellSize / 4;
+                    
+                    Raylib.DrawCircle(centerX, centerY, radius + 1, Color.DarkBlue); 
+                    Raylib.DrawCircle(centerX, centerY, radius, Color.White);        
                 }
             }
         }

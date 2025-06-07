@@ -1,13 +1,13 @@
-using System;
-using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
-using WaterWizard.Shared;
 
 namespace WaterWizard.Client;
 
+/// <summary>
+/// Manages the game state and provides access to various game components.
+/// </summary>
 public class GameStateManager
 {
     public IGameState GetCurrentState() => currentState;
@@ -31,7 +31,7 @@ public class GameStateManager
     private readonly ChatLogManager _chatLogManager;
     public ChatLogManager ChatLog => _chatLogManager;
 
-    
+
 
     // GoldSync
     private int player1Gold = 0;

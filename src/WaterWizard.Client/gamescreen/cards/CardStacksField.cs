@@ -75,15 +75,15 @@ public class CardStacksField(GameScreen gameScreen)
         var clicked = Raylib.IsMouseButtonPressed(MouseButton.Left);
         if (Raylib.CheckCollisionPointRec(mousePos, utilityRec) && clicked)
         {
-            NetworkManager.Instance.RequestCardBuy("Utility");
+            NetworkManager.RequestCardBuy("Utility");
         }
         else if (Raylib.CheckCollisionPointRec(mousePos, damageRec) && clicked)
         {
-            NetworkManager.Instance.RequestCardBuy("Damage");
+            NetworkManager.RequestCardBuy("Damage");
         }
         else if (Raylib.CheckCollisionPointRec(mousePos, environmentRec) && clicked)
         {
-            NetworkManager.Instance.RequestCardBuy("Environment");
+            NetworkManager.RequestCardBuy("Environment");
         }
     }
 }

@@ -16,7 +16,6 @@ public static class PreStartLobbyTimer
     public static void DrawCountdown(GameStateManager manager)
     {
         var countdown = NetworkManager.Instance.LobbyCountdownSeconds;
-        Console.WriteLine($"[DrawCountdown] Called. Countdown value: {countdown}");
         if (countdown.HasValue && countdown.Value > 0)
         {
             string countdownText = $"Game starts in {countdown.Value}...";

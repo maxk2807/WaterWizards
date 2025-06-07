@@ -200,7 +200,7 @@ public class GameScreen(
         GameBoard.Point? clickedCell = opponentBoard.Update();
         if (clickedCell.HasValue)
         {
-            NetworkManager.Instance.SendAttack(clickedCell.Value.X, clickedCell.Value.Y);
+            NetworkManager.SendAttack(clickedCell.Value.X, clickedCell.Value.Y);
             Console.WriteLine(
                 $"Attack initiated at ({clickedCell.Value.X}, {clickedCell.Value.Y})"
             );

@@ -1,4 +1,5 @@
 using Raylib_cs;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
@@ -33,7 +34,7 @@ public class PlacementPhaseState : IGameState
         );
         if (hoverReady && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
-            NetworkManager.Instance.SendPlacementReady();
+            HandleShips.SendPlacementReady(NetworkManager.Instance);
             //manager.SetStateToInGame();
         }
 
