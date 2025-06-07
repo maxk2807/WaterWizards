@@ -1,5 +1,7 @@
 using LiteNetLib;
+using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
 
@@ -143,6 +145,56 @@ public class HandleShips
         {
             int size = int.Parse(match.Groups[2].Value);
             GameStateManager.Instance.GameScreen?.MarkShipSizeLimitReached(size);
+        }
+    }
+
+    /// <summary>
+    /// Sends a message to the server indicating that the ship placement is ready.
+    /// </summary>
+    /// <param name="manager">The NetworkManager instance</param>
+    public static void SendPlacementReady(NetworkManager manager)
+    {
+        if (manager.clientService.client != null && manager.clientService.client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("PlacementReady");
+            manager.clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] PlacementReady gesendet");
+        }
+        else
+        {
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden."
+            );
+        }
+    }
+
+    /// <summary>
+    /// Sends a ship placement message to the server with the specified coordinates and dimensions.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <param name="manager"></param>
+    public static void SendShipPlacement(int x, int y, int width, int height, NetworkManager manager)
+    {
+        if (manager.clientService.client != null && manager.clientService.client.FirstPeer != null)
+        {
+            var writer = new NetDataWriter();
+            writer.Put("PlaceShip");
+            writer.Put(x);
+            writer.Put(y);
+            writer.Put(width);
+            writer.Put(height);
+            manager.clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine("[Client] PlaceShip gesendet");
+        }
+        else
+        {
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
+            );
         }
     }
 }

@@ -533,43 +533,6 @@ public class ClientService(NetworkManager manager)
         }
     }
 
-    public void SendPlacementReady()
-    {
-        if (client != null && client.FirstPeer != null)
-        {
-            var writer = new NetDataWriter();
-            writer.Put("PlacementReady");
-            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine("[Client] PlacementReady gesendet");
-        }
-        else
-        {
-            Console.WriteLine(
-                "[Client] Kein Server verbunden, PlacementReady konnte nicht gesendet werden."
-            );
-        }
-    }
-
-    public void SendShipPlacement(int x, int y, int width, int height)
-    {
-        if (client != null && client.FirstPeer != null)
-        {
-            var writer = new NetDataWriter();
-            writer.Put("PlaceShip");
-            writer.Put(x);
-            writer.Put(y);
-            writer.Put(width);
-            writer.Put(height);
-            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine("[Client] PlaceShip gesendet");
-        }
-        else
-        {
-            Console.WriteLine(
-                "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
-            );
-        }
-    }
 
     public void RequestCardBuy(string cardType)
     {

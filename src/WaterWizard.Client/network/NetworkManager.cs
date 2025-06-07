@@ -100,7 +100,7 @@ public class NetworkManager
 
     public void SendShipPlacement(int x, int y, int width, int height)
     {
-        clientService.SendShipPlacement(x, y, width, height);
+        HandleShips.SendShipPlacement(x, y, width, height, Instance);
     }
 
     public void RequestCardBuy(string cardType)
@@ -153,11 +153,6 @@ public class NetworkManager
     internal void SendChatMessage(string message)
     {
         clientService.SendChatMessage(message);
-    }
-
-    internal void SendPlacementReady()
-    {
-        clientService.SendPlacementReady();
     }
 
     /// <summary>
