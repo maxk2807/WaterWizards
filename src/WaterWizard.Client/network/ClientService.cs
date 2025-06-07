@@ -1,9 +1,8 @@
-using System.Net;
 using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen;
-using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
@@ -12,7 +11,7 @@ public class ClientService(NetworkManager manager)
 {
     public NetManager? client;
     public EventBasedNetListener? clientListener;
-    private bool clientReady = false;
+    public bool clientReady = false;
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
     private GameSessionId? sessionId;
@@ -32,7 +31,7 @@ public class ClientService(NetworkManager manager)
         }
 
         clientListener.NetworkReceiveUnconnectedEvent += (remoteEndPoint, reader, messageType) =>
-            LobbyHandler.HandleLobbyInfoResponse(manager, remoteEndPoint, reader, messageType);
+            LobbyHandler.HandleLobbyInfoResponse(manager, remoteEndPoint, reader);
     }
 
     public void CleanupIfRunning()
@@ -306,13 +305,13 @@ public class ClientService(NetworkManager manager)
                     {
                         var joinWriter = new NetDataWriter();
                         joinWriter.Put("PlayerJoin");
-                        joinWriter.Put(Environment.UserName); 
+                        joinWriter.Put(Environment.UserName);
                         client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
                     }
                     GameStateManager.Instance.SetStateToLobby();
                     break;
                 case "PlayerList":
-                    HandlePlayerListUpdate(reader);
+                    HandlePlayer.HandlePlayerListUpdate(reader);
                     break;
                 case "TimerUpdate":
                     try
@@ -422,22 +421,7 @@ public class ClientService(NetworkManager manager)
                 case "CellReveal":
                     try
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        bool isHit = reader.GetBool();
-
-                        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-                        if (opponentBoard != null)
-                        {
-                            opponentBoard.SetCellState(
-                                x,
-                                y,
-                                isHit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
-                            );
-                            Console.WriteLine(
-                                $"[Client] Cell revealed: ({x},{y}) = {(isHit ? "hit" : "miss")}"
-                            );
-                        }
+                        HandleCell.HandleCellReveal(reader);
                     }
                     catch (Exception ex)
                     {
@@ -448,34 +432,7 @@ public class ClientService(NetworkManager manager)
                 case "ShipReveal":
                     try
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        int width = reader.GetInt();
-                        int height = reader.GetInt();
-
-                        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-                        if (opponentBoard != null)
-                        {
-                            int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-                            int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-                            int pixelWidth = width * opponentBoard.CellSize;
-                            int pixelHeight = height * opponentBoard.CellSize;
-
-                            opponentBoard.putShip(
-                                new GameShip(
-                                    GameStateManager.Instance.GameScreen,
-                                    pixelX,
-                                    pixelY,
-                                    ShipType.DEFAULT,
-                                    pixelWidth,
-                                    pixelHeight
-                                )
-                            );
-
-                            Console.WriteLine(
-                                $"[Client] Ship revealed: ({x},{y}) size {width}x{height}"
-                            );
-                        }
+                        HandleShips.HandleShipReveal(reader);
                     }
                     catch (Exception ex)
                     {
@@ -485,22 +442,7 @@ public class ClientService(NetworkManager manager)
                 case "ShipPlacementError":
                     try
                     {
-                        string errorMsg = reader.GetString();
-                        Console.WriteLine(
-                            $"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}"
-                        );
-                        //GameStateManager.Instance.GameScreen?.ShowPlacementError(errorMsg);
-
-                        // Sperre das Draggen für diese Größe, wenn das Limit erreicht ist
-                        var match = System.Text.RegularExpressions.Regex.Match(
-                            errorMsg,
-                            @"nur (\d+) Schiffe der Länge (\d+)"
-                        );
-                        if (match.Success)
-                        {
-                            int size = int.Parse(match.Groups[2].Value);
-                            GameStateManager.Instance.GameScreen?.MarkShipSizeLimitReached(size);
-                        }
+                        HandleShips.HandleShipPlacementError(reader);
                     }
                     catch (Exception ex)
                     {
@@ -512,23 +454,7 @@ public class ClientService(NetworkManager manager)
                 case "ActiveCards":
                     try
                     {
-                        var activeCardsNum = reader.GetInt();
-                        List<Cards> activeCards = [];
-                        for (int i = 0; i < activeCardsNum; i++)
-                        {
-                            var variant = reader.GetString();
-                            var remainingDuration = reader.GetFloat();
-                            Cards card = new(Enum.Parse<CardVariant>(variant))
-                            {
-                                remainingDuration = remainingDuration,
-                            };
-                            activeCards.Add(card);
-                            Console.WriteLine($"[Client] ActivateCard received: {variant}");
-                        }
-
-                        GameStateManager.Instance.GameScreen.activeCards!.UpdateActiveCards(
-                            activeCards
-                        );
+                        HandleCards.HandleActiveCards(reader);
                     }
                     catch (Exception ex)
                     {
@@ -538,81 +464,19 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
                 case "UpdateMana":
-                {
-                    int playerIndex = reader.GetInt();
-                    int mana = reader.GetInt();
-                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {mana} Mana.");
-
-                    var ressourceField = GameStateManager.Instance.GameScreen.ressourceField!;
-                    ressourceField.SetMana(mana);
-                    ressourceField.ManaFieldUpdate();
-                    break;
-                }
+                    {
+                        HandleRessources.HandleUpdateMana(reader);
+                        break;
+                    }
                 case "UpdateGold":
-                {
-                    int playerIndex = reader.GetInt();
-                    int gold = reader.GetInt();
-                    Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {gold} Gold.");
-
-                    GameStateManager.Instance.SetGold(playerIndex, gold);
-                    // TODO: UI-Anzeige für Gold aktualisieren
-                    break;
-                }
+                    {
+                        HandleRessources.HandleUpdateGold(reader);
+                        break;
+                    }
                 case "AttackResult":
                     try
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
-                        bool hit = reader.GetBool();
-                        bool shipDestroyed = reader.GetBool();
-                        bool isDefender = reader.GetBool(); 
-                        
-                        if (isDefender)
-                        {
-                            if (hit)
-                            {
-                                var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
-                                if (playerBoard != null)
-                                {
-                                    playerBoard.MarkCellAsHit(x, y, true);
-                                    
-                                    foreach (var ship in playerBoard.Ships)
-                                    {
-                                        int cellSize = playerBoard.CellSize;
-                                        int shipCellX = (ship.X - (int)playerBoard.Position.X) / cellSize;
-                                        int shipCellY = (ship.Y - (int)playerBoard.Position.Y) / cellSize;
-                                        int shipWidth = ship.Width / cellSize;
-                                        int shipHeight = ship.Height / cellSize;
-                                        
-                                        if (x >= shipCellX && x < shipCellX + shipWidth &&
-                                            y >= shipCellY && y < shipCellY + shipHeight)
-                                        {
-                                            int relativeX = x - shipCellX;
-                                            int relativeY = y - shipCellY;
-                                            ship.AddDamage(relativeX, relativeY);
-                                            
-                                            Console.WriteLine($"[Client] Our ship hit at ({x},{y})! Ship destroyed: {shipDestroyed}");
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
-                                playerBoard?.MarkCellAsHit(x, y, false);
-                                Console.WriteLine($"[Client] Enemy missed at ({x},{y})");
-                            }
-                        }
-                        else
-                        {
-                            var opponentBoard = GameStateManager.Instance.GameScreen?.opponentBoard;
-                            if (opponentBoard != null)
-                            {
-                                opponentBoard.SetCellState(x, y, hit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss);
-                                Console.WriteLine($"[Client] Our attack at ({x},{y}): {(hit ? "HIT" : "MISS")}");
-                            }
-                        }
+                        HandleAttacks.HandleAttackResult(reader);
                     }
                     catch (Exception ex)
                     {
@@ -635,63 +499,6 @@ public class ClientService(NetworkManager manager)
             {
                 Console.WriteLine($"[Client] Fehler beim Recyceln des Readers: {ex.Message}");
             }
-        }
-    }
-
-    private void HandlePlayerListUpdate(NetDataReader reader)
-    {
-        try
-        {
-            int count = reader.GetInt();
-            Console.WriteLine($"[Client] Empfange Spielerliste mit {count} Spielern.");
-            ConnectedPlayers.Clear();
-
-            for (int i = 0; i < count; i++)
-            {
-                string address = reader.GetString();
-                string name = reader.GetString();
-                bool isReady = reader.GetBool();
-                ConnectedPlayers.Add(new Player(address) { Name = name, IsReady = isReady });
-                Console.WriteLine($"[Client] Spieler empfangen: {name} ({address}), Bereit: {isReady}");
-            }
-
-            if (ConnectedPlayers.Count == 0)
-            {
-                GameStateManager.Instance.ResetGame();
-                GameStateManager.Instance.SetStateToLobby();
-                Console.WriteLine($"[Client] 0 Spieler - GameScreen und Boards zurückgesetzt.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Client] Fehler beim Verarbeiten der Spielerliste: {ex.Message}");
-        }
-    }
-
-    public void ToggleReadyStatus()
-    {
-        clientReady = !clientReady;
-
-        if (client != null && client.FirstPeer != null)
-        {
-            var writer = new NetDataWriter();
-            //writer.Put("PlayerList");
-            //writer.Put(connectedPlayers.Count);
-            //string message = clientReady ? "PlayerReady" : "PlayerNotReady";
-            //writer.Put(message);
-            //client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            //Console.WriteLine($"[Client] Nachricht gesendet: {message}");
-
-            string message = clientReady ? "PlayerReady" : "PlayerNotReady";
-            writer.Put(message);
-            client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine($"[Client] Nachricht gesendet: {message}");
-        }
-        else
-        {
-            Console.WriteLine(
-                "[Client] Kein Server verbunden, Nachricht konnte nicht gesendet werden."
-            );
         }
     }
 

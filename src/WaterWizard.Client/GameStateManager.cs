@@ -1,15 +1,13 @@
-using System;
-using System.Numerics;
-using LiteNetLib;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen;
-using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
-using WaterWizard.Shared;
 
 namespace WaterWizard.Client;
 
+/// <summary>
+/// Manages the game state and provides access to various game components.
+/// </summary>
 public class GameStateManager
 {
     public IGameState GetCurrentState() => currentState;

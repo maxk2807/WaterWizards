@@ -1,8 +1,9 @@
 using System.Net;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Client.network;
 
-namespace WaterWizard.Client.network;
+namespace WaterWizard.Client.gamescreen.handler;
 
 public static class LobbyHandler
 {
@@ -21,8 +22,7 @@ public static class LobbyHandler
     public static void HandleLobbyInfoResponse(
         NetworkManager manager,
         IPEndPoint remoteEndPoint,
-        NetPacketReader reader,
-        UnconnectedMessageType messageType
+        NetPacketReader reader
     )
     {
         try

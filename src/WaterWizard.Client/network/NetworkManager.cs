@@ -1,6 +1,7 @@
 using LiteNetLib;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Shared;
+using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client.network;
 
@@ -141,7 +142,7 @@ public class NetworkManager
 
     internal void ToggleReadyStatus()
     {
-        clientService.ToggleReadyStatus();
+        HandlePlayer.ToggleReadyStatus();
     }
 
     internal void ConnectToServer(string ip, int port)
