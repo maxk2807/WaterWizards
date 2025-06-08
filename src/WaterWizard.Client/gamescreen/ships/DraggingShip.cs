@@ -210,8 +210,23 @@ public class DraggingShip
     {
         Raylib.DrawRectangleRec(DraggedShipRectangle, validPlacement ? new(30, 200, 200) : new(255, 0, 0));
 
+        // Calculate button positions with screen bounds checking
+        float screenHeight = gameScreen._gameStateManager.screenHeight;
+        float buttonAreaHeight = CellSize; // Height needed for buttons
+        
+        // Default position below the ship
         var rotateX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2 - CellSize;
         var rotateY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
+        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
+        var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
+        
+        // If buttons would go off screen, position them above the ship instead
+        if (confirmY + buttonAreaHeight > screenHeight)
+        {
+            rotateY = DraggedShipRectangle.Y - buttonAreaHeight;
+            confirmY = DraggedShipRectangle.Y - buttonAreaHeight;
+        }
+        
         Rectangle rotateButton = new(rotateX, rotateY, CellSize, CellSize);
         bool rotateHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rotateButton);
         Raylib.DrawRectangleRec(rotateButton, rotateHovered ? Color.LightGray : Color.Gray);
@@ -237,8 +252,6 @@ public class DraggingShip
             validPlacement = IsValid(DraggedShipRectangle);
         }
 
-        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
-        var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
         Rectangle confirmButton = new(confirmX, confirmY, CellSize, CellSize);
         bool confirmHovered = Raylib.CheckCollisionPointRec(
             Raylib.GetMousePosition(),
