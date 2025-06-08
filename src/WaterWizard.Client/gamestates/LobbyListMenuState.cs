@@ -1,5 +1,6 @@
 using Raylib_cs;
 using WaterWizard.Client.network;
+using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client.gamestates;
 
@@ -124,7 +125,7 @@ public class LobbyListMenuState : IGameState
         );
         if (hoverRefresh && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
-            NetworkManager.Instance.RefreshLobbies();
+            LobbyHandler.RefreshLobbies();
         }
         int manualBtnWidth = 300;
         Rectangle manualIpButton = new Rectangle(
