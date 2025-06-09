@@ -140,6 +140,11 @@ public class DraggingShip
             Raylib.GetMousePosition(),
             DraggedShipRectangle
         );
+
+        // Zeichne das Originalschiff immer
+        Raylib.DrawRectangleRec(Rectangle, Color.DarkPurple);
+        Raylib.DrawText(currentNumber.ToString(), X + Width / 2, Y + Height / 2, 10, Color.White);
+
         if (confirming)
         {
             HandleConfirm();

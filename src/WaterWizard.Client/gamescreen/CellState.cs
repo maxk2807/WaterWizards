@@ -10,4 +10,5 @@ public enum CellState
     Hit,
     Miss,
     Unknown,
+    Thunder,
 }

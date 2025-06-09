@@ -29,18 +29,18 @@ public class Cards
     // TODO: Mana class einbeziehen
 
     /// <summary>
-    /// Die Zeit (in Sekunden oder als „instant“), die zum Wirken der Karte benötigt wird.
+    /// Die Zeit (in Sekunden oder als "instant"), die zum Wirken der Karte benötigt wird.
     /// </summary>
     public string? CastTime { get; private set; }
 
     /// <summary>
-    /// Die Dauer (in Sekunden, „instant“ oder „permanent“) des Karteneffekts.
+    /// Die Dauer (in Sekunden, "instant" oder "permanent") des Karteneffekts.
     /// </summary>
     public string? Duration { get; private set; }
     public float remainingDuration = 0;
 
     /// <summary>
-    /// Gibt an, welches Ziel die Karte betrifft (z. B. „1x1“, „ship“, „battlefield“).
+    /// Gibt an, welches Ziel die Karte betrifft (z. B. "1x1", "ship", "battlefield").
     /// </summary>
     public CardTarget? Target { get; private set; }
 
@@ -319,6 +319,10 @@ public class Cards
         },
     };
 
+    private ThunderEffect? _activeThunderEffect;
+    private List<Cell[,]>? _battlefields;
+    private int _gridSize;
+
     /// <summary>
     /// Erstellt eine neue Karteninstanz anhand der angegebenen Kartenvariante.
     /// Die zugehörigen Typ- und Statuseigenschaften werden automatisch gesetzt.
@@ -397,4 +401,33 @@ public class Cards
             return new();
         }
     }
+
+    public void SetBattlefieldInfo(List<Cell[,]> battlefields, int gridSize)
+    {
+        _battlefields = battlefields;
+        _gridSize = gridSize;
+    }
+
+    public void Update(float deltaTime)
+    {
+        if (_activeThunderEffect != null)
+        {
+            _activeThunderEffect.Update(deltaTime);
+            
+            if (!_activeThunderEffect.IsActive)
+            {
+                _activeThunderEffect = null;
+            }
+        }
+    }
+
+    public void ActivateEffect()
+    {
+        if (Variant == CardVariant.Thunder && _battlefields != null)
+        {
+            _activeThunderEffect = new ThunderEffect(_battlefields, _gridSize);
+        }
+    }
+
+    public bool HasActiveEffect => _activeThunderEffect != null && _activeThunderEffect.IsActive;
 }

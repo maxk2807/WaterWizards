@@ -6,6 +6,10 @@ namespace WaterWizard.Server;
 
 public static class CardAbilities
 {
+    private static readonly Random random = new();
+    private static readonly float THUNDER_INTERVAL = 1.75f;
+    private static float thunderTimer = 0;
+
     public static void HandleAbility(
         CardVariant variant,
         GameState gameState,
@@ -15,6 +19,10 @@ public static class CardAbilities
     {
         switch (variant)
         {
+            case CardVariant.Thunder:
+                // Thunder wird über HandleActivationEffect gesteuert
+                Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
+                break;
             case CardVariant.MagicAttack:
                 break;
             default:
@@ -37,7 +45,7 @@ public static class CardAbilities
                 {
                     int duration = int.Parse(durationString);
                     gameState.CardActivation(variant, duration);
-                    Console.WriteLine($"[Server] Activated Card: {variant}");
+                    Console.WriteLine($"[Server] Activated Card: {variant} for {duration} seconds");
                     break;
                 }
                 catch (Exception ex)
@@ -58,9 +66,27 @@ public static class CardAbilities
     /// between degree of effect and passed time needs to be implemented.</param>
     internal static void HandleActivationEffect(Cards card, float passedTime)
     {
-        Console.WriteLine(
-            $"[Server] Effect of Card {card.Variant} got activated. {passedTime} since last activation"
-        );
+        if (card.Variant == CardVariant.Thunder)
+        {
+            thunderTimer -= passedTime / 1000f; // Konvertiere zu Sekunden
+
+            if (thunderTimer <= 0)
+            {
+                // Erzeuge neue Donnereinschläge
+                Console.WriteLine($"[Server] Thunder strikes! Time since last activation: {passedTime}ms");
+                thunderTimer = THUNDER_INTERVAL;
+
+                // TODO: Implementiere die Logik für den Donnereinschlag
+                // Hier müssen wir die Koordinaten an den Client senden
+                // und die Treffer überprüfen
+            }
+        }
+        else
+        {
+            Console.WriteLine(
+                $"[Server] Effect of Card {card.Variant} got activated. {passedTime} since last activation"
+            );
+        }
     }
 
     private static void PrintCardArea(

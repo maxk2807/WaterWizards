@@ -29,6 +29,9 @@ public class GameScreen(
     public int cardHeight;
     public float ZonePadding;
 
+    private float _thunderTimer = 0;
+    private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Donnereinschlägen
+
     /// <summary>
     /// Initialize all elements rendered on the GameScreen:
     ///  the two Boards, Cardhands and Cardstacks as well as the //TODO: Graveyard and GameTimer
@@ -273,6 +276,8 @@ public class GameScreen(
             _gameStateManager.SetStateToMainMenu();
         }
 
+        // Update und Draw für Thunder-Effekte
+        Update(Raylib.GetFrameTime());
         CastingUI.Instance.Draw();
     }
 
@@ -432,5 +437,33 @@ public class GameScreen(
         opponentBoard?.ClearBoard();
 
         Console.WriteLine("[Client][GameScreen] Boards reset");
+    }
+
+    public void Update(float deltaTime)
+    {
+        // Update Thunder-Timer
+        _thunderTimer -= deltaTime;
+        if (_thunderTimer <= 0)
+        {
+            _thunderTimer = THUNDER_INTERVAL;
+        }
+
+        // Update active cards
+        if (activeCards != null)
+        {
+            foreach (var card in activeCards.Cards)
+            {
+                card.card.Update(deltaTime);
+            }
+        }
+    }
+
+    private void CreateThunderStrike(GameBoard board)
+    {
+        // Zufällige Position für den 2x2 Einschlag finden
+        int x = Random.Shared.Next(0, board.GridWidth - 1);
+        int y = Random.Shared.Next(0, board.GridHeight - 1);
+        
+        board.AddThunderStrike(x, y);
     }
 }

@@ -4,6 +4,8 @@ using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Shared;
+using WaterWizard.Client.network;
+using WaterWizard.Client.Gamescreen;
 
 namespace WaterWizard.Client.network;
 
@@ -12,6 +14,7 @@ public class ClientService(NetworkManager manager)
     public NetManager? client;
     public EventBasedNetListener? clientListener;
     public bool clientReady = false;
+    public string? myEndPoint;
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
     public GameSessionId? sessionId;
@@ -20,6 +23,7 @@ public class ClientService(NetworkManager manager)
     public void InitializeClientForDiscovery()
     {
         CleanupIfRunning();
+        myEndPoint = null;
 
         clientListener = new EventBasedNetListener();
         client = new NetManager(clientListener) { UnconnectedMessagesEnabled = true };
@@ -71,6 +75,16 @@ public class ClientService(NetworkManager manager)
         clientListener.PeerConnectedEvent += peer =>
         {
             Console.WriteLine($"[Client] Erfolgreich mit dem Server verbunden: {peer}");
+            Console.WriteLine($"[Client] Debug Peer Properties:");
+            Console.WriteLine($"- peer.Address: {peer.Address}");
+            Console.WriteLine($"- peer.Port: {peer.Port}");
+            Console.WriteLine($"- peer.Id: {peer.Id}");
+            Console.WriteLine($"- peer.ConnectionState: {peer.ConnectionState}");
+            Console.WriteLine($"- peer.ToString(): {peer.ToString()}");
+            Console.WriteLine($"- client.LocalPort: {client?.LocalPort}");
+
+            myEndPoint = $"127.0.0.1:{client?.LocalPort}";
+            Console.WriteLine($"[Client] Meine Adresse ist: {myEndPoint}");
 
             GameStateManager.Instance.ChatLog.AddMessage($"Connected to server at {peer}");
         };
@@ -253,7 +267,22 @@ public class ClientService(NetworkManager manager)
                 case "CellReveal":
                     try
                     {
-                        HandleCell.HandleCellReveal(reader);
+                        int revealX = reader.GetInt();
+                        int revealY = reader.GetInt();
+                        bool isHit = reader.GetBool();
+
+                        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
+                        if (opponentBoard != null)
+                        {
+                            opponentBoard.SetCellState(
+                                revealX,
+                                revealY,
+                                isHit ? WaterWizard.Client.Gamescreen.CellState.Hit : WaterWizard.Client.Gamescreen.CellState.Miss
+                            );
+                            Console.WriteLine(
+                                $"[Client] Cell revealed: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}"
+                            );
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -295,25 +324,71 @@ public class ClientService(NetworkManager manager)
                         );
                     }
                     break;
-                case "UpdateMana":
+                case "ThunderStrike":
+                    string targetPlayerAddress = reader.GetString();
+                    int strikeX = reader.GetInt();
+                    int strikeY = reader.GetInt();
+                    bool hit = reader.GetBool();
+
+                    Console.WriteLine("\n[Client] Received Thunder Strike");
+                    Console.WriteLine("----------------------------------------");
+                    Console.WriteLine($"Target Player Address: {targetPlayerAddress}");
+                    Console.WriteLine($"Strike Coordinates: ({strikeX}, {strikeY})");
+                    Console.WriteLine($"Hit: {hit}");
+
+                    Console.WriteLine($"\nAddress Comparison:");
+                    Console.WriteLine($"- Target Address (full): {targetPlayerAddress}");
+                    Console.WriteLine($"- My Address (full): {myEndPoint}");
+
+                    // Wurde mein Board getroffen?
+                    bool myBoardWasHit = false;
+                    if (myEndPoint != null)
                     {
-                        HandleRessources.HandleUpdateMana(reader);
-                        break;
+                        // Vergleiche die Adressen ohne den "127.0.0.1:" Teil
+                        string targetPort = targetPlayerAddress.Split(':').LastOrDefault() ?? "";
+                        string myPort = myEndPoint.Split(':').LastOrDefault() ?? "";
+                        Console.WriteLine($"Port Comparison:");
+                        Console.WriteLine($"- Target Port: {targetPort}");
+                        Console.WriteLine($"- My Port: {myPort}");
+                        myBoardWasHit = targetPort == myPort;
                     }
-                case "UpdateGold":
+                    Console.WriteLine($"\nResult:");
+                    Console.WriteLine($"- Was my board hit? {myBoardWasHit}");
+                    Console.WriteLine($"- Will show on: {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+
+                    // Wenn mein Board getroffen wurde -> auf meinem playerBoard anzeigen
+                    // Wenn das gegnerische Board getroffen wurde -> auf meinem opponentBoard anzeigen
+                    var targetBoard = myBoardWasHit
+                        ? GameStateManager.Instance.GameScreen.playerBoard    // Mein Board wurde getroffen
+                        : GameStateManager.Instance.GameScreen.opponentBoard; // Gegnerisches Board wurde getroffen
+
+                    Console.WriteLine($"\nBoard Status:");
+                    Console.WriteLine($"- playerBoard is null: {GameStateManager.Instance.GameScreen.playerBoard == null}");
+                    Console.WriteLine($"- opponentBoard is null: {GameStateManager.Instance.GameScreen.opponentBoard == null}");
+                    Console.WriteLine($"- targetBoard is null: {targetBoard == null}");
+
+                    if (targetBoard != null)
                     {
-                        HandleRessources.HandleUpdateGold(reader);
-                        break;
+                        // Füge zuerst den visuellen Blitzeffekt hinzu
+                        targetBoard.AddThunderStrike(strikeX, strikeY);
+
+                        // Dann setze den Zellstatus basierend auf dem Treffer
+                        if (hit)
+                        {
+                            targetBoard.SetCellState(strikeX, strikeY, WaterWizard.Client.Gamescreen.CellState.Hit);
+                            Console.WriteLine($"Set Hit at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+                        }
+                        else
+                        {
+                            targetBoard.SetCellState(strikeX, strikeY, WaterWizard.Client.Gamescreen.CellState.Thunder);
+                            Console.WriteLine($"Set Thunder at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+                        }
                     }
-                case "AttackResult":
-                    try
-                    {
-                        HandleAttacks.HandleAttackResult(reader);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[Client] Error handling AttackResult: {ex.Message}");
-                    }
+                    Console.WriteLine("----------------------------------------\n");
+                    break;
+                case "ThunderReset":
+                    GameStateManager.Instance.GameScreen.playerBoard?.ResetThunderFields();
+                    GameStateManager.Instance.GameScreen.opponentBoard?.ResetThunderFields();
                     break;
             }
         }
