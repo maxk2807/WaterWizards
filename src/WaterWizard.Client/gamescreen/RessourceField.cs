@@ -21,9 +21,9 @@ public class RessourceField(GameScreen gameScreen)
 
     public void Initialize()
     {
-        Mana = 4f;
+        Mana = 0f;
         manaString = Mana.ToString() + " Mana";
-        Gold = 5f;
+        Gold = 0f;
         goldString = Gold.ToString() + " $";
 
         X = ZonePadding;
@@ -37,6 +37,23 @@ public class RessourceField(GameScreen gameScreen)
         int goldY = (int)(Y + (Height - goldFontSize) / 2f);
 
         GoldRec = new(goldX, goldY, goldWidth, goldFontSize);
+
+        int manaFontSize = 30;
+        int manaWidth = Raylib.MeasureText(manaString, manaFontSize);
+        int manaX = X + (int)(3f * Width / 4f - manaWidth / 2f);
+        int manaY = (int)(Y + (Height - manaFontSize) / 2f);
+
+        ManaRec = new(manaX, manaY, manaWidth, manaFontSize);
+    }
+    
+    public void SetMana(int mana)
+    {
+        Mana = mana;
+    }
+
+    public void ManaFieldUpdate()
+    {
+        manaString = Mana + " Mana";
 
         int manaFontSize = 30;
         int manaWidth = Raylib.MeasureText(manaString, manaFontSize);

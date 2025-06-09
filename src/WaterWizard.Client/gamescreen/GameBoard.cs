@@ -2,23 +2,10 @@ using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
-using WaterWizard.Client.network;
-using WaterWizard.Shared;
+using WaterWizard.Client.Gamescreen;
 
 namespace WaterWizard.Client.gamescreen;
 
-/// <summary>
-/// CellState enum represents the possible states of a cell in the game board.
-/// </summary>
-public enum CellState
-{
-    Empty,
-    Ship,
-    Hit,
-    Miss,
-    Unknown,
-    Thunder,
-}
 
 /// <summary>
 /// GameBoard class represents the game board for the battleship game.
@@ -283,12 +270,12 @@ public class GameBoard
                 }
                 else if (_gridStates[x, y] == CellState.Miss)
                 {
-                    Raylib.DrawCircle(
-                        posX + CellSize / 2,
-                        posY + CellSize / 2,
-                        (float)CellSize / 4,
-                        Color.White
-                    );
+                    int centerX = posX + CellSize / 2;
+                    int centerY = posY + CellSize / 2;
+                    float radius = (float)CellSize / 4;
+                    
+                    Raylib.DrawCircle(centerX, centerY, radius + 1, Color.DarkBlue); 
+                    Raylib.DrawCircle(centerX, centerY, radius, Color.White);        
                 }
             }
         }

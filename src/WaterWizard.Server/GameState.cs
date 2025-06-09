@@ -67,6 +67,12 @@ public class GameState
 
     private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
 
+    
+    public Mana Player1Mana { get; private set; } = new();
+    public Mana Player2Mana { get; private set; } = new();
+    public int Player1Gold { get; private set; } = 0;
+    public int Player2Gold { get; private set; } = 0;
+
     private bool IsPlacementPhase()
     {
         return manager.CurrentState is PlacementState;
@@ -100,12 +106,39 @@ public class GameState
         }
     }
 
+    public void SetGold(int playerIndex, int amount)
+    {
+        if (playerIndex == 0)
+            Player1Gold = amount;
+        else if (playerIndex == 1)
+            Player2Gold = amount;
+    }
+
     /// <summary>
-    /// A new Gamestate.
+    /// Returns the NetPeer instance for the given player index (0 or 1).
     /// </summary>
-    /// <param name="server">Corresponding NetManager server to access Clients (Players)</param>
-    /// <param name="manager">Corresponding <see cref="ServerGameStateManager"/></param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="index">The index of the player (0 = Player 1, 1 = Player 2).</param>
+    /// <returns>The NetPeer associated with the specified player index.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if no player is assigned at the given index.</exception>
+    public NetPeer GetPlayer(int index)
+    {
+        if (index < 0 || index >= players.Length || players[index] == null)
+            throw new InvalidOperationException($"No player at index {index}");
+
+        return players[index];
+    }
+
+// TODO: für HandleCardBuying() gut verwendbar
+    public void SyncGoldToClient(int playerIndex)
+    {
+        var peer = GetPlayer(playerIndex);
+        var writer = new NetDataWriter();
+        writer.Put("UpdateGold");
+        writer.Put(playerIndex);
+        writer.Put(playerIndex == 0 ? Player1Gold : Player2Gold);
+        peer.Send(writer, DeliveryMethod.ReliableOrdered);
+    }
+
     public GameState(NetManager server, ServerGameStateManager manager)
     {
         int connectedCount = server.ConnectedPeerList.Count;
@@ -590,17 +623,25 @@ public class GameState
         bool shipDestroyed
     )
     {
-        var writer = new NetDataWriter();
-        writer.Put("AttackResult");
-        writer.Put(x);
-        writer.Put(y);
-        writer.Put(hit);
-        writer.Put(shipDestroyed);
+        var attackerWriter = new NetDataWriter();
+        attackerWriter.Put("AttackResult");
+        attackerWriter.Put(x);
+        attackerWriter.Put(y);
+        attackerWriter.Put(hit);
+        attackerWriter.Put(shipDestroyed);
+        attackerWriter.Put(false); 
+        attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
-        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
-        defender.Send(writer, DeliveryMethod.ReliableOrdered);
+        var defenderWriter = new NetDataWriter();
+        defenderWriter.Put("AttackResult");
+        defenderWriter.Put(x);
+        defenderWriter.Put(y);
+        defenderWriter.Put(hit);
+        defenderWriter.Put(shipDestroyed);
+        defenderWriter.Put(true); 
+        defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
-        Console.WriteLine($"[Server] Attack result sent: hit={hit}, destroyed={shipDestroyed}");
+        Console.WriteLine($"[Server] Attack result sent: attacker sees result, defender sees damage");
     }
 
     /// <summary>
@@ -692,7 +733,7 @@ public class GameState
                 }
             },
             null,
-            5000,
+            500,
             Timeout.Infinite
         );
     }
