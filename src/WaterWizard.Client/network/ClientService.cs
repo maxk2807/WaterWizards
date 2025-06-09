@@ -4,6 +4,8 @@ using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Shared;
+using WaterWizard.Client.network;
+using WaterWizard.Client.Gamescreen;
 
 namespace WaterWizard.Client.network;
 
@@ -12,6 +14,7 @@ public class ClientService(NetworkManager manager)
     public NetManager? client;
     public EventBasedNetListener? clientListener;
     public bool clientReady = false;
+    public string? myEndPoint;
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
     public GameSessionId? sessionId;
@@ -274,7 +277,7 @@ public class ClientService(NetworkManager manager)
                             opponentBoard.SetCellState(
                                 revealX,
                                 revealY,
-                                isHit ? gamescreen.CellState.Hit : gamescreen.CellState.Miss
+                                isHit ? WaterWizard.Client.Gamescreen.CellState.Hit : WaterWizard.Client.Gamescreen.CellState.Miss
                             );
                             Console.WriteLine(
                                 $"[Client] Cell revealed: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}"
@@ -372,12 +375,12 @@ public class ClientService(NetworkManager manager)
                         // Dann setze den Zellstatus basierend auf dem Treffer
                         if (hit)
                         {
-                            targetBoard.SetCellState(strikeX, strikeY, gamescreen.CellState.Hit);
+                            targetBoard.SetCellState(strikeX, strikeY, WaterWizard.Client.Gamescreen.CellState.Hit);
                             Console.WriteLine($"Set Hit at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
                         }
                         else
                         {
-                            targetBoard.SetCellState(strikeX, strikeY, gamescreen.CellState.Thunder);
+                            targetBoard.SetCellState(strikeX, strikeY, WaterWizard.Client.Gamescreen.CellState.Thunder);
                             Console.WriteLine($"Set Thunder at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
                         }
                     }

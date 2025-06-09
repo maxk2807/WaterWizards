@@ -3,6 +3,7 @@ using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.Gamescreen;
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -41,7 +42,7 @@ public class GameBoard
         {
             Position = position;
             Duration = MaxDuration;
-            
+
             // Generiere zufällige Punkte für Mini-Blitze
             miniLightningPoints = new Vector2[4];
             for (int i = 0; i < 4; i++)
@@ -72,17 +73,17 @@ public class GameBoard
 
             // Blitzeffekte
             Color thunderColor = new(255, 255, 0, (int)(255 * alpha));
-            
+
             // Hauptblitz
             float size = cellSize * 2.5f;
             Vector2 end = new(Position.X, Position.Y - size);
-            
+
             for (int i = 0; i < 3; i++)
             {
                 float offset = (float)(random.NextDouble() * 12 - 6) * alpha;
-                Vector2 mid1 = new(Position.X + offset, Position.Y - size/3);
-                Vector2 mid2 = new(Position.X - offset, Position.Y - size*2/3);
-                
+                Vector2 mid1 = new(Position.X + offset, Position.Y - size / 3);
+                Vector2 mid2 = new(Position.X - offset, Position.Y - size * 2 / 3);
+
                 float lineWidth = 2f + alpha * 2f;
                 Raylib.DrawLineEx(Position, mid1, lineWidth, thunderColor);
                 Raylib.DrawLineEx(mid1, mid2, lineWidth, thunderColor);
@@ -129,7 +130,7 @@ public class GameBoard
     public void putShip(GameShip ship)
     {
         Ships.Add(ship);
-        
+
         // Aktualisiere den Zellstatus für das platzierte Schiff
         int startX = (int)((ship.X - Position.X) / CellSize);
         int startY = (int)((ship.Y - Position.Y) / CellSize);
@@ -186,7 +187,7 @@ public class GameBoard
         {
             var strike = _activeThunderStrikes[i];
             strike.Update(deltaTime);
-            
+
             // Wenn die Animation beendet ist, entferne den Strike
             if (!strike.IsActive)
             {
@@ -251,7 +252,7 @@ public class GameBoard
                         (float)CellSize / 4,
                         Color.Red
                     );
-                    
+
                     // Zusätzliche X-Markierung für bessere Sichtbarkeit
                     float margin = CellSize * 0.2f;
                     Color hitColor = new(200, 0, 0, 255);
@@ -273,9 +274,9 @@ public class GameBoard
                     int centerX = posX + CellSize / 2;
                     int centerY = posY + CellSize / 2;
                     float radius = (float)CellSize / 4;
-                    
-                    Raylib.DrawCircle(centerX, centerY, radius + 1, Color.DarkBlue); 
-                    Raylib.DrawCircle(centerX, centerY, radius, Color.White);        
+
+                    Raylib.DrawCircle(centerX, centerY, radius + 1, Color.DarkBlue);
+                    Raylib.DrawCircle(centerX, centerY, radius, Color.White);
                 }
             }
         }
@@ -316,7 +317,7 @@ public class GameBoard
     {
         var mousePos = Raylib.GetMousePosition();
         Vector2 aim = gameCard.card.TargetAsVector();
-        
+
         // Spezialbehandlung für battlefield-Ziele wie Thunder
         if (gameCard.card.Target!.Target == "battlefield")
         {
@@ -327,22 +328,22 @@ public class GameBoard
                 20,
                 Color.Black
             );
-            
+
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
                 aiming = false;
-                NetworkManager.Instance.HandleCast(cardToAim!.card, new Point(0, 0));
+                NetworkManager.HandleCast(cardToAim!.card, new Point(0, 0));
             }
             return;
         }
-        
+
         // Normale Zielbehandlung für andere Kartentypen
         if ((int)aim.X == 0 && (int)aim.Y == 0)
         {
             //TODO: handle other types of aims
             return;
         }
-        
+
         Point? hoveredCoords;
         Vector2 boardPos;
         if (gameCard.card.Target!.Ally)
@@ -358,12 +359,12 @@ public class GameBoard
                 );
             boardPos = GameStateManager.Instance.GameScreen.opponentBoard!.Position;
         }
-        
+
         if (!hoveredCoords.HasValue)
         {
             return;
         }
-        
+
         Raylib.DrawText(
             "Click again to cast Card",
             (int)mousePos.X,
@@ -371,7 +372,7 @@ public class GameBoard
             20,
             Color.Black
         );
-        
+
         var onScreenX =
             boardPos.X + (hoveredCoords.Value.X - (float)Math.Floor(aim.X / 2f)) * CellSize;
         var onScreenY =
@@ -382,7 +383,7 @@ public class GameBoard
         if (Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
             aiming = false;
-            NetworkManager.Instance.HandleCast(cardToAim!.card, hoveredCoords.Value);
+            NetworkManager.HandleCast(cardToAim!.card, hoveredCoords.Value);
         }
     }
 
@@ -408,6 +409,20 @@ public class GameBoard
             {
                 _gridStates[x, y] = state;
             }
+        }
+    }
+
+    /// <summary>
+    /// Marks a cell as hit or missed based on the attack result.
+    /// </summary>
+    /// <param name="x">X coordinate of the cell</param>
+    /// <param name="y">Y coordinate of the cell</param>
+    /// <param name="hit">True if the attack hit, false if it missed</param>
+    public void MarkCellAsHit(int x, int y, bool hit)
+    {
+        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+        {
+            _gridStates[x, y] = hit ? CellState.Hit : CellState.Miss;
         }
     }
 
@@ -451,7 +466,7 @@ public class GameBoard
             Position.X + x * CellSize + CellSize / 2,
             Position.Y + y * CellSize + CellSize / 2
         );
-        
+
         // Neuen Blitzeinschlag hinzufügen
         _activeThunderStrikes.Add(new ThunderStrike(position));
 
