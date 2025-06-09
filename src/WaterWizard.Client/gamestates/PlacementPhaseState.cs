@@ -34,12 +34,7 @@ public class PlacementPhaseState : IGameState
         if (hoverReady && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             NetworkManager.Instance.SendPlacementReady();
-            //manager.SetStateToInGame();
-        }
-
-        if (Raylib.IsKeyPressed(KeyboardKey.L))
-        {
-            manager.SetStateToInGame();
+            // Der Übergang erfolgt erst, wenn der Server die "StartGame" Nachricht sendet
         }
     }
 }

@@ -13,6 +13,7 @@ public class ClientService(NetworkManager manager)
     private NetManager? client;
     private EventBasedNetListener? clientListener;
     private bool clientReady = false;
+    private string? myEndPoint;
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
     private GameSessionId? sessionId;
@@ -21,6 +22,7 @@ public class ClientService(NetworkManager manager)
     public void InitializeClientForDiscovery()
     {
         CleanupIfRunning();
+        myEndPoint = null;
 
         clientListener = new EventBasedNetListener();
         client = new NetManager(clientListener) { UnconnectedMessagesEnabled = true };
@@ -222,6 +224,13 @@ public class ClientService(NetworkManager manager)
                 return;
             }
 
+            // Speichere die lokale Adresse des Clients
+            if (client.FirstPeer != null)
+            {
+                myEndPoint = client.FirstPeer.ToString();
+                Console.WriteLine($"[Client] Lokale Client-Adresse: {myEndPoint}");
+            }
+
             SetupClientEventHandlers();
 
             bool pingAttemptFailed = true;
@@ -324,6 +333,16 @@ public class ClientService(NetworkManager manager)
         clientListener.PeerConnectedEvent += peer =>
         {
             Console.WriteLine($"[Client] Erfolgreich mit dem Server verbunden: {peer}");
+            Console.WriteLine($"[Client] Debug Peer Properties:");
+            Console.WriteLine($"- peer.Address: {peer.Address}");
+            Console.WriteLine($"- peer.Port: {peer.Port}");
+            Console.WriteLine($"- peer.Id: {peer.Id}");
+            Console.WriteLine($"- peer.ConnectionState: {peer.ConnectionState}");
+            Console.WriteLine($"- peer.ToString(): {peer.ToString()}");
+            Console.WriteLine($"- client.LocalPort: {client?.LocalPort}");
+
+            myEndPoint = $"127.0.0.1:{client?.LocalPort}";
+            Console.WriteLine($"[Client] Meine Adresse ist: {myEndPoint}");
 
             GameStateManager.Instance.ChatLog.AddMessage($"Connected to server at {peer}");
         };
@@ -656,20 +675,20 @@ public class ClientService(NetworkManager manager)
                 case "CellReveal":
                     try
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
+                        int revealX = reader.GetInt();
+                        int revealY = reader.GetInt();
                         bool isHit = reader.GetBool();
 
                         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
                         if (opponentBoard != null)
                         {
                             opponentBoard.SetCellState(
-                                x,
-                                y,
+                                revealX,
+                                revealY,
                                 isHit ? gamescreen.CellState.Hit : gamescreen.CellState.Miss
                             );
                             Console.WriteLine(
-                                $"[Client] Cell revealed: ({x},{y}) = {(isHit ? "hit" : "miss")}"
+                                $"[Client] Cell revealed: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}"
                             );
                         }
                     }
@@ -682,16 +701,16 @@ public class ClientService(NetworkManager manager)
                 case "ShipReveal":
                     try
                     {
-                        int x = reader.GetInt();
-                        int y = reader.GetInt();
+                        int shipX = reader.GetInt();
+                        int shipY = reader.GetInt();
                         int width = reader.GetInt();
                         int height = reader.GetInt();
 
                         var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
                         if (opponentBoard != null)
                         {
-                            int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-                            int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
+                            int pixelX = (int)opponentBoard.Position.X + shipX * opponentBoard.CellSize;
+                            int pixelY = (int)opponentBoard.Position.Y + shipY * opponentBoard.CellSize;
                             int pixelWidth = width * opponentBoard.CellSize;
                             int pixelHeight = height * opponentBoard.CellSize;
 
@@ -707,7 +726,7 @@ public class ClientService(NetworkManager manager)
                             );
 
                             Console.WriteLine(
-                                $"[Client] Ship revealed: ({x},{y}) size {width}x{height}"
+                                $"[Client] Ship revealed: ({shipX},{shipY}) size {width}x{height}"
                             );
                         }
                     }
@@ -770,6 +789,72 @@ public class ClientService(NetworkManager manager)
                             $"[Client] Fehler beim Verarbeiten von ActiveCardsError: {ex.Message}"
                         );
                     }
+                    break;
+                case "ThunderStrike":
+                    string targetPlayerAddress = reader.GetString();
+                    int strikeX = reader.GetInt();
+                    int strikeY = reader.GetInt();
+                    bool hit = reader.GetBool();
+
+                    Console.WriteLine("\n[Client] Received Thunder Strike");
+                    Console.WriteLine("----------------------------------------");
+                    Console.WriteLine($"Target Player Address: {targetPlayerAddress}");
+                    Console.WriteLine($"Strike Coordinates: ({strikeX}, {strikeY})");
+                    Console.WriteLine($"Hit: {hit}");
+
+                    Console.WriteLine($"\nAddress Comparison:");
+                    Console.WriteLine($"- Target Address (full): {targetPlayerAddress}");
+                    Console.WriteLine($"- My Address (full): {myEndPoint}");
+
+                    // Wurde mein Board getroffen?
+                    bool myBoardWasHit = false;
+                    if (myEndPoint != null)
+                    {
+                        // Vergleiche die Adressen ohne den "127.0.0.1:" Teil
+                        string targetPort = targetPlayerAddress.Split(':').LastOrDefault() ?? "";
+                        string myPort = myEndPoint.Split(':').LastOrDefault() ?? "";
+                        Console.WriteLine($"Port Comparison:");
+                        Console.WriteLine($"- Target Port: {targetPort}");
+                        Console.WriteLine($"- My Port: {myPort}");
+                        myBoardWasHit = targetPort == myPort;
+                    }
+                    Console.WriteLine($"\nResult:");
+                    Console.WriteLine($"- Was my board hit? {myBoardWasHit}");
+                    Console.WriteLine($"- Will show on: {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+
+                    // Wenn mein Board getroffen wurde -> auf meinem playerBoard anzeigen
+                    // Wenn das gegnerische Board getroffen wurde -> auf meinem opponentBoard anzeigen
+                    var targetBoard = myBoardWasHit
+                        ? GameStateManager.Instance.GameScreen.playerBoard    // Mein Board wurde getroffen
+                        : GameStateManager.Instance.GameScreen.opponentBoard; // Gegnerisches Board wurde getroffen
+
+                    Console.WriteLine($"\nBoard Status:");
+                    Console.WriteLine($"- playerBoard is null: {GameStateManager.Instance.GameScreen.playerBoard == null}");
+                    Console.WriteLine($"- opponentBoard is null: {GameStateManager.Instance.GameScreen.opponentBoard == null}");
+                    Console.WriteLine($"- targetBoard is null: {targetBoard == null}");
+
+                    if (targetBoard != null)
+                    {
+                        // Füge zuerst den visuellen Blitzeffekt hinzu
+                        targetBoard.AddThunderStrike(strikeX, strikeY);
+
+                        // Dann setze den Zellstatus basierend auf dem Treffer
+                        if (hit)
+                        {
+                            targetBoard.SetCellState(strikeX, strikeY, gamescreen.CellState.Hit);
+                            Console.WriteLine($"Set Hit at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+                        }
+                        else
+                        {
+                            targetBoard.SetCellState(strikeX, strikeY, gamescreen.CellState.Thunder);
+                            Console.WriteLine($"Set Thunder at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+                        }
+                    }
+                    Console.WriteLine("----------------------------------------\n");
+                    break;
+                case "ThunderReset":
+                    GameStateManager.Instance.GameScreen.playerBoard?.ResetThunderFields();
+                    GameStateManager.Instance.GameScreen.opponentBoard?.ResetThunderFields();
                     break;
             }
         }

@@ -62,6 +62,8 @@ public class GameState
     public List<Cards> Graveyard { get; private set; }
 
     private Timer activationTimer;
+    private float thunderTimer = 0f;
+    private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Blitzeinschlägen in Sekunden
 
     private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
 
@@ -113,6 +115,18 @@ public class GameState
         players = new NetPeer[connectedCount];
         for (int i = 0; i < connectedCount; i++)
             players[i] = server.ConnectedPeerList[i];
+
+        // Log initial player setup
+        Console.WriteLine("\n[Server] Initial Player Setup:");
+        Console.WriteLine("----------------------------------------");
+        for (int i = 0; i < players.Length; i++)
+        {
+            Console.WriteLine($"Player {i + 1}: {players[i]}");
+            Console.WriteLine($"  - Owns Board[{i}]");
+            Console.WriteLine($"  - Opponent: {(i == 0 ? players[1] : players[0])}");
+            Console.WriteLine($"  - Opponent's Board: Board[{(i == 0 ? 1 : 0)}]");
+        }
+        Console.WriteLine("----------------------------------------\n");
 
         boards = InitBoards();
         hands =
@@ -337,37 +351,113 @@ public class GameState
     {
         Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
         ActiveCards.Add(new(variant) { remainingDuration = duration * 1000f });
+        
+        // Sofort die aktive Karte an alle Clients senden
+        foreach (var player in players)
+        {
+            SendActiveCardsUpdate(player);
+        }
     }
 
     private void UpdateActiveCards(float passedTime)
     {
-        List<Cards> toDelete = [];
-        Dictionary<Cards, float> toSend = [];
-        NetDataWriter writer = new();
-        writer.Put("ActiveCards");
-        foreach (Cards card in ActiveCards)
+        for (int i = ActiveCards.Count - 1; i >= 0; i--)
         {
+            var card = ActiveCards[i];
             card.remainingDuration -= passedTime;
+
             if (card.remainingDuration <= 0)
             {
-                toDelete.Add(card);
+                // Karte ist abgelaufen
+                ActiveCards.RemoveAt(i);
+                
+                foreach (var player in players)
+                {
+                    SendActiveCardsUpdate(player);
+                }
+                
+                if (card.Variant == CardVariant.Thunder)
+                {
+                    Console.WriteLine("\n[Server] Thunder Card expired");
+                    Console.WriteLine("----------------------------------------");
+                    foreach (var player in players)
+                    {
+                        NetDataWriter resetWriter = new();
+                        resetWriter.Put("ThunderReset");
+                        player.Send(resetWriter, DeliveryMethod.ReliableOrdered);
+                        Console.WriteLine($"Sent ThunderReset to player: {player}");
+                    }
+                    Console.WriteLine("----------------------------------------\n");
+                }
+                continue;
             }
-            else
+
+            CardAbilities.HandleActivationEffect(card, passedTime);
+
+            if (card.Variant == CardVariant.Thunder)
             {
-                toSend.Add(card, card.remainingDuration);
-                CardAbilities.HandleActivationEffect(card, passedTime);
+                thunderTimer -= passedTime / 1000f;
+                
+                if (thunderTimer <= 0)
+                {
+                    thunderTimer = THUNDER_INTERVAL;
+                    Console.WriteLine("\n[Server] Thunder Strike Round");
+                    Console.WriteLine("----------------------------------------");
+                    
+                    for (int playerIndex = 0; playerIndex < 2; playerIndex++)
+                    {
+                        var targetPlayer = players[playerIndex];
+                        Console.WriteLine($"\nGenerating strike for Board[{playerIndex}] owned by {targetPlayer}");
+                        
+                        int x = Random.Shared.Next(0, boardWidth);
+                        int y = Random.Shared.Next(0, boardHeight);
+                        Console.WriteLine($"Strike coordinates: ({x}, {y})");
+
+                        bool hit = GetShips(targetPlayer).Any(ship =>
+                            x >= ship.X && x < ship.X + ship.Width &&
+                            y >= ship.Y && y < ship.Y + ship.Height
+                        );
+
+                        // Detailed strike information
+                        Console.WriteLine($"Strike Result:");
+                        Console.WriteLine($"  - Target Board: Board[{playerIndex}]");
+                        Console.WriteLine($"  - Board Owner: {targetPlayer}");
+                        Console.WriteLine($"  - Coordinates: ({x}, {y})");
+                        Console.WriteLine($"  - Hit: {(hit ? "YES" : "NO")}");
+
+                        NetDataWriter thunderWriter = new();
+                        thunderWriter.Put("ThunderStrike");
+                        thunderWriter.Put(targetPlayer.ToString());
+                        thunderWriter.Put(x);
+                        thunderWriter.Put(y);
+                        thunderWriter.Put(hit);
+
+                        // Log message sending
+                        Console.WriteLine("\nSending strike information to players:");
+                        foreach (var player in players)
+                        {
+                            player.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
+                            Console.WriteLine($"  - Sent to {player}");
+                            Console.WriteLine($"    - {(player == targetPlayer ? "This is their board" : "This is their opponent's board")}");
+                            Console.WriteLine($"    - They should show this on their {(player == targetPlayer ? "playerBoard" : "opponentBoard")}");
+                        }
+
+                        if (hit)
+                        {
+                            var hitShip = GetShips(targetPlayer).First(ship =>
+                                x >= ship.X && x < ship.X + ship.Width &&
+                                y >= ship.Y && y < ship.Y + ship.Height
+                            );
+                            Console.WriteLine($"\nHit Details:");
+                            Console.WriteLine($"  - Hit ship at position: ({hitShip.X}, {hitShip.Y})");
+                            Console.WriteLine($"  - Ship size: {hitShip.Width}x{hitShip.Height}");
+                            Console.WriteLine($"  - Current damage: {hitShip.DamagedCells.Count}/{hitShip.MaxHealth}");
+                        }
+                    }
+                    Console.WriteLine("----------------------------------------\n");
+                }
             }
         }
-        writer.Put(toSend.Count);
-        foreach (var pair in toSend)
-        {
-            writer.Put(pair.Key.Variant.ToString());
-            writer.Put(pair.Value);
-        }
-        server.ConnectedPeerList.ForEach(client =>
-            client.Send(writer, DeliveryMethod.ReliableOrdered)
-        );
-        bool success = toDelete.All(ActiveCards.Remove);
     }
 
     /// <summary>
@@ -605,5 +695,18 @@ public class GameState
             5000,
             Timeout.Infinite
         );
+    }
+
+    private void SendActiveCardsUpdate(NetPeer player)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("ActiveCards");
+        writer.Put(ActiveCards.Count);
+        foreach (var card in ActiveCards)
+        {
+            writer.Put(card.Variant.ToString());
+            writer.Put(card.remainingDuration);
+        }
+        player.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 }
