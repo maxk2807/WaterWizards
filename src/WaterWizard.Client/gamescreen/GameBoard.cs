@@ -463,8 +463,8 @@ public class GameBoard
     {
         // Position für den Blitzeinschlag berechnen
         Vector2 position = new(
-            Position.X + (float)(x * CellSize) + (float)(CellSize / 2),
-            Position.Y + (float)(y * CellSize) + (float)(CellSize / 2)
+            Position.X + (float)x * (float)CellSize + (float)CellSize / 2f,
+            Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
         );
 
         // Neuen Blitzeinschlag hinzufügen
