@@ -191,6 +191,8 @@ public class GameStateManager
     public void SetStateToHostingMenu()
     {
         currentState = new HostingMenuState();
+        gameTimer.Reset();
+        NetworkManager.Instance.LobbyCountdownSeconds = null;
         NetworkManager.Instance.StartHosting();
     }
 

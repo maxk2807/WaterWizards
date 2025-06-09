@@ -203,6 +203,9 @@ public static class LobbyHandler
 
         GameStateManager.Instance.ResetGame();
 
+        NetworkManager.Instance.clientService.clientReady = false;
+        NetworkManager.Instance.LobbyCountdownSeconds = null;
+
         if (NetworkManager.Instance.clientService.client != null && NetworkManager.Instance.clientService.client.FirstPeer != null)
         {
             var joinWriter = new NetDataWriter();

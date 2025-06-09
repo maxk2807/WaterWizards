@@ -170,6 +170,10 @@ public class NetworkManager
             : "You fought well, but victory slipped away. Better luck next time!";
 
         Console.WriteLine($"[Client] Game Over - Result: {result}, IsWinner: {isWinner}");
+
+        Instance.clientService.clientReady = false;
+        Instance.LobbyCountdownSeconds = null;
+
         GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
     }
 

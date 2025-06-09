@@ -642,7 +642,7 @@ public class GameState
                 }
             },
             null,
-            5000,
+            500,
             Timeout.Infinite
         );
     }
