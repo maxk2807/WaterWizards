@@ -63,6 +63,23 @@ public class RessourceField(GameScreen gameScreen)
         ManaRec = new(manaX, manaY, manaWidth, manaFontSize);
     }
 
+    public void SetGold(int gold)
+    {
+        Gold = gold;
+    }
+
+    public void GoldFieldUpdate()
+    {
+        goldString = Gold + " $";
+
+        int goldFontSize = 30;
+        int goldWidth = Raylib.MeasureText(goldString, goldFontSize);
+        int goldX = X + (int)(Width / 4f - goldWidth / 2f);
+        int goldY = (int)(Y + (Height - goldFontSize) / 2f);
+
+        GoldRec = new(goldX, goldY, goldWidth, goldFontSize);
+    }
+
     public void Draw()
     {
         Raylib.DrawText(
