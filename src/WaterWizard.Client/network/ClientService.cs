@@ -267,22 +267,7 @@ public class ClientService(NetworkManager manager)
                 case "CellReveal":
                     try
                     {
-                        int revealX = reader.GetInt();
-                        int revealY = reader.GetInt();
-                        bool isHit = reader.GetBool();
-
-                        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-                        if (opponentBoard != null)
-                        {
-                            opponentBoard.SetCellState(
-                                revealX,
-                                revealY,
-                                isHit ? WaterWizard.Client.Gamescreen.CellState.Hit : WaterWizard.Client.Gamescreen.CellState.Miss
-                            );
-                            Console.WriteLine(
-                                $"[Client] Cell revealed: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}"
-                            );
-                        }
+                        HandleAttacks.HandleCellReveal(reader);
                     }
                     catch (Exception ex)
                     {

@@ -86,16 +86,16 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "CastCard":
                 gameState.HandleCardCasting(peer, reader);
                 break;
-            case "Attack":
-                int x = reader.GetInt();
-                int y = reader.GetInt();
-                Console.WriteLine($"[Server] Attack received at ({x}, {y}) from {peer}");
-                var defender = FindOpponent(peer);
-                if (defender != null)
-                    gameState.HandleAttack(peer, defender, x, y);
-                else
-                    Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
-                break;
+             case "Attack":
+                 int x = reader.GetInt();
+                 int y = reader.GetInt();
+                 Console.WriteLine($"[Server] Attack received at ({x}, {y}) from {peer}");
+                 var defender = FindOpponent(peer);
+                 if (defender != null)
+                     gameState.HandleAttack(peer, defender, x, y);
+                 else
+                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
+                 break;
             default:
                 Console.WriteLine($"[InGameState] Unbekannter Nachrichtentyp: {messageType}");
                 break;

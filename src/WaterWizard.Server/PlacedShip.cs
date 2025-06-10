@@ -10,7 +10,7 @@ public class PlacedShip
     public int Width { get; set; }
     public int Height { get; set; }
 
-    public int MaxHealth => Width * Height; // Total cells
+    public int MaxHealth => Width * Height; 
     public HashSet<(int X, int Y)> DamagedCells { get; set; } = new();
     public bool IsDestroyed => DamagedCells.Count >= MaxHealth;
 

@@ -44,7 +44,7 @@ namespace WaterWizard.Server;
 /// </summary>
 public class GameState
 {
-    private NetPeer[] players = new NetPeer[2];
+    public NetPeer[] players = new NetPeer[2];
     private static readonly int boardWidth = 12;
     private static readonly int boardHeight = 10;
     private readonly Cell[][,] boards = new Cell[2][,];
@@ -534,13 +534,13 @@ public class GameState
                     }
                     else
                     {
-                        SendCellReveal(attacker, x, y, true);
+                        SendCellReveal(attacker, defender, x, y, true); 
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
-                    SendCellReveal(attacker, x, y, true);
+                    SendCellReveal(attacker, defender, x, y, true); 
                 }
                 break;
             }
@@ -549,7 +549,7 @@ public class GameState
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
-            SendCellReveal(attacker, x, y, false);
+            SendCellReveal(attacker, defender, x, y, false); // Updated to include defender
         }
 
         /// <summary>
@@ -570,27 +570,37 @@ public class GameState
     }
 
     /// <summary>
-    /// Reveals a specific cell to the attacker (hit or miss)
+    /// Reveals a specific cell to both attacker and defender
     /// </summary>
-    /// <param name="attacker"></param>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="isHit"></param>
-    private void SendCellReveal(NetPeer attacker, int x, int y, bool isHit)
+    /// <param name="attacker">The attacker who needs to see the result on opponent's board</param>
+    /// <param name="defender">The defender who needs to see where they got attacked</param>
+    /// <param name="x">X coordinate</param>
+    /// <param name="y">Y coordinate</param>
+    /// <param name="isHit">Whether it was a hit or miss</param>
+    public void SendCellReveal(NetPeer attacker, NetPeer defender, int x, int y, bool isHit)
     {
-        var writer = new NetDataWriter();
-        writer.Put("CellReveal");
-        writer.Put(x);
-        writer.Put(y);
-        writer.Put(isHit);
-        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
+        var attackerWriter = new NetDataWriter();
+        attackerWriter.Put("CellReveal");
+        attackerWriter.Put(x);
+        attackerWriter.Put(y);
+        attackerWriter.Put(isHit);
+        attackerWriter.Put(false); 
+        attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
+
+        var defenderWriter = new NetDataWriter();
+        defenderWriter.Put("CellReveal");
+        defenderWriter.Put(x);
+        defenderWriter.Put(y);
+        defenderWriter.Put(isHit);
+        defenderWriter.Put(true); 
+        defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Cell reveal sent to {attacker}: ({x},{y}) = {(isHit ? "hit" : "miss")}"
+            $"[Server] Cell reveal sent to both players: ({x},{y}) = {(isHit ? "hit" : "miss")}"
         );
     }
 
-    private void SendShipReveal(NetPeer attacker, PlacedShip ship)
+    public void SendShipReveal(NetPeer attacker, PlacedShip ship)
     {
         var writer = new NetDataWriter();
         writer.Put("ShipReveal");

@@ -111,7 +111,7 @@ public class Cards
                 Mana = 2,
                 CastTime = "instant",
                 Duration = "instant",
-                Target = new("2x1"),
+                Target = new("1x1"),
             }
         },
         {

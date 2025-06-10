@@ -20,7 +20,7 @@ public class GameBoard
     public int CellSize { get; set; }
     public Vector2 Position { get; set; }
 
-    private readonly CellState[,] _gridStates;
+    public readonly CellState[,] _gridStates;
 
     private bool aiming = false;
     private GameCard? cardToAim;
@@ -404,11 +404,16 @@ public class GameBoard
     {
         if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
         {
-            // Wenn ein Schiff getroffen wurde, behalte den Hit-Status
-            if (state == CellState.Hit || (_gridStates[x, y] != CellState.Hit && _gridStates[x, y] != CellState.Ship))
+            if (state == CellState.Hit || state == CellState.Miss)
             {
                 _gridStates[x, y] = state;
             }
+            else if (_gridStates[x, y] != CellState.Hit && _gridStates[x, y] != CellState.Ship)
+            {
+                _gridStates[x, y] = state;
+            }
+            
+            Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
         }
     }
 
@@ -423,6 +428,8 @@ public class GameBoard
         if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
         {
             _gridStates[x, y] = hit ? CellState.Hit : CellState.Miss;
+            
+            Console.WriteLine($"[GameBoard] Cell ({x},{y}) marked as {(hit ? "HIT" : "MISS")} - State: {_gridStates[x, y]}");
         }
     }
 
