@@ -29,6 +29,9 @@ public class FireboltCard : IDamageCard
     /// </summary>
     public bool HasSpecialTargeting => false;
 
+    /// <summary>
+    /// Executes the damage effect of the Firebolt card
+    /// </summary>
     /// <param name="gameState">The current game state</param>
     /// <param name="targetCoords">The coordinates targeted by the card</param>
     /// <param name="attacker">The attacking player</param>
@@ -37,10 +40,10 @@ public class FireboltCard : IDamageCard
     {
         int startX = (int)targetCoords.X;
         int startY = (int)targetCoords.Y;
-        
+
         var ships = gameState.GetShips(defender);
         bool anyHit = false;
-        
+
         for (int dx = 0; dx < (int)AreaOfEffect.X; dx++)
         {
             for (int dy = 0; dy < (int)AreaOfEffect.Y; dy++)
@@ -48,15 +51,15 @@ public class FireboltCard : IDamageCard
                 int x = startX + dx;
                 int y = startY + dy;
                 bool cellHit = false;
-                
+
                 foreach (var ship in ships)
                 {
-                    if (x >= ship.X && x < ship.X + ship.Width && 
+                    if (x >= ship.X && x < ship.X + ship.Width &&
                         y >= ship.Y && y < ship.Y + ship.Height)
                     {
                         cellHit = true;
                         bool newDamage = ship.DamageCell(x, y);
-                        
+
                         if (newDamage)
                         {
                             if (ship.IsDestroyed)
@@ -75,7 +78,7 @@ public class FireboltCard : IDamageCard
                         break;
                     }
                 }
-                
+
                 if (!cellHit)
                 {
                     gameState.SendCellReveal(attacker, defender, x, y, false);
@@ -87,7 +90,7 @@ public class FireboltCard : IDamageCard
                 }
             }
         }
-        
+
         return anyHit;
     }
 
