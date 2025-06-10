@@ -1,8 +1,8 @@
 using System.Numerics;
 using LiteNetLib;
-using LiteNetLib.Utils;
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
+using WaterWizard.Server.handler;
 
 namespace WaterWizard.Server.Card;
 
@@ -41,7 +41,7 @@ public class FireboltCard : IDamageCard
         int startX = (int)targetCoords.X;
         int startY = (int)targetCoords.Y;
 
-        var ships = gameState.GetShips(defender);
+        var ships = ShipHandler.GetShips(defender);
         bool anyHit = false;
 
         for (int dx = 0; dx < (int)AreaOfEffect.X; dx++)

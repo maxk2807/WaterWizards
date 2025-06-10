@@ -1,8 +1,9 @@
-namespace WaterWizard.Server.ServerGameStates;
-
-using System;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server.handler;
+using WaterWizard.Server;
+
+namespace WaterWizard.Server.ServerGameStates;
 
 /// <summary>
 /// Server-Spielzustand für die eigentliche Spielphase (nach Platzierung).
@@ -11,7 +12,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 {
     private readonly NetManager server = server;
     private readonly GameState gameState = gameState;
-    
+
     private System.Timers.Timer? manaTimer;
 
     /// <summary>
@@ -59,7 +60,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     /// Wird beim Verlassen des States aufgerufen (hier leer).
     /// </summary>
     public void OnExit()
-    { 
+    {
         manaTimer?.Stop();
         manaTimer?.Dispose();
     }
@@ -78,7 +79,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         switch (messageType)
         {
             case "PlaceShip":
-                gameState.HandleShipPlacement(peer, reader);
+                ShipHandler.HandleShipPlacement(peer, reader, gameState);
                 break;
             case "BuyCard":
                 gameState.HandleCardBuying(peer, reader);
@@ -86,16 +87,16 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "CastCard":
                 gameState.HandleCardCasting(peer, reader);
                 break;
-             case "Attack":
-                 int x = reader.GetInt();
-                 int y = reader.GetInt();
-                 Console.WriteLine($"[Server] Attack received at ({x}, {y}) from {peer}");
-                 var defender = FindOpponent(peer);
-                 if (defender != null)
-                     gameState.HandleAttack(peer, defender, x, y);
-                 else
-                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
-                 break;
+            case "Attack":
+                int x = reader.GetInt();
+                int y = reader.GetInt();
+                Console.WriteLine($"[Server] Attack received at ({x}, {y}) from {peer}");
+                var defender = FindOpponent(peer);
+                if (defender != null)
+                    gameState.HandleAttack(peer, defender, x, y);
+                else
+                    Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
+                break;
             default:
                 Console.WriteLine($"[InGameState] Unbekannter Nachrichtentyp: {messageType}");
                 break;
