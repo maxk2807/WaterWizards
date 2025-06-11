@@ -19,10 +19,10 @@ public static class DamageCardFactory
         return variant switch
         {
             CardVariant.Firebolt => new FireboltCard(),
-            _ => null
+            _ => null,
         };
     }
-    
+
     /// <summary>
     /// Checks if the given card variant is a damage card
     /// </summary>

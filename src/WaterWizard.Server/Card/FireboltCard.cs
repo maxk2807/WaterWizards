@@ -1,8 +1,8 @@
 using System.Numerics;
 using LiteNetLib;
+using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
-using WaterWizard.Server.handler;
 
 namespace WaterWizard.Server.Card;
 
@@ -16,14 +16,17 @@ public class FireboltCard : IDamageCard
     /// The variant of the card
     /// </summary>
     public CardVariant Variant => CardVariant.Firebolt;
+
     /// <summary>
     /// The area of effect as a Vector2 (width x height)
     /// </summary>
-    public Vector2 AreaOfEffect => new(1, 1); 
+    public Vector2 AreaOfEffect => new(1, 1);
+
     /// <summary>
     /// The base damage this card deals
     /// </summary>
     public int BaseDamage => 1;
+
     /// <summary>
     /// Whether this card has special targeting rules
     /// </summary>
@@ -36,7 +39,12 @@ public class FireboltCard : IDamageCard
     /// <param name="targetCoords">The coordinates targeted by the card</param>
     /// <param name="attacker">The attacking player</param>
     /// <param name="defender">The defending player</param>
-    public bool ExecuteDamage(GameState gameState, Vector2 targetCoords, NetPeer attacker, NetPeer defender)
+    public bool ExecuteDamage(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer attacker,
+        NetPeer defender
+    )
     {
         int startX = (int)targetCoords.X;
         int startY = (int)targetCoords.Y;
@@ -54,8 +62,12 @@ public class FireboltCard : IDamageCard
 
                 foreach (var ship in ships)
                 {
-                    if (x >= ship.X && x < ship.X + ship.Width &&
-                        y >= ship.Y && y < ship.Y + ship.Height)
+                    if (
+                        x >= ship.X
+                        && x < ship.X + ship.Width
+                        && y >= ship.Y
+                        && y < ship.Y + ship.Height
+                    )
                     {
                         cellHit = true;
                         bool newDamage = ship.DamageCell(x, y);
@@ -106,9 +118,9 @@ public class FireboltCard : IDamageCard
         int boardWidth = 12;
         int boardHeight = 10;
 
-        return targetCoords.X >= 0 &&
-               targetCoords.Y >= 0 &&
-               targetCoords.X + AreaOfEffect.X <= boardWidth &&
-               targetCoords.Y + AreaOfEffect.Y <= boardHeight;
+        return targetCoords.X >= 0
+            && targetCoords.Y >= 0
+            && targetCoords.X + AreaOfEffect.X <= boardWidth
+            && targetCoords.Y + AreaOfEffect.Y <= boardHeight;
     }
 }

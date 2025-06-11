@@ -1,8 +1,8 @@
+using LiteNetLib;
+using LiteNetLib.Utils;
 using WaterWizard.Server;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
-using LiteNetLib.Utils;
-using LiteNetLib;
 
 namespace WaterWizard.Server.handler;
 
@@ -11,9 +11,7 @@ namespace WaterWizard.Server.handler;
 /// </summary>
 public class ShipHandler
 {
-
     public static readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = [];
-
 
     /// <summary>
     /// Adds a ship to the player's collection of ships.
@@ -68,7 +66,11 @@ public class ShipHandler
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
-    public static void HandleShipPlacement(NetPeer peer, NetPacketReader reader, GameState gameState)
+    public static void HandleShipPlacement(
+        NetPeer peer,
+        NetPacketReader reader,
+        GameState gameState
+    )
     {
         int x = reader.GetInt();
         int y = reader.GetInt();

@@ -39,7 +39,7 @@ public class CastingUI
                 20,
                 Color.Black
             );
-            
+
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
                 aiming = false;
@@ -90,7 +90,7 @@ public class CastingUI
             }
         }
     }
-    
+
     public void StartDrawingCardAim(GameCard gameCard)
     {
         aiming = true;

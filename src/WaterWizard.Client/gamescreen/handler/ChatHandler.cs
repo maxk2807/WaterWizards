@@ -1,6 +1,6 @@
-using WaterWizard.Client.network;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
 

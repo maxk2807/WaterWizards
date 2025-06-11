@@ -13,22 +13,22 @@ public interface IDamageCard
     /// The variant of the card
     /// </summary>
     CardVariant Variant { get; }
-    
+
     /// <summary>
     /// The area of effect as a Vector2 (width x height)
     /// </summary>
     Vector2 AreaOfEffect { get; }
-    
+
     /// <summary>
     /// The base damage this card deals
     /// </summary>
     int BaseDamage { get; }
-    
+
     /// <summary>
     /// Whether this card has special targeting rules
     /// </summary>
     bool HasSpecialTargeting { get; }
-    
+
     /// <summary>
     /// Executes the damage effect of the card
     /// </summary>
@@ -37,8 +37,13 @@ public interface IDamageCard
     /// <param name="attacker">The player casting the card</param>
     /// <param name="defender">The player being targeted</param>
     /// <returns>True if any damage was dealt, false otherwise</returns>
-    bool ExecuteDamage(GameState gameState, Vector2 targetCoords, NetPeer attacker, NetPeer defender);
-    
+    bool ExecuteDamage(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer attacker,
+        NetPeer defender
+    );
+
     /// <summary>
     /// Validates if the target coordinates are valid for this card
     /// </summary>

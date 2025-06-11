@@ -84,9 +84,13 @@ public class HandleShips
                 )
             );
         }
-        Console.WriteLine($"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
+        Console.WriteLine(
+            $"[Client] Nach ShipSync sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+        );
         GameStateManager.Instance.SetStateToInGame();
-        Console.WriteLine($"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board.");
+        Console.WriteLine(
+            $"[Client] Nach SetStateToInGame sind {playerBoard.Ships.Count} Schiffe auf dem Board."
+        );
     }
 
     /// <summary>
@@ -119,9 +123,7 @@ public class HandleShips
                 )
             );
 
-            Console.WriteLine(
-                $"[Client] Ship revealed: ({x},{y}) size {width}x{height}"
-            );
+            Console.WriteLine($"[Client] Ship revealed: ({x},{y}) size {width}x{height}");
         }
     }
 
@@ -132,9 +134,7 @@ public class HandleShips
     public static void HandleShipPlacementError(NetPacketReader reader)
     {
         string errorMsg = reader.GetString();
-        Console.WriteLine(
-            $"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}"
-        );
+        Console.WriteLine($"[Client] Fehler beim Platzieren des Schiffs: {errorMsg}");
 
         // Sperre das Draggen für diese Größe, wenn das Limit erreicht ist
         var match = System.Text.RegularExpressions.Regex.Match(
@@ -177,7 +177,13 @@ public class HandleShips
     /// <param name="width">The width (in grid cells) of the ship to be placed.</param>
     /// <param name="height">The height (in grid cells) of the ship to be placed.</param>
     /// <param name="manager">The NetworkManager instance used to send the placement message to the server.</param>
-    public static void SendShipPlacement(int x, int y, int width, int height, NetworkManager manager)
+    public static void SendShipPlacement(
+        int x,
+        int y,
+        int width,
+        int height,
+        NetworkManager manager
+    )
     {
         if (manager.clientService.client != null && manager.clientService.client.FirstPeer != null)
         {

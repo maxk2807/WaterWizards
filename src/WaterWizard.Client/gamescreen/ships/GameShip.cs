@@ -11,9 +11,11 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     public int Y = y;
     public int Width = width;
     public int Height = height;
-    
+
     public HashSet<(int X, int Y)> DamagedCells { get; private set; } = new();
-    public bool IsDestroyed => DamagedCells.Count >= (Width * Height / (gameScreen.playerBoard!.CellSize * gameScreen.playerBoard.CellSize));
+    public bool IsDestroyed =>
+        DamagedCells.Count
+        >= (Width * Height / (gameScreen.playerBoard!.CellSize * gameScreen.playerBoard.CellSize));
 
     public void AddDamage(int cellX, int cellY)
     {

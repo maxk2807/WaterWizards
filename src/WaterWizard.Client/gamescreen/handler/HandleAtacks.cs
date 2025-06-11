@@ -23,7 +23,9 @@ public class HandleAttacks
         bool shipDestroyed = reader.GetBool();
         bool isDefender = reader.GetBool();
 
-        Console.WriteLine($"[Client] HandleAttackResult: ({x},{y}) hit={hit} isDefender={isDefender}");
+        Console.WriteLine(
+            $"[Client] HandleAttackResult: ({x},{y}) hit={hit} isDefender={isDefender}"
+        );
 
         if (isDefender)
         {
@@ -31,10 +33,14 @@ public class HandleAttacks
             var playerBoard = GameStateManager.Instance.GameScreen?.playerBoard;
             if (playerBoard != null)
             {
-                Console.WriteLine($"[Client] Before MarkCellAsHit - Cell state: {playerBoard._gridStates[x, y]}");
+                Console.WriteLine(
+                    $"[Client] Before MarkCellAsHit - Cell state: {playerBoard._gridStates[x, y]}"
+                );
                 playerBoard.MarkCellAsHit(x, y, hit);
-                Console.WriteLine($"[Client] After MarkCellAsHit - Cell state: {playerBoard._gridStates[x, y]}");
-                
+                Console.WriteLine(
+                    $"[Client] After MarkCellAsHit - Cell state: {playerBoard._gridStates[x, y]}"
+                );
+
                 if (hit)
                 {
                     foreach (var ship in playerBoard.Ships)
@@ -45,14 +51,20 @@ public class HandleAttacks
                         int shipWidth = ship.Width / cellSize;
                         int shipHeight = ship.Height / cellSize;
 
-                        if (x >= shipCellX && x < shipCellX + shipWidth &&
-                            y >= shipCellY && y < shipCellY + shipHeight)
+                        if (
+                            x >= shipCellX
+                            && x < shipCellX + shipWidth
+                            && y >= shipCellY
+                            && y < shipCellY + shipHeight
+                        )
                         {
                             int relativeX = x - shipCellX;
                             int relativeY = y - shipCellY;
                             ship.AddDamage(relativeX, relativeY);
 
-                            Console.WriteLine($"[Client] Our ship hit at ({x},{y})! Ship destroyed: {shipDestroyed}");
+                            Console.WriteLine(
+                                $"[Client] Our ship hit at ({x},{y})! Ship destroyed: {shipDestroyed}"
+                            );
                             break;
                         }
                     }
@@ -73,7 +85,11 @@ public class HandleAttacks
             var opponentBoard = GameStateManager.Instance.GameScreen?.opponentBoard;
             if (opponentBoard != null)
             {
-                opponentBoard.SetCellState(x, y, hit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss);
+                opponentBoard.SetCellState(
+                    x,
+                    y,
+                    hit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
+                );
                 Console.WriteLine($"[Client] Our attack at ({x},{y}): {(hit ? "HIT" : "MISS")}");
             }
         }
@@ -102,8 +118,8 @@ public class HandleAttacks
         int revealX = reader.GetInt();
         int revealY = reader.GetInt();
         bool isHit = reader.GetBool();
-        bool isDefender = reader.GetBool(); 
-        
+        bool isDefender = reader.GetBool();
+
         var gameScreen = GameStateManager.Instance.GameScreen;
         if (gameScreen != null)
         {
@@ -113,7 +129,9 @@ public class HandleAttacks
                 if (playerBoard != null)
                 {
                     playerBoard.MarkCellAsHit(revealX, revealY, isHit);
-                    Console.WriteLine($"[Client] Defender - Cell revealed on own board: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}");
+                    Console.WriteLine(
+                        $"[Client] Defender - Cell revealed on own board: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}"
+                    );
                 }
             }
             else
@@ -126,11 +144,13 @@ public class HandleAttacks
                         revealY,
                         isHit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
                     );
-                    Console.WriteLine($"[Client] Attacker - Cell revealed on opponent board: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}");
+                    Console.WriteLine(
+                        $"[Client] Attacker - Cell revealed on opponent board: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}"
+                    );
                 }
             }
         }
-        
+
         Console.WriteLine(
             $"[Client] Cell revealed: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")} isDefender={isDefender}"
         );

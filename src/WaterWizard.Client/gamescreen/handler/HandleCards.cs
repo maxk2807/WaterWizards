@@ -56,7 +56,7 @@ public class HandleCards
             );
         }
     }
-    
+
     /// <summary>
     /// Handles the casting of a card at the specified coordinates.
     /// </summary>

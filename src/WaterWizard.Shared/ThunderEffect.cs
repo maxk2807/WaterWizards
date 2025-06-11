@@ -70,4 +70,4 @@ public class ThunderEffect
     {
         return new Vector2(_random.Next(0, _gridSize - 1), _random.Next(0, _gridSize - 1));
     }
-} 
+}

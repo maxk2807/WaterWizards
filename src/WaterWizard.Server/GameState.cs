@@ -1,9 +1,9 @@
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server.handler;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
-using WaterWizard.Server.handler;
 
 namespace WaterWizard.Server;
 
@@ -66,8 +66,6 @@ public class GameState
     private float thunderTimer = 0f;
     private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Blitzeinschlägen in Sekunden
 
-
-    
     public Mana Player1Mana { get; private set; } = new();
     public Mana Player2Mana { get; private set; } = new();
     public int Player1Gold { get; private set; } = 0;
@@ -100,7 +98,7 @@ public class GameState
         return players[index];
     }
 
-// TODO: für HandleCardBuying() gut verwendbar
+    // TODO: für HandleCardBuying() gut verwendbar
     public void SyncGoldToClient(int playerIndex)
     {
         var peer = GetPlayer(playerIndex);
@@ -117,10 +115,10 @@ public class GameState
         if (connectedCount < 1 || connectedCount > 2)
             throw new InvalidOperationException("Game requires 1 or 2 connected players.");
 
-        players = new NetPeer[2]; 
+        players = new NetPeer[2];
         for (int i = 0; i < connectedCount; i++)
             players[i] = server.ConnectedPeerList[i];
-        
+
         for (int i = connectedCount; i < 2; i++)
             players[i] = null;
 
@@ -132,7 +130,7 @@ public class GameState
             {
                 Console.WriteLine($"Player {i + 1}: {players[i]}");
                 Console.WriteLine($"  - Owns Board[{i}]");
-                
+
                 if (connectedCount > 1)
                 {
                     var opponentIndex = i == 0 ? 1 : 0;
@@ -268,7 +266,7 @@ public class GameState
     {
         Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
         ActiveCards.Add(new(variant) { remainingDuration = duration * 1000f });
-        
+
         // Sofort die aktive Karte an alle Clients senden
         foreach (var player in players)
         {
@@ -287,12 +285,12 @@ public class GameState
             {
                 // Karte ist abgelaufen
                 ActiveCards.RemoveAt(i);
-                
+
                 foreach (var player in players)
                 {
                     SendActiveCardsUpdate(player);
                 }
-                
+
                 if (card.Variant == CardVariant.Thunder)
                 {
                     Console.WriteLine("\n[Server] Thunder Card expired");
@@ -314,26 +312,32 @@ public class GameState
             if (card.Variant == CardVariant.Thunder)
             {
                 thunderTimer -= passedTime / 1000f;
-                
+
                 if (thunderTimer <= 0)
                 {
                     thunderTimer = THUNDER_INTERVAL;
                     Console.WriteLine("\n[Server] Thunder Strike Round");
                     Console.WriteLine("----------------------------------------");
-                    
+
                     for (int playerIndex = 0; playerIndex < 2; playerIndex++)
                     {
                         var targetPlayer = players[playerIndex];
-                        Console.WriteLine($"\nGenerating strike for Board[{playerIndex}] owned by {targetPlayer}");
-                        
+                        Console.WriteLine(
+                            $"\nGenerating strike for Board[{playerIndex}] owned by {targetPlayer}"
+                        );
+
                         int x = Random.Shared.Next(0, boardWidth);
                         int y = Random.Shared.Next(0, boardHeight);
                         Console.WriteLine($"Strike coordinates: ({x}, {y})");
 
-                        bool hit = ShipHandler.GetShips(targetPlayer).Any(ship =>
-                            x >= ship.X && x < ship.X + ship.Width &&
-                            y >= ship.Y && y < ship.Y + ship.Height
-                        );
+                        bool hit = ShipHandler
+                            .GetShips(targetPlayer)
+                            .Any(ship =>
+                                x >= ship.X
+                                && x < ship.X + ship.Width
+                                && y >= ship.Y
+                                && y < ship.Y + ship.Height
+                            );
 
                         // Detailed strike information
                         Console.WriteLine($"Strike Result:");
@@ -355,20 +359,32 @@ public class GameState
                         {
                             player.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
                             Console.WriteLine($"  - Sent to {player}");
-                            Console.WriteLine($"    - {(player == targetPlayer ? "This is their board" : "This is their opponent's board")}");
-                            Console.WriteLine($"    - They should show this on their {(player == targetPlayer ? "playerBoard" : "opponentBoard")}");
+                            Console.WriteLine(
+                                $"    - {(player == targetPlayer ? "This is their board" : "This is their opponent's board")}"
+                            );
+                            Console.WriteLine(
+                                $"    - They should show this on their {(player == targetPlayer ? "playerBoard" : "opponentBoard")}"
+                            );
                         }
 
                         if (hit)
                         {
-                            var hitShip = ShipHandler.GetShips(targetPlayer).First(ship =>
-                                x >= ship.X && x < ship.X + ship.Width &&
-                                y >= ship.Y && y < ship.Y + ship.Height
-                            );
+                            var hitShip = ShipHandler
+                                .GetShips(targetPlayer)
+                                .First(ship =>
+                                    x >= ship.X
+                                    && x < ship.X + ship.Width
+                                    && y >= ship.Y
+                                    && y < ship.Y + ship.Height
+                                );
                             Console.WriteLine($"\nHit Details:");
-                            Console.WriteLine($"  - Hit ship at position: ({hitShip.X}, {hitShip.Y})");
+                            Console.WriteLine(
+                                $"  - Hit ship at position: ({hitShip.X}, {hitShip.Y})"
+                            );
                             Console.WriteLine($"  - Ship size: {hitShip.Width}x{hitShip.Height}");
-                            Console.WriteLine($"  - Current damage: {hitShip.DamagedCells.Count}/{hitShip.MaxHealth}");
+                            Console.WriteLine(
+                                $"  - Current damage: {hitShip.DamagedCells.Count}/{hitShip.MaxHealth}"
+                            );
                         }
                     }
                     Console.WriteLine("----------------------------------------\n");
@@ -418,13 +434,13 @@ public class GameState
                     }
                     else
                     {
-                        SendCellReveal(attacker, defender, x, y, true); 
+                        SendCellReveal(attacker, defender, x, y, true);
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
-                    SendCellReveal(attacker, defender, x, y, true); 
+                    SendCellReveal(attacker, defender, x, y, true);
                 }
                 break;
             }
@@ -468,7 +484,7 @@ public class GameState
         attackerWriter.Put(x);
         attackerWriter.Put(y);
         attackerWriter.Put(isHit);
-        attackerWriter.Put(false); 
+        attackerWriter.Put(false);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
         var defenderWriter = new NetDataWriter();
@@ -476,15 +492,13 @@ public class GameState
         defenderWriter.Put(x);
         defenderWriter.Put(y);
         defenderWriter.Put(isHit);
-        defenderWriter.Put(true); 
+        defenderWriter.Put(true);
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
             $"[Server] Cell reveal sent to both players: ({x},{y}) = {(isHit ? "hit" : "miss")}"
         );
     }
-
-    
 
     /// <summary>
     /// Sends the result of an attack to both players.
@@ -510,7 +524,7 @@ public class GameState
         attackerWriter.Put(y);
         attackerWriter.Put(hit);
         attackerWriter.Put(shipDestroyed);
-        attackerWriter.Put(false); 
+        attackerWriter.Put(false);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
         var defenderWriter = new NetDataWriter();
@@ -519,10 +533,12 @@ public class GameState
         defenderWriter.Put(y);
         defenderWriter.Put(hit);
         defenderWriter.Put(shipDestroyed);
-        defenderWriter.Put(true); 
+        defenderWriter.Put(true);
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
-        Console.WriteLine($"[Server] Attack result sent: attacker sees result, defender sees damage");
+        Console.WriteLine(
+            $"[Server] Attack result sent: attacker sees result, defender sees damage"
+        );
     }
 
     /// <summary>
