@@ -31,6 +31,38 @@ public class GameScreen(
 
     private float _thunderTimer = 0;
     private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Donnereinschlägen
+    
+    private Texture2D gameBackground;
+    private Texture2D gridBackground;
+    private Texture2D enemyGridBackground;
+    private Texture2D graveyardAsset;
+
+    public void LoadBackgroundAssets()
+    {
+        if (gameBackground.Id != 0) return;
+        gameBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/BasicBackground.png");
+        //Hintergrund für das Spielbrett
+    }
+
+    public void LoadBoardBackground() //Hintergrund für das Grid
+    {
+        if (gridBackground.Id != 0) return;
+        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+        
+
+        if (enemyGridBackground.Id != 0) return;
+        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+    }
+
+    public void LoadUiBackground() //Ui hintergrund
+    {
+        if (gridBackground.Id != 0) return;
+        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+        
+
+        if (enemyGridBackground.Id != 0) return;
+        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+    } 
 
     /// <summary>
     /// Initialize all elements rendered on the GameScreen:
@@ -38,6 +70,8 @@ public class GameScreen(
     /// </summary>
     public void Initialize()
     {
+        LoadBackgroundAssets(); //Laden der Assets
+
         cardWidth = (int)Math.Round(screenWidth * (1 / 12f));
         cardHeight = (int)Math.Round(screenHeight * (7 / 45f));
         ZonePadding = screenWidth * 0.02f;
@@ -159,6 +193,20 @@ public class GameScreen(
             Raylib.DrawText("Initializing game boards...", 10, 50, 20, Color.Gray);
             return;
         }
+
+        //Draw der Assets
+        LoadBackgroundAssets();
+
+        Raylib.DrawTexture(gameBackground, 0, 0, Color.White); //Hintergrund zuerst zeichnen
+
+        LoadBoardBackground();
+
+        Raylib.DrawTexture(gridBackground, (int)playerBoard.Position.X, (int)playerBoard.Position.Y, Color.White);
+
+        Raylib.DrawTexture(enemyGridBackground, (int)opponentBoard.Position.X, (int)opponentBoard.Position.Y, Color.White);
+
+        LoadBoardBackground();
+
 
         // Calculate dynamic layout values inside Draw
         cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));

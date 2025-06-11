@@ -306,7 +306,7 @@ public class GameBoard
             CellState.Ship => Color.Gray,
             CellState.Hit => Color.Orange,
             CellState.Miss => Color.Blue,
-            CellState.Unknown => Color.SkyBlue,
+            CellState.Unknown => new Color(135, 206, 235, 0), //transparenz hinzugefügt um den background sichtbar zu machen 
             CellState.Thunder => new Color(30, 30, 150, 255), // Dunkelblau für Thunder
             _ => Color.Black,
         };

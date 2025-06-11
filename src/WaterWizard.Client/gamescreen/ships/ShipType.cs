@@ -4,4 +4,8 @@ public enum ShipType
 {
     DEFAULT,
     MERCHANT,
+    ONEFIELDSHIP,
+    TWOFIELDSHIP,
+    FOURFIELDSHIP,
+    FIVEFIELDSHIP
 }
