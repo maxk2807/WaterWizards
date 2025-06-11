@@ -32,6 +32,7 @@ public class GameScreen(
     private Texture2D gameBackground;
     private Texture2D gridBackground;
     private Texture2D enemyGridBackground;
+    private Texture2D graveyardAsset;
 
     public void LoadBackgroundAssets()
     {
@@ -48,7 +49,17 @@ public class GameScreen(
 
         if (enemyGridBackground.Id != 0) return;
         enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
-    }   
+    }
+
+    public void LoadUiBackground() //Ui hintergrund
+    {
+        if (gridBackground.Id != 0) return;
+        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+        
+
+        if (enemyGridBackground.Id != 0) return;
+        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+    } 
 
     /// <summary>
     /// Initialize all elements rendered on the GameScreen:
@@ -191,7 +202,8 @@ public class GameScreen(
 
         Raylib.DrawTexture(enemyGridBackground, (int)opponentBoard.Position.X, (int)opponentBoard.Position.Y, Color.White);
 
-        
+        LoadBoardBackground();
+
 
         // Calculate dynamic layout values inside Draw
         cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));
