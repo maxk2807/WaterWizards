@@ -140,6 +140,11 @@ public class DraggingShip
             Raylib.GetMousePosition(),
             DraggedShipRectangle
         );
+
+        // Zeichne das Originalschiff immer
+        Raylib.DrawRectangleRec(Rectangle, Color.DarkPurple);
+        Raylib.DrawText(currentNumber.ToString(), X + Width / 2, Y + Height / 2, 10, Color.White);
+
         if (confirming)
         {
             HandleConfirm();
@@ -208,10 +213,25 @@ public class DraggingShip
     /// </summary>
     private void HandleConfirm()
     {
-        Raylib.DrawRectangleRec(DraggedShipRectangle, validPlacement ? new(30, 200, 200) : new(255, 0, 0));
+        Raylib.DrawRectangleRec(
+            DraggedShipRectangle,
+            validPlacement ? new(30, 200, 200) : new(255, 0, 0)
+        );
+
+        float screenHeight = gameScreen._gameStateManager.screenHeight;
+        float buttonAreaHeight = CellSize;
 
         var rotateX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2 - CellSize;
         var rotateY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
+        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
+        var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
+
+        if (confirmY + buttonAreaHeight > screenHeight)
+        {
+            rotateY = DraggedShipRectangle.Y - buttonAreaHeight;
+            confirmY = DraggedShipRectangle.Y - buttonAreaHeight;
+        }
+
         Rectangle rotateButton = new(rotateX, rotateY, CellSize, CellSize);
         bool rotateHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rotateButton);
         Raylib.DrawRectangleRec(rotateButton, rotateHovered ? Color.LightGray : Color.Gray);
@@ -237,8 +257,6 @@ public class DraggingShip
             validPlacement = IsValid(DraggedShipRectangle);
         }
 
-        var confirmX = DraggedShipRectangle.X + DraggedShipRectangle.Width / 2;
-        var confirmY = DraggedShipRectangle.Y + DraggedShipRectangle.Height;
         Rectangle confirmButton = new(confirmX, confirmY, CellSize, CellSize);
         bool confirmHovered = Raylib.CheckCollisionPointRec(
             Raylib.GetMousePosition(),

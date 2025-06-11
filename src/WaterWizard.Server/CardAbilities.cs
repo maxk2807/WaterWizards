@@ -1,11 +1,17 @@
 using System.Numerics;
 using LiteNetLib;
+using WaterWizard.Server.Card;
+using WaterWizard.Server.handler;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
 public static class CardAbilities
 {
+    private static readonly Random random = new();
+    private static readonly float THUNDER_INTERVAL = 1.75f;
+    private static float thunderTimer = 0;
+
     public static void HandleAbility(
         CardVariant variant,
         GameState gameState,
@@ -13,9 +19,48 @@ public static class CardAbilities
         NetPeer defender
     )
     {
+        if (DamageCardFactory.IsDamageCard(variant))
+        {
+            var damageCard = DamageCardFactory.CreateDamageCard(variant);
+            if (damageCard != null)
+            {
+                Console.WriteLine($"[Server] Executing damage card {variant}");
+
+                if (damageCard.IsValidTarget(gameState, targetCoords, defender))
+                {
+                    var attacker = gameState.players.FirstOrDefault(p => p != defender);
+                    if (attacker != null)
+                    {
+                        bool damageDealt = damageCard.ExecuteDamage(
+                            gameState,
+                            targetCoords,
+                            attacker,
+                            defender
+                        );
+                        Console.WriteLine(
+                            $"[Server] {variant} damage result: {(damageDealt ? "damage dealt" : "no damage")}"
+                        );
+
+                        if (damageDealt)
+                        {
+                            gameState.CheckGameOver();
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
+                    );
+                }
+                return;
+            }
+        }
+
         switch (variant)
         {
-            case CardVariant.MagicAttack:
+            case CardVariant.Thunder:
+                Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
                 break;
             default:
                 Console.WriteLine(
@@ -24,6 +69,7 @@ public static class CardAbilities
                 PrintCardArea(variant, targetCoords, gameState, defender);
                 break;
         }
+
         var durationString = new Cards(variant).Duration!;
         switch (durationString)
         {
@@ -37,7 +83,7 @@ public static class CardAbilities
                 {
                     int duration = int.Parse(durationString);
                     gameState.CardActivation(variant, duration);
-                    Console.WriteLine($"[Server] Activated Card: {variant}");
+                    Console.WriteLine($"[Server] Activated Card: {variant} for {duration} seconds");
                     break;
                 }
                 catch (Exception ex)
@@ -58,9 +104,29 @@ public static class CardAbilities
     /// between degree of effect and passed time needs to be implemented.</param>
     internal static void HandleActivationEffect(Cards card, float passedTime)
     {
-        Console.WriteLine(
-            $"[Server] Effect of Card {card.Variant} got activated. {passedTime} since last activation"
-        );
+        if (card.Variant == CardVariant.Thunder)
+        {
+            thunderTimer -= passedTime / 1000f; // Konvertiere zu Sekunden
+
+            if (thunderTimer <= 0)
+            {
+                // Erzeuge neue Donnereinschläge
+                Console.WriteLine(
+                    $"[Server] Thunder strikes! Time since last activation: {passedTime}ms"
+                );
+                thunderTimer = THUNDER_INTERVAL;
+
+                // TODO: Implementiere die Logik für den Donnereinschlag
+                // Hier müssen wir die Koordinaten an den Client senden
+                // und die Treffer überprüfen
+            }
+        }
+        else
+        {
+            Console.WriteLine(
+                $"[Server] Effect of Card {card.Variant} got activated. {passedTime} since last activation"
+            );
+        }
     }
 
     private static void PrintCardArea(
@@ -81,7 +147,7 @@ public static class CardAbilities
                 {
                     int tx = (int)targetCoords.X + dx;
                     int ty = (int)targetCoords.Y + dy;
-                    bool hit = gameState
+                    bool hit = ShipHandler
                         .GetShips(defender)
                         .Any(ship =>
                             tx >= ship.X
@@ -95,7 +161,7 @@ public static class CardAbilities
         }
         else
         {
-            bool hit = gameState
+            bool hit = ShipHandler
                 .GetShips(defender)
                 .Any(ship =>
                     (int)targetCoords.X >= ship.X

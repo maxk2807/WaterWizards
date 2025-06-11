@@ -1,8 +1,9 @@
-namespace WaterWizard.Server.ServerGameStates;
-
-using System;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server;
+using WaterWizard.Server.handler;
+
+namespace WaterWizard.Server.ServerGameStates;
 
 /// <summary>
 /// Server-Spielzustand für die eigentliche Spielphase (nach Platzierung).
@@ -12,6 +13,11 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     private readonly NetManager server = server;
     private readonly GameState gameState = gameState;
 
+    private System.Timers.Timer? manaTimer;
+
+    /// <summary>
+    /// Wird beim Eintritt in die Spielphase aufgerufen.
+    /// </summary>
     public void OnEnter()
     {
         var writer = new NetDataWriter();
@@ -20,9 +26,46 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         {
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
+        //TODO: Gold und Mana Initialisieren
+        //TODO: Auf Input von Clients warten?
+        // Mana-Timer starten
+        // Mana alle 10 Sekunden
+        manaTimer = new System.Timers.Timer(1_000);
+        manaTimer.Elapsed += (sender, e) => UpdateMana();
+        manaTimer.AutoReset = true;
+        manaTimer.Start();
     }
 
-    public void OnExit() { }
+    private void UpdateMana()
+    {
+        gameState.Player1Mana.Add(1);
+        gameState.Player2Mana.Add(1);
+
+        for (int i = 0; i < server.ConnectedPeersCount; i++)
+        {
+            var peer = server.ConnectedPeerList[i];
+            var writer = new NetDataWriter();
+            writer.Put("UpdateMana");
+            writer.Put(i); // Spielerindex
+            writer.Put(
+                i == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana
+            );
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+
+        Console.WriteLine(
+            $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
+        );
+    }
+
+    /// <summary>
+    /// Wird beim Verlassen des States aufgerufen (hier leer).
+    /// </summary>
+    public void OnExit()
+    {
+        manaTimer?.Stop();
+        manaTimer?.Dispose();
+    }
 
     public void HandleNetworkEvent(
         NetPeer peer,
@@ -38,7 +81,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         switch (messageType)
         {
             case "PlaceShip":
-                gameState.HandleShipPlacement(peer, reader);
+                ShipHandler.HandleShipPlacement(peer, reader, gameState);
                 break;
             case "BuyCard":
                 gameState.HandleCardBuying(peer, reader);

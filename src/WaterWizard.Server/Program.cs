@@ -262,7 +262,7 @@ static class Program
         }
     }
 
-    private static void SendPlayerList(NetManager? server)
+    public static void SendPlayerList(NetManager? server)
     {
         if (server == null)
             return;

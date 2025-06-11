@@ -29,6 +29,9 @@ public class GameScreen(
     public int cardHeight;
     public float ZonePadding;
 
+    private float _thunderTimer = 0;
+    private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Donnereinschlägen
+    
     private Texture2D gameBackground;
     private Texture2D gridBackground;
     private Texture2D enemyGridBackground;
@@ -248,7 +251,7 @@ public class GameScreen(
         GameBoard.Point? clickedCell = opponentBoard.Update();
         if (clickedCell.HasValue)
         {
-            NetworkManager.Instance.SendAttack(clickedCell.Value.X, clickedCell.Value.Y);
+            NetworkManager.SendAttack(clickedCell.Value.X, clickedCell.Value.Y);
             Console.WriteLine(
                 $"Attack initiated at ({clickedCell.Value.X}, {clickedCell.Value.Y})"
             );
@@ -320,6 +323,10 @@ public class GameScreen(
             NetworkManager.Instance.Shutdown();
             _gameStateManager.SetStateToMainMenu();
         }
+
+        // Update und Draw für Thunder-Effekte
+        Update(Raylib.GetFrameTime());
+        CastingUI.Instance.Draw();
     }
 
     private void DrawRessourceField()
@@ -478,5 +485,33 @@ public class GameScreen(
         opponentBoard?.ClearBoard();
 
         Console.WriteLine("[Client][GameScreen] Boards reset");
+    }
+
+    public void Update(float deltaTime)
+    {
+        // Update Thunder-Timer
+        _thunderTimer -= deltaTime;
+        if (_thunderTimer <= 0)
+        {
+            _thunderTimer = THUNDER_INTERVAL;
+        }
+
+        // Update active cards
+        if (activeCards != null)
+        {
+            foreach (var card in activeCards.Cards)
+            {
+                card.card.Update(deltaTime);
+            }
+        }
+    }
+
+    private void CreateThunderStrike(GameBoard board)
+    {
+        // Zufällige Position für den 2x2 Einschlag finden
+        int x = Random.Shared.Next(0, board.GridWidth - 1);
+        int y = Random.Shared.Next(0, board.GridHeight - 1);
+
+        board.AddThunderStrike(x, y);
     }
 }

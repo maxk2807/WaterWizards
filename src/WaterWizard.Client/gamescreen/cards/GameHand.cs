@@ -53,6 +53,21 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
         }
     }
 
+    /// <summary>
+    /// Checks whether the given Card is being hovered. Handles the drawing of the preview of a
+    /// hovered Card as well as handles the cast-process of the card:
+    /// 1. Clicking on the hovered card 2. Confirming selection, by aiming if required
+    /// 3. Making Cast-Request to the Server
+    /// </summary>
+    /// <param name="front">
+    ///     Whether the current GameHand is facing the front, ie. is the players hand.
+    ///     If false, doesn't draw card preview
+    /// </param>
+    /// <param name="i">Index of the Card to check</param>
+    /// <param name="cardX">X coordinate of the Card to check, relative to the middle of the GameHand</param>
+    /// <param name="effectiveCardWidth">
+    ///     How wide the Card to check is on screen, ie. how much of it is not covered by another Card
+    /// </param>
     private void DrawCardPreview(bool front, int i, int cardX, int effectiveCardWidth)
     {
         //Draw Card Preview if Mouse over card snippet
@@ -69,12 +84,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 
     internal virtual void HandleCast(GameCard gameCard)
     {
-        HandleConfirmCast(gameCard);
-    }
-
-    private void HandleConfirmCast(GameCard gameCard)
-    {
-        gameScreen.opponentBoard!.StartDrawingCardAim(gameCard);
+        CastingUI.Instance.StartDrawingCardAim(gameCard);
     }
 
     /// <summary>

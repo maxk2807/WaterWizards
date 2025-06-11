@@ -51,8 +51,44 @@ public class LobbyState : IServerGameState
         }
     }
 
+    /// <summary>
+    /// Überprüft, ob alle Spieler bereit sind, und startet den Countdown für den Spielbeginn.
+    /// </summary>
+    /// <param name="server">Der NetManager-Server für die Netzwerkkommunikation.</param>
     public void CheckAllPlayersReady(ServerGameStateManager manager)
     {
+        if (Program.ConnectedPlayers.Count > 2)
+        {
+            Console.WriteLine(
+                $"[Server] Too many players connected ({Program.ConnectedPlayers.Count}). Maximum is 2. Resetting all players to not ready."
+            );
+
+            var playerKeys = Program.ConnectedPlayers.Keys.ToList();
+            foreach (var playerKey in playerKeys)
+            {
+                Program.ConnectedPlayers[playerKey] = false;
+            }
+
+            if (countdownTimer != null)
+            {
+                ResetCountdown();
+            }
+
+            Program.SendPlayerList(server);
+
+            var systemMessageWriter = new NetDataWriter();
+            systemMessageWriter.Put("SystemMessage");
+            systemMessageWriter.Put(
+                "Too many players! Maximum 2 players allowed. All players reset to not ready."
+            );
+            foreach (var peer in server.ConnectedPeerList)
+            {
+                peer.Send(systemMessageWriter, DeliveryMethod.ReliableOrdered);
+            }
+
+            return;
+        }
+
         if (
             Program.ConnectedPlayers.Count > 0
             && Program.ConnectedPlayers.Values.All(ready => ready)

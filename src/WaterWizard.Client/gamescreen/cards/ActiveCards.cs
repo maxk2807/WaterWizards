@@ -7,6 +7,7 @@ namespace WaterWizard.Client.gamescreen.cards;
 public class ActiveCards(GameScreen gameScreen)
 {
     private ActiveCardsHand? _cards;
+    public List<GameCard> Cards => _cards?.Cards ?? [];
 
     private int X,
         Y;
@@ -74,34 +75,44 @@ public class ActiveCards(GameScreen gameScreen)
 
                 var card = Cards[i].card;
                 int radius = 15;
+
+                // Zeichne den äußeren Kreis
                 Raylib.DrawCircleLines(
                     centralX + cardX + radius,
                     cardY + radius,
                     radius,
                     Color.Black
                 );
-                if (
-                    int.TryParse(
-                        card.Duration,
-                        System.Globalization.NumberStyles.Integer,
-                        null,
-                        out int totalDuration
-                    )
-                )
+
+                // Berechne den Fortschritt für die Karte
+                if (int.TryParse(card.Duration, out int totalDuration))
                 {
-                    float relativePassed = card.remainingDuration / (totalDuration * 1000f);
-                    int degrees = (int)(relativePassed * 360);
-                    Raylib.DrawCircleSector(
-                        new(centralX + cardX + radius, cardY + radius),
-                        radius,
-                        0,
-                        degrees,
-                        100,
-                        Color.Black
-                    );
+                    // Konvertiere die verbleibende Zeit von Millisekunden in Sekunden
+                    float remainingSeconds = card.remainingDuration / 1000f;
+                    float progress = remainingSeconds / totalDuration;
+
+                    // Begrenze den Fortschritt auf 0-1
+                    progress = Math.Max(0, Math.Min(1, progress));
+
+                    // Berechne die Grad für den gefüllten Sektor (von 0 bis 360)
+                    int degrees = (int)(progress * 360);
+
+                    // Zeichne den gefüllten Sektor
+                    if (degrees > 0)
+                    {
+                        Raylib.DrawCircleSector(
+                            new(centralX + cardX + radius, cardY + radius),
+                            radius,
+                            0,
+                            degrees,
+                            100,
+                            Color.Black
+                        );
+                    }
                 }
-                else
+                else if (card.Duration == "permanent")
                 {
+                    // Für permanente Karten zeichne einen vollständig gefüllten Kreis
                     Raylib.DrawCircleSector(
                         new(centralX + cardX + radius, cardY + radius),
                         radius,

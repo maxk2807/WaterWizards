@@ -1,7 +1,8 @@
-namespace WaterWizard.Server.ServerGameStates;
-
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server.handler;
+
+namespace WaterWizard.Server.ServerGameStates;
 
 /// <summary>
 /// Server-Spielzustand für die Schiffsplatzierungsphase.
@@ -62,7 +63,7 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
                     Console.WriteLine(
                         "[PlacementState] All players have placed ships. Starting game."
                     );
-                    GameState!.PrintAllShips();
+                    ShipHandler.PrintAllShips();
 
                     var writer = new NetDataWriter();
                     writer.Put("StartGame");
@@ -75,7 +76,7 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
                     // ShipSync für eigene Schiffe
                     foreach (var p in peers)
                     {
-                        var ships = GameState!.GetShips(p);
+                        var ships = ShipHandler.GetShips(p);
                         var shipWriter = new NetDataWriter();
                         shipWriter.Put("ShipSync");
                         shipWriter.Put(ships.Count);
@@ -99,7 +100,7 @@ public class PlacementState(NetManager server, ServerGameStateManager manager) :
                 }
                 break;
             case "PlaceShip":
-                GameState!.HandleShipPlacement(peer, reader);
+                ShipHandler.HandleShipPlacement(peer, reader, GameState!);
                 break;
             default:
                 Console.WriteLine(
