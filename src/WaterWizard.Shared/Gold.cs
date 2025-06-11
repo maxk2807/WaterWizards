@@ -8,7 +8,7 @@ namespace WaterWizard.Shared
     /// but if you have one or more merchant ships on the board, production increases.
     /// Production = 1 (base) + number of merchant ships.
     /// </summary>
-    public class Coin
+    public class Gold
     {
         public int Amount { get; private set; }
 
@@ -16,7 +16,7 @@ namespace WaterWizard.Shared
 
         private double timeAccumulator = 0;
 
-        public Coin()
+        public Gold()
         {
             Amount = 0;
         }

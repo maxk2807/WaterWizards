@@ -1,4 +1,5 @@
 using Raylib_cs;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
@@ -56,7 +57,13 @@ public class LobbyListMenuState : IGameState
                         NetworkManager.Instance.ConnectToServer(ip, 7777);
                     }
                 }
-                Raylib.DrawText(lobby.Name, tableX, yPos, 18, Color.Black);
+                Raylib.DrawText(
+                    lobby.Name + " " + lobby.IP[0] + lobby.IP[1] + "...",
+                    tableX,
+                    yPos,
+                    18,
+                    Color.Black
+                );
                 Raylib.DrawText(
                     $"{lobby.PlayerCount}",
                     tableX + headerSpacing,
@@ -124,7 +131,7 @@ public class LobbyListMenuState : IGameState
         );
         if (hoverRefresh && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
-            NetworkManager.Instance.RefreshLobbies();
+            LobbyHandler.RefreshLobbies();
         }
         int manualBtnWidth = 300;
         Rectangle manualIpButton = new Rectangle(

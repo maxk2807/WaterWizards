@@ -1,5 +1,6 @@
 using LiteNetLib;
 using WaterWizard.Client.gamescreen;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
@@ -8,20 +9,18 @@ public class NetworkManager
 {
     private static NetworkManager? instance;
     public static NetworkManager Instance => instance ??= new NetworkManager();
-
     public HostService hostService { get; private set; }
     public ClientService clientService { get; private set; }
-
+    public ServerConnection ServerConnection { get; private set; }
     public readonly List<LobbyInfo> discoveredLobbies = [];
-
     public readonly int hostPort = 7777;
-
     public int? LobbyCountdownSeconds { get; set; }
 
     private NetworkManager()
     {
         hostService = new(this);
         clientService = new(this);
+        ServerConnection = new ServerConnection();
     }
 
     /// <summary>
@@ -42,7 +41,7 @@ public class NetworkManager
         }
 
         clientService.InitializeClientForDiscovery();
-        clientService.SendDiscoveryRequests();
+        LobbyHandler.SendDiscoveryRequests(Instance);
     }
 
     /// <summary>
@@ -99,22 +98,25 @@ public class NetworkManager
 
     public void SendShipPlacement(int x, int y, int width, int height)
     {
-        clientService.SendShipPlacement(x, y, width, height);
+        HandleShips.SendShipPlacement(x, y, width, height, Instance);
     }
 
-    public void RequestCardBuy(string cardType)
+    public static void RequestCardBuy(string cardType)
     {
-        clientService.RequestCardBuy(cardType);
+        var handleCards = new HandleCards();
+        handleCards.RequestCardBuy(cardType);
     }
 
-    public void HandleCast(Cards card, GameBoard.Point hoveredCoords)
+    public static void HandleCast(Cards card, GameBoard.Point hoveredCoords)
     {
-        clientService.HandleCast(card, hoveredCoords);
+        var handleCards = new HandleCards();
+        handleCards.HandleCast(card, hoveredCoords);
     }
 
-    public void SendAttack(int x, int y)
+    public static void SendAttack(int x, int y)
     {
-        clientService.SendAttack(x, y);
+        var handleAttacks = new HandleAttacks();
+        handleAttacks.SendAttack(x, y);
     }
 
     public List<Player> GetConnectedPlayers()
@@ -141,27 +143,17 @@ public class NetworkManager
 
     internal void ToggleReadyStatus()
     {
-        clientService.ToggleReadyStatus();
+        HandlePlayer.ToggleReadyStatus();
     }
 
     internal void ConnectToServer(string ip, int port)
     {
-        clientService.ConnectToServer(ip, port);
-    }
-
-    internal void RefreshLobbies()
-    {
-        clientService.RefreshLobbies();
+        ServerConnection.ConnectToServer(ip, port);
     }
 
     internal void SendChatMessage(string message)
     {
-        clientService.SendChatMessage(message);
-    }
-
-    internal void SendPlacementReady()
-    {
-        clientService.SendPlacementReady();
+        ChatHandler.SendChatMessage(message, Instance);
     }
 
     /// <summary>
@@ -172,12 +164,16 @@ public class NetworkManager
     {
         string result = reader.GetString();
         bool isWinner = DetermineIfPlayerIsWinner(result);
-        
+
         string winnerMessage = isWinner
             ? "Congratulations! You emerged victorious!"
             : "You fought well, but victory slipped away. Better luck next time!";
 
         Console.WriteLine($"[Client] Game Over - Result: {result}, IsWinner: {isWinner}");
+
+        Instance.clientService.clientReady = false;
+        Instance.LobbyCountdownSeconds = null;
+
         GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
     }
 
@@ -188,25 +184,27 @@ public class NetworkManager
     /// <returns>True if the current player won the game, false otherwise.</returns>
     private static bool DetermineIfPlayerIsWinner(string result)
     {
-        if (result.Equals("Victory", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("win", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("victory", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("won", StringComparison.OrdinalIgnoreCase))
+        if (
+            result.Equals("Victory", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("win", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("victory", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("won", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return true;
         }
 
-        if (result.Equals("Defeat", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("lose", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("lost", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("defeat", StringComparison.OrdinalIgnoreCase))
+        if (
+            result.Equals("Defeat", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("lose", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("lost", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("defeat", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return false;
         }
 
         Console.WriteLine($"[Client] Unclear game result: {result}. Assuming defeat.");
         return false;
-
-
-    }    
+    }
 }

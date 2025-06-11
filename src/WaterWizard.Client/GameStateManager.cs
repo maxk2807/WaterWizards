@@ -1,13 +1,13 @@
-using System;
-using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
-using WaterWizard.Shared;
 
 namespace WaterWizard.Client;
 
+/// <summary>
+/// Manages the game state and provides access to various game components.
+/// </summary>
 public class GameStateManager
 {
     public IGameState GetCurrentState() => currentState;
@@ -30,6 +30,28 @@ public class GameStateManager
 
     private readonly ChatLogManager _chatLogManager;
     public ChatLogManager ChatLog => _chatLogManager;
+
+    // GoldSync
+    private int player1Gold = 0;
+    private int player2Gold = 0;
+
+    public void SetGold(int playerIndex, int gold)
+    {
+        if (playerIndex == 0)
+            player1Gold = gold;
+        else if (playerIndex == 1)
+            player2Gold = gold;
+    }
+
+    public int GetGold(int playerIndex)
+    {
+        return playerIndex == 0 ? player1Gold : player2Gold;
+    }
+
+    private float titleAnimTime = 0;
+    private float titleVerticalPosition = 0;
+    private const float TITLE_ANIM_SPEED = 1.5f;
+    private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
 
     public static void Initialize(int screenWidth, int screenHeight)
     {
@@ -167,6 +189,8 @@ public class GameStateManager
     public void SetStateToHostingMenu()
     {
         currentState = new HostingMenuState();
+        gameTimer.Reset();
+        NetworkManager.Instance.LobbyCountdownSeconds = null;
         NetworkManager.Instance.StartHosting();
     }
 

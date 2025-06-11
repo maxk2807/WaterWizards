@@ -1,6 +1,7 @@
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server.handler;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
 
@@ -44,10 +45,10 @@ namespace WaterWizard.Server;
 /// </summary>
 public class GameState
 {
-    private NetPeer[] players = new NetPeer[2];
+    public NetPeer[] players = new NetPeer[2];
     private static readonly int boardWidth = 12;
     private static readonly int boardHeight = 10;
-    private readonly Cell[][,] boards = new Cell[2][,];
+    public readonly Cell[][,] boards = new Cell[2][,];
     public Cell[,] Player1 => boards[0];
     public Cell[,] Player2 => boards[1];
     public readonly List<Cards>[] hands;
@@ -62,57 +63,91 @@ public class GameState
     public List<Cards> Graveyard { get; private set; }
 
     private Timer activationTimer;
+    private float thunderTimer = 0f;
+    private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Blitzeinschlägen in Sekunden
 
-    private readonly Dictionary<NetPeer, List<PlacedShip>> playerShips = new();
+    public Mana Player1Mana { get; private set; } = new();
+    public Mana Player2Mana { get; private set; } = new();
+    public int Player1Gold { get; private set; } = 0;
+    public int Player2Gold { get; private set; } = 0;
 
-    private bool IsPlacementPhase()
+    public bool IsPlacementPhase()
     {
         return manager.CurrentState is PlacementState;
     }
 
-    public void AddShip(NetPeer player, PlacedShip ship)
+    public void SetGold(int playerIndex, int amount)
     {
-        if (!playerShips.ContainsKey(player))
-            playerShips[player] = new List<PlacedShip>();
-        playerShips[player].Add(ship);
-    }
-
-    public IReadOnlyList<PlacedShip> GetShips(NetPeer player)
-    {
-        if (playerShips.TryGetValue(player, out var ships))
-            return ships;
-        return [];
-    }
-
-    public void PrintAllShips()
-    {
-        foreach (var kvp in playerShips)
-        {
-            Console.WriteLine($"Schiffe von Spieler {kvp.Key}:");
-            foreach (var ship in kvp.Value)
-            {
-                Console.WriteLine(
-                    $"  Schiff: X={ship.X}, Y={ship.Y}, W={ship.Width}, H={ship.Height}"
-                );
-            }
-        }
+        if (playerIndex == 0)
+            Player1Gold = amount;
+        else if (playerIndex == 1)
+            Player2Gold = amount;
     }
 
     /// <summary>
-    /// A new Gamestate.
+    /// Returns the NetPeer instance for the given player index (0 or 1).
     /// </summary>
-    /// <param name="server">Corresponding NetManager server to access Clients (Players)</param>
-    /// <param name="manager">Corresponding <see cref="ServerGameStateManager"/></param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="index">The index of the player (0 = Player 1, 1 = Player 2).</param>
+    /// <returns>The NetPeer associated with the specified player index.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if no player is assigned at the given index.</exception>
+    public NetPeer GetPlayer(int index)
+    {
+        if (index < 0 || index >= players.Length || players[index] == null)
+            throw new InvalidOperationException($"No player at index {index}");
+
+        return players[index];
+    }
+
+    // TODO: für HandleCardBuying() gut verwendbar
+    public void SyncGoldToClient(int playerIndex)
+    {
+        var peer = GetPlayer(playerIndex);
+        var writer = new NetDataWriter();
+        writer.Put("UpdateGold");
+        writer.Put(playerIndex);
+        writer.Put(playerIndex == 0 ? Player1Gold : Player2Gold);
+        peer.Send(writer, DeliveryMethod.ReliableOrdered);
+    }
+
     public GameState(NetManager server, ServerGameStateManager manager)
     {
         int connectedCount = server.ConnectedPeerList.Count;
         if (connectedCount < 1 || connectedCount > 2)
             throw new InvalidOperationException("Game requires 1 or 2 connected players.");
 
-        players = new NetPeer[connectedCount];
+        players = new NetPeer[2];
         for (int i = 0; i < connectedCount; i++)
             players[i] = server.ConnectedPeerList[i];
+
+        for (int i = connectedCount; i < 2; i++)
+            players[i] = null;
+
+        Console.WriteLine("\n[Server] Initial Player Setup:");
+        Console.WriteLine("----------------------------------------");
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i] != null)
+            {
+                Console.WriteLine($"Player {i + 1}: {players[i]}");
+                Console.WriteLine($"  - Owns Board[{i}]");
+
+                if (connectedCount > 1)
+                {
+                    var opponentIndex = i == 0 ? 1 : 0;
+                    Console.WriteLine($"  - Opponent: {players[opponentIndex]}");
+                    Console.WriteLine($"  - Opponent's Board: Board[{opponentIndex}]");
+                }
+                else
+                {
+                    Console.WriteLine($"  - No opponent (single player mode)");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Player {i + 1}: [Empty Slot]");
+            }
+        }
+        Console.WriteLine("----------------------------------------\n");
 
         boards = InitBoards();
         hands =
@@ -152,112 +187,6 @@ public class GameState
             }
         }
         return [player1Board, player2Board];
-    }
-
-    /// <summary>
-    /// Handles the Placement of the ships. Receives the Position of the ship placement
-    /// from the Client. Validates placement and sends error messages if invalid.
-    /// </summary>
-    /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
-    /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
-    public void HandleShipPlacement(NetPeer peer, NetPacketReader reader)
-    {
-        int x = reader.GetInt();
-        int y = reader.GetInt();
-        int width = reader.GetInt();
-        int height = reader.GetInt();
-
-        int size = Math.Max(width, height);
-
-        if (IsPlacementPhase())
-        {
-            var allowedShips = new Dictionary<int, int>
-            {
-                { 5, 1 },
-                { 4, 2 },
-                { 3, 2 },
-                { 2, 4 },
-                { 1, 5 },
-            };
-
-            var playerShipList = GetShips(peer);
-            int alreadyPlaced = playerShipList.Count(s => Math.Max(s.Width, s.Height) == size);
-
-            // 1. Zu viele Schiffe dieser Länge?
-            if (!allowedShips.ContainsKey(size) || alreadyPlaced >= allowedShips[size])
-            {
-                NetDataWriter errorWriter = new();
-                errorWriter.Put("ShipPlacementError");
-                errorWriter.Put(
-                    $"Du darfst nur {allowedShips.GetValueOrDefault(size, 0)} Schiffe der Länge {size} platzieren!"
-                );
-                peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
-                return;
-            }
-
-            // 2. Überlappung mit eigenen Schiffen verhindern
-            foreach (var ship in playerShipList)
-            {
-                bool overlap =
-                    x < ship.X + ship.Width
-                    && x + width > ship.X
-                    && y < ship.Y + ship.Height
-                    && y + height > ship.Y;
-                if (overlap)
-                {
-                    NetDataWriter errorWriter = new();
-                    errorWriter.Put("ShipPlacementError");
-                    errorWriter.Put("Schiffe dürfen sich nicht überlappen!");
-                    peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
-                    return;
-                }
-            }
-        }
-
-        // 3. Felder auf dem Board prüfen
-        int playerIndex = Array.IndexOf(players, peer);
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                var cell = boards[playerIndex][x + i, y + j];
-                if (cell.CellState != CellState.Empty)
-                {
-                    NetDataWriter errorWriter = new();
-                    errorWriter.Put("ShipPlacementError");
-                    errorWriter.Put("Feld ist bereits belegt!");
-                    peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
-                    return;
-                }
-            }
-        }
-
-        // Schiff platzieren
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                boards[playerIndex][x + i, y + j].CellState = CellState.Ship;
-            }
-        }
-        AddShip(
-            peer,
-            new PlacedShip
-            {
-                X = x,
-                Y = y,
-                Width = width,
-                Height = height,
-            }
-        );
-
-        NetDataWriter writer = new();
-        writer.Put("ShipPosition");
-        writer.Put(x);
-        writer.Put(y);
-        writer.Put(width);
-        writer.Put(height);
-        peer.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 
     /// <summary>
@@ -337,37 +266,131 @@ public class GameState
     {
         Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
         ActiveCards.Add(new(variant) { remainingDuration = duration * 1000f });
+
+        // Sofort die aktive Karte an alle Clients senden
+        foreach (var player in players)
+        {
+            SendActiveCardsUpdate(player);
+        }
     }
 
     private void UpdateActiveCards(float passedTime)
     {
-        List<Cards> toDelete = [];
-        Dictionary<Cards, float> toSend = [];
-        NetDataWriter writer = new();
-        writer.Put("ActiveCards");
-        foreach (Cards card in ActiveCards)
+        for (int i = ActiveCards.Count - 1; i >= 0; i--)
         {
+            var card = ActiveCards[i];
             card.remainingDuration -= passedTime;
+
             if (card.remainingDuration <= 0)
             {
-                toDelete.Add(card);
+                // Karte ist abgelaufen
+                ActiveCards.RemoveAt(i);
+
+                foreach (var player in players)
+                {
+                    SendActiveCardsUpdate(player);
+                }
+
+                if (card.Variant == CardVariant.Thunder)
+                {
+                    Console.WriteLine("\n[Server] Thunder Card expired");
+                    Console.WriteLine("----------------------------------------");
+                    foreach (var player in players)
+                    {
+                        NetDataWriter resetWriter = new();
+                        resetWriter.Put("ThunderReset");
+                        player.Send(resetWriter, DeliveryMethod.ReliableOrdered);
+                        Console.WriteLine($"Sent ThunderReset to player: {player}");
+                    }
+                    Console.WriteLine("----------------------------------------\n");
+                }
+                continue;
             }
-            else
+
+            CardAbilities.HandleActivationEffect(card, passedTime);
+
+            if (card.Variant == CardVariant.Thunder)
             {
-                toSend.Add(card, card.remainingDuration);
-                CardAbilities.HandleActivationEffect(card, passedTime);
+                thunderTimer -= passedTime / 1000f;
+
+                if (thunderTimer <= 0)
+                {
+                    thunderTimer = THUNDER_INTERVAL;
+                    Console.WriteLine("\n[Server] Thunder Strike Round");
+                    Console.WriteLine("----------------------------------------");
+
+                    for (int playerIndex = 0; playerIndex < 2; playerIndex++)
+                    {
+                        var targetPlayer = players[playerIndex];
+                        Console.WriteLine(
+                            $"\nGenerating strike for Board[{playerIndex}] owned by {targetPlayer}"
+                        );
+
+                        int x = Random.Shared.Next(0, boardWidth);
+                        int y = Random.Shared.Next(0, boardHeight);
+                        Console.WriteLine($"Strike coordinates: ({x}, {y})");
+
+                        bool hit = ShipHandler
+                            .GetShips(targetPlayer)
+                            .Any(ship =>
+                                x >= ship.X
+                                && x < ship.X + ship.Width
+                                && y >= ship.Y
+                                && y < ship.Y + ship.Height
+                            );
+
+                        // Detailed strike information
+                        Console.WriteLine($"Strike Result:");
+                        Console.WriteLine($"  - Target Board: Board[{playerIndex}]");
+                        Console.WriteLine($"  - Board Owner: {targetPlayer}");
+                        Console.WriteLine($"  - Coordinates: ({x}, {y})");
+                        Console.WriteLine($"  - Hit: {(hit ? "YES" : "NO")}");
+
+                        NetDataWriter thunderWriter = new();
+                        thunderWriter.Put("ThunderStrike");
+                        thunderWriter.Put(targetPlayer.ToString());
+                        thunderWriter.Put(x);
+                        thunderWriter.Put(y);
+                        thunderWriter.Put(hit);
+
+                        // Log message sending
+                        Console.WriteLine("\nSending strike information to players:");
+                        foreach (var player in players)
+                        {
+                            player.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
+                            Console.WriteLine($"  - Sent to {player}");
+                            Console.WriteLine(
+                                $"    - {(player == targetPlayer ? "This is their board" : "This is their opponent's board")}"
+                            );
+                            Console.WriteLine(
+                                $"    - They should show this on their {(player == targetPlayer ? "playerBoard" : "opponentBoard")}"
+                            );
+                        }
+
+                        if (hit)
+                        {
+                            var hitShip = ShipHandler
+                                .GetShips(targetPlayer)
+                                .First(ship =>
+                                    x >= ship.X
+                                    && x < ship.X + ship.Width
+                                    && y >= ship.Y
+                                    && y < ship.Y + ship.Height
+                                );
+                            Console.WriteLine($"\nHit Details:");
+                            Console.WriteLine(
+                                $"  - Hit ship at position: ({hitShip.X}, {hitShip.Y})"
+                            );
+                            Console.WriteLine($"  - Ship size: {hitShip.Width}x{hitShip.Height}");
+                            Console.WriteLine(
+                                $"  - Current damage: {hitShip.DamagedCells.Count}/{hitShip.MaxHealth}"
+                            );
+                        }
+                    }
+                    Console.WriteLine("----------------------------------------\n");
+                }
             }
         }
-        writer.Put(toSend.Count);
-        foreach (var pair in toSend)
-        {
-            writer.Put(pair.Key.Variant.ToString());
-            writer.Put(pair.Value);
-        }
-        server.ConnectedPeerList.ForEach(client =>
-            client.Send(writer, DeliveryMethod.ReliableOrdered)
-        );
-        bool success = toDelete.All(ActiveCards.Remove);
     }
 
     /// <summary>
@@ -385,7 +408,7 @@ public class GameState
             $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
         );
 
-        var ships = GetShips(defender);
+        var ships = ShipHandler.GetShips(defender);
         bool hit = false;
         PlacedShip? hitShip = null;
 
@@ -407,17 +430,17 @@ public class GameState
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
-                        SendShipReveal(attacker, ship);
+                        ShipHandler.SendShipReveal(attacker, ship);
                     }
                     else
                     {
-                        SendCellReveal(attacker, x, y, true);
+                        SendCellReveal(attacker, defender, x, y, true);
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
-                    SendCellReveal(attacker, x, y, true);
+                    SendCellReveal(attacker, defender, x, y, true);
                 }
                 break;
             }
@@ -426,7 +449,7 @@ public class GameState
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
-            SendCellReveal(attacker, x, y, false);
+            SendCellReveal(attacker, defender, x, y, false); // Updated to include defender
         }
 
         /// <summary>
@@ -447,38 +470,33 @@ public class GameState
     }
 
     /// <summary>
-    /// Reveals a specific cell to the attacker (hit or miss)
+    /// Reveals a specific cell to both attacker and defender
     /// </summary>
-    /// <param name="attacker"></param>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="isHit"></param>
-    private void SendCellReveal(NetPeer attacker, int x, int y, bool isHit)
+    /// <param name="attacker">The attacker who needs to see the result on opponent's board</param>
+    /// <param name="defender">The defender who needs to see where they got attacked</param>
+    /// <param name="x">X coordinate</param>
+    /// <param name="y">Y coordinate</param>
+    /// <param name="isHit">Whether it was a hit or miss</param>
+    public void SendCellReveal(NetPeer attacker, NetPeer defender, int x, int y, bool isHit)
     {
-        var writer = new NetDataWriter();
-        writer.Put("CellReveal");
-        writer.Put(x);
-        writer.Put(y);
-        writer.Put(isHit);
-        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
+        var attackerWriter = new NetDataWriter();
+        attackerWriter.Put("CellReveal");
+        attackerWriter.Put(x);
+        attackerWriter.Put(y);
+        attackerWriter.Put(isHit);
+        attackerWriter.Put(false);
+        attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
+
+        var defenderWriter = new NetDataWriter();
+        defenderWriter.Put("CellReveal");
+        defenderWriter.Put(x);
+        defenderWriter.Put(y);
+        defenderWriter.Put(isHit);
+        defenderWriter.Put(true);
+        defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Cell reveal sent to {attacker}: ({x},{y}) = {(isHit ? "hit" : "miss")}"
-        );
-    }
-
-    private void SendShipReveal(NetPeer attacker, PlacedShip ship)
-    {
-        var writer = new NetDataWriter();
-        writer.Put("ShipReveal");
-        writer.Put(ship.X);
-        writer.Put(ship.Y);
-        writer.Put(ship.Width);
-        writer.Put(ship.Height);
-        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
-
-        Console.WriteLine(
-            $"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height}"
+            $"[Server] Cell reveal sent to both players: ({x},{y}) = {(isHit ? "hit" : "miss")}"
         );
     }
 
@@ -500,27 +518,27 @@ public class GameState
         bool shipDestroyed
     )
     {
-        var writer = new NetDataWriter();
-        writer.Put("AttackResult");
-        writer.Put(x);
-        writer.Put(y);
-        writer.Put(hit);
-        writer.Put(shipDestroyed);
+        var attackerWriter = new NetDataWriter();
+        attackerWriter.Put("AttackResult");
+        attackerWriter.Put(x);
+        attackerWriter.Put(y);
+        attackerWriter.Put(hit);
+        attackerWriter.Put(shipDestroyed);
+        attackerWriter.Put(false);
+        attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
-        attacker.Send(writer, DeliveryMethod.ReliableOrdered);
-        defender.Send(writer, DeliveryMethod.ReliableOrdered);
+        var defenderWriter = new NetDataWriter();
+        defenderWriter.Put("AttackResult");
+        defenderWriter.Put(x);
+        defenderWriter.Put(y);
+        defenderWriter.Put(hit);
+        defenderWriter.Put(shipDestroyed);
+        defenderWriter.Put(true);
+        defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
-        Console.WriteLine($"[Server] Attack result sent: hit={hit}, destroyed={shipDestroyed}");
-    }
-
-    /// <summary>
-    /// Checks if all ships of a player are destroyed.
-    /// </summary>
-    /// <param name="player">The player to check</param>
-    public bool AreAllShipsDestroyed(NetPeer player)
-    {
-        var ships = GetShips(player);
-        return ships.Count > 0 && ships.All(ship => ship.IsDestroyed);
+        Console.WriteLine(
+            $"[Server] Attack result sent: attacker sees result, defender sees damage"
+        );
     }
 
     /// <summary>
@@ -531,7 +549,7 @@ public class GameState
     {
         foreach (var player in players)
         {
-            if (player != null && AreAllShipsDestroyed(player))
+            if (player != null && ShipHandler.AreAllShipsDestroyed(player))
             {
                 var winner = players.FirstOrDefault(p => p != player);
                 if (winner != null)
@@ -575,7 +593,7 @@ public class GameState
                 }
                 Program.PlacementReadyPlayers.Clear();
 
-                playerShips.Clear();
+                ShipHandler.playerShips.Clear();
                 Console.WriteLine("[Server] Ship placements cleared for next game.");
 
                 var playerListWriter = new NetDataWriter();
@@ -602,8 +620,21 @@ public class GameState
                 }
             },
             null,
-            5000,
+            500,
             Timeout.Infinite
         );
+    }
+
+    private void SendActiveCardsUpdate(NetPeer player)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("ActiveCards");
+        writer.Put(ActiveCards.Count);
+        foreach (var card in ActiveCards)
+        {
+            writer.Put(card.Variant.ToString());
+            writer.Put(card.remainingDuration);
+        }
+        player.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 }

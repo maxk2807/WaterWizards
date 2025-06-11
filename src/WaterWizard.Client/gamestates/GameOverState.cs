@@ -73,7 +73,10 @@ public class GameOverState(bool isWinner, string winnerMessage = "") : IGameStat
             buttonWidth,
             buttonHeight
         );
-        bool hoverPlayAgain = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), playAgainButton);
+        bool hoverPlayAgain = Raylib.CheckCollisionPointRec(
+            Raylib.GetMousePosition(),
+            playAgainButton
+        );
         Raylib.DrawRectangleRec(playAgainButton, hoverPlayAgain ? Color.DarkGreen : Color.Green);
 
         string playAgainText = "Play Again";
@@ -93,7 +96,10 @@ public class GameOverState(bool isWinner, string winnerMessage = "") : IGameStat
             buttonWidth,
             buttonHeight
         );
-        bool hoverMainMenu = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), mainMenuButton);
+        bool hoverMainMenu = Raylib.CheckCollisionPointRec(
+            Raylib.GetMousePosition(),
+            mainMenuButton
+        );
         Raylib.DrawRectangleRec(mainMenuButton, hoverMainMenu ? Color.DarkBlue : Color.Blue);
 
         string mainMenuText = "Main Menu";
