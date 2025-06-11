@@ -8,13 +8,25 @@ public class MainMenuState : IGameState
     private const float TITLE_ANIM_SPEED = 1.5f;
     private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
 
+    private Texture2D menuBackground; //Hintergrund Variable
+
+    public void LoadAssets()
+    {
+        if (menuBackground.Id != 0) return;
+        menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
+    }
+
     public void UpdateAndDraw(GameStateManager manager)
     {
+        LoadAssets();    
+        
         DrawMainMenu(manager);
     }
 
     private void DrawMainMenu(GameStateManager manager)
     {
+        Raylib.DrawTexture(menuBackground, 0, 0, Color.White); //Zeichnen des Hintergrundbildes
+
         string title = "Welcome to WaterWizards!";
         float letterSpacing = 3;
         float totalTitleWidth = 0;
