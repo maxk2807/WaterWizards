@@ -2,6 +2,7 @@ using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Shared;
 using WaterWizard.Server.Card;
+using WaterWizard.Server.handler;
 
 namespace WaterWizard.Server;
 
@@ -143,7 +144,7 @@ public static class CardAbilities
                 {
                     int tx = (int)targetCoords.X + dx;
                     int ty = (int)targetCoords.Y + dy;
-                    bool hit = gameState
+                    bool hit = ShipHandler
                         .GetShips(defender)
                         .Any(ship =>
                             tx >= ship.X
@@ -159,7 +160,7 @@ public static class CardAbilities
         }
         else
         {
-            bool hit = gameState
+            bool hit = ShipHandler
                 .GetShips(defender)
                 .Any(ship =>
                     (int)targetCoords.X >= ship.X
