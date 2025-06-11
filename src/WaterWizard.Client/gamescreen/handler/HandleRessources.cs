@@ -33,6 +33,6 @@ public class HandleRessources
         Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {gold} Gold.");
 
         GameStateManager.Instance.SetGold(playerIndex, gold);
-        // TODO: UI-Anzeige für Gold aktualisieren  
+        // TODO: UI-Anzeige für Gold aktualisieren
     }
 }

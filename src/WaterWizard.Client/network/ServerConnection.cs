@@ -29,7 +29,6 @@ public class ServerConnection
 
         clientService.CleanupIfRunning();
 
-
         try
         {
             string cleanIp = ip;

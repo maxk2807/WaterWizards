@@ -31,8 +31,6 @@ public class GameStateManager
     private readonly ChatLogManager _chatLogManager;
     public ChatLogManager ChatLog => _chatLogManager;
 
-
-
     // GoldSync
     private int player1Gold = 0;
     private int player2Gold = 0;

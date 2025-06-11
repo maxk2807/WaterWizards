@@ -1,8 +1,9 @@
-namespace WaterWizard.Server.ServerGameStates;
-
-using System;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server;
+using WaterWizard.Server.handler;
+
+namespace WaterWizard.Server.ServerGameStates;
 
 /// <summary>
 /// Server-Spielzustand für die eigentliche Spielphase (nach Platzierung).
@@ -11,7 +12,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 {
     private readonly NetManager server = server;
     private readonly GameState gameState = gameState;
-    
+
     private System.Timers.Timer? manaTimer;
 
     /// <summary>
@@ -35,8 +36,6 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         manaTimer.Start();
     }
 
-
-
     private void UpdateMana()
     {
         gameState.Player1Mana.Add(1);
@@ -48,18 +47,22 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             var writer = new NetDataWriter();
             writer.Put("UpdateMana");
             writer.Put(i); // Spielerindex
-            writer.Put(i == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana);
+            writer.Put(
+                i == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana
+            );
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
 
-        Console.WriteLine($"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}");
+        Console.WriteLine(
+            $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
+        );
     }
 
     /// <summary>
     /// Wird beim Verlassen des States aufgerufen (hier leer).
     /// </summary>
     public void OnExit()
-    { 
+    {
         manaTimer?.Stop();
         manaTimer?.Dispose();
     }
@@ -78,7 +81,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         switch (messageType)
         {
             case "PlaceShip":
-                gameState.HandleShipPlacement(peer, reader);
+                ShipHandler.HandleShipPlacement(peer, reader, gameState);
                 break;
             case "BuyCard":
                 gameState.HandleCardBuying(peer, reader);

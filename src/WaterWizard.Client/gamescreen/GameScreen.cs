@@ -463,7 +463,7 @@ public class GameScreen(
         // Zufällige Position für den 2x2 Einschlag finden
         int x = Random.Shared.Next(0, board.GridWidth - 1);
         int y = Random.Shared.Next(0, board.GridHeight - 1);
-        
+
         board.AddThunderStrike(x, y);
     }
 }

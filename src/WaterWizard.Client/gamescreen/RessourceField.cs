@@ -45,7 +45,7 @@ public class RessourceField(GameScreen gameScreen)
 
         ManaRec = new(manaX, manaY, manaWidth, manaFontSize);
     }
-    
+
     public void SetMana(int mana)
     {
         Mana = mana;

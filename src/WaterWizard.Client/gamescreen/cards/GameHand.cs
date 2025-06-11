@@ -54,10 +54,10 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     }
 
     /// <summary>
-    /// Checks whether the given Card is being hovered. Handles the drawing of the preview of a 
+    /// Checks whether the given Card is being hovered. Handles the drawing of the preview of a
     /// hovered Card as well as handles the cast-process of the card:
     /// 1. Clicking on the hovered card 2. Confirming selection, by aiming if required
-    /// 3. Making Cast-Request to the Server 
+    /// 3. Making Cast-Request to the Server
     /// </summary>
     /// <param name="front">
     ///     Whether the current GameHand is facing the front, ie. is the players hand.
