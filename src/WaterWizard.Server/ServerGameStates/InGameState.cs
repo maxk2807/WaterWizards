@@ -29,8 +29,8 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         //TODO: Gold und Mana Initialisieren
         //TODO: Auf Input von Clients warten?
         // Mana-Timer starten
-        // Mana alle 10 Sekunden
-        manaTimer = new System.Timers.Timer(1_000);
+        // Mana alle 4Sekunden
+        manaTimer = new System.Timers.Timer(4_000);
         manaTimer.Elapsed += (sender, e) => UpdateMana();
         manaTimer.AutoReset = true;
         manaTimer.Start();
@@ -52,10 +52,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             );
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-
-        Console.WriteLine(
-            $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
-        );
+// only for logging / testing
+        // Console.WriteLine(
+        //     $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
+        // );
     }
 
     /// <summary>
