@@ -68,12 +68,12 @@ public class FireboltCard : IDamageCard
                             }
                             else
                             {
-                                gameState.SendCellReveal(attacker, defender, x, y, true);
+                                CellHandler.SendCellReveal(attacker, defender, x, y, true);
                             }
                         }
                         else
                         {
-                            gameState.SendCellReveal(attacker, defender, x, y, true);
+                            CellHandler.SendCellReveal(attacker, defender, x, y, true);
                         }
                         break;
                     }
@@ -81,7 +81,7 @@ public class FireboltCard : IDamageCard
 
                 if (!cellHit)
                 {
-                    gameState.SendCellReveal(attacker, defender, x, y, false);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, false);
                 }
 
                 if (cellHit)
