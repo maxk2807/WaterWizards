@@ -84,7 +84,7 @@ public class AttackHandler
 
         if (hit && hitShip?.IsDestroyed == true)
         {
-            gameState.CheckGameOver();
+            gameState?.CheckGameOver();
         }
     }
 
