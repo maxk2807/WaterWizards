@@ -96,7 +96,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 Console.WriteLine($"[Server] Attack received at ({x}, {y}) from {peer}");
                 var defender = FindOpponent(peer);
                 if (defender != null)
-                    gameState.HandleAttack(peer, defender, x, y);
+                {
+                    AttackHandler.Initialize(gameState);
+                    AttackHandler.HandleAttack(peer, defender, x, y);
+                }                   
                 else
                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
                 break;
