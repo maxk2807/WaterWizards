@@ -122,7 +122,7 @@ public class GameState
             players[i] = server.ConnectedPeerList[i];
         
         for (int i = connectedCount; i < 2; i++)
-            players[i] = null;
+            players[i] = default!;
 
         Console.WriteLine("\n[Server] Initial Player Setup:");
         Console.WriteLine("----------------------------------------");

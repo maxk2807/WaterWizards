@@ -5,7 +5,7 @@ namespace WaterWizard.Server.handler;
 
 public class AttackHandler
 {
-    private static GameState gameState;
+    private static GameState? gameState;
 
     // Add a method to set the game state
     public static void Initialize(GameState state)
