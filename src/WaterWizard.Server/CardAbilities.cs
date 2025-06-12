@@ -1,8 +1,8 @@
 using System.Numerics;
 using LiteNetLib;
-using WaterWizard.Shared;
 using WaterWizard.Server.Card;
 using WaterWizard.Server.handler;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
@@ -31,7 +31,12 @@ public static class CardAbilities
                     var attacker = gameState.players.FirstOrDefault(p => p != defender);
                     if (attacker != null)
                     {
-                        bool damageDealt = damageCard.ExecuteDamage(gameState, targetCoords, attacker, defender);
+                        bool damageDealt = damageCard.ExecuteDamage(
+                            gameState,
+                            targetCoords,
+                            attacker,
+                            defender
+                        );
                         Console.WriteLine(
                             $"[Server] {variant} damage result: {(damageDealt ? "damage dealt" : "no damage")}"
                         );
@@ -152,9 +157,7 @@ public static class CardAbilities
                             && ty >= ship.Y
                             && ty < ship.Y + ship.Height
                         );
-                    Console.WriteLine(
-                        $"  -> ({tx},{ty}) {(hit ? "[TREFFER]" : "[kein Treffer]")}"
-                    );
+                    Console.WriteLine($"  -> ({tx},{ty}) {(hit ? "[TREFFER]" : "[kein Treffer]")}");
                 }
             }
         }

@@ -1,7 +1,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
-using WaterWizard.Server.handler;
 using WaterWizard.Server;
+using WaterWizard.Server.handler;
 
 namespace WaterWizard.Server.ServerGameStates;
 
@@ -36,8 +36,6 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         manaTimer.Start();
     }
 
-
-
     private void UpdateMana()
     {
         gameState.Player1Mana.Add(1);
@@ -49,11 +47,15 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             var writer = new NetDataWriter();
             writer.Put("UpdateMana");
             writer.Put(i); // Spielerindex
-            writer.Put(i == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana);
+            writer.Put(
+                i == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana
+            );
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
 
-        Console.WriteLine($"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}");
+        Console.WriteLine(
+            $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
+        );
     }
 
     /// <summary>

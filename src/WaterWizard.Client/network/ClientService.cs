@@ -2,10 +2,10 @@ using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen;
-using WaterWizard.Client.gamescreen.handler;
-using WaterWizard.Shared;
-using WaterWizard.Client.network;
 using WaterWizard.Client.Gamescreen;
+using WaterWizard.Client.gamescreen.handler;
+using WaterWizard.Client.network;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
 
@@ -222,7 +222,9 @@ public class ClientService(NetworkManager manager)
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}");
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}"
+                        );
                     }
                     break;
                 case "BoughtCard":
@@ -339,17 +341,23 @@ public class ClientService(NetworkManager manager)
                     }
                     Console.WriteLine($"\nResult:");
                     Console.WriteLine($"- Was my board hit? {myBoardWasHit}");
-                    Console.WriteLine($"- Will show on: {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+                    Console.WriteLine(
+                        $"- Will show on: {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
+                    );
 
                     // Wenn mein Board getroffen wurde -> auf meinem playerBoard anzeigen
                     // Wenn das gegnerische Board getroffen wurde -> auf meinem opponentBoard anzeigen
                     var targetBoard = myBoardWasHit
-                        ? GameStateManager.Instance.GameScreen.playerBoard    // Mein Board wurde getroffen
+                        ? GameStateManager.Instance.GameScreen.playerBoard // Mein Board wurde getroffen
                         : GameStateManager.Instance.GameScreen.opponentBoard; // Gegnerisches Board wurde getroffen
 
                     Console.WriteLine($"\nBoard Status:");
-                    Console.WriteLine($"- playerBoard is null: {GameStateManager.Instance.GameScreen.playerBoard == null}");
-                    Console.WriteLine($"- opponentBoard is null: {GameStateManager.Instance.GameScreen.opponentBoard == null}");
+                    Console.WriteLine(
+                        $"- playerBoard is null: {GameStateManager.Instance.GameScreen.playerBoard == null}"
+                    );
+                    Console.WriteLine(
+                        $"- opponentBoard is null: {GameStateManager.Instance.GameScreen.opponentBoard == null}"
+                    );
                     Console.WriteLine($"- targetBoard is null: {targetBoard == null}");
 
                     if (targetBoard != null)
@@ -360,13 +368,25 @@ public class ClientService(NetworkManager manager)
                         // Dann setze den Zellstatus basierend auf dem Treffer
                         if (hit)
                         {
-                            targetBoard.SetCellState(strikeX, strikeY, WaterWizard.Client.Gamescreen.CellState.Hit);
-                            Console.WriteLine($"Set Hit at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+                            targetBoard.SetCellState(
+                                strikeX,
+                                strikeY,
+                                WaterWizard.Client.Gamescreen.CellState.Hit
+                            );
+                            Console.WriteLine(
+                                $"Set Hit at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
+                            );
                         }
                         else
                         {
-                            targetBoard.SetCellState(strikeX, strikeY, WaterWizard.Client.Gamescreen.CellState.Thunder);
-                            Console.WriteLine($"Set Thunder at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}");
+                            targetBoard.SetCellState(
+                                strikeX,
+                                strikeY,
+                                WaterWizard.Client.Gamescreen.CellState.Thunder
+                            );
+                            Console.WriteLine(
+                                $"Set Thunder at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
+                            );
                         }
                     }
                     Console.WriteLine("----------------------------------------\n");

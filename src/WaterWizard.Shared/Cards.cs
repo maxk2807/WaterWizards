@@ -413,7 +413,7 @@ public class Cards
         if (_activeThunderEffect != null)
         {
             _activeThunderEffect.Update(deltaTime);
-            
+
             if (!_activeThunderEffect.IsActive)
             {
                 _activeThunderEffect = null;

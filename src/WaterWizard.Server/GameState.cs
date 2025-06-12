@@ -1,9 +1,9 @@
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server.handler;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
-using WaterWizard.Server.handler;
 
 namespace WaterWizard.Server;
 
@@ -100,7 +100,7 @@ public class GameState
         return players[index];
     }
 
-// TODO: für HandleCardBuying() gut verwendbar
+    // TODO: für HandleCardBuying() gut verwendbar
     public void SyncGoldToClient(int playerIndex)
     {
         var peer = GetPlayer(playerIndex);
@@ -117,10 +117,10 @@ public class GameState
         if (connectedCount < 1 || connectedCount > 2)
             throw new InvalidOperationException("Game requires 1 or 2 connected players.");
 
-        players = new NetPeer[2];
+        players = new NetPeer[2]; 
         for (int i = 0; i < connectedCount; i++)
             players[i] = server.ConnectedPeerList[i];
-
+        
         for (int i = connectedCount; i < 2; i++)
             players[i] = null;
 
@@ -132,7 +132,7 @@ public class GameState
             {
                 Console.WriteLine($"Player {i + 1}: {players[i]}");
                 Console.WriteLine($"  - Owns Board[{i}]");
-
+                
                 if (connectedCount > 1)
                 {
                     var opponentIndex = i == 0 ? 1 : 0;
@@ -274,7 +274,7 @@ public class GameState
         attackerWriter.Put(y);
         attackerWriter.Put(hit);
         attackerWriter.Put(shipDestroyed);
-        attackerWriter.Put(false); 
+        attackerWriter.Put(false);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
         var defenderWriter = new NetDataWriter();
@@ -283,10 +283,12 @@ public class GameState
         defenderWriter.Put(y);
         defenderWriter.Put(hit);
         defenderWriter.Put(shipDestroyed);
-        defenderWriter.Put(true); 
+        defenderWriter.Put(true);
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
-        Console.WriteLine($"[Server] Attack result sent: attacker sees result, defender sees damage");
+        Console.WriteLine(
+            $"[Server] Attack result sent: attacker sees result, defender sees damage"
+        );
     }
 
     /// <summary>

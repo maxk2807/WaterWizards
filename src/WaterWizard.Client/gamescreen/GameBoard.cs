@@ -1,12 +1,11 @@
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.ships;
-using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen;
-
 
 /// <summary>
 /// GameBoard class represents the game board for the battleship game.
@@ -64,7 +63,8 @@ public class GameBoard
         public void Draw(float cellSize)
         {
             float alpha = Alpha;
-            if (alpha <= 0) return;
+            if (alpha <= 0)
+                return;
 
             // Hauptleuchteffekt
             float glowSize = cellSize * (0.75f + 0.5f * alpha);
@@ -93,10 +93,7 @@ public class GameBoard
             // Mini-Blitze
             foreach (var point in miniLightningPoints)
             {
-                Vector2 endPoint = new(
-                    Position.X + point.X * alpha,
-                    Position.Y + point.Y * alpha
-                );
+                Vector2 endPoint = new(Position.X + point.X * alpha, Position.Y + point.Y * alpha);
                 Raylib.DrawLineEx(Position, endPoint, 1f, thunderColor);
             }
         }
@@ -201,7 +198,9 @@ public class GameBoard
             Point? clickedCell = GetCellFromScreenCoords(mousePos);
             if (clickedCell.HasValue)
             {
-                Console.WriteLine($"Clicked on cell: ({clickedCell.Value.X}, {clickedCell.Value.Y})");
+                Console.WriteLine(
+                    $"Clicked on cell: ({clickedCell.Value.X}, {clickedCell.Value.Y})"
+                );
                 return clickedCell;
             }
         }
@@ -412,7 +411,7 @@ public class GameBoard
             {
                 _gridStates[x, y] = state;
             }
-            
+
             Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
         }
     }
@@ -428,8 +427,10 @@ public class GameBoard
         if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
         {
             _gridStates[x, y] = hit ? CellState.Hit : CellState.Miss;
-            
-            Console.WriteLine($"[GameBoard] Cell ({x},{y}) marked as {(hit ? "HIT" : "MISS")} - State: {_gridStates[x, y]}");
+
+            Console.WriteLine(
+                $"[GameBoard] Cell ({x},{y}) marked as {(hit ? "HIT" : "MISS")} - State: {_gridStates[x, y]}"
+            );
         }
     }
 

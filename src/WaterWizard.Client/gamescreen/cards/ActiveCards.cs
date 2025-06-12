@@ -75,7 +75,7 @@ public class ActiveCards(GameScreen gameScreen)
 
                 var card = Cards[i].card;
                 int radius = 15;
-                
+
                 // Zeichne den äußeren Kreis
                 Raylib.DrawCircleLines(
                     centralX + cardX + radius,
@@ -90,13 +90,13 @@ public class ActiveCards(GameScreen gameScreen)
                     // Konvertiere die verbleibende Zeit von Millisekunden in Sekunden
                     float remainingSeconds = card.remainingDuration / 1000f;
                     float progress = remainingSeconds / totalDuration;
-                    
+
                     // Begrenze den Fortschritt auf 0-1
                     progress = Math.Max(0, Math.Min(1, progress));
-                    
+
                     // Berechne die Grad für den gefüllten Sektor (von 0 bis 360)
                     int degrees = (int)(progress * 360);
-                    
+
                     // Zeichne den gefüllten Sektor
                     if (degrees > 0)
                     {

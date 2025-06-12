@@ -1,6 +1,6 @@
 using Raylib_cs;
-using WaterWizard.Client.network;
 using WaterWizard.Client.gamescreen.handler;
+using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
@@ -57,7 +57,13 @@ public class LobbyListMenuState : IGameState
                         NetworkManager.Instance.ConnectToServer(ip, 7777);
                     }
                 }
-                Raylib.DrawText(lobby.Name +" "+ lobby.IP[0] + lobby.IP[1]+"...", tableX, yPos, 18, Color.Black);
+                Raylib.DrawText(
+                    lobby.Name + " " + lobby.IP[0] + lobby.IP[1] + "...",
+                    tableX,
+                    yPos,
+                    18,
+                    Color.Black
+                );
                 Raylib.DrawText(
                     $"{lobby.PlayerCount}",
                     tableX + headerSpacing,

@@ -59,7 +59,9 @@ public class LobbyState : IServerGameState
     {
         if (Program.ConnectedPlayers.Count > 2)
         {
-            Console.WriteLine($"[Server] Too many players connected ({Program.ConnectedPlayers.Count}). Maximum is 2. Resetting all players to not ready.");
+            Console.WriteLine(
+                $"[Server] Too many players connected ({Program.ConnectedPlayers.Count}). Maximum is 2. Resetting all players to not ready."
+            );
 
             var playerKeys = Program.ConnectedPlayers.Keys.ToList();
             foreach (var playerKey in playerKeys)
@@ -76,7 +78,9 @@ public class LobbyState : IServerGameState
 
             var systemMessageWriter = new NetDataWriter();
             systemMessageWriter.Put("SystemMessage");
-            systemMessageWriter.Put("Too many players! Maximum 2 players allowed. All players reset to not ready.");
+            systemMessageWriter.Put(
+                "Too many players! Maximum 2 players allowed. All players reset to not ready."
+            );
             foreach (var peer in server.ConnectedPeerList)
             {
                 peer.Send(systemMessageWriter, DeliveryMethod.ReliableOrdered);

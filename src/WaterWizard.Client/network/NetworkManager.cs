@@ -1,7 +1,7 @@
 using LiteNetLib;
 using WaterWizard.Client.gamescreen;
-using WaterWizard.Shared;
 using WaterWizard.Client.gamescreen.handler;
+using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
 
@@ -164,7 +164,7 @@ public class NetworkManager
     {
         string result = reader.GetString();
         bool isWinner = DetermineIfPlayerIsWinner(result);
-        
+
         string winnerMessage = isWinner
             ? "Congratulations! You emerged victorious!"
             : "You fought well, but victory slipped away. Better luck next time!";
@@ -184,25 +184,27 @@ public class NetworkManager
     /// <returns>True if the current player won the game, false otherwise.</returns>
     private static bool DetermineIfPlayerIsWinner(string result)
     {
-        if (result.Equals("Victory", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("win", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("victory", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("won", StringComparison.OrdinalIgnoreCase))
+        if (
+            result.Equals("Victory", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("win", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("victory", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("won", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return true;
         }
 
-        if (result.Equals("Defeat", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("lose", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("lost", StringComparison.OrdinalIgnoreCase) ||
-            result.Contains("defeat", StringComparison.OrdinalIgnoreCase))
+        if (
+            result.Equals("Defeat", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("lose", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("lost", StringComparison.OrdinalIgnoreCase)
+            || result.Contains("defeat", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return false;
         }
 
         Console.WriteLine($"[Client] Unclear game result: {result}. Assuming defeat.");
         return false;
-
-
-    }    
+    }
 }

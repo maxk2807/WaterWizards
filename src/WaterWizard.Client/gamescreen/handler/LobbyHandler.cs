@@ -4,7 +4,6 @@ using LiteNetLib.Utils;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
 
-
 namespace WaterWizard.Client.gamescreen.handler;
 
 /// <summary>
@@ -174,7 +173,8 @@ public static class LobbyHandler
 
                     if (
                         manager.clientService.client.FirstPeer != null
-                        && manager.clientService.client.FirstPeer.ConnectionState == ConnectionState.Connected
+                        && manager.clientService.client.FirstPeer.ConnectionState
+                            == ConnectionState.Connected
                     )
                     {
                         Console.WriteLine("[Client] Direct connection successful!");
@@ -206,12 +206,18 @@ public static class LobbyHandler
         NetworkManager.Instance.clientService.clientReady = false;
         NetworkManager.Instance.LobbyCountdownSeconds = null;
 
-        if (NetworkManager.Instance.clientService.client != null && NetworkManager.Instance.clientService.client.FirstPeer != null)
+        if (
+            NetworkManager.Instance.clientService.client != null
+            && NetworkManager.Instance.clientService.client.FirstPeer != null
+        )
         {
             var joinWriter = new NetDataWriter();
             joinWriter.Put("PlayerJoin");
             joinWriter.Put(Environment.UserName);
-            NetworkManager.Instance.clientService.client.FirstPeer.Send(joinWriter, DeliveryMethod.ReliableOrdered);
+            NetworkManager.Instance.clientService.client.FirstPeer.Send(
+                joinWriter,
+                DeliveryMethod.ReliableOrdered
+            );
         }
         GameStateManager.Instance.SetStateToLobby();
     }
