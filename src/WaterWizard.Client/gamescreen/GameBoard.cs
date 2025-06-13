@@ -467,7 +467,7 @@ public class GameBoard
         }
     }
 
-    public void AddThunderStrike(int x, int y)
+    public void AddThunderStrike(int x, int y, bool hit = false)
     {
         Vector2 position = new(
             Position.X + (float)x * (float)CellSize + (float)CellSize / 2f,

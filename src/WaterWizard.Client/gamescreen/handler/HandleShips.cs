@@ -103,27 +103,47 @@ public class HandleShips
         int y = reader.GetInt();
         int width = reader.GetInt();
         int height = reader.GetInt();
-
-        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-        if (opponentBoard != null)
+        
+        int damageCount = reader.GetInt();
+        var damagedCells = new HashSet<(int X, int Y)>();
+        for (int i = 0; i < damageCount; i++)
         {
-            int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-            int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-            int pixelWidth = width * opponentBoard.CellSize;
-            int pixelHeight = height * opponentBoard.CellSize;
+            int damageX = reader.GetInt();
+            int damageY = reader.GetInt();
+            damagedCells.Add((damageX, damageY));
+        }
 
-            opponentBoard.putShip(
-                new GameShip(
-                    GameStateManager.Instance.GameScreen,
-                    pixelX,
-                    pixelY,
-                    ShipType.DEFAULT,
-                    pixelWidth,
-                    pixelHeight
-                )
+        var targetBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
+
+        if (targetBoard != null)
+        {
+            int pixelX = (int)targetBoard.Position.X + x * targetBoard.CellSize;
+            int pixelY = (int)targetBoard.Position.Y + y * targetBoard.CellSize;
+            int pixelWidth = width * targetBoard.CellSize;
+            int pixelHeight = height * targetBoard.CellSize;
+
+            GameShip revealedShip = new GameShip(
+                GameStateManager.Instance.GameScreen,
+                pixelX,
+                pixelY,
+                ShipType.DEFAULT,
+                pixelWidth,
+                pixelHeight
             );
 
-            Console.WriteLine($"[Client] Ship revealed: ({x},{y}) size {width}x{height}");
+            foreach (var (damageX, damageY) in damagedCells)
+            {
+                revealedShip.AddDamage(damageX, damageY);
+            }
+
+            revealedShip.IsRevealed = true;
+            revealedShip.Transparency = 0.5f;
+
+            targetBoard.putShip(revealedShip);
+
+            Console.WriteLine(
+                $"[Client] Ship revealed on opponent board: ({x},{y}) size {width}x{height} with {damageCount} damage cells"
+            );
         }
     }
 
