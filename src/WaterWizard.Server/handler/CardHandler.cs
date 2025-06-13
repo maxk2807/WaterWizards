@@ -174,54 +174,59 @@ public class CardHandler
                     Console.WriteLine("\n[Server] Thunder Strike Round");
                     Console.WriteLine("----------------------------------------");
 
-                    for (int playerIndex = 0; playerIndex < 2; playerIndex++)
+                    for (int boardIndex = 0; boardIndex < 2; boardIndex++)
                     {
-                        var targetPlayer = gameState.players[playerIndex];
-                        Console.WriteLine($"\nGenerating strike for Board[{playerIndex}] owned by {targetPlayer}");
-
+                        var targetPlayer = gameState.players[boardIndex];
+                        var attacker = gameState.players[boardIndex == 0 ? 1 : 0];
+                        
                         int x = Random.Shared.Next(0, GameState.boardWidth);
                         int y = Random.Shared.Next(0, GameState.boardHeight);
-                        Console.WriteLine($"Strike coordinates: ({x}, {y})");
 
                         bool hit = ShipHandler.GetShips(targetPlayer).Any(ship =>
                             x >= ship.X && x < ship.X + ship.Width &&
                             y >= ship.Y && y < ship.Y + ship.Height
                         );
 
-                        // Detailed strike information
-                        Console.WriteLine($"Strike Result:");
-                        Console.WriteLine($"  - Target Board: Board[{playerIndex}]");
-                        Console.WriteLine($"  - Board Owner: {targetPlayer}");
-                        Console.WriteLine($"  - Coordinates: ({x}, {y})");
-                        Console.WriteLine($"  - Hit: {(hit ? "YES" : "NO")}");
-
-                        NetDataWriter thunderWriter = new();
-                        thunderWriter.Put("ThunderStrike");
-                        thunderWriter.Put(targetPlayer.ToString());
-                        thunderWriter.Put(x);
-                        thunderWriter.Put(y);
-                        thunderWriter.Put(hit);
-
-                        // Log message sending
-                        Console.WriteLine("\nSending strike information to players:");
-                        foreach (var player in gameState.players)
-                        {
-                            player.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
-                            Console.WriteLine($"  - Sent to {player}");
-                            Console.WriteLine($"    - {(player == targetPlayer ? "This is their board" : "This is their opponent's board")}");
-                            Console.WriteLine($"    - They should show this on their {(player == targetPlayer ? "playerBoard" : "opponentBoard")}");
-                        }
+                        Console.WriteLine($"Thunder strike on Board[{boardIndex}] (Player: {targetPlayer}) at ({x}, {y}), Hit: {hit}");
 
                         if (hit)
                         {
-                            var hitShip = ShipHandler.GetShips(targetPlayer).First(ship =>
+                            var hitShip = ShipHandler.GetShips(targetPlayer).FirstOrDefault(ship =>
                                 x >= ship.X && x < ship.X + ship.Width &&
                                 y >= ship.Y && y < ship.Y + ship.Height
                             );
-                            Console.WriteLine($"\nHit Details:");
-                            Console.WriteLine($"  - Hit ship at position: ({hitShip.X}, {hitShip.Y})");
-                            Console.WriteLine($"  - Ship size: {hitShip.Width}x{hitShip.Height}");
-                            Console.WriteLine($"  - Current damage: {hitShip.DamagedCells.Count}/{hitShip.MaxHealth}");
+
+                            if (hitShip != null)
+                            {
+                                bool newDamage = hitShip.DamageCell(x, y);
+                                Console.WriteLine($"Thunder hit ship at ({hitShip.X}, {hitShip.Y}), new damage: {newDamage}");
+
+                                if (newDamage && hitShip.IsDestroyed)
+                                {
+                                    Console.WriteLine($"Thunder destroyed ship at ({hitShip.X}, {hitShip.Y})!");
+                                    ShipHandler.SendShipReveal(attacker, hitShip);
+                                    gameState.CheckGameOver();
+                                }
+                                else
+                                {
+                                    CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false);
+                        }
+
+                        foreach (var client in gameState.players)
+                        {
+                            NetDataWriter thunderWriter = new();
+                            thunderWriter.Put("ThunderStrike");
+                            thunderWriter.Put(boardIndex); 
+                            thunderWriter.Put(x);
+                            thunderWriter.Put(y);
+                            
+                            client.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
                         }
                     }
                     Console.WriteLine("----------------------------------------\n");

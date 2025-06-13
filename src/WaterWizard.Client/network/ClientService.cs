@@ -312,84 +312,32 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
                 case "ThunderStrike":
-                    string targetPlayerAddress = reader.GetString();
+                    int targetBoardIndex = reader.GetInt();
                     int strikeX = reader.GetInt();
                     int strikeY = reader.GetInt();
-                    bool hit = reader.GetBool();
 
-                    Console.WriteLine("\n[Client] Received Thunder Strike");
-                    Console.WriteLine("----------------------------------------");
-                    Console.WriteLine($"Target Player Address: {targetPlayerAddress}");
-                    Console.WriteLine($"Strike Coordinates: ({strikeX}, {strikeY})");
-                    Console.WriteLine($"Hit: {hit}");
-
-                    Console.WriteLine($"\nAddress Comparison:");
-                    Console.WriteLine($"- Target Address (full): {targetPlayerAddress}");
-                    Console.WriteLine($"- My Address (full): {myEndPoint}");
-
-                    // Wurde mein Board getroffen?
-                    bool myBoardWasHit = false;
-                    if (myEndPoint != null)
+                    var gameScreen = GameStateManager.Instance.GameScreen;
+                    if (gameScreen != null)
                     {
-                        // Vergleiche die Adressen ohne den "127.0.0.1:" Teil
-                        string targetPort = targetPlayerAddress.Split(':').LastOrDefault() ?? "";
-                        string myPort = myEndPoint.Split(':').LastOrDefault() ?? "";
-                        Console.WriteLine($"Port Comparison:");
-                        Console.WriteLine($"- Target Port: {targetPort}");
-                        Console.WriteLine($"- My Port: {myPort}");
-                        myBoardWasHit = targetPort == myPort;
-                    }
-                    Console.WriteLine($"\nResult:");
-                    Console.WriteLine($"- Was my board hit? {myBoardWasHit}");
-                    Console.WriteLine(
-                        $"- Will show on: {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
-                    );
-
-                    // Wenn mein Board getroffen wurde -> auf meinem playerBoard anzeigen
-                    // Wenn das gegnerische Board getroffen wurde -> auf meinem opponentBoard anzeigen
-                    var targetBoard = myBoardWasHit
-                        ? GameStateManager.Instance.GameScreen.playerBoard // Mein Board wurde getroffen
-                        : GameStateManager.Instance.GameScreen.opponentBoard; // Gegnerisches Board wurde getroffen
-
-                    Console.WriteLine($"\nBoard Status:");
-                    Console.WriteLine(
-                        $"- playerBoard is null: {GameStateManager.Instance.GameScreen.playerBoard == null}"
-                    );
-                    Console.WriteLine(
-                        $"- opponentBoard is null: {GameStateManager.Instance.GameScreen.opponentBoard == null}"
-                    );
-                    Console.WriteLine($"- targetBoard is null: {targetBoard == null}");
-
-                    if (targetBoard != null)
-                    {
-                        // Füge zuerst den visuellen Blitzeffekt hinzu
-                        targetBoard.AddThunderStrike(strikeX, strikeY);
-
-                        // Dann setze den Zellstatus basierend auf dem Treffer
-                        if (hit)
+                        int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
+                        
+                        GameBoard targetBoard;
+                        if (targetBoardIndex == myPlayerIndex)
                         {
-                            targetBoard.SetCellState(
-                                strikeX,
-                                strikeY,
-                                WaterWizard.Client.Gamescreen.CellState.Hit
-                            );
-                            Console.WriteLine(
-                                $"Set Hit at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
-                            );
+                            targetBoard = gameScreen.playerBoard;
+                            Console.WriteLine($"Thunder visual effect on MY board at ({strikeX}, {strikeY})");
                         }
                         else
                         {
-                            targetBoard.SetCellState(
-                                strikeX,
-                                strikeY,
-                                WaterWizard.Client.Gamescreen.CellState.Thunder
-                            );
-                            Console.WriteLine(
-                                $"Set Thunder at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
-                            );
+                            targetBoard = gameScreen.opponentBoard;
+                            Console.WriteLine($"Thunder visual effect on OPPONENT's board at ({strikeX}, {strikeY})");
+                        }
+
+                        if (targetBoard != null)
+                        {
+                            targetBoard.AddThunderStrike(strikeX, strikeY);
                         }
                     }
-                    Console.WriteLine("----------------------------------------\n");
                     break;
                 case "ThunderReset":
                     GameStateManager.Instance.GameScreen.playerBoard?.ResetThunderFields();

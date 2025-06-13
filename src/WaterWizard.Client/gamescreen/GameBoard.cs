@@ -475,18 +475,9 @@ public class GameBoard
             Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
         );
 
-        // Neuen Blitzeinschlag hinzufügen
         _activeThunderStrikes.Add(new ThunderStrike(position));
 
-        // Markiere das getroffene Feld
-        if (x < GridWidth && y < GridHeight)
-        {
-            // Wenn das Feld bereits als "Hit" markiert ist, nicht überschreiben
-            if (_gridStates[x, y] != CellState.Hit)
-            {
-                _gridStates[x, y] = CellState.Thunder;
-            }
-        }
+        Console.WriteLine($"[GameBoard] Added thunder visual effect at ({x}, {y})");
     }
 
     public void ResetThunderFields()
