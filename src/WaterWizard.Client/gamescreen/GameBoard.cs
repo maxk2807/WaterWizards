@@ -469,7 +469,6 @@ public class GameBoard
 
     public void AddThunderStrike(int x, int y)
     {
-        // Position für den Blitzeinschlag berechnen
         Vector2 position = new(
             Position.X + (float)x * (float)CellSize + (float)CellSize / 2f,
             Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
@@ -477,7 +476,6 @@ public class GameBoard
 
         _activeThunderStrikes.Add(new ThunderStrike(position));
         
-        // Also mark this cell with the Thunder state so it's visually different
         if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
         {
             _gridStates[x, y] = CellState.Thunder;
@@ -488,12 +486,10 @@ public class GameBoard
 
     public void ResetThunderFields()
     {
-        // Setze alle Thunder-Felder zurück auf ihren vorherigen Zustand
         for (int x = 0; x < GridWidth; x++)
         {
             for (int y = 0; y < GridHeight; y++)
             {
-                // Nur Thunder-Felder zurücksetzen, Hit-Felder bleiben bestehen
                 if (_gridStates[x, y] == CellState.Thunder)
                 {
                     _gridStates[x, y] = CellState.Unknown;

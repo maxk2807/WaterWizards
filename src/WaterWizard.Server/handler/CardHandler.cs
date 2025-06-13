@@ -174,7 +174,6 @@ public class CardHandler
                     Console.WriteLine("\n[Server] Thunder Strike Round");
                     Console.WriteLine("----------------------------------------");
 
-                    // Generate strikes for BOTH boards (0 and 1)
                     for (int boardIndex = 0; boardIndex < 2; boardIndex++)
                     {
                         var targetPlayer = gameState.players[boardIndex];
@@ -182,7 +181,6 @@ public class CardHandler
                         
                         Console.WriteLine($"Generating 2 thunder strikes for Board[{boardIndex}] (Player: {targetPlayer})");
                         
-                        // Generate exactly 2 strikes per board per wave
                         for (int strikeNum = 0; strikeNum < 2; strikeNum++)
                         {
                             int x = Random.Shared.Next(0, GameState.boardWidth);
@@ -195,7 +193,6 @@ public class CardHandler
 
                             Console.WriteLine($"  Strike {strikeNum + 1}: Board[{boardIndex}] at ({x}, {y}), Hit: {hit}");
 
-                            // Handle ship damage and send CellReveal
                             if (hit)
                             {
                                 var hitShip = ShipHandler.GetShips(targetPlayer).FirstOrDefault(ship =>
@@ -216,23 +213,20 @@ public class CardHandler
                                     }
                                     else
                                     {
-                                        // Send individual CellReveal for this specific strike
                                         CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true);
                                     }
                                 }
                             }
                             else
                             {
-                                // Send individual CellReveal for this specific strike
                                 CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false);
                             }
 
-                            // Send visual thunder effect to both clients for this specific strike
                             foreach (var client in gameState.players)
                             {
                                 NetDataWriter thunderWriter = new();
                                 thunderWriter.Put("ThunderStrike");
-                                thunderWriter.Put(boardIndex); // Which board the strike targets
+                                thunderWriter.Put(boardIndex);
                                 thunderWriter.Put(x);
                                 thunderWriter.Put(y);
                                 
