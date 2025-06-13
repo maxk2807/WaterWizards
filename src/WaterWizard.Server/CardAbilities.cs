@@ -69,7 +69,7 @@ public static class CardAbilities
                 PrintCardArea(variant, targetCoords, gameState, defender);
                 break;
         }
-
+        CardHandler cardHandler = new(gameState);
         var durationString = new Cards(variant).Duration!;
         switch (durationString)
         {
@@ -82,8 +82,10 @@ public static class CardAbilities
                 try
                 {
                     int duration = int.Parse(durationString);
-                    gameState.CardActivation(variant, duration);
-                    Console.WriteLine($"[Server] Activated Card: {variant} for {duration} seconds");
+                    cardHandler.CardActivation(variant, duration);
+                    Console.WriteLine(
+                        $"[Server] Activated Card: {variant} for {duration} seconds"
+                    );
                     break;
                 }
                 catch (Exception ex)

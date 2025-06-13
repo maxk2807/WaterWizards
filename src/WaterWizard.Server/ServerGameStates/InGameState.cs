@@ -78,16 +78,17 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         Console.WriteLine(
             $"[InGameState] HandleNetworkEvent called for peer {peer} with messageType {messageType}. Reader position: {reader.Position}"
         );
+        CardHandler cardHandler = new(gameState);
         switch (messageType)
         {
             case "PlaceShip":
                 ShipHandler.HandleShipPlacement(peer, reader, gameState);
                 break;
             case "BuyCard":
-                gameState.HandleCardBuying(peer, reader);
+                CardHandler.HandleCardBuying(serverInstance, peer, reader);
                 break;
             case "CastCard":
-                gameState.HandleCardCasting(peer, reader);
+                cardHandler.HandleCardCasting(serverInstance, peer, reader, gameState);
                 break;
             case "Attack":
                 int x = reader.GetInt();
@@ -95,7 +96,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 Console.WriteLine($"[Server] Attack received at ({x}, {y}) from {peer}");
                 var defender = FindOpponent(peer);
                 if (defender != null)
-                    gameState.HandleAttack(peer, defender, x, y);
+                {
+                    AttackHandler.Initialize(gameState);
+                    AttackHandler.HandleAttack(peer, defender, x, y);
+                }                   
                 else
                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
                 break;
