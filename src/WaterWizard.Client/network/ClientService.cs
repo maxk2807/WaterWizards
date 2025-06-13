@@ -322,15 +322,17 @@ public class ClientService(NetworkManager manager)
                         int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
                         
                         GameBoard targetBoard;
+                        Console.WriteLine($"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}");
+                        
                         if (targetBoardIndex == myPlayerIndex)
                         {
                             targetBoard = gameScreen.playerBoard;
-                            Console.WriteLine($"Thunder visual effect on MY board at ({strikeX}, {strikeY})");
+                            Console.WriteLine($"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY})");
                         }
                         else
                         {
                             targetBoard = gameScreen.opponentBoard;
-                            Console.WriteLine($"Thunder visual effect on OPPONENT's board at ({strikeX}, {strikeY})");
+                            Console.WriteLine($"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY})");
                         }
 
                         if (targetBoard != null)
@@ -342,6 +344,11 @@ public class ClientService(NetworkManager manager)
                 case "ThunderReset":
                     GameStateManager.Instance.GameScreen.playerBoard?.ResetThunderFields();
                     GameStateManager.Instance.GameScreen.opponentBoard?.ResetThunderFields();
+                    break;
+                case "PlayerIndex":
+                    int playerIndex = reader.GetInt();
+                    GameStateManager.Instance.MyPlayerIndex = playerIndex;
+                    Console.WriteLine($"[Client] Received player index: {playerIndex}");
                     break;
             }
         }

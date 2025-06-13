@@ -181,7 +181,7 @@ public class ShipHandler
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height}"
+            $"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height} with 50% transparency"
         );
     }
 

@@ -476,6 +476,12 @@ public class GameBoard
         );
 
         _activeThunderStrikes.Add(new ThunderStrike(position));
+        
+        // Also mark this cell with the Thunder state so it's visually different
+        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+        {
+            _gridStates[x, y] = CellState.Thunder;
+        }
 
         Console.WriteLine($"[GameBoard] Added thunder visual effect at ({x}, {y})");
     }
