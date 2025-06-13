@@ -1,6 +1,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
@@ -99,51 +100,56 @@ public class HandleShips
     /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleShipReveal(NetPacketReader reader)
     {
-        int x = reader.GetInt();
-        int y = reader.GetInt();
-        int width = reader.GetInt();
-        int height = reader.GetInt();
-        
-        int damageCount = reader.GetInt();
-        var damagedCells = new HashSet<(int X, int Y)>();
-        for (int i = 0; i < damageCount; i++)
+        try
         {
-            int damageX = reader.GetInt();
-            int damageY = reader.GetInt();
-            damagedCells.Add((damageX, damageY));
-        }
-
-        var targetBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-
-        if (targetBoard != null)
-        {
-            int pixelX = (int)targetBoard.Position.X + x * targetBoard.CellSize;
-            int pixelY = (int)targetBoard.Position.Y + y * targetBoard.CellSize;
-            int pixelWidth = width * targetBoard.CellSize;
-            int pixelHeight = height * targetBoard.CellSize;
-
-            GameShip revealedShip = new GameShip(
-                GameStateManager.Instance.GameScreen,
-                pixelX,
-                pixelY,
-                ShipType.DEFAULT,
-                pixelWidth,
-                pixelHeight
-            );
-
-            foreach (var (damageX, damageY) in damagedCells)
+            int x = reader.GetInt();
+            int y = reader.GetInt();
+            int width = reader.GetInt();
+            int height = reader.GetInt();
+            
+            int damageCount = reader.GetInt();
+            var damagedCells = new HashSet<(int X, int Y)>();
+            
+            Console.WriteLine($"[Client] HandleShipReveal: Ship at ({x},{y}) size {width}x{height}, damageCount={damageCount}");
+            
+            for (int i = 0; i < damageCount; i++)
             {
-                revealedShip.AddDamage(damageX, damageY);
+                int damageX = reader.GetInt();
+                int damageY = reader.GetInt();
+                damagedCells.Add((damageX, damageY));
+                Console.WriteLine($"[Client] HandleShipReveal: Damage at ({damageX},{damageY})");
             }
 
-            revealedShip.IsRevealed = true;
-            revealedShip.Transparency = 0.5f;
+            var targetBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
 
-            targetBoard.putShip(revealedShip);
+            if (targetBoard != null)
+            {
+                for (int dx = 0; dx < width; dx++)
+                {
+                    for (int dy = 0; dy < height; dy++)
+                    {
+                        int cellX = x + dx;
+                        int cellY = y + dy;
+                        
+                        if (cellX >= 0 && cellX < targetBoard.GridWidth && cellY >= 0 && cellY < targetBoard.GridHeight)
+                        {
+                            if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
+                            {
+                                targetBoard.SetCellState(cellX, cellY, CellState.Ship);
+                            }
+                        }
+                    }
+                }
 
-            Console.WriteLine(
-                $"[Client] Ship revealed on opponent board: ({x},{y}) size {width}x{height} with {damageCount} damage cells"
-            );
+                Console.WriteLine(
+                    $"[Client] Ship revealed on opponent board: ({x},{y}) size {width}x{height} with {damageCount} damage cells - marked cells as Ship state"
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Error in HandleShipReveal: {ex.Message}");
+            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
         }
     }
 

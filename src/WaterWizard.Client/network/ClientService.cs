@@ -335,10 +335,7 @@ public class ClientService(NetworkManager manager)
                             Console.WriteLine($"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
                         }
 
-                        if (targetBoard != null)
-                        {
-                            targetBoard.AddThunderStrike(strikeX, strikeY, thunderHit);
-                        }
+                        targetBoard?.AddThunderStrike(strikeX, strikeY, thunderHit);
                     }
                     break;
                 case "ThunderReset":
