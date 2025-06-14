@@ -16,6 +16,7 @@ public static class CardAbilities
         CardVariant variant,
         GameState gameState,
         Vector2 targetCoords,
+        NetPeer caster,
         NetPeer defender
     )
     {
@@ -74,6 +75,16 @@ public static class CardAbilities
         switch (durationString)
         {
             case "instant":
+                if (variant == CardVariant.Heal)
+                {
+                    var ships = ShipHandler.GetShips(caster);
+                    var healed = ships.Find(_ => _.X == targetCoords.X && _.Y == targetCoords.Y);
+                    bool? success = healed?.HealCell((int)targetCoords.X, (int)targetCoords.Y);
+                    if (success.HasValue)
+                    {
+                        Console.WriteLine($"[Server] Heal Ship on ({targetCoords.X},{targetCoords.Y})");
+                    }
+                }
                 break;
             case "permanent":
                 Console.WriteLine($"[Server] Activated Card: {variant}");

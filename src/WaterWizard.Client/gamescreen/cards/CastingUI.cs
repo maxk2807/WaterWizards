@@ -30,6 +30,31 @@ public class CastingUI
         Vector2 aim = gameCard.card.TargetAsVector();
         if ((int)aim.X == 0 && (int)aim.Y == 0)
         {
+            Vector2 shipCoords = new();
+            if (gameCard.card.Target!.Target.Contains("ship"))
+            {
+                GameBoard board = gameCard.card.Target.Ally ?
+                    GameScreen.playerBoard! :
+                    GameScreen.opponentBoard!;
+                Point? hoveredCoords = board.GetCellFromScreenCoords(mousePos);
+                Vector2 boardPos = board.Position;
+                if (!hoveredCoords.HasValue)
+                    return;
+
+                var ship = GameScreen.playerBoard!.Ships.Find(ship =>
+                {
+                    return hoveredCoords.Value.X >= (ship.X - boardPos.X) / CellSize &&
+                        hoveredCoords.Value.X < (ship.X + ship.Width - boardPos.X) / CellSize &&
+                        hoveredCoords.Value.Y >= (ship.Y - boardPos.Y) / CellSize &&
+                        hoveredCoords.Value.Y < (ship.Y + ship.Height - boardPos.Y) / CellSize;
+                });
+                if (ship != null)
+                {
+                    var r = new Rectangle(ship.X, ship.Y, ship.Width, ship.Height);
+                    Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
+                    shipCoords = new((ship.X - board.Position.X) / CellSize, (ship.Y - board.Position.Y) / CellSize);
+                }
+            }
             var txt = $"Click to cast {gameCard.card.Variant}";
             var txtWidth = Raylib.MeasureText(txt, 20);
             Raylib.DrawText(
@@ -43,7 +68,7 @@ public class CastingUI
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
                 aiming = false;
-                NetworkManager.HandleCast(cardToAim!.card, new());
+                NetworkManager.HandleCast(cardToAim!.card, new((int)shipCoords.X, (int)shipCoords.Y));
             }
         }
         else

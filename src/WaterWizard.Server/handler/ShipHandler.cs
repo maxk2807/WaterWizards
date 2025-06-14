@@ -194,4 +194,9 @@ public class ShipHandler
         var ships = GetShips(player);
         return ships.Count > 0 && ships.All(ship => ship.IsDestroyed);
     }
+
+    public static void HandleShipHealing()
+    {
+        //TODO: 
+    }
 }

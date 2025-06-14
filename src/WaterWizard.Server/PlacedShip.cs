@@ -20,4 +20,11 @@ public class PlacedShip
     {
         return DamagedCells.Add((cellX, cellY));
     }
+
+    public bool HealCell(int cellX, int cellY)
+    {
+        return DamagedCells.Remove((cellX, cellY));
+    }
+
+    
 }
