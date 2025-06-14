@@ -321,7 +321,7 @@ public class ClientService(NetworkManager manager)
                     if (gameScreen != null)
                     {
                         int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
-                        
+
                         GameBoard? targetBoard = null;
                         Console.WriteLine($"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}");
                         if (targetBoardIndex == myPlayerIndex)
@@ -347,6 +347,11 @@ public class ClientService(NetworkManager manager)
                     GameStateManager.Instance.MyPlayerIndex = playerIndex;
                     Console.WriteLine($"[Client] Received player index: {playerIndex}");
                     break;
+                case "UpdateMana":
+                {
+                    HandleRessources.HandleUpdateMana(reader);
+                    break;
+                }
             }
         }
         catch (Exception ex)
