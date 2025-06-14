@@ -139,6 +139,7 @@ public class CardHandler
             if (card.remainingDuration <= 0)
             {
                 // Karte ist abgelaufen
+                Console.WriteLine($"[Server] Card {card.Variant} expired, removing from active cards");
                 GameState.ActiveCards.RemoveAt(i);
 
                 foreach (var player in gameState.players)

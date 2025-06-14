@@ -127,21 +127,29 @@ public class ActiveCards(GameScreen gameScreen)
     }
 
     public void Update(float deltaTime)
-    {
-        if (_cards == null || _cards.Cards.Count == 0)
-            return;
+{
+    if (_cards == null || _cards.Cards.Count == 0)
+        return;
 
-        foreach (var gameCard in _cards.Cards)
+    for (int i = _cards.Cards.Count - 1; i >= 0; i--)
+    {
+        var gameCard = _cards.Cards[i];
+        
+        if (gameCard.card.Duration != "permanent" && gameCard.card.Duration != "instant")
         {
-            if (gameCard.card.Duration != "permanent" && gameCard.card.Duration != "instant")
+            if (gameCard.card.remainingDuration > 0)
             {
-                if (gameCard.card.remainingDuration > 0)
+                gameCard.card.remainingDuration -= deltaTime * 1000; 
+                
+                Console.WriteLine($"[Client] Card {gameCard.card.Variant} remaining: {gameCard.card.remainingDuration}ms");
+                
+                if (gameCard.card.remainingDuration <= 0)
                 {
-                    gameCard.card.remainingDuration -= deltaTime * 1000; 
-                    if (gameCard.card.remainingDuration < 0)
-                        gameCard.card.remainingDuration = 0;
+                    Console.WriteLine($"[Client] Card {gameCard.card.Variant} duration expired on client");
+                    gameCard.card.remainingDuration = 0;
                 }
             }
         }
     }
+}
 }
