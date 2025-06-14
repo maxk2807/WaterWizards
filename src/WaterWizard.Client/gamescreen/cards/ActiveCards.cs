@@ -85,7 +85,7 @@ public class ActiveCards(GameScreen gameScreen)
                 );
 
                 // Berechne den Fortschritt für die Karte
-                if (int.TryParse(card.Duration, out int totalDuration))
+                if (int.TryParse(card.Duration, out int totalDuration) && totalDuration > 0)
                 {
                     // Konvertiere die verbleibende Zeit von Millisekunden in Sekunden
                     float remainingSeconds = card.remainingDuration / 1000f;
@@ -121,6 +121,25 @@ public class ActiveCards(GameScreen gameScreen)
                         100,
                         Color.Black
                     );
+                }
+            }
+        }
+    }
+
+    public void Update(float deltaTime)
+    {
+        if (_cards == null || _cards.Cards.Count == 0)
+            return;
+
+        foreach (var gameCard in _cards.Cards)
+        {
+            if (gameCard.card.Duration != "permanent" && gameCard.card.Duration != "instant")
+            {
+                if (gameCard.card.remainingDuration > 0)
+                {
+                    gameCard.card.remainingDuration -= deltaTime * 1000; 
+                    if (gameCard.card.remainingDuration < 0)
+                        gameCard.card.remainingDuration = 0;
                 }
             }
         }

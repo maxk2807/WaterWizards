@@ -481,9 +481,12 @@ public class GameBoard
             Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
         );
 
-        _activeThunderStrikes.Add(new ThunderStrike(position, hit));
+        var strike = new ThunderStrike(position, hit);
+        _activeThunderStrikes.Add(strike);
 
         Console.WriteLine($"[GameBoard] Added thunder visual effect at ({x}, {y})");
+
+        SetCellState(x, y, hit ? CellState.Hit : CellState.Miss);
     }
 
     public void ResetThunderFields()

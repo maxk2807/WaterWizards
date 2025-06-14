@@ -181,7 +181,7 @@ public class CardHandler
                         
                         Console.WriteLine($"Generating 2 thunder strikes for Board[{boardIndex}] (Player: {targetPlayer})");
                         
-                        for (int strikeNum = 0; strikeNum < 2; strikeNum++)
+                        for (int strikeNum = 0; strikeNum < 3; strikeNum++)
                         {
                             int x = Random.Shared.Next(0, GameState.boardWidth);
                             int y = Random.Shared.Next(0, GameState.boardHeight);
