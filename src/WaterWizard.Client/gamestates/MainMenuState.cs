@@ -53,9 +53,9 @@ public class MainMenuState : IGameState
         float scaleFactor = Math.Min(scaleX, scaleY); 
 
         // Berechnung der Position
-        Rectangle destRect = new Rectangle(
-        manager.screenWidth / 2 - (titleAsset.Width * scaleFactor) / 2, // Zentrierung auf X-Achse
-        manager.screenHeight / 9, // Y-Position relativ zum Bildschirm
+        Rectangle destRect = new(
+        (float)manager.screenWidth / 2 - (titleAsset.Width * scaleFactor) / 2, // Zentrierung auf X-Achse
+        (float)manager.screenHeight / 9, // Y-Position relativ zum Bildschirm
         titleAsset.Width * scaleFactor,
         titleAsset.Height * scaleFactor
         );

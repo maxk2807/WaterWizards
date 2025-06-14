@@ -496,6 +496,8 @@ public class GameScreen(
             _thunderTimer = THUNDER_INTERVAL;
         }
 
+        activeCards?.Update(deltaTime);
+
         // Update active cards
         if (activeCards != null)
         {

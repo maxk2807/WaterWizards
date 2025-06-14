@@ -113,6 +113,9 @@ public class HandleAttacks
         }
     }
 
+// float transparency = 0.5f;
+//         writer.Put(transparency);
+
     public static void HandleCellReveal(NetPacketReader reader)
     {
         int revealX = reader.GetInt();
@@ -129,6 +132,35 @@ public class HandleAttacks
                 if (playerBoard != null)
                 {
                     playerBoard.MarkCellAsHit(revealX, revealY, isHit);
+
+                    if (isHit)
+                    {
+                        foreach (var ship in playerBoard.Ships)
+                        {
+                            int cellSize = playerBoard.CellSize;
+                            int shipCellX = (ship.X - (int)playerBoard.Position.X) / cellSize;
+                            int shipCellY = (ship.Y - (int)playerBoard.Position.Y) / cellSize;
+                            int shipWidth = ship.Width / cellSize;
+                            int shipHeight = ship.Height / cellSize;
+
+                            if (
+                                revealX >= shipCellX
+                                && revealX < shipCellX + shipWidth
+                                && revealY >= shipCellY
+                                && revealY < shipCellY + shipHeight
+                            )
+                            {
+                                int relativeX = revealX - shipCellX;
+                                int relativeY = revealY - shipCellY;
+                                ship.AddDamage(relativeX, relativeY);
+                                Console.WriteLine(
+                                    $"[Client] Added damage to ship at ({relativeX},{relativeY})"
+                                );
+                                break;
+                            }
+                        }
+                    }
+
                     Console.WriteLine(
                         $"[Client] Defender - Cell revealed on own board: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")}"
                     );

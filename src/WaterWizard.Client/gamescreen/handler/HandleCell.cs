@@ -16,16 +16,37 @@ public class HandleCell
         int x = reader.GetInt();
         int y = reader.GetInt();
         bool isHit = reader.GetBool();
+        bool isDefender = reader.GetBool();
 
-        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-        if (opponentBoard != null)
+        var gameScreen = GameStateManager.Instance.GameScreen;
+        if (gameScreen != null)
         {
-            opponentBoard.SetCellState(
-                x,
-                y,
-                isHit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
-            );
-            Console.WriteLine($"[Client] Cell revealed: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+            if (isDefender)
+            {
+                var playerBoard = gameScreen.playerBoard;
+                if (playerBoard != null)
+                {
+                    playerBoard.SetCellState(
+                        x,
+                        y,
+                        isHit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
+                    );
+                    Console.WriteLine($"[Client] Defender - Cell revealed on own board: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+                }
+            }
+            else
+            {
+                var opponentBoard = gameScreen.opponentBoard;
+                if (opponentBoard != null)
+                {
+                    opponentBoard.SetCellState(
+                        x,
+                        y,
+                        isHit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
+                    );
+                    Console.WriteLine($"[Client] Attacker - Cell revealed on opponent board: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+                }
+            }
         }
     }
 }

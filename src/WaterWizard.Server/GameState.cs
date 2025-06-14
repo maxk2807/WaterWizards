@@ -119,7 +119,15 @@ public class GameState
 
         players = new NetPeer[2]; 
         for (int i = 0; i < connectedCount; i++)
+        {
             players[i] = server.ConnectedPeerList[i];
+            
+            var writer = new NetDataWriter();
+            writer.Put("PlayerIndex");
+            writer.Put(i);
+            players[i].Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine($"[Server] Sent player index {i} to {players[i]}");
+        }
         
         for (int i = connectedCount; i < 2; i++)
             players[i] = default!;
