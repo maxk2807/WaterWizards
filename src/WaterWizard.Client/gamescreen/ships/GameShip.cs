@@ -17,6 +17,9 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
         DamagedCells.Count
         >= (Width * Height / (gameScreen.playerBoard!.CellSize * gameScreen.playerBoard.CellSize));
 
+    public bool IsRevealed { get; set; } = false;
+    public float Transparency { get; set; } = 1.0f;
+
     public void AddDamage(int cellX, int cellY)
     {
         DamagedCells.Add((cellX, cellY));
@@ -33,20 +36,29 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
         if (IsDestroyed)
             shipColor = Color.Black;
 
+        if (IsRevealed && Transparency < 1.0f)
+        {
+            shipColor = new Color(shipColor.R, shipColor.G, shipColor.B, 0.3f);
+        }
+
         Raylib.DrawRectangleRec(rec, shipColor);
 
-        int cellSize = gameScreen.playerBoard!.CellSize;
-        foreach (var (damageX, damageY) in DamagedCells)
-        {
-            int pixelX = X + (damageX * cellSize);
-            int pixelY = Y + (damageY * cellSize);
 
-            Raylib.DrawCircle(
-                pixelX + cellSize / 2,
-                pixelY + cellSize / 2,
-                cellSize / 4f,
-                Color.Red
-            );
+        if (!IsRevealed || Transparency >= 1.0f)
+        {
+            int cellSize = gameScreen.playerBoard!.CellSize;
+            foreach (var (damageX, damageY) in DamagedCells)
+            {
+                int pixelX = X + (damageX * cellSize);
+                int pixelY = Y + (damageY * cellSize);
+
+                Raylib.DrawCircle(
+                    pixelX + cellSize / 2,
+                    pixelY + cellSize / 2,
+                    cellSize / 4f,
+                    Color.Red
+                );
+            }
         }
     }
 }
