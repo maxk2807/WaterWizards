@@ -90,7 +90,7 @@ public class CardHandler
             }
             if (defender != null)
             {
-                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), defender);
+                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
             }
             else
             {

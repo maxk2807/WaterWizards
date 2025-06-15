@@ -46,7 +46,7 @@ public class CellHandler
         attackerWriter.Put(x);
         attackerWriter.Put(y);
         attackerWriter.Put(isHit);
-        attackerWriter.Put(false); 
+        attackerWriter.Put(false);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
         var defenderWriter = new NetDataWriter();
@@ -54,7 +54,7 @@ public class CellHandler
         defenderWriter.Put(x);
         defenderWriter.Put(y);
         defenderWriter.Put(isHit);
-        defenderWriter.Put(true); 
+        defenderWriter.Put(true);
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(

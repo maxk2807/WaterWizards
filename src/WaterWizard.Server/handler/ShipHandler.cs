@@ -203,4 +203,36 @@ public class ShipHandler
         var ships = GetShips(player);
         return ships.Count > 0 && ships.All(ship => ship.IsDestroyed);
     }
+
+    public static void HandleShipHealing(NetPeer caster, PlacedShip? ship, CardVariant variant)
+    {
+        if (ship == null)
+        {
+            return;
+        }
+
+        var writer = new NetDataWriter();
+        writer.Put("ShipHeal");
+        
+        switch (variant)
+        {
+            case CardVariant.Heal:
+                if (ship.DamagedCells.Count > 0)
+                {
+                    var (X, Y) = ship.DamagedCells.First();
+                    ship.HealCell(X, Y);
+                    writer.Put(true); // success
+                    writer.Put(X);
+                    writer.Put(Y);
+                    Console.WriteLine($"[Server] Sent ShipHeal on {(X,Y)}");
+                }
+                else
+                {
+                    writer.Put(false); // failed
+                    Console.WriteLine($"[Server] Sent Failed ShipHeal, Possible Mismatch between Client and Server");
+                }
+                caster.Send(writer, DeliveryMethod.ReliableOrdered);
+                break;
+        }
+    }
 }

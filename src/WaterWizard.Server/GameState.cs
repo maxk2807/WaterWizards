@@ -175,7 +175,7 @@ public class GameState
         this.manager = manager;
 
         CardHandler cardHandler = new(this);
-
+     
         activationTimer = new Timer(_ => cardHandler.UpdateActiveCards(500), null, 0, 500);
     } 
 
