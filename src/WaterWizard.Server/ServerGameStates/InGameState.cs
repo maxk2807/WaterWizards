@@ -52,10 +52,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             );
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-
-        Console.WriteLine(
-            $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
-        );
+// only for logging / testing
+        // Console.WriteLine(
+        //     $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
+        // );
     }
 
     /// <summary>
