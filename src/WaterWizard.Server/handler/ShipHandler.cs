@@ -170,7 +170,7 @@ public class ShipHandler
         peer.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 
-    public static void SendShipReveal(NetPeer attacker, PlacedShip ship)
+    public static void SendShipReveal(NetPeer attacker, PlacedShip ship, GameState gameState)
     {
         var writer = new NetDataWriter();
         writer.Put("ShipReveal");
@@ -178,10 +178,19 @@ public class ShipHandler
         writer.Put(ship.Y);
         writer.Put(ship.Width);
         writer.Put(ship.Height);
+        writer.Put(false);
+        
+        writer.Put(ship.DamagedCells.Count);
+        foreach (var (damageX, damageY) in ship.DamagedCells)
+        {
+            writer.Put(damageX);
+            writer.Put(damageY);
+        }
+        
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Ship reveal sent to {attacker}: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height}"
+            $"[Server] Ship reveal sent to attacker: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height} with {ship.DamagedCells.Count} damage cells"
         );
     }
 
