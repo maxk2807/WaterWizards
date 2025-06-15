@@ -37,14 +37,66 @@ public class CastingUI
         {
             HandleTargeted(gameCard, mousePos, aim);
         }
-        else if (!IsTargeted(aim))
+        else if (!IsTargeted(aim) && IsTargetShip(gameCard))
         {
-            
+            HandleShipTargeted(gameCard, mousePos);
         }
         else
         {
             HandleNonTargeted(gameCard, mousePos);
         }
+    }
+
+    /// <summary>
+    /// Handles the Drawing of the Cursor For Cards that Target Ships
+    /// </summary>
+    /// <param name="gameCard">Card to Cast</param>
+    /// <param name="mousePos">Get from <see cref="Raylib.GetMousePosition()"/></param>
+    private void HandleShipTargeted(GameCard gameCard, Vector2 mousePos)
+    {
+        Vector2 shipCoords = new();
+        GameBoard board = gameCard.card.Target!.Ally ?
+                            GameScreen.playerBoard! :
+                            GameScreen.opponentBoard!;
+        Point? hoveredCoords = board.GetCellFromScreenCoords(mousePos);
+        Vector2 boardPos = board.Position;
+        if (hoveredCoords.HasValue)
+        {
+            var ship = GameScreen.playerBoard!.Ships.Find(ship =>
+            {
+                return hoveredCoords.Value.X >= (ship.X - boardPos.X) / CellSize &&
+                    hoveredCoords.Value.X < (ship.X + ship.Width - boardPos.X) / CellSize &&
+                    hoveredCoords.Value.Y >= (ship.Y - boardPos.Y) / CellSize &&
+                    hoveredCoords.Value.Y < (ship.Y + ship.Height - boardPos.Y) / CellSize;
+            });
+            if (ship != null)
+            {
+                var r = new Rectangle(ship.X, ship.Y, ship.Width, ship.Height);
+                Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
+                shipCoords = new((ship.X - board.Position.X) / CellSize, (ship.Y - board.Position.Y) / CellSize);
+            }
+        }
+
+        var txt = $"Click to cast {gameCard.card.Variant}";
+        var txtWidth = Raylib.MeasureText(txt, 20);
+        Raylib.DrawText(
+            txt,
+            (int)mousePos.X - (txtWidth / 2),
+            (int)mousePos.Y - 20,
+            20,
+            Color.Black
+        );
+
+        if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            aiming = false;
+            NetworkManager.HandleCast(cardToAim!.card, new((int)shipCoords.X, (int)shipCoords.Y));
+        }
+    }
+
+    private static bool IsTargetShip(GameCard gameCard)
+    {
+        return gameCard.card.Target!.Target.Contains("ship");
     }
 
     /// <summary>
@@ -107,30 +159,6 @@ public class CastingUI
     private void HandleNonTargeted(GameCard gameCard, Vector2 mousePos)
     {
         Vector2 shipCoords = new();
-        if (gameCard.card.Target!.Target.Contains("ship"))
-        {
-            GameBoard board = gameCard.card.Target.Ally ?
-                GameScreen.playerBoard! :
-                GameScreen.opponentBoard!;
-            Point? hoveredCoords = board.GetCellFromScreenCoords(mousePos);
-            Vector2 boardPos = board.Position;
-            if (hoveredCoords.HasValue)
-            {
-                var ship = GameScreen.playerBoard!.Ships.Find(ship =>
-                {
-                    return hoveredCoords.Value.X >= (ship.X - boardPos.X) / CellSize &&
-                        hoveredCoords.Value.X < (ship.X + ship.Width - boardPos.X) / CellSize &&
-                        hoveredCoords.Value.Y >= (ship.Y - boardPos.Y) / CellSize &&
-                        hoveredCoords.Value.Y < (ship.Y + ship.Height - boardPos.Y) / CellSize;
-                });
-                if (ship != null)
-                {
-                    var r = new Rectangle(ship.X, ship.Y, ship.Width, ship.Height);
-                    Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
-                    shipCoords = new((ship.X - board.Position.X) / CellSize, (ship.Y - board.Position.Y) / CellSize);
-                }
-            }
-        }
         var txt = $"Click to cast {gameCard.card.Variant}";
         var txtWidth = Raylib.MeasureText(txt, 20);
         Raylib.DrawText(
