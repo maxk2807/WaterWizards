@@ -395,6 +395,21 @@ public class ClientService(NetworkManager manager)
                     GameStateManager.Instance.GameScreen.playerBoard?.ResetThunderFields();
                     GameStateManager.Instance.GameScreen.opponentBoard?.ResetThunderFields();
                     break;
+                case "ShipHeal":
+                    bool success = reader.GetBool();
+                    if (success)
+                    {
+                        int X = reader.GetInt();
+                        int Y = reader.GetInt();
+                        GameStateManager.Instance.GameScreen.playerBoard!.SetCellState(
+                                X,
+                                Y,
+                                Gamescreen.CellState.Ship
+                            );
+                        Console.WriteLine($"[Client] Healed At ({X},{Y})");
+                    }
+                    Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
+                    break;
             }
         }
         catch (Exception ex)

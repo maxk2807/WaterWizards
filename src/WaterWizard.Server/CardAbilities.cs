@@ -78,12 +78,8 @@ public static class CardAbilities
                 if (variant == CardVariant.Heal)
                 {
                     var ships = ShipHandler.GetShips(caster);
-                    var healed = ships.Find(_ => _.X == targetCoords.X && _.Y == targetCoords.Y);
-                    bool? success = healed?.HealCell((int)targetCoords.X, (int)targetCoords.Y);
-                    if (success.HasValue)
-                    {
-                        Console.WriteLine($"[Server] Heal Ship on ({targetCoords.X},{targetCoords.Y})");
-                    }
+                    var healed = ships.Find(ship => ship.X == targetCoords.X && ship.Y == targetCoords.Y);
+                    ShipHandler.HandleShipHealing(caster, healed, variant);
                 }
                 break;
             case "permanent":

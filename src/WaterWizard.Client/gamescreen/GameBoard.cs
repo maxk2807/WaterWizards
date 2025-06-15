@@ -407,6 +407,10 @@ public class GameBoard
             {
                 _gridStates[x, y] = state;
             }
+            else if (state == CellState.Ship && _gridStates[x, y] == CellState.Hit)
+            {
+                _gridStates[x, y] = state;
+            }
             else if (_gridStates[x, y] != CellState.Hit && _gridStates[x, y] != CellState.Ship)
             {
                 _gridStates[x, y] = state;
