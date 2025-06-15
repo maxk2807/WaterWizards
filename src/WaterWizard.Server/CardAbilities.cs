@@ -16,6 +16,7 @@ public static class CardAbilities
         CardVariant variant,
         GameState gameState,
         Vector2 targetCoords,
+        NetPeer caster,
         NetPeer defender
     )
     {
@@ -69,11 +70,17 @@ public static class CardAbilities
                 PrintCardArea(variant, targetCoords, gameState, defender);
                 break;
         }
-
+        CardHandler cardHandler = new(gameState);
         var durationString = new Cards(variant).Duration!;
         switch (durationString)
         {
             case "instant":
+                if (variant == CardVariant.Heal)
+                {
+                    var ships = ShipHandler.GetShips(caster);
+                    var healed = ships.Find(ship => ship.X == (int)targetCoords.X && ship.Y == (int)targetCoords.Y);
+                    ShipHandler.HandleShipHealing(caster, healed, variant);
+                }
                 break;
             case "permanent":
                 Console.WriteLine($"[Server] Activated Card: {variant}");
@@ -82,8 +89,10 @@ public static class CardAbilities
                 try
                 {
                     int duration = int.Parse(durationString);
-                    gameState.CardActivation(variant, duration);
-                    Console.WriteLine($"[Server] Activated Card: {variant} for {duration} seconds");
+                    cardHandler.CardActivation(variant, duration);
+                    Console.WriteLine(
+                        $"[Server] Activated Card: {variant} for {duration} seconds"
+                    );
                     break;
                 }
                 catch (Exception ex)

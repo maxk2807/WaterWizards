@@ -1,6 +1,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
@@ -99,31 +100,56 @@ public class HandleShips
     /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleShipReveal(NetPacketReader reader)
     {
-        int x = reader.GetInt();
-        int y = reader.GetInt();
-        int width = reader.GetInt();
-        int height = reader.GetInt();
-
-        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-        if (opponentBoard != null)
+        try
         {
-            int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-            int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-            int pixelWidth = width * opponentBoard.CellSize;
-            int pixelHeight = height * opponentBoard.CellSize;
+            int x = reader.GetInt();
+            int y = reader.GetInt();
+            int width = reader.GetInt();
+            int height = reader.GetInt();
+            
+            int damageCount = reader.GetInt();
+            var damagedCells = new HashSet<(int X, int Y)>();
+            
+            Console.WriteLine($"[Client] HandleShipReveal: Ship at ({x},{y}) size {width}x{height}, damageCount={damageCount}");
+            
+            for (int i = 0; i < damageCount; i++)
+            {
+                int damageX = reader.GetInt();
+                int damageY = reader.GetInt();
+                damagedCells.Add((damageX, damageY));
+                Console.WriteLine($"[Client] HandleShipReveal: Damage at ({damageX},{damageY})");
+            }
 
-            opponentBoard.putShip(
-                new GameShip(
-                    GameStateManager.Instance.GameScreen,
-                    pixelX,
-                    pixelY,
-                    ShipType.DEFAULT,
-                    pixelWidth,
-                    pixelHeight
-                )
-            );
+            var targetBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
 
-            Console.WriteLine($"[Client] Ship revealed: ({x},{y}) size {width}x{height}");
+            if (targetBoard != null)
+            {
+                for (int dx = 0; dx < width; dx++)
+                {
+                    for (int dy = 0; dy < height; dy++)
+                    {
+                        int cellX = x + dx;
+                        int cellY = y + dy;
+                        
+                        if (cellX >= 0 && cellX < targetBoard.GridWidth && cellY >= 0 && cellY < targetBoard.GridHeight)
+                        {
+                            if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
+                            {
+                                targetBoard.SetCellState(cellX, cellY, CellState.Ship);
+                            }
+                        }
+                    }
+                }
+
+                Console.WriteLine(
+                    $"[Client] Ship revealed on opponent board: ({x},{y}) size {width}x{height} with {damageCount} damage cells - marked cells as Ship state"
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Error in HandleShipReveal: {ex.Message}");
+            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
         }
     }
 

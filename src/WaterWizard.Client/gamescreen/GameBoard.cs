@@ -31,18 +31,19 @@ public class GameBoard
     {
         public Vector2 Position { get; set; }
         public float Duration { get; set; }
-        public float MaxDuration { get; } = 0.75f;
+        public float MaxDuration { get; } = 1.0f; 
         public float Alpha => Duration / MaxDuration;
         public bool IsActive => Duration > 0;
+        public bool Hit { get; set; } 
         private Vector2[] miniLightningPoints;
         private readonly Random random = new();
 
-        public ThunderStrike(Vector2 position)
+        public ThunderStrike(Vector2 position, bool hit = false)
         {
             Position = position;
             Duration = MaxDuration;
+            Hit = hit;
 
-            // Generiere zufällige Punkte für Mini-Blitze
             miniLightningPoints = new Vector2[4];
             for (int i = 0; i < 4; i++)
             {
@@ -66,15 +67,17 @@ public class GameBoard
             if (alpha <= 0)
                 return;
 
-            // Hauptleuchteffekt
+            Color baseColor = Hit ? 
+                new Color(255, 100, 100, (int)(255 * alpha)) : 
+                new Color(255, 255, 0, (int)(255 * alpha));   
+            
+            Color glowColor = Hit ? 
+                new Color(255, 150, 150, (int)(100 * alpha)) :
+                new Color(255, 255, 100, (int)(100 * alpha));  
+
             float glowSize = cellSize * (0.75f + 0.5f * alpha);
-            Color glowColor = new(255, 255, 100, (int)(100 * alpha));
             Raylib.DrawCircle((int)Position.X, (int)Position.Y, glowSize, glowColor);
 
-            // Blitzeffekte
-            Color thunderColor = new(255, 255, 0, (int)(255 * alpha));
-
-            // Hauptblitz
             float size = cellSize * 2.5f;
             Vector2 end = new(Position.X, Position.Y - size);
 
@@ -85,16 +88,15 @@ public class GameBoard
                 Vector2 mid2 = new(Position.X - offset, Position.Y - size * 2 / 3);
 
                 float lineWidth = 2f + alpha * 2f;
-                Raylib.DrawLineEx(Position, mid1, lineWidth, thunderColor);
-                Raylib.DrawLineEx(mid1, mid2, lineWidth, thunderColor);
-                Raylib.DrawLineEx(mid2, end, lineWidth, thunderColor);
+                Raylib.DrawLineEx(Position, mid1, lineWidth, baseColor);
+                Raylib.DrawLineEx(mid1, mid2, lineWidth, baseColor);
+                Raylib.DrawLineEx(mid2, end, lineWidth, baseColor);
             }
 
-            // Mini-Blitze
             foreach (var point in miniLightningPoints)
             {
                 Vector2 endPoint = new(Position.X + point.X * alpha, Position.Y + point.Y * alpha);
-                Raylib.DrawLineEx(Position, endPoint, 1f, thunderColor);
+                Raylib.DrawLineEx(Position, endPoint, 1f, baseColor);
             }
         }
     }
@@ -306,7 +308,7 @@ public class GameBoard
             CellState.Ship => Color.Gray,
             CellState.Hit => Color.Orange,
             CellState.Miss => Color.Blue,
-            CellState.Unknown => Color.SkyBlue,
+            CellState.Unknown => new Color(135, 206, 235, 0), //transparenz hinzugefügt um den background sichtbar zu machen 
             CellState.Thunder => new Color(30, 30, 150, 255), // Dunkelblau für Thunder
             _ => Color.Black,
         };
@@ -403,15 +405,20 @@ public class GameBoard
     {
         if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
         {
-            if (state == CellState.Hit || state == CellState.Miss)
+            if (_gridStates[x, y] == CellState.Hit && state == CellState.Ship)
             {
-                _gridStates[x, y] = state;
+                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) keeping Hit state over Ship state");
+                return;
             }
-            else if (_gridStates[x, y] != CellState.Hit && _gridStates[x, y] != CellState.Ship)
+            
+            if ((_gridStates[x, y] == CellState.Hit || _gridStates[x, y] == CellState.Miss) && 
+                state != CellState.Hit && state != CellState.Miss)
             {
-                _gridStates[x, y] = state;
+                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) already has final state {_gridStates[x, y]}, ignoring {state}");
+                return;
             }
-
+            
+            _gridStates[x, y] = state;
             Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
         }
     }
@@ -467,36 +474,27 @@ public class GameBoard
         }
     }
 
-    public void AddThunderStrike(int x, int y)
+    public void AddThunderStrike(int x, int y, bool hit = false)
     {
-        // Position für den Blitzeinschlag berechnen
         Vector2 position = new(
             Position.X + (float)x * (float)CellSize + (float)CellSize / 2f,
             Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
         );
 
-        // Neuen Blitzeinschlag hinzufügen
-        _activeThunderStrikes.Add(new ThunderStrike(position));
+        var strike = new ThunderStrike(position, hit);
+        _activeThunderStrikes.Add(strike);
 
-        // Markiere das getroffene Feld
-        if (x < GridWidth && y < GridHeight)
-        {
-            // Wenn das Feld bereits als "Hit" markiert ist, nicht überschreiben
-            if (_gridStates[x, y] != CellState.Hit)
-            {
-                _gridStates[x, y] = CellState.Thunder;
-            }
-        }
+        Console.WriteLine($"[GameBoard] Added thunder visual effect at ({x}, {y})");
+
+        SetCellState(x, y, hit ? CellState.Hit : CellState.Miss);
     }
 
     public void ResetThunderFields()
     {
-        // Setze alle Thunder-Felder zurück auf ihren vorherigen Zustand
         for (int x = 0; x < GridWidth; x++)
         {
             for (int y = 0; y < GridHeight; y++)
             {
-                // Nur Thunder-Felder zurücksetzen, Hit-Felder bleiben bestehen
                 if (_gridStates[x, y] == CellState.Thunder)
                 {
                     _gridStates[x, y] = CellState.Unknown;

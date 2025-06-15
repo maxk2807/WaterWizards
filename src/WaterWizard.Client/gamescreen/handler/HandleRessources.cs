@@ -32,7 +32,8 @@ public class HandleRessources
         int gold = reader.GetInt();
         Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {gold} Gold.");
 
-        GameStateManager.Instance.SetGold(playerIndex, gold);
-        // TODO: UI-Anzeige für Gold aktualisieren
+        var ressourceField = GameStateManager.Instance.GameScreen.ressourceField!;
+        ressourceField.SetGold(gold);
+        ressourceField.GoldFieldUpdate();
     }
 }
