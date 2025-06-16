@@ -354,6 +354,7 @@ public class ClientService(NetworkManager manager)
                                 Gamescreen.CellState.Ship
                             );
                         Console.WriteLine($"[Client] Healed At ({X},{Y})");
+                        break;
                     }
                     Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
                     break;

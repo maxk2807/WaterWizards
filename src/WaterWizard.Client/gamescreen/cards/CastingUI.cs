@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.network;
+using WaterWizard.Shared;
 using static WaterWizard.Client.gamescreen.GameBoard;
 
 namespace WaterWizard.Client.gamescreen.cards;
@@ -37,8 +38,9 @@ public class CastingUI
         {
             HandleTargeted(gameCard, mousePos, aim);
         }
-        else if (!IsTargeted(aim) && IsTargetShip(gameCard))
+        else if (IsTargetShip(gameCard))
         {
+            Console.WriteLine("Target Ship");
             HandleShipTargeted(gameCard, mousePos);
         }
         else
@@ -60,18 +62,22 @@ public class CastingUI
                             GameScreen.opponentBoard!;
         Point? hoveredCoords = board.GetCellFromScreenCoords(mousePos);
         Vector2 boardPos = board.Position;
+        bool hoveringShip = false;
         if (hoveredCoords.HasValue)
         {
             var ship = GameScreen.playerBoard!.Ships.Find(ship =>
             {
+                Console.WriteLine($"shipPos: {((ship.X - boardPos.X) / CellSize, (ship.Y - boardPos.Y) / CellSize)}");
+                Console.WriteLine($"shipBounds: {(ship.Width / CellSize, ship.Height / CellSize)}");
+                Console.WriteLine($"hoveredCoords: {(hoveredCoords.Value.X, hoveredCoords.Value.Y)}");
                 return hoveredCoords.Value.X >= (ship.X - boardPos.X) / CellSize &&
                     hoveredCoords.Value.X < (ship.X + ship.Width - boardPos.X) / CellSize &&
                     hoveredCoords.Value.Y >= (ship.Y - boardPos.Y) / CellSize &&
                     hoveredCoords.Value.Y < (ship.Y + ship.Height - boardPos.Y) / CellSize;
             });
-            if (ship != null)
+            if (hoveringShip = ship != null)
             {
-                var r = new Rectangle(ship.X, ship.Y, ship.Width, ship.Height);
+                var r = new Rectangle(ship!.X, ship.Y, ship.Width, ship.Height);
                 Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
                 shipCoords = new((ship.X - board.Position.X) / CellSize, (ship.Y - board.Position.Y) / CellSize);
             }
@@ -87,7 +93,7 @@ public class CastingUI
             Color.Black
         );
 
-        if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+        if (hoveringShip && Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
             aiming = false;
             NetworkManager.HandleCast(cardToAim!.card, new((int)shipCoords.X, (int)shipCoords.Y));
@@ -183,7 +189,7 @@ public class CastingUI
     /// <returns>Wether the Cursor is Targeted, i.e. targets Cells</returns>
     private static bool IsTargeted(Vector2 aim)
     {
-        return (int)aim.X >= 0 && (int)aim.Y >= 0;
+        return (int)aim.X > 0 && (int)aim.Y > 0;
     }
 
     public void StartDrawingCardAim(GameCard gameCard)
