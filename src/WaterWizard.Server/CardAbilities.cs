@@ -79,6 +79,7 @@ public static class CardAbilities
                 {
                     var ships = ShipHandler.GetShips(caster);
                     var healed = ships.Find(ship => ship.X == (int)targetCoords.X && ship.Y == (int)targetCoords.Y);
+                        
                     ShipHandler.HandleShipHealing(caster, healed, variant);
                 }
                 break;
