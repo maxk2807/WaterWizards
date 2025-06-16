@@ -181,8 +181,8 @@ public class Cards
             {
                 Mana = 4,
                 CastTime = "instant",
-                Duration = "2",
-                Target = new("ship"),
+                Duration = "6",
+                Target = new("battlefield"),
             }
         },
         {

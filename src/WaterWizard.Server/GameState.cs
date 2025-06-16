@@ -60,18 +60,22 @@ public class GameState
     public static List<Cards>? UtilityStack { get; private set; }
     public static List<Cards>? DamageStack { get; private set; }
     public static List<Cards>? EnvironmentStack { get; private set; }
+    public static List<Cards>? HealingStack { get; private set; }
     public static List<Cards>? Graveyard { get; private set; }
 
     private Timer activationTimer;
     public static float thunderTimer = 0f;
     public static float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Blitzeinschlägen in Sekunden
 
-
-    
     public Mana Player1Mana { get; private set; } = new();
     public Mana Player2Mana { get; private set; } = new();
     public int Player1Gold { get; private set; } = 0;
     public int Player2Gold { get; private set; } = 0;
+
+    /// <summary>
+    /// Öffentlicher Zugriff auf den Server für Handler-Klassen
+    /// </summary>
+    public NetManager Server => server;
 
     public bool IsPlacementPhase()
     {
@@ -117,18 +121,18 @@ public class GameState
         if (connectedCount < 1 || connectedCount > 2)
             throw new InvalidOperationException("Game requires 1 or 2 connected players.");
 
-        players = new NetPeer[2]; 
+        players = new NetPeer[2];
         for (int i = 0; i < connectedCount; i++)
         {
             players[i] = server.ConnectedPeerList[i];
-            
+
             var writer = new NetDataWriter();
             writer.Put("PlayerIndex");
             writer.Put(i);
             players[i].Send(writer, DeliveryMethod.ReliableOrdered);
             Console.WriteLine($"[Server] Sent player index {i} to {players[i]}");
         }
-        
+
         for (int i = connectedCount; i < 2; i++)
             players[i] = default!;
 
@@ -140,7 +144,7 @@ public class GameState
             {
                 Console.WriteLine($"Player {i + 1}: {players[i]}");
                 Console.WriteLine($"  - Owns Board[{i}]");
-                
+
                 if (connectedCount > 1)
                 {
                     var opponentIndex = i == 0 ? 1 : 0;
@@ -167,17 +171,17 @@ public class GameState
         ];
         ActiveCards = [];
         UtilityStack = Cards.GetCardsOfType(CardType.Utility);
-        UtilityStack.AddRange(Cards.GetCardsOfType(CardType.Healing));
         DamageStack = Cards.GetCardsOfType(CardType.Damage);
         EnvironmentStack = Cards.GetCardsOfType(CardType.Environment);
+        HealingStack = Cards.GetCardsOfType(CardType.Healing);
         Graveyard = [];
         this.server = server;
         this.manager = manager;
 
         CardHandler cardHandler = new(this);
-     
+
         activationTimer = new Timer(_ => cardHandler.UpdateActiveCards(500), null, 0, 500);
-    } 
+    }
 
     /// <summary>
     /// Checks if the game is over by checking if any player's ships are all destroyed.

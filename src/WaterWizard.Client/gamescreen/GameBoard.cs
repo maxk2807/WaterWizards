@@ -31,10 +31,10 @@ public class GameBoard
     {
         public Vector2 Position { get; set; }
         public float Duration { get; set; }
-        public float MaxDuration { get; } = 1.0f; 
+        public float MaxDuration { get; } = 1.0f;
         public float Alpha => Duration / MaxDuration;
         public bool IsActive => Duration > 0;
-        public bool Hit { get; set; } 
+        public bool Hit { get; set; }
         private Vector2[] miniLightningPoints;
         private readonly Random random = new();
 
@@ -67,13 +67,13 @@ public class GameBoard
             if (alpha <= 0)
                 return;
 
-            Color baseColor = Hit ? 
-                new Color(255, 100, 100, (int)(255 * alpha)) : 
-                new Color(255, 255, 0, (int)(255 * alpha));   
-            
-            Color glowColor = Hit ? 
+            Color baseColor = Hit ?
+                new Color(255, 100, 100, (int)(255 * alpha)) :
+                new Color(255, 255, 0, (int)(255 * alpha));
+
+            Color glowColor = Hit ?
                 new Color(255, 150, 150, (int)(100 * alpha)) :
-                new Color(255, 255, 100, (int)(100 * alpha));  
+                new Color(255, 255, 100, (int)(100 * alpha));
 
             float glowSize = cellSize * (0.75f + 0.5f * alpha);
             Raylib.DrawCircle((int)Position.X, (int)Position.Y, glowSize, glowColor);
@@ -319,12 +319,12 @@ public class GameBoard
         var mousePos = Raylib.GetMousePosition();
         Vector2 aim = gameCard.card.TargetAsVector();
 
-        // Spezialbehandlung für battlefield-Ziele wie Thunder
+        // Spezialbehandlung für battlefield-Ziele wie Paralize
         if (gameCard.card.Target!.Target == "battlefield")
         {
             Raylib.DrawText(
-                "Klicken Sie irgendwo, um die Karte zu wirken",
-                (int)mousePos.X,
+                $"Klicken Sie irgendwo, um {gameCard.card.Variant} zu wirken",
+                (int)mousePos.X - 100,
                 (int)mousePos.Y - 20,
                 20,
                 Color.Black
@@ -410,14 +410,14 @@ public class GameBoard
                 Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) keeping Hit state over Ship state");
                 return;
             }
-            
-            if ((_gridStates[x, y] == CellState.Hit || _gridStates[x, y] == CellState.Miss) && 
+
+            if ((_gridStates[x, y] == CellState.Hit || _gridStates[x, y] == CellState.Miss) &&
                 state != CellState.Hit && state != CellState.Miss)
             {
                 Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) already has final state {_gridStates[x, y]}, ignoring {state}");
                 return;
             }
-            
+
             _gridStates[x, y] = state;
             Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
         }
