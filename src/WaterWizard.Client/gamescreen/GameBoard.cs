@@ -408,7 +408,7 @@ public class GameBoard
             if (_gridStates[x, y] == CellState.Hit && state == CellState.Ship)
             {
                 _gridStates[x, y] = state;
-                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) Turning Hit into Ship (e.g.: to heal damage)");
+                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
                 return;
             }
             
