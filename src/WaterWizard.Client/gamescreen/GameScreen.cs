@@ -197,13 +197,52 @@ public class GameScreen(
         //Draw der Assets
         LoadBackgroundAssets();
 
-        Raylib.DrawTexture(gameBackground, 0, 0, Color.White); //Hintergrund zuerst zeichnen
+        //Raylib.DrawTexture(gameBackground, 0, 0, Color.White); //Hintergrund zuerst zeichnen
+        Raylib.DrawTexturePro(
+            gameBackground,
+            new Rectangle(0, 0, gameBackground.Width, gameBackground.Height),
+            new Rectangle(0, 0, currentScreenWidth, currentScreenHeight),       
+            Vector2.Zero,                                                       
+            0f,                                                                 
+            Color.White                                                         
+        );
+
 
         LoadBoardBackground();
 
-        Raylib.DrawTexture(gridBackground, (int)playerBoard.Position.X, (int)playerBoard.Position.Y, Color.White);
+        //Raylib.DrawTexture(gridBackground, (int)playerBoard.Position.X, (int)playerBoard.Position.Y, Color.White);
 
-        Raylib.DrawTexture(enemyGridBackground, (int)opponentBoard.Position.X, (int)opponentBoard.Position.Y, Color.White);
+        Raylib.DrawTexturePro(
+            gridBackground,
+            new Rectangle(0, 0, gridBackground.Width, gridBackground.Height), // Quelle: ganzes Bild
+            new Rectangle(
+                playerBoard.Position.X,
+                playerBoard.Position.Y,
+                playerBoard.GridWidth * playerBoard.CellSize,
+                playerBoard.GridHeight * playerBoard.CellSize
+            ),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
+
+        //Raylib.DrawTexture(enemyGridBackground, (int)opponentBoard.Position.X, (int)opponentBoard.Position.Y, Color.White);
+
+        Raylib.DrawTexturePro(
+            enemyGridBackground,
+            new Rectangle(0, 0, enemyGridBackground.Width, enemyGridBackground.Height),
+            new Rectangle(
+                opponentBoard.Position.X,
+                opponentBoard.Position.Y,
+                opponentBoard.GridWidth * opponentBoard.CellSize,
+                opponentBoard.GridHeight * opponentBoard.CellSize
+            ),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
 
         LoadBoardBackground();
 

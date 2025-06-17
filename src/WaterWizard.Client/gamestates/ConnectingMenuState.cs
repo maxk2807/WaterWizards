@@ -1,10 +1,19 @@
 using Raylib_cs;
+using System.Numerics;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
 public class ConnectingMenuState : IGameState
 {
+    private Texture2D menuBackground;
+
+    private void LoadAssets()
+    {
+        if (menuBackground.Id != 0) return;
+        menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
+    }
+
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawConnectMenu(manager);
@@ -12,6 +21,18 @@ public class ConnectingMenuState : IGameState
 
     private void DrawConnectMenu(GameStateManager manager)
     {
+        LoadAssets();
+
+        Raylib.DrawTexturePro(
+            menuBackground,
+            new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),
+            new Rectangle(0, 0, manager.screenWidth, manager.screenHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
+
         Raylib.DrawText(
             "Enter IP Address:",
             manager.screenWidth / 3,
