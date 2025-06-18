@@ -72,6 +72,12 @@ public class GameState
     public int Player1Gold { get; private set; } = 0;
     public int Player2Gold { get; private set; } = 0;
 
+    private float _player1GoldFreezeTimer = 0f;
+    private float _player2GoldFreezeTimer = 0f;
+
+    public bool IsPlayer1GoldFrozen => _player1GoldFreezeTimer > 0f;
+    public bool IsPlayer2GoldFrozen => _player2GoldFreezeTimer > 0f;
+
     /// <summary>
     /// Öffentlicher Zugriff auf den Server für Handler-Klassen
     /// </summary>
@@ -269,6 +275,97 @@ public class GameState
             500,
             Timeout.Infinite
         );
+    }
+
+    /// <summary>
+    /// Freezes gold generation for the specified player for a duration
+    /// </summary>
+    /// <param name="playerIndex">The player index (0 or 1)</param>
+    /// <param name="durationSeconds">Duration in seconds to freeze gold generation</param>
+    public void FreezeGoldGeneration(int playerIndex, int durationSeconds)
+    {
+        Console.WriteLine($"[GameState] Freezing gold generation for Player {playerIndex} for {durationSeconds} seconds");
+
+        if (playerIndex == 0)
+        {
+            _player1GoldFreezeTimer = durationSeconds * 1000f;
+            Console.WriteLine($"[GameState] Player 1 gold generation frozen for {durationSeconds} seconds");
+        }
+        else if (playerIndex == 1)
+        {
+            _player2GoldFreezeTimer = durationSeconds * 1000f;
+            Console.WriteLine($"[GameState] Player 2 gold generation frozen for {durationSeconds} seconds");
+        }
+
+        SendGoldFreezeStatusToClients();
+    }
+
+    /// <summary>
+    /// Updates the gold freeze timers based on elapsed time
+    /// </summary>
+    /// <param name="deltaTimeMs">Elapsed time in milliseconds</param>
+    public void UpdateGoldFreezeTimers(float deltaTimeMs)
+    {
+        bool statusChanged = false;
+
+        if (_player1GoldFreezeTimer > 0f)
+        {
+            _player1GoldFreezeTimer -= deltaTimeMs;
+            if (_player1GoldFreezeTimer <= 0f)
+            {
+                _player1GoldFreezeTimer = 0f;
+                Console.WriteLine("[GameState] Player 1 gold freeze ended");
+                statusChanged = true;
+            }
+        }
+
+        if (_player2GoldFreezeTimer > 0f)
+        {
+            _player2GoldFreezeTimer -= deltaTimeMs;
+            if (_player2GoldFreezeTimer <= 0f)
+            {
+                _player2GoldFreezeTimer = 0f;
+                Console.WriteLine("[GameState] Player 2 gold freeze ended");
+                statusChanged = true;
+            }
+        }
+
+        if (statusChanged)
+        {
+            SendGoldFreezeStatusToClients();
+        }
+    }
+
+    /// <summary>
+    /// Checks if a player's gold generation is frozen
+    /// </summary>
+    /// <param name="playerIndex">Index of the player (0 or 1)</param>
+    /// <returns>True if the player's gold generation is frozen</returns>
+    public bool IsPlayerGoldFrozen(int playerIndex)
+    {
+        return playerIndex == 0 ? IsPlayer1GoldFrozen : IsPlayer2GoldFrozen;
+    }
+
+    /// <summary>
+    /// Sends the current gold freeze status to all clients
+    /// </summary>
+    private void SendGoldFreezeStatusToClients()
+    {
+        Console.WriteLine($"[GameState] Sending gold freeze status to {server.ConnectedPeersCount} clients");
+
+        for (int i = 0; i < server.ConnectedPeersCount; i++)
+        {
+            var peer = server.ConnectedPeerList[i];
+            bool isFrozen = IsPlayerGoldFrozen(i);
+
+            var writer = new NetDataWriter();
+            writer.Put("GoldFreezeStatus");
+            writer.Put(i);
+            writer.Put(isFrozen);
+            
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine($"[GameState] GoldFreezeStatus sent to {peer} - PlayerIndex: {i}, IsFrozen: {isFrozen}");
+        }
     }
 
     /// <summary>
