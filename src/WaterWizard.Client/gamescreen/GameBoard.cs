@@ -282,12 +282,6 @@ public class GameBoard
             }
         }
 
-        // // Zeichne die Zielvorschau
-        // if (aiming)
-        // {
-        //     DrawCastAim(cardToAim!);
-        // }
-
         // Thunder-Effekte zeichnen
         foreach (var strike in _activeThunderStrikes)
         {

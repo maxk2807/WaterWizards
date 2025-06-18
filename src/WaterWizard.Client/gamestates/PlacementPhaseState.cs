@@ -6,6 +6,9 @@ namespace WaterWizard.Client.gamestates;
 
 public class PlacementPhaseState : IGameState
 {
+
+    private bool IsReady = false;
+
     public void UpdateAndDraw(GameStateManager manager)
     {
         manager.GameScreen.Draw(manager.screenWidth, manager.screenHeight);
@@ -16,14 +19,16 @@ public class PlacementPhaseState : IGameState
 
         int buttonWidth = 200;
         int buttonHeight = 50;
-        //TODO: Fix the button when clicking it it shouldn't click a cell
-        //that's why it's moved to the left
         int buttonX = (manager.screenWidth - buttonWidth) / 8;
         int buttonY = textY + (int)(manager.screenHeight * 0.15f);
         Rectangle readyButton = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
         bool hoverReady = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), readyButton);
-        Raylib.DrawRectangleRec(readyButton, hoverReady ? Color.DarkGreen : Color.Green);
-        string readyText = "Fertig";
+        Raylib.DrawRectangleRec(readyButton,
+            IsReady ?
+                Color.LightGray
+                    : hoverReady ? Color.DarkGreen : Color.Green);
+        if(IsReady) Raylib.DrawRectangleLinesEx(readyButton, 3, Color.Black);
+        string readyText = "Fertig" + (!IsReady ? "?" : "!");
         int readyTextWidth = Raylib.MeasureText(readyText, 24);
         Raylib.DrawText(
             readyText,
@@ -35,6 +40,7 @@ public class PlacementPhaseState : IGameState
         if (hoverReady && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             HandleShips.SendPlacementReady(NetworkManager.Instance);
+            IsReady = true;
             //manager.SetStateToInGame();
         }
 
