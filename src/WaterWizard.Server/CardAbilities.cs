@@ -125,12 +125,6 @@ public static class CardAbilities
         switch (durationString)
         {
             case "instant":
-                if (variant == CardVariant.Heal)
-                {
-                    var ships = ShipHandler.GetShips(caster);
-                    var healed = ships.Find(ship => ship.X == (int)targetCoords.X && ship.Y == (int)targetCoords.Y);
-                    ShipHandler.HandleShipHealing(caster, healed, variant);
-                }
                 break;
             case "permanent":
                 Console.WriteLine($"[Server] Activated Card: {variant}");
