@@ -2,18 +2,14 @@ using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen.cards;
+using WaterWizard.Server.Card.environment;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server.handler;
 
-public class CardHandler
+public class CardHandler(GameState gameState)
 {
-    private readonly GameState? gameState;
-
-    public CardHandler(GameState gameState)
-    {
-        this.gameState = gameState;
-    }
+    private readonly GameState? gameState = gameState;
 
     /// <summary>
     /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
@@ -146,9 +142,8 @@ public class CardHandler
             var card = GameState.ActiveCards[i];
             card.remainingDuration -= passedTime;
 
-            if (card.remainingDuration <= 0)
+            if (card.remainingDuration <= 0) // Ist Karte abgelaufen
             {
-                // Karte ist abgelaufen
                 Console.WriteLine($"[Server] Card {card.Variant} expired, removing from active cards");
                 GameState.ActiveCards.RemoveAt(i);
 
@@ -159,52 +154,12 @@ public class CardHandler
 
                 if (card.Variant == CardVariant.Thunder)
                 {
-                    Console.WriteLine("\n[Server] Thunder Card expired");
-                    Console.WriteLine("----------------------------------------");
-                    foreach (var player in gameState.players)
-                    {
-                        NetDataWriter resetWriter = new();
-                        resetWriter.Put("ThunderReset");
-                        player.Send(resetWriter, DeliveryMethod.ReliableOrdered);
-                        Console.WriteLine($"Sent ThunderReset to player: {player}");
-                    }
-                    Console.WriteLine("----------------------------------------\n");
+                    ThunderCard.ThunderEffectExpired(gameState);
                 }
                 continue;
             }
 
-            CardAbilities.HandleActivationEffect(card, passedTime);
-
-            if (card.Variant == CardVariant.Thunder)
-            {
-                GameState.thunderTimer -= passedTime / 1000f;
-
-                if (GameState.thunderTimer <= 0)
-                {
-                    GameState.thunderTimer = GameState.THUNDER_INTERVAL;
-                    Console.WriteLine("\n[Server] Thunder Strike Round");
-                    Console.WriteLine("----------------------------------------");
-
-                    for (int boardIndex = 0; boardIndex < 2; boardIndex++)
-                    {
-                        var targetPlayer = gameState.players[boardIndex];
-                        var attacker = gameState.players[boardIndex == 0 ? 1 : 0];
-
-                        Console.WriteLine($"Generating 2 thunder strikes for Board[{boardIndex}] (Player: {targetPlayer})");
-
-                        for (int strikeNum = 0; strikeNum < 3; strikeNum++)
-                        {
-                            int x = Random.Shared.Next(0, GameState.boardWidth);
-                            int y = Random.Shared.Next(0, GameState.boardHeight);
-
-                            bool hit = HandleThunderStrike(attacker, targetPlayer, x, y);
-
-                            SendThunderVisualEffect(gameState.players, boardIndex, x, y, hit);
-                        }
-                    }
-                    Console.WriteLine("----------------------------------------\n");
-                }
-            }
+            CardAbilities.HandleActivationEffect(gameState, card, passedTime);
         }
     }
 
@@ -224,76 +179,5 @@ public class CardHandler
             writer.Put(card.remainingDuration);
         }
         player.Send(writer, DeliveryMethod.ReliableOrdered);
-    }
-
-    /// <summary>
-    /// Handles a single thunder strike and returns if it was a hit
-    /// </summary>
-    private bool HandleThunderStrike(NetPeer attacker, NetPeer targetPlayer, int x, int y)
-    {
-        var ships = ShipHandler.GetShips(targetPlayer);
-        bool hit = false;
-
-        foreach (var ship in ships)
-        {
-            if (x >= ship.X && x < ship.X + ship.Width &&
-                y >= ship.Y && y < ship.Y + ship.Height)
-            {
-                hit = true;
-                bool newDamage = ship.DamageCell(x, y);
-
-                Console.WriteLine($"    Thunder hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}");
-
-                if (newDamage)
-                {
-                    if (ship.IsDestroyed)
-                    {
-                        Console.WriteLine($"    Thunder destroyed ship at ({ship.X}, {ship.Y})!");
-                        ShipHandler.SendShipReveal(attacker, ship, gameState!);
-                    }
-                    else
-                    {
-                        CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true);
-                    }
-                }
-                else
-                {
-                    CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true);
-                }
-                break;
-            }
-        }
-
-        if (!hit)
-        {
-            Console.WriteLine($"    Thunder missed at ({x}, {y})");
-            CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false);
-        }
-
-        return hit;
-    }
-
-    /// <summary>
-    /// Sends thunder visual effects to all clients
-    /// </summary>
-    /// <param name="boardIndex">The referenced board</param>
-    /// <param name="hit">Boolean if a ship was hit or not</param>
-    /// <param name="players">The connected player</param>
-    /// <param name="x">x-Coordinate</param>
-    /// <param name="y">y-Coordinate</param>
-    private void SendThunderVisualEffect(NetPeer[] players, int boardIndex, int x, int y, bool hit)
-    {
-        foreach (var client in players)
-        {
-            NetDataWriter thunderWriter = new();
-            thunderWriter.Put("ThunderStrike");
-            thunderWriter.Put(boardIndex);
-            thunderWriter.Put(x);
-            thunderWriter.Put(y);
-            thunderWriter.Put(hit);
-
-            client.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine($"    Sent ThunderStrike visual to {client} for Board[{boardIndex}] at ({x},{y}) hit={hit}");
-        }
     }
 }
