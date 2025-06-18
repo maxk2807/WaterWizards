@@ -64,8 +64,6 @@ public class GameState
     public static List<Cards>? Graveyard { get; private set; }
 
     private Timer activationTimer;
-    public static float thunderTimer = 0f;
-    public static float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Blitzeinschlägen in Sekunden
 
     public Mana Player1Mana { get; private set; } = new();
     public Mana Player2Mana { get; private set; } = new();
