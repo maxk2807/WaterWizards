@@ -369,9 +369,19 @@ public class ClientService(NetworkManager manager)
                         HandleRessources.HandleUpdateMana(reader);
                         break;
                     }
+                case "UpdateGold":
+                    {
+                        HandleRessources.HandleUpdateGold(reader);
+                        break;
+                    }
+                case "GoldFreezeStatus":
+                    {
+                        HandleRessources.HandleGoldFreeze(reader);
+                        break;
+                    }
                 case "ParalizeStatus":
                     {
-                        WaterWizard.Client.gamescreen.handler.HandleParalize.HandleParalizeStatus(reader);
+                        HandleParalize.HandleParalizeStatus(reader);
                         break;
                     }
             }

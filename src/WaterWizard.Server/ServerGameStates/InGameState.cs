@@ -14,7 +14,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     private readonly GameState gameState = gameState;
 
     private System.Timers.Timer? manaTimer;
+    private System.Timers.Timer? goldTimer;
     private ManaHandler? manaHandler;
+    private GoldHandler? goldHandler;
     private ParalizeHandler? paralizeHandler;
     private UtilityCardHandler? utilityCardHandler;
 
@@ -33,19 +35,28 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         // Initialisiere Handler
         paralizeHandler = new ParalizeHandler(gameState);
         manaHandler = new ManaHandler(gameState, paralizeHandler);
+        goldHandler = new GoldHandler(gameState);
         utilityCardHandler = new UtilityCardHandler(gameState, paralizeHandler);
 
-        // Mana-Timer starten
-        // Mana alle 4 Sekunden
-        manaTimer = new System.Timers.Timer(4_000);
+        manaTimer = new System.Timers.Timer(4000);
         manaTimer.Elapsed += (sender, e) => UpdateMana();
         manaTimer.AutoReset = true;
         manaTimer.Start();
+
+        goldTimer = new System.Timers.Timer(2000);
+        goldTimer.Elapsed += (sender, e) => UpdateGold();
+        goldTimer.AutoReset = true;
+        goldTimer.Start();
     }
 
     private void UpdateMana()
     {
         manaHandler?.UpdateMana();
+    }
+
+    private void UpdateGold()
+    {
+        goldHandler?.UpdateGold();
     }
 
     /// <summary>
@@ -55,6 +66,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     {
         manaTimer?.Stop();
         manaTimer?.Dispose();
+        
+        goldTimer?.Stop();
+        goldTimer?.Dispose();
     }
 
     public void HandleNetworkEvent(
