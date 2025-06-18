@@ -2,6 +2,7 @@ using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
+using WaterWizard.Client.Gamescreen;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
@@ -364,7 +365,7 @@ public class DraggingShip
 
     /// <summary>
     /// Checks whether the Placement of ship is obstructed by being out of bounds
-    /// of the board or obstructed by other ships //TODO: and Rocks
+    /// of the board or obstructed by other ships or rocks
     /// </summary>
     /// <param name="dragShip"></param>
     /// <returns>Whether the placement is valid or not</returns>
@@ -376,6 +377,11 @@ public class DraggingShip
             || dragShip.Y < board.Position.Y
             || dragShip.X + dragShip.Width > board.Position.X + (float)board.GridWidth * CellSize
             || dragShip.Y + dragShip.Height > board.Position.Y + (float)board.GridHeight * CellSize;
+        
+        if (isOutOfBounds)
+            return false;
+            
+        // Prüfe Kollision mit anderen Schiffen
         bool collidesWithShips = false;
         foreach (var ship in gameScreen.playerBoard!.Ships)
         {
@@ -384,8 +390,35 @@ public class DraggingShip
             if (collidesWithShips)
                 break;
         }
-        return !(isOutOfBounds || collidesWithShips);
-        //TODO: Check for other ships and rocks
+        
+        if (collidesWithShips)
+            return false;
+            
+        // Prüfe Kollision mit Steinen
+        bool collidesWithRocks = false;
+        int startX = (int)((dragShip.X - board.Position.X) / CellSize);
+        int startY = (int)((dragShip.Y - board.Position.Y) / CellSize);
+        int width = (int)(dragShip.Width / CellSize);
+        int height = (int)(dragShip.Height / CellSize);
+        
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < board.GridWidth && y >= 0 && y < board.GridHeight)
+                {
+                    if (board._gridStates[x, y] == CellState.Rock)
+                    {
+                        collidesWithRocks = true;
+                        break;
+                    }
+                }
+            }
+            if (collidesWithRocks)
+                break;
+        }
+        
+        return !collidesWithRocks;
     }
 
     /// <summary>

@@ -266,6 +266,19 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
 
+                case "RockSync":
+                    try
+                    {
+                        HandleRocks.HandleRockSync(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von RockSync: {ex.Message}"
+                        );
+                    }
+                    break;
+
                 case "CellReveal":
                     try
                     {

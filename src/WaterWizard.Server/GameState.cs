@@ -164,6 +164,10 @@ public class GameState
         Console.WriteLine("----------------------------------------\n");
 
         boards = CellHandler.InitBoards();
+        
+        // Generiere Steine für alle Spieler-Boards
+        RockHandler.GenerateAndSyncRocks(this);
+        
         hands =
         [
             [],

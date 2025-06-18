@@ -300,6 +300,7 @@ public class GameBoard
         {
             CellState.Empty => Color.LightGray,
             CellState.Ship => Color.Gray,
+            CellState.Rock => Color.DarkGray,
             CellState.Hit => Color.Orange,
             CellState.Miss => Color.Blue,
             CellState.Unknown => new Color(135, 206, 235, 0), //transparenz hinzugefügt um den background sichtbar zu machen 
