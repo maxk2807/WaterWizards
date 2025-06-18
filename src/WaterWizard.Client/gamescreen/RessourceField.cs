@@ -123,10 +123,6 @@ public class RessourceField(GameScreen gameScreen)
         if (isGoldFrozen)
         {
             Console.WriteLine($"[RessourceField] Zeichne blauen Gold-Freeze-Punkt - isGoldFrozen: {isGoldFrozen}");
-
-            int dotX = (int)GoldRec.X + (int)GoldRec.Width + 15;
-            int dotY = (int)GoldRec.Y + (int)GoldRec.Height / 2;
-
             int statusY = (int)GoldRec.Y - 25;
             int statusX = (int)GoldRec.X;
 
