@@ -7,6 +7,7 @@ public enum CellState
 {
     Empty,
     Ship,
+    Rock,
     Hit,
     Miss,
     Unknown,
