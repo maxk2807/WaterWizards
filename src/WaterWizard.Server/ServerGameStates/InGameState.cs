@@ -107,13 +107,35 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 else
                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
                 break;
+            case "Surrender":
+                HandleSurrender(peer);
+                break;
             default:
                 Console.WriteLine($"[InGameState] Unbekannter Nachrichtentyp: {messageType}");
                 break;
         }
     }
 
-    private NetPeer? FindOpponent(NetPeer attacker)
+    /// <summary>
+    /// Handles the surrender button usage
+    /// </summary>
+    /// <param name="surrenderingPlayer">The player which surrenders</param>
+    private void HandleSurrender(NetPeer surrenderingPlayer)
+    {
+        Console.WriteLine($"[Server] Player {surrenderingPlayer} has surrendered");
+
+        var opponent = FindOpponent(surrenderingPlayer);
+        if (opponent != null)
+        {
+            gameState.HandleSurrender(opponent, surrenderingPlayer);
+        }
+        else
+        {
+            Console.WriteLine("[Server] No opponent found for surrender handling");
+        }
+    }
+
+    public NetPeer? FindOpponent(NetPeer attacker)
     {
         foreach (var peer in server.ConnectedPeerList)
         {
