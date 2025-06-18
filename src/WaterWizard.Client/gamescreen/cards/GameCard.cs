@@ -75,11 +75,13 @@ public class GameCard(GameScreen gameScreen, Cards card)
             ? (
                 card.Type == CardType.Damage ? new(238, 156, 156)
                 : card.Type == CardType.Environment ? new(210, 152, 255)
+                : card.Type == CardType.Utility ? new(255, 255, 153)
                 : new(149, 251, 215)
             )
             : (
                 card.Type == CardType.Damage ? Color.Red
                 : card.Type == CardType.Environment ? Color.Blue
+                : card.Type == CardType.Utility ? Color.Yellow
                 : Color.Green
             );
     }

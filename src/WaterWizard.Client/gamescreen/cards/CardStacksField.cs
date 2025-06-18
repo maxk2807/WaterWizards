@@ -6,9 +6,10 @@ namespace WaterWizard.Client.gamescreen.cards;
 
 public class CardStacksField(GameScreen gameScreen)
 {
-    private CardStack? utilityStack;
     private CardStack? damageStack;
     private CardStack? environmentStack;
+    private CardStack? utilityStack;
+    private CardStack? healingStack;
 
     private int _x;
     public int X => _x;
@@ -20,33 +21,43 @@ public class CardStacksField(GameScreen gameScreen)
     public void Initialize()
     {
         Width = gameScreen.cardWidth;
-        Height = gameScreen.cardHeight * 3 + (int)gameScreen.ZonePadding * 2;
+        Height = gameScreen.cardHeight * 4 + (int)gameScreen.ZonePadding * 3; // 4 Stacks + 3 Paddings
         _x = (int)gameScreen.ZonePadding;
         _y = (gameScreen._gameStateManager.screenHeight - Height) / 2;
 
+        // Position 1: Damage (Rot)
         int damageX = _x;
         int damageY = _y;
         damageStack = new(gameScreen, damageX, damageY);
         damageStack.InitDamage();
 
+        // Position 2: Environment (Blau)
+        int environmentX = _x;
+        int environmentY = _y + (int)gameScreen.ZonePadding + gameScreen.cardHeight;
+        environmentStack = new(gameScreen, environmentX, environmentY);
+        environmentStack.InitEnvironment();
+
+        // Position 3: Utility (Gelb) - unter Environment
         int utilityX = _x;
-        int utilityY = _y + (int)gameScreen.ZonePadding + gameScreen.cardHeight;
+        int utilityY = _y + (int)gameScreen.ZonePadding * 2 + gameScreen.cardHeight * 2;
         utilityStack = new(gameScreen, utilityX, utilityY);
         utilityStack.InitUtility();
 
-        int environmentX = _x;
-        int environmentY = _y + (int)gameScreen.ZonePadding * 2 + gameScreen.cardHeight * 2;
-        environmentStack = new(gameScreen, environmentX, environmentY);
-        environmentStack.InitEnvironment();
+        // Position 4: Healing (Grün)
+        int healingX = _x;
+        int healingY = _y + (int)gameScreen.ZonePadding * 3 + gameScreen.cardHeight * 3;
+        healingStack = new(gameScreen, healingX, healingY);
+        healingStack.InitHealing();
     }
 
     public void Draw()
     {
         // Raylib.DrawRectangleLinesEx(new(X,Y,Width,Height), 1, Color.Black);
 
-        utilityStack!.Draw();
         damageStack!.Draw();
         environmentStack!.Draw();
+        utilityStack!.Draw();
+        healingStack!.Draw();
 
         HandleBuyingCardFromStack();
     }
@@ -54,12 +65,6 @@ public class CardStacksField(GameScreen gameScreen)
     private void HandleBuyingCardFromStack()
     {
         var mousePos = Raylib.GetMousePosition();
-        Rectangle utilityRec = new(
-            utilityStack!.X,
-            utilityStack.Y,
-            gameScreen.cardWidth,
-            gameScreen.cardHeight
-        );
         Rectangle damageRec = new(
             damageStack!.X,
             damageStack.Y,
@@ -72,18 +77,34 @@ public class CardStacksField(GameScreen gameScreen)
             gameScreen.cardWidth,
             gameScreen.cardHeight
         );
+        Rectangle utilityRec = new(
+            utilityStack!.X,
+            utilityStack.Y,
+            gameScreen.cardWidth,
+            gameScreen.cardHeight
+        );
+        Rectangle healingRec = new(
+            healingStack!.X,
+            healingStack.Y,
+            gameScreen.cardWidth,
+            gameScreen.cardHeight
+        );
         var clicked = Raylib.IsMouseButtonPressed(MouseButton.Left);
-        if (Raylib.CheckCollisionPointRec(mousePos, utilityRec) && clicked)
-        {
-            NetworkManager.RequestCardBuy("Utility");
-        }
-        else if (Raylib.CheckCollisionPointRec(mousePos, damageRec) && clicked)
+        if (Raylib.CheckCollisionPointRec(mousePos, damageRec) && clicked)
         {
             NetworkManager.RequestCardBuy("Damage");
         }
         else if (Raylib.CheckCollisionPointRec(mousePos, environmentRec) && clicked)
         {
             NetworkManager.RequestCardBuy("Environment");
+        }
+        else if (Raylib.CheckCollisionPointRec(mousePos, utilityRec) && clicked)
+        {
+            NetworkManager.RequestCardBuy("Utility");
+        }
+        else if (Raylib.CheckCollisionPointRec(mousePos, healingRec) && clicked)
+        {
+            NetworkManager.RequestCardBuy("Healing");
         }
     }
 }

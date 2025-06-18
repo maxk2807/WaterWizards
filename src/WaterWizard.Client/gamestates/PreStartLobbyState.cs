@@ -1,4 +1,5 @@
 using Raylib_cs;
+using System.Numerics;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.network;
 
@@ -11,8 +12,27 @@ public class PreStartLobbyState : IGameState
         DrawPreStartLobby(manager);
     }
 
+    private Texture2D menuBackground;
+
     private void DrawPreStartLobby(GameStateManager manager)
     {
+
+        if (menuBackground.Id == 0)
+            {
+                menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
+            }
+
+        Raylib.DrawTexturePro(
+            menuBackground,
+            new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),
+            new Rectangle(0, 0, manager.screenWidth, manager.screenHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
+
+
         manager.ChatLog.Draw(manager.screenWidth, manager.screenHeight);
         float availableWidth = manager.screenWidth - (manager.screenWidth * 0.3f + 40);
         int titleWidth = Raylib.MeasureText("Waiting for players...", 30);

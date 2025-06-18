@@ -1,4 +1,5 @@
 using Raylib_cs;
+using System.Numerics;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
@@ -22,7 +23,17 @@ public class HostingMenuState : IGameState
 
         LoadAssets();
 
-        Raylib.DrawTexture(menuBackground, 0, 0, Color.White);
+        //Raylib.DrawTexture(menuBackground, 0, 0, Color.White);
+
+        Raylib.DrawTexturePro(
+            menuBackground,
+            new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),
+            new Rectangle(0, 0, manager.screenWidth, manager.screenHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
 
         manager.GetGameTimer().Draw(10, 10, 20, Color.Red);
         string publicIp = WaterWizard.Shared.NetworkUtils.GetPublicIPAddress();

@@ -25,7 +25,7 @@ public class CardHandler
     {
         string cardType = reader.GetString();
         Console.WriteLine($"[Server] Trying to Buy {cardType} Card");
-        if(GameState.UtilityStack == null || GameState.DamageStack == null || GameState.EnvironmentStack == null)
+        if (GameState.UtilityStack == null || GameState.DamageStack == null || GameState.EnvironmentStack == null || GameState.HealingStack == null)
         {
             Console.WriteLine("[Server] Card stacks are not initialized, cannot buy card.");
             return;
@@ -35,10 +35,11 @@ public class CardHandler
             "Utility" => RandomCard(GameState.UtilityStack), //TODO: Actually Paying
             "Damage" => RandomCard(GameState.DamageStack), //TODO: Actually Paying
             "Environment" => RandomCard(GameState.EnvironmentStack), //TODO: Actually Paying
+            "Healing" => RandomCard(GameState.HealingStack), // Healing hat eigenen Stack
             _ => throw new Exception(
                 "Invalid CardType: "
                     + cardType
-                    + " . Has to be a string of either: Utility, Damage or Environment"
+                    + " . Has to be a string of either: Utility, Damage, Environment or Healing"
             ),
         };
         NetDataWriter writer = new();
@@ -73,15 +74,19 @@ public class CardHandler
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
-    public void HandleCardCasting(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState)
+    public void HandleCardCasting(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState, ParalizeHandler paralizeHandler, UtilityCardHandler utilityCardHandler)
     {
         //TODO: Handle Mana Cost
         string cardVariantString = reader.GetString();
         int cardX = reader.GetInt();
         int cardY = reader.GetInt();
+
+        Console.WriteLine($"[CardHandler] Kartenausspielung empfangen von {peer.ToString()} (Port: {peer.Port})");
+        Console.WriteLine($"[CardHandler] Kartenvariante: {cardVariantString}");
+        Console.WriteLine($"[CardHandler] Zielkoordinaten: ({cardX}, {cardY})");
+
         if (Enum.TryParse<CardVariant>(cardVariantString, out var variant))
         {
-            // Gegner finden
             var defender = server.ConnectedPeerList.Find(p => !p.Equals(peer));
             if (gameState == null)
             {
@@ -90,7 +95,12 @@ public class CardHandler
             }
             if (defender != null)
             {
-                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
+                Console.WriteLine($"[CardHandler] Gegner gefunden: {defender.ToString()} (Port: {defender.Port})");
+                Console.WriteLine($"[CardHandler] Starte Kartenausführung für {variant}...");
+
+                CardAbilities.HandleAbilityWithHandlers(variant, gameState, new Vector2(cardX, cardY), peer, defender, paralizeHandler, utilityCardHandler);
+
+                Console.WriteLine($"[CardHandler] Kartenausführung für {variant} abgeschlossen");
             }
             else
             {
@@ -124,7 +134,7 @@ public class CardHandler
     {
         if (GameState.ActiveCards == null || GameState.ActiveCards.Count == 0)
         {
-            return; 
+            return;
         }
         if (gameState == null)
         {
@@ -179,16 +189,16 @@ public class CardHandler
                     {
                         var targetPlayer = gameState.players[boardIndex];
                         var attacker = gameState.players[boardIndex == 0 ? 1 : 0];
-                        
+
                         Console.WriteLine($"Generating 2 thunder strikes for Board[{boardIndex}] (Player: {targetPlayer})");
-                        
+
                         for (int strikeNum = 0; strikeNum < 3; strikeNum++)
                         {
                             int x = Random.Shared.Next(0, GameState.boardWidth);
                             int y = Random.Shared.Next(0, GameState.boardHeight);
 
                             bool hit = HandleThunderStrike(attacker, targetPlayer, x, y);
-                            
+
                             SendThunderVisualEffect(gameState.players, boardIndex, x, y, hit);
                         }
                     }
@@ -197,12 +207,12 @@ public class CardHandler
             }
         }
     }
-    
+
     private static void SendActiveCardsUpdate(NetPeer player)
     {
         var writer = new NetDataWriter();
         writer.Put("ActiveCards");
-        if(GameState.ActiveCards == null)
+        if (GameState.ActiveCards == null)
         {
             Console.WriteLine("[Server] GameState.ActiveCards is null, cannot send active cards.");
             return;
@@ -231,7 +241,7 @@ public class CardHandler
             {
                 hit = true;
                 bool newDamage = ship.DamageCell(x, y);
-                
+
                 Console.WriteLine($"    Thunder hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}");
 
                 if (newDamage)
@@ -281,7 +291,7 @@ public class CardHandler
             thunderWriter.Put(x);
             thunderWriter.Put(y);
             thunderWriter.Put(hit);
-            
+
             client.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
             Console.WriteLine($"    Sent ThunderStrike visual to {client} for Board[{boardIndex}] at ({x},{y}) hit={hit}");
         }

@@ -354,6 +354,7 @@ public class ClientService(NetworkManager manager)
                                 Gamescreen.CellState.Ship
                             );
                         Console.WriteLine($"[Client] Healed At ({X},{Y})");
+                        break;
                     }
                     Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
                     break;
@@ -364,10 +365,15 @@ public class ClientService(NetworkManager manager)
                     Console.WriteLine($"[Client] Received player index: {playerIndex}");
                     break;
                 case "UpdateMana":
-                {
-                    HandleRessources.HandleUpdateMana(reader);
-                    break;
-                }
+                    {
+                        HandleRessources.HandleUpdateMana(reader);
+                        break;
+                    }
+                case "ParalizeStatus":
+                    {
+                        WaterWizard.Client.gamescreen.handler.HandleParalize.HandleParalizeStatus(reader);
+                        break;
+                    }
             }
         }
         catch (Exception ex)

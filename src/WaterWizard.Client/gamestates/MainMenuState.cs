@@ -6,17 +6,11 @@ namespace WaterWizard.Client.gamestates;
 
 public class MainMenuState : IGameState
 {
-    private float titleAnimTime = 0;
     private const float TITLE_ANIM_SPEED = 1.5f;
     private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
 
     private Texture2D menuBackground; //Hintergrund Variable
     private Texture2D titleAsset; //Hintergrund Variable
-
-    private Texture2D joinButtonAsset;
-    private Texture2D hostButtonAsset;
-    private Texture2D mapButtonAsset;
-
 
     public void LoadAssets()
     {
@@ -38,19 +32,28 @@ public class MainMenuState : IGameState
 
     public void UpdateAndDraw(GameStateManager manager)
     {
-        LoadAssets();    
-        
+        LoadAssets();
+
         DrawMainMenu(manager);
     }
 
     private void DrawMainMenu(GameStateManager manager)
     {
-        Raylib.DrawTexture(menuBackground, 0, 0, Color.White); //Zeichnen des Hintergrundbildes
+        //Raylib.DrawTexture(menuBackground, 0, 0, Color.White); //Zeichnen des Hintergrundbildes
+
+        Raylib.DrawTexturePro(
+            menuBackground,
+            new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),  // vollständiger Bildausschnitt
+            new Rectangle(0, 0, manager.screenWidth, manager.screenHeight),     // füllt komplettes Fenster
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
 
         //einbinden des Titels
         float scaleX = (float)manager.screenWidth / titleAsset.Width;
         float scaleY = (float)manager.screenHeight / titleAsset.Height;
-        float scaleFactor = Math.Min(scaleX, scaleY); 
+        float scaleFactor = Math.Min(scaleX, scaleY);
 
         // Berechnung der Position
         Rectangle destRect = new(

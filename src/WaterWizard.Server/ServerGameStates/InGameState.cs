@@ -14,6 +14,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     private readonly GameState gameState = gameState;
 
     private System.Timers.Timer? manaTimer;
+    private ManaHandler? manaHandler;
+    private ParalizeHandler? paralizeHandler;
+    private UtilityCardHandler? utilityCardHandler;
 
     /// <summary>
     /// Wird beim Eintritt in die Spielphase aufgerufen.
@@ -26,8 +29,12 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         {
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-        //TODO: Gold und Mana Initialisieren
-        //TODO: Auf Input von Clients warten?
+
+        // Initialisiere Handler
+        paralizeHandler = new ParalizeHandler(gameState);
+        manaHandler = new ManaHandler(gameState, paralizeHandler);
+        utilityCardHandler = new UtilityCardHandler(gameState, paralizeHandler);
+
         // Mana-Timer starten
         // Mana alle 4 Sekunden
         manaTimer = new System.Timers.Timer(4_000);
@@ -38,24 +45,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 
     private void UpdateMana()
     {
-        gameState.Player1Mana.Add(1);
-        gameState.Player2Mana.Add(1);
-
-        for (int i = 0; i < server.ConnectedPeersCount; i++)
-        {
-            var peer = server.ConnectedPeerList[i];
-            var writer = new NetDataWriter();
-            writer.Put("UpdateMana");
-            writer.Put(i); // Spielerindex
-            writer.Put(
-                i == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana
-            );
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        }
-// only for logging / testing
-        // Console.WriteLine(
-        //     $"[Server] Mana updated: P1={gameState.Player1Mana.CurrentMana}, P2={gameState.Player2Mana.CurrentMana}"
-        // );
+        manaHandler?.UpdateMana();
     }
 
     /// <summary>
@@ -88,7 +78,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 CardHandler.HandleCardBuying(serverInstance, peer, reader);
                 break;
             case "CastCard":
-                cardHandler.HandleCardCasting(serverInstance, peer, reader, gameState);
+                cardHandler.HandleCardCasting(serverInstance, peer, reader, gameState, paralizeHandler!, utilityCardHandler!);
                 break;
             case "Attack":
                 int x = reader.GetInt();
@@ -99,7 +89,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 {
                     AttackHandler.Initialize(gameState);
                     AttackHandler.HandleAttack(peer, defender, x, y);
-                }                   
+                }
                 else
                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
                 break;
