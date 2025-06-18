@@ -39,7 +39,16 @@ public class MainMenuState : IGameState
 
     private void DrawMainMenu(GameStateManager manager)
     {
-        Raylib.DrawTexture(menuBackground, 0, 0, Color.White); //Zeichnen des Hintergrundbildes
+        //Raylib.DrawTexture(menuBackground, 0, 0, Color.White); //Zeichnen des Hintergrundbildes
+
+        Raylib.DrawTexturePro(
+            menuBackground,
+            new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),  // vollständiger Bildausschnitt
+            new Rectangle(0, 0, manager.screenWidth, manager.screenHeight),     // füllt komplettes Fenster
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
 
         //einbinden des Titels
         float scaleX = (float)manager.screenWidth / titleAsset.Width;

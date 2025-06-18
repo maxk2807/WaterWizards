@@ -1,4 +1,5 @@
 using Raylib_cs;
+using System.Numerics;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.network;
 
@@ -26,7 +27,17 @@ public class LobbyListMenuState : IGameState
     {
         LoadAssets();
 
-        Raylib.DrawTexture(menuBackground, 0, 0, Color.White);
+        //Raylib.DrawTexture(menuBackground, 0, 0, Color.White);
+
+        Raylib.DrawTexturePro(
+            menuBackground,
+            new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),
+            new Rectangle(0, 0, manager.screenWidth, manager.screenHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
 
         int titleWidth = Raylib.MeasureText("Verfügbare Lobbies", 30);
         Raylib.DrawText(
