@@ -14,8 +14,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     private readonly GameState gameState = gameState;
 
     private System.Timers.Timer? manaTimer;
+    private System.Timers.Timer? goldTimer;
     private ManaHandler? manaHandler;
     public ParalizeHandler? paralizeHandler;
+    private GoldHandler? goldHandler;
     private UtilityCardHandler? utilityCardHandler;
 
     /// <summary>
@@ -33,19 +35,28 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         // Initialisiere Handler
         paralizeHandler = new ParalizeHandler(gameState);
         manaHandler = new ManaHandler(gameState, paralizeHandler);
+        goldHandler = new GoldHandler(gameState);
         utilityCardHandler = new UtilityCardHandler(gameState, paralizeHandler);
 
-        // Mana-Timer starten
-        // Mana alle 4 Sekunden
-        manaTimer = new System.Timers.Timer(4_000);
+        manaTimer = new System.Timers.Timer(4000);
         manaTimer.Elapsed += (sender, e) => UpdateMana();
         manaTimer.AutoReset = true;
         manaTimer.Start();
+
+        goldTimer = new System.Timers.Timer(2000);
+        goldTimer.Elapsed += (sender, e) => UpdateGold();
+        goldTimer.AutoReset = true;
+        goldTimer.Start();
     }
 
     private void UpdateMana()
     {
         manaHandler?.UpdateMana();
+    }
+
+    private void UpdateGold()
+    {
+        goldHandler?.UpdateGold();
     }
 
     /// <summary>
@@ -55,6 +66,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     {
         manaTimer?.Stop();
         manaTimer?.Dispose();
+        
+        goldTimer?.Stop();
+        goldTimer?.Dispose();
     }
 
     public void HandleNetworkEvent(
@@ -93,13 +107,35 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 else
                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
                 break;
+            case "Surrender":
+                HandleSurrender(peer);
+                break;
             default:
                 Console.WriteLine($"[InGameState] Unbekannter Nachrichtentyp: {messageType}");
                 break;
         }
     }
 
-    private NetPeer? FindOpponent(NetPeer attacker)
+    /// <summary>
+    /// Handles the surrender button usage
+    /// </summary>
+    /// <param name="surrenderingPlayer">The player which surrenders</param>
+    private void HandleSurrender(NetPeer surrenderingPlayer)
+    {
+        Console.WriteLine($"[Server] Player {surrenderingPlayer} has surrendered");
+
+        var opponent = FindOpponent(surrenderingPlayer);
+        if (opponent != null)
+        {
+            gameState.HandleSurrender(opponent, surrenderingPlayer);
+        }
+        else
+        {
+            Console.WriteLine("[Server] No opponent found for surrender handling");
+        }
+    }
+
+    public NetPeer? FindOpponent(NetPeer attacker)
     {
         foreach (var peer in server.ConnectedPeerList)
         {
