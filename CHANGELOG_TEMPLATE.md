@@ -11,6 +11,9 @@
 ### 🐛 Bug Fixes
 {{BUG_FIXES}}
 
+### 📝 Other Changes
+{{OTHER_CHANGES}}
+
 ### 📦 Installation & Usage
 
 #### 🪟 Windows
