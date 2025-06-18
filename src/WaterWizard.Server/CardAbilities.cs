@@ -2,6 +2,7 @@ using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server.Card;
 using WaterWizard.Server.Card.healing;
+using WaterWizard.Server.Card.utility;
 using WaterWizard.Server.handler;
 using WaterWizard.Shared;
 
@@ -94,18 +95,40 @@ public static class CardAbilities
                 return;
             }
         }
-
-        // Prüfe, ob es eine Utility-Karte ist
-        var card = new Cards(variant);
-        if (card.Type == CardType.Utility)
+        else if (UtilityCardFactory.IsUtilityCard(variant))
         {
-            // Erstelle Handler-Instanzen
-            var paralizeHandler = new ParalizeHandler(gameState);
-            var utilityCardHandler = new UtilityCardHandler(gameState, paralizeHandler);
+            var utilityCard = UtilityCardFactory.CreateUtilityCard(variant);
+            if (utilityCard != null)
+            {
+                Console.WriteLine($"[Server] Executing healing card {variant}");
 
-            // Behandle die Utility-Karte
-            utilityCardHandler.HandleUtilityCard(variant, targetCoords, caster, defender);
-            return;
+                if (utilityCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                {
+                    if (caster != null)
+                    {
+                        bool utilityDone = utilityCard.ExecuteUtility(
+                            gameState,
+                            targetCoords,
+                            caster,
+                            defender
+                        );
+                        Console.WriteLine(
+                            $"[Server] {variant} execution result: {(utilityDone ? "utility executed" : "not executed")}"
+                        );
+
+                        if (utilityDone)
+                        {
+                            gameState.CheckGameOver();
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
+                    );
+                }
+            }
         }
 
         switch (variant)

@@ -35,7 +35,7 @@ public class UtilityCardHandler
                 Console.WriteLine($"[UtilityCardHandler] Caster (Angreifer): {caster.ToString()} (Port: {caster.Port})");
                 Console.WriteLine($"[UtilityCardHandler] Defender (Ziel): {defender.ToString()} (Port: {defender.Port})");
                 Console.WriteLine($"[UtilityCardHandler] Zielkoordinaten: ({targetCoords.X}, {targetCoords.Y})");
-                paralizeHandler.HandleParalizeCard(caster, defender);
+                // paralizeHandler.HandleParalizeCard(caster, defender); //TODO:not needed if factory goes right
                 break;
             case CardVariant.HoveringEye:
                 Console.WriteLine($"[UtilityCardHandler] HoveringEye-Karte aktiviert!");
