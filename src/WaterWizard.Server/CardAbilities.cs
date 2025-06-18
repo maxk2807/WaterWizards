@@ -193,6 +193,42 @@ public static class CardAbilities
                 return;
             }
         }
+        else if (HealingCardFactory.IsHealingCard(variant))
+        {
+            var healingCard = HealingCardFactory.CreateHealingCard(variant);
+            if (healingCard != null)
+            {
+                Console.WriteLine($"[Server] Executing healing card {variant}");
+
+                if (healingCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                {
+                    if (caster != null)
+                    {
+                        bool healingDone = healingCard.ExecuteHealing(
+                            gameState,
+                            targetCoords,
+                            caster,
+                            defender
+                        );
+                        Console.WriteLine(
+                            $"[Server] {variant} healing result: {(healingDone ? "healing done" : "no healing")}"
+                        );
+
+                        if (healingDone)
+                        {
+                            gameState.CheckGameOver();
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
+                    );
+                }
+                return;
+            }
+        }
 
         // Prüfe, ob es eine Utility-Karte ist
         var card = new Cards(variant);
