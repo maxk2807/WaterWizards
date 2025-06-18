@@ -79,22 +79,59 @@ jobs:
           if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION="${{ github.event.inputs.version }}"
           else
-            # Auto-increment version
-            VERSION=$(grep -m1 '<Version>' src/WaterWizard.Server/WaterWizard.Server.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
-            if [ -z "$VERSION" ]; then
-              VERSION="0.0.$GITHUB_RUN_NUMBER"
+            # Get current version from .csproj
+            PROJECT_VERSION=$(grep -m1 '<Version>' src/WaterWizard.Server/WaterWizard.Server.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
+            
+            # Get latest tag version
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -n "$LATEST_TAG" ]; then
+              LATEST_VERSION=${LATEST_TAG#v}  # Remove 'v' prefix
+            else
+              LATEST_VERSION="0.0.0"
             fi
+            
+            echo "Project version: $PROJECT_VERSION"
+            echo "Latest tag: $LATEST_TAG"
+            echo "Latest tag version: $LATEST_VERSION"
+            
+            # Use the higher version between project and latest tag
+            if [ -n "$PROJECT_VERSION" ] && [ "$PROJECT_VERSION" != "0.0.0" ]; then
+              VERSION="$PROJECT_VERSION"
+              echo "Using project version: $VERSION"
+            else
+              VERSION="$LATEST_VERSION"
+              echo "Using latest tag version: $VERSION"
+            fi
+            
+            # Parse version components
             MAJOR=$(echo "$VERSION" | cut -d. -f1)
             MINOR=$(echo "$VERSION" | cut -d. -f2)
             PATCH=$(echo "$VERSION" | cut -d. -f3)
             [ -z "$PATCH" ] && PATCH=0
+            
+            # Increment patch version for next release
             PATCH=$((PATCH + 1))
             VERSION="$MAJOR.$MINOR.$PATCH"
+            
+            echo "Incremented version: $VERSION"
           fi
           
           TAG="v$VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
+          
+          # Check if tag already exists
+          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "❌ Tag $TAG already exists! Incrementing patch version..."
+            PATCH=$((PATCH + 1))
+            VERSION="$MAJOR.$MINOR.$PATCH"
+            TAG="v$VERSION"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "Final version: $VERSION"
+          echo "Final tag: $TAG"
 
       - name: Generate Intelligent Changelog
         id: changelog
