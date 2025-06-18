@@ -282,12 +282,6 @@ public class GameBoard
             }
         }
 
-        // // Zeichne die Zielvorschau
-        // if (aiming)
-        // {
-        //     DrawCastAim(cardToAim!);
-        // }
-
         // Thunder-Effekte zeichnen
         foreach (var strike in _activeThunderStrikes)
         {
@@ -312,86 +306,6 @@ public class GameBoard
             CellState.Thunder => new Color(30, 30, 150, 255), // Dunkelblau für Thunder
             _ => Color.Black,
         };
-    }
-
-    public void DrawCastAim(GameCard gameCard)
-    {
-        var mousePos = Raylib.GetMousePosition();
-        Vector2 aim = gameCard.card.TargetAsVector();
-
-        // Spezialbehandlung für battlefield-Ziele wie Thunder
-        if (gameCard.card.Target!.Target == "battlefield")
-        {
-            Raylib.DrawText(
-                "Klicken Sie irgendwo, um die Karte zu wirken",
-                (int)mousePos.X,
-                (int)mousePos.Y - 20,
-                20,
-                Color.Black
-            );
-
-            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
-            {
-                aiming = false;
-                NetworkManager.HandleCast(cardToAim!.card, new Point(0, 0));
-            }
-            return;
-        }
-
-        // Normale Zielbehandlung für andere Kartentypen
-        if ((int)aim.X == 0 && (int)aim.Y == 0)
-        {
-            //TODO: handle other types of aims
-            return;
-        }
-
-        Point? hoveredCoords;
-        Vector2 boardPos;
-        if (gameCard.card.Target!.Ally)
-        {
-            hoveredCoords = GetCellFromScreenCoords(mousePos);
-            boardPos = Position;
-        }
-        else
-        {
-            hoveredCoords =
-                GameStateManager.Instance.GameScreen.opponentBoard!.GetCellFromScreenCoords(
-                    mousePos
-                );
-            boardPos = GameStateManager.Instance.GameScreen.opponentBoard!.Position;
-        }
-
-        if (!hoveredCoords.HasValue)
-        {
-            return;
-        }
-
-        Raylib.DrawText(
-            "Click again to cast Card",
-            (int)mousePos.X,
-            (int)mousePos.Y - 20,
-            20,
-            Color.Black
-        );
-
-        var onScreenX =
-            boardPos.X + (hoveredCoords.Value.X - (float)Math.Floor(aim.X / 2f)) * CellSize;
-        var onScreenY =
-            boardPos.Y + (hoveredCoords.Value.Y - (float)Math.Floor(aim.Y / 2f)) * CellSize;
-        var r = new Rectangle(onScreenX, onScreenY, aim.X * CellSize, aim.Y * CellSize);
-        Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
-
-        if (Raylib.IsMouseButtonPressed(MouseButton.Left))
-        {
-            aiming = false;
-            NetworkManager.HandleCast(cardToAim!.card, hoveredCoords.Value);
-        }
-    }
-
-    public void StartDrawingCardAim(GameCard gameCard)
-    {
-        aiming = true;
-        cardToAim = gameCard;
     }
 
     /// <summary>
