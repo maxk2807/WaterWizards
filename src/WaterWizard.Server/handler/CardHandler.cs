@@ -98,7 +98,7 @@ public class CardHandler
                 Console.WriteLine($"[CardHandler] Gegner gefunden: {defender.ToString()} (Port: {defender.Port})");
                 Console.WriteLine($"[CardHandler] Starte Kartenausführung für {variant}...");
 
-                CardAbilities.HandleAbilityWithHandlers(variant, gameState, new Vector2(cardX, cardY), peer, defender, paralizeHandler, utilityCardHandler);
+                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
 
                 Console.WriteLine($"[CardHandler] Kartenausführung für {variant} abgeschlossen");
             }

@@ -53,7 +53,7 @@ public class GameState
     public Cell[,] Player2 => boards[1];
     public readonly List<Cards>[] hands;
     private readonly NetManager server;
-    private readonly ServerGameStateManager manager;
+    public readonly ServerGameStateManager manager;
     public List<Cards> Player1Hand => hands[0];
     public List<Cards> Player2Hand => hands[1];
     public static List<Cards>? ActiveCards { get; private set; }
