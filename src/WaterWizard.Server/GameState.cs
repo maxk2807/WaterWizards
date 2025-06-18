@@ -262,4 +262,21 @@ public class GameState
             Timeout.Infinite
         );
     }
+
+    /// <summary>
+    /// Gets the index of a player in the players array
+    /// </summary>
+    /// <param name="player">The player to find</param>
+    /// <returns>The index (0 or 1) or -1 if not found</returns>
+    public int GetPlayerIndex(NetPeer player)
+    {
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i] == player)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
