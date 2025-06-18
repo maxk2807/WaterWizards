@@ -48,10 +48,6 @@ public class GameStateManager
         return playerIndex == 0 ? player1Gold : player2Gold;
     }
 
-    private float titleAnimTime = 0;
-    private float titleVerticalPosition = 0;
-    private const float TITLE_ANIM_SPEED = 1.5f;
-    private const float TITLE_FLOAT_AMPLITUDE = 10.0f;
     public int MyPlayerIndex { get; set; } = -1; //new
 
     public static void Initialize(int screenWidth, int screenHeight)

@@ -31,11 +31,10 @@ public class GameScreen(
 
     private float _thunderTimer = 0;
     private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Donnereinschlägen
-    
+
     private Texture2D gameBackground;
     private Texture2D gridBackground;
     private Texture2D enemyGridBackground;
-    private Texture2D graveyardAsset;
 
     public void LoadBackgroundAssets()
     {
@@ -48,7 +47,7 @@ public class GameScreen(
     {
         if (gridBackground.Id != 0) return;
         gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
-        
+
 
         if (enemyGridBackground.Id != 0) return;
         enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
@@ -58,11 +57,11 @@ public class GameScreen(
     {
         if (gridBackground.Id != 0) return;
         gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
-        
+
 
         if (enemyGridBackground.Id != 0) return;
         enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
-    } 
+    }
 
     /// <summary>
     /// Initialize all elements rendered on the GameScreen:

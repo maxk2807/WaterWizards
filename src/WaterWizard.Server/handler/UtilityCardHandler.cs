@@ -1,0 +1,110 @@
+using System.Numerics;
+using LiteNetLib;
+using WaterWizard.Server;
+using WaterWizard.Shared;
+
+namespace WaterWizard.Server.handler;
+
+/// <summary>
+/// Verwaltet Utility-Karten und ihre Effekte.
+/// </summary>
+public class UtilityCardHandler
+{
+    private readonly GameState gameState;
+    private readonly ParalizeHandler paralizeHandler;
+
+    public UtilityCardHandler(GameState gameState, ParalizeHandler paralizeHandler)
+    {
+        this.gameState = gameState;
+        this.paralizeHandler = paralizeHandler;
+    }
+
+    /// <summary>
+    /// Behandelt die Ausführung einer Utility-Karte
+    /// </summary>
+    /// <param name="variant">Die Kartenvariante</param>
+    /// <param name="targetCoords">Die Zielkoordinaten</param>
+    /// <param name="caster">Der Spieler, der die Karte wirkt</param>
+    /// <param name="defender">Der Spieler, der das Ziel ist</param>
+    public void HandleUtilityCard(CardVariant variant, Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        switch (variant)
+        {
+            case CardVariant.Paralize:
+                Console.WriteLine($"[UtilityCardHandler] Paralize-Karte aktiviert!");
+                Console.WriteLine($"[UtilityCardHandler] Caster (Angreifer): {caster.ToString()} (Port: {caster.Port})");
+                Console.WriteLine($"[UtilityCardHandler] Defender (Ziel): {defender.ToString()} (Port: {defender.Port})");
+                Console.WriteLine($"[UtilityCardHandler] Zielkoordinaten: ({targetCoords.X}, {targetCoords.Y})");
+                paralizeHandler.HandleParalizeCard(caster, defender);
+                break;
+            case CardVariant.HoveringEye:
+                Console.WriteLine($"[UtilityCardHandler] HoveringEye-Karte aktiviert!");
+                HandleHoveringEye(targetCoords, caster, defender);
+                break;
+            case CardVariant.Teleport:
+                Console.WriteLine($"[UtilityCardHandler] Teleport-Karte aktiviert!");
+                HandleTeleport(targetCoords, caster, defender);
+                break;
+            case CardVariant.ConeOfCold:
+                Console.WriteLine($"[UtilityCardHandler] ConeOfCold-Karte aktiviert!");
+                HandleConeOfCold(targetCoords, caster, defender);
+                break;
+            case CardVariant.MinorIllusion:
+                Console.WriteLine($"[UtilityCardHandler] MinorIllusion-Karte aktiviert!");
+                HandleMinorIllusion(targetCoords, caster, defender);
+                break;
+            case CardVariant.Polymorph:
+                Console.WriteLine($"[UtilityCardHandler] Polymorph-Karte aktiviert!");
+                HandlePolymorph(targetCoords, caster, defender);
+                break;
+            default:
+                Console.WriteLine($"[UtilityCardHandler] Unbekannte Utility-Karte: {variant}");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Behandelt die HoveringEye-Karte (permanente Überwachung)
+    /// </summary>
+    private void HandleHoveringEye(Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        // TODO: Implementiere permanente Überwachung der Zielzelle
+        Console.WriteLine($"[UtilityCardHandler] HoveringEye placed at ({targetCoords.X}, {targetCoords.Y})");
+    }
+
+    /// <summary>
+    /// Behandelt die Teleport-Karte (Schiff teleportieren)
+    /// </summary>
+    private void HandleTeleport(Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        // TODO: Implementiere Schiff-Teleportation
+        Console.WriteLine($"[UtilityCardHandler] Teleport to ({targetCoords.X}, {targetCoords.Y})");
+    }
+
+    /// <summary>
+    /// Behandelt die ConeOfCold-Karte (Verlangsamung)
+    /// </summary>
+    private void HandleConeOfCold(Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        // TODO: Implementiere Verlangsamungseffekt
+        Console.WriteLine($"[UtilityCardHandler] ConeOfCold at ({targetCoords.X}, {targetCoords.Y})");
+    }
+
+    /// <summary>
+    /// Behandelt die MinorIllusion-Karte (Täuschung)
+    /// </summary>
+    private void HandleMinorIllusion(Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        // TODO: Implementiere Illusionseffekt
+        Console.WriteLine($"[UtilityCardHandler] MinorIllusion at ({targetCoords.X}, {targetCoords.Y})");
+    }
+
+    /// <summary>
+    /// Behandelt die Polymorph-Karte (Verwandlung)
+    /// </summary>
+    private void HandlePolymorph(Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        // TODO: Implementiere Verwandlungseffekt
+        Console.WriteLine($"[UtilityCardHandler] Polymorph at ({targetCoords.X}, {targetCoords.Y})");
+    }
+}

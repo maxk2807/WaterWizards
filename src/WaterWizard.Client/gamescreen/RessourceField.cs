@@ -8,6 +8,8 @@ public class RessourceField(GameScreen gameScreen)
     private string manaString = "";
     private float Gold;
     private string goldString = "";
+    private bool isParalized = false;
+    private string paralizeString = "PARALYZED";
 
     private int X;
     private int Y;
@@ -18,6 +20,7 @@ public class RessourceField(GameScreen gameScreen)
 
     private Rectangle GoldRec;
     private Rectangle ManaRec;
+    private Rectangle ParalizeRec;
 
     public void Initialize()
     {
@@ -25,6 +28,7 @@ public class RessourceField(GameScreen gameScreen)
         manaString = Mana.ToString() + " Mana";
         Gold = 0f;
         goldString = Gold.ToString() + " $";
+        isParalized = false;
 
         X = ZonePadding;
         Y = ZonePadding * 2 + 20; //20 is fontsize of GameTimer in GameScreen
@@ -44,6 +48,14 @@ public class RessourceField(GameScreen gameScreen)
         int manaY = (int)(Y + (Height - manaFontSize) / 2f);
 
         ManaRec = new(manaX, manaY, manaWidth, manaFontSize);
+
+        // Paralize-Anzeige (rechts von Mana)
+        int paralizeFontSize = 20;
+        int paralizeWidth = Raylib.MeasureText(paralizeString, paralizeFontSize);
+        int paralizeX = manaX + manaWidth + 20;
+        int paralizeY = manaY;
+
+        ParalizeRec = new(paralizeX, paralizeY, paralizeWidth, paralizeFontSize);
     }
 
     public void SetMana(int mana)
@@ -61,6 +73,14 @@ public class RessourceField(GameScreen gameScreen)
         int manaY = (int)(Y + (Height - manaFontSize) / 2f);
 
         ManaRec = new(manaX, manaY, manaWidth, manaFontSize);
+
+        // Aktualisiere auch Paralize-Position
+        int paralizeFontSize = 20;
+        int paralizeWidth = Raylib.MeasureText(paralizeString, paralizeFontSize);
+        int paralizeX = manaX + manaWidth + 20;
+        int paralizeY = manaY;
+
+        ParalizeRec = new(paralizeX, paralizeY, paralizeWidth, paralizeFontSize);
     }
 
     public void SetGold(int gold)
@@ -80,6 +100,13 @@ public class RessourceField(GameScreen gameScreen)
         GoldRec = new(goldX, goldY, goldWidth, goldFontSize);
     }
 
+    public void SetParalized(bool paralized)
+    {
+        Console.WriteLine($"[RessourceField] SetParalized aufgerufen: {paralized}");
+        isParalized = paralized;
+        Console.WriteLine($"[RessourceField] isParalized ist jetzt: {isParalized}");
+    }
+
     public void Draw()
     {
         Raylib.DrawText(
@@ -94,7 +121,30 @@ public class RessourceField(GameScreen gameScreen)
             (int)ManaRec.X,
             (int)ManaRec.Y,
             (int)ManaRec.Height,
-            Color.Black
+            isParalized ? Color.Red : Color.Black
         );
+
+        // Zeichne gelben Paralize-Punkt wenn paralysiert
+        if (isParalized)
+        {
+            Console.WriteLine($"[RessourceField] Zeichne gelben Paralize-Punkt - isParalized: {isParalized}");
+
+            // Gelber Punkt rechts neben dem Mana
+            int dotRadius = 8;
+            int dotX = (int)ManaRec.X + (int)ManaRec.Width + 15;
+            int dotY = (int)ManaRec.Y + (int)ManaRec.Height / 2;
+
+            Raylib.DrawCircle(dotX, dotY, dotRadius, Color.Yellow);
+            Raylib.DrawCircleLines(dotX, dotY, dotRadius, Color.Black);
+
+            // Optional: "PARALYZED" Text anzeigen
+            Raylib.DrawText(
+                paralizeString,
+                (int)ParalizeRec.X,
+                (int)ParalizeRec.Y,
+                (int)ParalizeRec.Height,
+                Color.Yellow
+            );
+        }
     }
 }

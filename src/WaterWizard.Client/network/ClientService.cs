@@ -365,10 +365,15 @@ public class ClientService(NetworkManager manager)
                     Console.WriteLine($"[Client] Received player index: {playerIndex}");
                     break;
                 case "UpdateMana":
-                {
-                    HandleRessources.HandleUpdateMana(reader);
-                    break;
-                }
+                    {
+                        HandleRessources.HandleUpdateMana(reader);
+                        break;
+                    }
+                case "ParalizeStatus":
+                    {
+                        WaterWizard.Client.gamescreen.handler.HandleParalize.HandleParalizeStatus(reader);
+                        break;
+                    }
             }
         }
         catch (Exception ex)

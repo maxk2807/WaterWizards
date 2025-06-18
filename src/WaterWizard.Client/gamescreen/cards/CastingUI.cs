@@ -34,6 +34,26 @@ public class CastingUI
     {
         var mousePos = Raylib.GetMousePosition();
         Vector2 aim = gameCard.card.TargetAsVector();
+
+        // Spezialbehandlung für battlefield-Ziele wie Paralize
+        if (gameCard.card.Target!.Target == "battlefield")
+        {
+            Raylib.DrawText(
+                $"Klicken Sie irgendwo, um {gameCard.card.Variant} zu wirken",
+                (int)mousePos.X - 100,
+                (int)mousePos.Y - 20,
+                20,
+                Color.Black
+            );
+
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                aiming = false;
+                NetworkManager.HandleCast(cardToAim!.card, new Point(0, 0));
+            }
+            return;
+        }
+
         if (IsTargeted(aim))
         {
             HandleTargeted(gameCard, mousePos, aim);
