@@ -218,8 +218,8 @@ public class GameScreen(
             new Rectangle(
                 playerBoard.Position.X,
                 playerBoard.Position.Y,
-                playerBoard.GridWidth * playerBoard.CellSize,
-                playerBoard.GridHeight * playerBoard.CellSize
+                playerBoard.GridWidth * (float)playerBoard.CellSize,
+                playerBoard.GridHeight * (float)playerBoard.CellSize
             ),
             Vector2.Zero,
             0f,
@@ -235,8 +235,8 @@ public class GameScreen(
             new Rectangle(
                 opponentBoard.Position.X,
                 opponentBoard.Position.Y,
-                opponentBoard.GridWidth * opponentBoard.CellSize,
-                opponentBoard.GridHeight * opponentBoard.CellSize
+                opponentBoard.GridWidth * (float)opponentBoard.CellSize,
+                opponentBoard.GridHeight * (float)opponentBoard.CellSize
             ),
             Vector2.Zero,
             0f,
