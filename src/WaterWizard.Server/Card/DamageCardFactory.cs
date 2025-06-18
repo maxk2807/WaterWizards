@@ -20,6 +20,7 @@ public static class DamageCardFactory
         {
             CardVariant.Firebolt => new FireboltCard(),
             CardVariant.ArcaneMissile => new ArcaneMissileCard(),
+            CardVariant.GreedHit => new GreedHitCard(),
             _ => null,
         };
     }

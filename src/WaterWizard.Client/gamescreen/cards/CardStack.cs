@@ -13,6 +13,7 @@ public class CardStack(GameScreen gameScreen, int x, int y)
     {
         //later calls to Network to get correct Cards
         cards.Add(new(gameScreen, new(Shared.CardVariant.Firebolt)));
+        cards.Add(new(gameScreen, new(Shared.CardVariant.GreedHit)));
     }
 
     public void InitUtility()
