@@ -1,3 +1,4 @@
+using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Server;
@@ -179,14 +180,14 @@ public class ShipHandler
         writer.Put(ship.Width);
         writer.Put(ship.Height);
         writer.Put(false);
-        
+
         writer.Put(ship.DamagedCells.Count);
         foreach (var (damageX, damageY) in ship.DamagedCells)
         {
             writer.Put(damageX);
             writer.Put(damageY);
         }
-        
+
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
@@ -204,35 +205,23 @@ public class ShipHandler
         return ships.Count > 0 && ships.All(ship => ship.IsDestroyed);
     }
 
-    public static void HandleShipHealing(NetPeer caster, PlacedShip? ship, CardVariant variant)
+    public static void SendHealing(Vector2 healedCoords, bool success, NetPeer caster)
     {
-        if (ship == null)
-        {
-            return;
-        }
-
         var writer = new NetDataWriter();
         writer.Put("ShipHeal");
-        
-        switch (variant)
+        if (success)
         {
-            case CardVariant.Heal:
-                if (ship.DamagedCells.Count > 0)
-                {
-                    var (X, Y) = ship.DamagedCells.First();
-                    ship.HealCell(X, Y);
-                    writer.Put(true); // success
-                    writer.Put(X);
-                    writer.Put(Y);
-                    Console.WriteLine($"[Server] Sent ShipHeal on {(X,Y)}");
-                }
-                else
-                {
-                    writer.Put(false); // failed
-                    Console.WriteLine($"[Server] Sent Failed ShipHeal, Possible Mismatch between Client and Server");
-                }
-                caster.Send(writer, DeliveryMethod.ReliableOrdered);
-                break;
+            writer.Put(true); // success
+            writer.Put((int)healedCoords.X);
+            writer.Put((int)healedCoords.Y);
+            Console.WriteLine($"[Server] Sent ShipHeal on {(healedCoords.X, healedCoords.Y)}");
         }
+        else
+        {
+            writer.Put(false); // failed
+            Console.WriteLine($"[Server] Sent Failed ShipHeal, Possible Mismatch between Client and Server");
+        }
+        caster.Send(writer, DeliveryMethod.ReliableOrdered);
+
     }
 }

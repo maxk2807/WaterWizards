@@ -282,11 +282,11 @@ public class GameBoard
             }
         }
 
-        // Zeichne die Zielvorschau
-        if (aiming)
-        {
-            DrawCastAim(cardToAim!);
-        }
+        // // Zeichne die Zielvorschau
+        // if (aiming)
+        // {
+        //     DrawCastAim(cardToAim!);
+        // }
 
         // Thunder-Effekte zeichnen
         foreach (var strike in _activeThunderStrikes)
@@ -407,7 +407,8 @@ public class GameBoard
         {
             if (_gridStates[x, y] == CellState.Hit && state == CellState.Ship)
             {
-                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) keeping Hit state over Ship state");
+                _gridStates[x, y] = state;
+                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
                 return;
             }
 
