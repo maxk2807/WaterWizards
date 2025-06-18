@@ -21,6 +21,7 @@ public static class DamageCardFactory
             CardVariant.Firebolt => new FireboltCard(),
             CardVariant.ArcaneMissile => new ArcaneMissileCard(),
             CardVariant.GreedHit => new GreedHitCard(),
+            CardVariant.FrostBolt => new FrostBoltCard(),
             _ => null,
         };
     }

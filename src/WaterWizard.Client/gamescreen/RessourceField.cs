@@ -10,6 +10,8 @@ public class RessourceField(GameScreen gameScreen)
     private string goldString = "";
     private bool isParalized = false;
     private string paralizeString = "PARALYZED";
+    private bool isGoldFrozen = false;
+    private string goldFrozenString = "FROZEN";
 
     private int X;
     private int Y;
@@ -107,41 +109,53 @@ public class RessourceField(GameScreen gameScreen)
         Console.WriteLine($"[RessourceField] isParalized ist jetzt: {isParalized}");
     }
 
+    public void SetGoldFrozen(bool frozen)
+    {
+        Console.WriteLine($"[RessourceField] SetGoldFrozen aufgerufen: {frozen}");
+        isGoldFrozen = frozen;
+        Console.WriteLine($"[RessourceField] isGoldFrozen ist jetzt: {isGoldFrozen}");
+    }
+
     public void Draw()
     {
-        Raylib.DrawText(
-            goldString,
-            (int)GoldRec.X,
-            (int)GoldRec.Y,
-            (int)GoldRec.Height,
-            Color.Black
-        );
-        Raylib.DrawText(
-            manaString,
-            (int)ManaRec.X,
-            (int)ManaRec.Y,
-            (int)ManaRec.Height,
-            isParalized ? Color.Red : Color.Black
-        );
+        Raylib.DrawText(goldString, (int)GoldRec.X, (int)GoldRec.Y, 30, Color.Black);
+        
+        if (isGoldFrozen)
+        {
+            Console.WriteLine($"[RessourceField] Zeichne blauen Gold-Freeze-Punkt - isGoldFrozen: {isGoldFrozen}");
+            int statusY = (int)GoldRec.Y - 25;
+            int statusX = (int)GoldRec.X;
 
-        // Zeichne gelben Paralize-Punkt wenn paralysiert
+            Raylib.DrawCircle(statusX + 8, statusY + 8, 6, Color.SkyBlue);
+            Raylib.DrawCircleLines(statusX + 8, statusY + 8, 6, Color.Black);
+
+            Raylib.DrawText(
+                goldFrozenString,
+                statusX + 15,
+                statusY,
+                15,
+                Color.SkyBlue
+            );
+        }
+
+        Raylib.DrawText(manaString, (int)ManaRec.X, (int)ManaRec.Y, 30, Color.Black);
+
+        // Draw paralysis indicator if paralyzed
         if (isParalized)
         {
             Console.WriteLine($"[RessourceField] Zeichne gelben Paralize-Punkt - isParalized: {isParalized}");
 
-            // Gelber Punkt rechts neben dem Mana
-            int dotRadius = 8;
-            int dotX = (int)ManaRec.X + (int)ManaRec.Width + 15;
-            int dotY = (int)ManaRec.Y + (int)ManaRec.Height / 2;
+            int statusY = (int)ManaRec.Y - 25;
+            int statusX = (int)ManaRec.X;
 
-            Raylib.DrawCircle(dotX, dotY, dotRadius, Color.Yellow);
-            Raylib.DrawCircleLines(dotX, dotY, dotRadius, Color.Black);
+            Raylib.DrawCircle(statusX + 8, statusY + 8, 6, Color.Yellow);
+            Raylib.DrawCircleLines(statusX + 8, statusY + 8, 6, Color.Black);
 
             // Optional: "PARALYZED" Text anzeigen
             Raylib.DrawText(
                 paralizeString,
-                (int)ParalizeRec.X,
-                (int)ParalizeRec.Y,
+                statusX + 15,
+                statusY,
                 (int)ParalizeRec.Height,
                 Color.Yellow
             );
