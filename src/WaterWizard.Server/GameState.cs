@@ -170,10 +170,10 @@ public class GameState
         Console.WriteLine("----------------------------------------\n");
 
         boards = CellHandler.InitBoards();
-        
+
         // Generiere Steine für alle Spieler-Boards
         RockHandler.GenerateAndSyncRocks(this);
-        
+
         hands =
         [
             [],
@@ -362,7 +362,7 @@ public class GameState
             writer.Put("GoldFreezeStatus");
             writer.Put(i);
             writer.Put(isFrozen);
-            
+
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
             Console.WriteLine($"[GameState] GoldFreezeStatus sent to {peer} - PlayerIndex: {i}, IsFrozen: {isFrozen}");
         }
@@ -383,5 +383,16 @@ public class GameState
             }
         }
         return -1;
+    }
+    
+    /// <summary>
+    /// Handles player surrender by triggering game over with the opponent as winner
+    /// </summary>
+    /// <param name="winner">The opponent who wins due to surrender</param>
+    /// <param name="surrenderingPlayer">The player who surrendered</param>
+    public void HandleSurrender(NetPeer winner, NetPeer surrenderingPlayer)
+    {
+        Console.WriteLine($"[Server] Processing surrender - Winner: {winner}, Surrendering: {surrenderingPlayer}");
+        BroadcastGameOver(winner, surrenderingPlayer);
     }
 }
