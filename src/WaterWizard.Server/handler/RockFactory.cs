@@ -157,9 +157,9 @@ public static class RockFactory
     {
         var zonePositions = new List<(int X, int Y)>();
         
-        for (int x = (int)zone.X; x < zone.X + zone.Width; x++)
+        for (int x = zone.X; x < zone.X + zone.Width; x++)
         {
-            for (int y = (int)zone.Y; y < zone.Y + zone.Height; y++)
+            for (int y = zone.Y; y < zone.Y + zone.Height; y++)
             {
                 if (availablePositions.Contains((x, y)))
                 {
