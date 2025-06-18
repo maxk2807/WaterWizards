@@ -7,3 +7,7 @@ obj
 .vs
 .nuke/temp/
 .vscode
+# Analytics Reports
+analytics/analytics_*.json
+analytics/analytics_*.md
+!analytics/analytics_latest.*

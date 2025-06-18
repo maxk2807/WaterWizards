@@ -3,6 +3,9 @@ name: Release with Changelog
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    types: [closed]
+    branches: [ "main" ]
   workflow_dispatch:
     inputs:
       version:
@@ -13,6 +16,7 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
 
     permissions:
       contents: write 
@@ -106,56 +110,101 @@ jobs:
             COMMITS=$(git log --pretty=format:"%s|%h|%an" --no-merges ${PREVIOUS_TAG}..HEAD)
           fi
           
-          # Categorize commits
+          # Categorize commits based on WaterWizards conventions
           GAME_FEATURES=""
           TECHNICAL_IMPROVEMENTS=""
           BUG_FIXES=""
-          OTHER_CHANGES=""
+          DOCUMENTATION_CHANGES=""
+          MAINTENANCE_CHANGES=""
+          UNCATEGORIZED=""
           
           while IFS='|' read -r message hash author; do
             # Skip empty lines
             [ -z "$message" ] && continue
             
-            # Categorize based on commit message patterns
-            if [[ "$message" =~ ^(feat|feature|add|new|implement) ]]; then
+            # WaterWizards-specific patterns
+            if [[ "$message" =~ ^(feat|feature|add|new|implement|F[0-9]+) ]] || [[ "$message" =~ F[0-9]+ ]]; then
               GAME_FEATURES+="- $message ($hash) by $author"$'\n'
-            elif [[ "$message" =~ ^(fix|bug|resolve|patch) ]]; then
+            elif [[ "$message" =~ ^(fix|bug|resolve|patch|B[0-9]+) ]] || [[ "$message" =~ B[0-9]+ ]]; then
               BUG_FIXES+="- $message ($hash) by $author"$'\n'
             elif [[ "$message" =~ ^(refactor|improve|optimize|update|upgrade|enhance) ]]; then
               TECHNICAL_IMPROVEMENTS+="- $message ($hash) by $author"$'\n'
+            elif [[ "$message" =~ ^(docs|documentation) ]]; then
+              DOCUMENTATION_CHANGES+="- 📚 $message ($hash) by $author"$'\n'
+            elif [[ "$message" =~ ^(test|chore|style|ci|build) ]]; then
+              MAINTENANCE_CHANGES+="- 🔧 $message ($hash) by $author"$'\n'
             else
-              OTHER_CHANGES+="- $message ($hash) by $author"$'\n'
+              # Only include meaningful uncategorized commits (not merge commits, etc.)
+              if [[ ! "$message" =~ ^(merge|Merge|WIP|wip|temp|Temp|test|Test) ]] && [[ ${#message} -gt 10 ]]; then
+                UNCATEGORIZED+="- $message ($hash) by $author"$'\n'
+              fi
             fi
           done <<< "$COMMITS"
-          
-          # Set defaults if empty
-          [ -z "$GAME_FEATURES" ] && GAME_FEATURES="- No new game features in this release"
-          [ -z "$TECHNICAL_IMPROVEMENTS" ] && TECHNICAL_IMPROVEMENTS="- No technical improvements in this release"
-          [ -z "$BUG_FIXES" ] && BUG_FIXES="- No bug fixes in this release"
           
           # Create changelog
           CHANGELOG="## 🚀 What's New in v${{ steps.get_version.outputs.version }}
 
-          ### 🎮 Game Features
+          "
+          
+          # Add sections only if they have content
+          if [ -n "$GAME_FEATURES" ]; then
+            CHANGELOG+="### 🎮 Game Features
           $GAME_FEATURES
 
-          ### 🛠️ Technical Improvements
-          $TECHNICAL_IMPROVEMENTS
+          "
+          else
+            CHANGELOG+="### 🎮 Game Features
+          - No new game features in this release
 
-          ### 🐛 Bug Fixes
-          $BUG_FIXES"
-
-          # Add other changes if any
-          if [ -n "$OTHER_CHANGES" ]; then
-            CHANGELOG+="
-
-          ### 📝 Other Changes
-          $OTHER_CHANGES"
+          "
           fi
 
-          CHANGELOG+="
+          if [ -n "$TECHNICAL_IMPROVEMENTS" ]; then
+            CHANGELOG+="### 🛠️ Technical Improvements
+          $TECHNICAL_IMPROVEMENTS
 
-          ### 📦 Installation & Usage
+          "
+          else
+            CHANGELOG+="### 🛠️ Technical Improvements
+          - No technical improvements in this release
+
+          "
+          fi
+
+          if [ -n "$BUG_FIXES" ]; then
+            CHANGELOG+="### 🐛 Bug Fixes
+          $BUG_FIXES
+
+          "
+          else
+            CHANGELOG+="### 🐛 Bug Fixes
+          - No bug fixes in this release
+
+          "
+          fi
+
+          if [ -n "$DOCUMENTATION_CHANGES" ]; then
+            CHANGELOG+="### 📚 Documentation
+          $DOCUMENTATION_CHANGES
+
+          "
+          fi
+
+          if [ -n "$MAINTENANCE_CHANGES" ]; then
+            CHANGELOG+="### 🔧 Maintenance
+          $MAINTENANCE_CHANGES
+
+          "
+          fi
+
+          if [ -n "$UNCATEGORIZED" ]; then
+            CHANGELOG+="### 📝 Other Changes
+          $UNCATEGORIZED
+
+          "
+          fi
+
+          CHANGELOG+="### 📦 Installation & Usage
 
           #### 🪟 Windows
           1. Download \`WaterWizard.Client.exe\`
