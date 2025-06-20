@@ -397,6 +397,9 @@ public class ClientService(NetworkManager manager)
                         HandleParalize.HandleParalizeStatus(reader);
                         break;
                     }
+                case "HoveringEyeReveal":
+                    HandleUtility.HandleHoveringEyeReveal(reader);
+                    break;
             }
         }
         catch (Exception ex)

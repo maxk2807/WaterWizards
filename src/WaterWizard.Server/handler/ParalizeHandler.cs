@@ -102,41 +102,6 @@ public class ParalizeHandler
     }
 
     /// <summary>
-    /// Behandelt die Ausführung der Paralize-Karte
-    /// </summary>
-    /// <param name="caster">Der Spieler, der die Karte wirkt</param>
-    /// <param name="defender">Der Spieler, der paralysiert wird</param>
-    public void HandleParalizeCard(NetPeer caster, NetPeer defender)
-    {
-        Console.WriteLine($"[ParalizeHandler] Paralize-Karte wird ausgeführt...");
-        Console.WriteLine($"[ParalizeHandler] Caster (Angreifer): {caster.ToString()} (Port: {caster.Port})");
-        Console.WriteLine($"[ParalizeHandler] Defender (Ziel): {defender.ToString()} (Port: {defender.Port})");
-
-        // Finde den Spielerindex des Gegners
-        int defenderIndex = -1;
-        for (int i = 0; i < gameState.players.Length; i++)
-        {
-            if (gameState.players[i]?.Equals(defender) == true)
-            {
-                defenderIndex = i;
-                break;
-            }
-        }
-
-        if (defenderIndex != -1)
-        {
-            // Aktiviere Paralize für 6 Sekunden
-            ActivateParalize(defenderIndex, 6.0f);
-            Console.WriteLine($"[ParalizeHandler] Player {defenderIndex + 1} paralyzed for 6 seconds");
-            Console.WriteLine($"[ParalizeHandler] Paralize-Effekt: Mana-Generierung für {defenderIndex + 1} Sekunden gestoppt");
-        }
-        else
-        {
-            Console.WriteLine("[ParalizeHandler] Could not find defender index for Paralize");
-        }
-    }
-
-    /// <summary>
     /// Sendet den aktuellen Paralize-Status an alle Clients
     /// </summary>
     private void SendParalizeStatusToClients()
