@@ -438,6 +438,27 @@ public class GameBoard
     }
 
     /// <summary>
+    /// Marks a cell as revealed by hovering eye (different from attack reveals)
+    /// </summary>
+    /// <param name="x">The x coordinate</param>
+    /// <param name="y">The y coordinate</param>
+    /// <param name="hasShip">Whether there's a ship at this location</param>
+    public void MarkCellAsHoveringEyeRevealed(int x, int y, bool hasShip)
+    {
+        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+        {
+            if (hasShip)
+            {
+                _gridStates[x, y] = CellState.Ship;
+            }
+            else
+            {
+                _gridStates[x, y] = CellState.HoveringEyeRevealed;
+            }
+        }
+    }
+
+    /// <summary>
     /// Clears the game board, removing all ships and resetting cell states to Unknown.
     /// </summary>
     public void ClearBoard()
@@ -498,5 +519,43 @@ public class GameBoard
             }
         }
         _activeThunderStrikes.Clear();
+    }
+
+    private void DrawCell(int x, int y)
+    {
+        int cellX = (int)Position.X + x * CellSize;
+        int cellY = (int)Position.Y + y * CellSize;
+
+        switch (_gridStates[x, y])
+        {
+            case CellState.Empty:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.LightGray);
+                break;
+            case CellState.Ship:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Gray);
+                break;
+            case CellState.Rock:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.DarkGray);
+                break;
+            case CellState.Hit:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Orange);
+                break;
+            case CellState.Miss:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Blue);
+                break;
+            case CellState.Unknown:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(135, 206, 235, 0));
+                break;
+            case CellState.Thunder:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(30, 30, 150, 255));
+                break;
+            case CellState.HoveringEyeRevealed:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(100, 150, 255, 100));
+                Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, Color.Blue);
+                break;
+            default:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Black);
+                break;
+        }
     }
 }

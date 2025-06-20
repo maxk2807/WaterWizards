@@ -15,6 +15,7 @@ public class UtilityCardFactory
         return variant switch
         {
             CardVariant.Paralize => new ParalizeCard(),
+            CardVariant.HoveringEye => new HoveringEyeCard(),
             _ => null,
         };
     }
