@@ -109,7 +109,7 @@ public class CardHandler(GameState gameState)
         }
     }
 
-    internal void CardActivation(CardVariant variant, int duration)
+    internal static void CardActivation(GameState gameState, CardVariant variant, int duration)
     {
         if (gameState == null)
         {
@@ -126,7 +126,7 @@ public class CardHandler(GameState gameState)
         }
     }
 
-    public void UpdateActiveCards(float passedTime)
+    public static void UpdateActiveCards(GameState gameState, float passedTime)
     {
         if (GameState.ActiveCards == null || GameState.ActiveCards.Count == 0)
         {

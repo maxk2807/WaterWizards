@@ -9,24 +9,35 @@ namespace WaterWizard.Server.Card.environment;
 
 public class ThunderCard : IEnvironmentCard
 {
-    public CardVariant Variant => throw new NotImplementedException();
+    public CardVariant Variant => CardVariant.Thunder;
 
-    public Vector2 AreaOfEffect => throw new NotImplementedException();
+    public Vector2 AreaOfEffect => new(); //target is whole battlefield
 
-    public bool HasSpecialTargeting => throw new NotImplementedException();
+    public bool HasSpecialTargeting => true;
 
     private static readonly float THUNDER_INTERVAL = 1.75f;// Intervall zwischen Blitzeinschlägen in Sekunden
     private static float thunderTimer = 0;
 
 
-    public bool ExecuteDamage(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteEnvironment(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
     {
-        throw new NotImplementedException();
+        try
+        {
+           var durationString = new Cards(Variant).Duration!;
+           int duration = int.Parse(durationString);
+           CardHandler.CardActivation(gameState, Variant, duration);
+           return true;
+        }
+        catch (Exception)
+        {
+            return false;
+            throw;
+        }
     }
 
     public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer defender)
     {
-        throw new NotImplementedException();
+        return true; //true because target is battlefield
     }
 
     public static void ThunderEffectExpired(GameState gameState)
