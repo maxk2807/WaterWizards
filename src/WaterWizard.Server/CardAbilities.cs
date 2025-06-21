@@ -97,7 +97,7 @@ public static class CardAbilities
             var utilityCard = UtilityCardFactory.CreateUtilityCard(variant);
             if (utilityCard != null)
             {
-                Console.WriteLine($"[Server] Executing healing card {variant}");
+                Console.WriteLine($"[Server] Executing utility card {variant}");
 
                 if (utilityCard.IsValidTarget(gameState, targetCoords, caster, defender))
                 {
@@ -129,7 +129,38 @@ public static class CardAbilities
         }
         else if (EnvironmentCardFactory.IsEnvironmentCard(variant))
         {
+            var environmentCard = EnvironmentCardFactory.CreateEnvironmentCard(variant);
+            if (environmentCard != null)
+            {
+                Console.WriteLine($"[Server] Executing environment card {variant}");
 
+                if (environmentCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                {
+                    if (caster != null)
+                    {
+                        bool environmentExecuted = environmentCard.ExecuteEnvironment(
+                            gameState,
+                            targetCoords,
+                            caster,
+                            defender
+                        );
+                        Console.WriteLine(
+                            $"[Server] {variant} execution result: {(environmentExecuted ? "environment executed" : "not executed")}"
+                        );
+
+                        if (environmentExecuted)
+                        {
+                            gameState.CheckGameOver();
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
+                    );
+                }
+            }
         }
 
         switch (variant)
@@ -156,11 +187,12 @@ public static class CardAbilities
             default: //Duration is a number
                 try
                 {
-                    int duration = int.Parse(durationString);
-                    cardHandler.CardActivation(variant, duration);
-                    Console.WriteLine(
-                        $"[Server] Activated Card: {variant} for {duration} seconds"
-                    );
+                    //Now covered by individual cards: see Thunder
+                    // int duration = int.Parse(durationString);
+                    // CardHandler.CardActivation(gameState, variant, duration);
+                    // Console.WriteLine(
+                    //     $"[Server] Activated Card: {variant} for {duration} seconds"
+                    // );
                     break;
                 }
                 catch (Exception ex)
@@ -264,42 +296,16 @@ public static class CardAbilities
         }
 
         switch (variant)
-            {
-                case CardVariant.Thunder:
-                    Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
-                    break;
-                default:
-                    Console.WriteLine(
-                        $"[Server] Cast Card Variant {variant} on coords ({targetCoords.X},{targetCoords.Y})"
-                    );
-                    PrintCardArea(variant, targetCoords, gameState, defender);
-                    break;
-            }
-        CardHandler cardHandler = new(gameState);
-        var durationString = new Cards(variant).Duration!;
-        switch (durationString)
         {
-            case "instant":
-                
-                break;
-            case "permanent":
-                Console.WriteLine($"[Server] Activated Card: {variant}");
+            case CardVariant.Thunder:
+                Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
                 break;
             default:
-                try
-                {
-                    int duration = int.Parse(durationString);
-                    cardHandler.CardActivation(variant, duration);
-                    Console.WriteLine(
-                        $"[Server] Activated Card: {variant} for {duration} seconds"
-                    );
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    throw;
-                }
+                Console.WriteLine(
+                    $"[Server] Cast Card Variant {variant} on coords ({targetCoords.X},{targetCoords.Y})"
+                );
+                PrintCardArea(variant, targetCoords, gameState, defender);
+                break;
         }
     }
 
