@@ -152,7 +152,7 @@ public class Cards
                 Mana = 2,
                 CastTime = "instant",
                 Duration = "permanent",
-                Target = new("1x1"),
+                Target = new("2x1"),
             }
         },
         {
