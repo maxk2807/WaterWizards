@@ -29,7 +29,7 @@ public interface IEnvironmentCard
     /// <param name="caster">The player casting the card</param>
     /// <param name="opponent">The opponent player</param>
     /// <returns>True if Environment Effect was dealt, false otherwise</returns>
-    bool ExecuteDamage(
+    bool ExecuteEnvironment(
         GameState gameState,
         Vector2 targetCoords,
         NetPeer caster,

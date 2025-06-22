@@ -1,6 +1,7 @@
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server.Card;
+using WaterWizard.Server.Card.environment;
 using WaterWizard.Server.Card.healing;
 using WaterWizard.Server.Card.utility;
 using WaterWizard.Server.handler;
@@ -11,9 +12,6 @@ namespace WaterWizard.Server;
 public static class CardAbilities
 {
     private static readonly Random random = new();
-    private static readonly float THUNDER_INTERVAL = 1.75f;
-    private static float thunderTimer = 0;
-
     public static void HandleAbility(
         CardVariant variant,
         GameState gameState,
@@ -92,7 +90,6 @@ public static class CardAbilities
                         $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
                     );
                 }
-                return;
             }
         }
         else if (UtilityCardFactory.IsUtilityCard(variant))
@@ -100,7 +97,7 @@ public static class CardAbilities
             var utilityCard = UtilityCardFactory.CreateUtilityCard(variant);
             if (utilityCard != null)
             {
-                Console.WriteLine($"[Server] Executing healing card {variant}");
+                Console.WriteLine($"[Server] Executing utility card {variant}");
 
                 if (utilityCard.IsValidTarget(gameState, targetCoords, caster, defender))
                 {
@@ -117,6 +114,41 @@ public static class CardAbilities
                         );
 
                         if (utilityDone)
+                        {
+                            gameState.CheckGameOver();
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
+                    );
+                }
+            }
+        }
+        else if (EnvironmentCardFactory.IsEnvironmentCard(variant))
+        {
+            var environmentCard = EnvironmentCardFactory.CreateEnvironmentCard(variant);
+            if (environmentCard != null)
+            {
+                Console.WriteLine($"[Server] Executing environment card {variant}");
+
+                if (environmentCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                {
+                    if (caster != null)
+                    {
+                        bool environmentExecuted = environmentCard.ExecuteEnvironment(
+                            gameState,
+                            targetCoords,
+                            caster,
+                            defender
+                        );
+                        Console.WriteLine(
+                            $"[Server] {variant} execution result: {(environmentExecuted ? "environment executed" : "not executed")}"
+                        );
+
+                        if (environmentExecuted)
                         {
                             gameState.CheckGameOver();
                         }
@@ -152,14 +184,15 @@ public static class CardAbilities
             case "permanent":
                 Console.WriteLine($"[Server] Activated Card: {variant}");
                 break;
-            default:
+            default: //Duration is a number
                 try
                 {
-                    int duration = int.Parse(durationString);
-                    cardHandler.CardActivation(variant, duration);
-                    Console.WriteLine(
-                        $"[Server] Activated Card: {variant} for {duration} seconds"
-                    );
+                    //Now covered by individual cards: see Thunder
+                    // int duration = int.Parse(durationString);
+                    // CardHandler.CardActivation(gameState, variant, duration);
+                    // Console.WriteLine(
+                    //     $"[Server] Activated Card: {variant} for {duration} seconds"
+                    // );
                     break;
                 }
                 catch (Exception ex)
@@ -258,47 +291,21 @@ public static class CardAbilities
         if (card.Type == CardType.Utility)
         {
             // Verwende die übergebenen Handler
-            utilityCardHandler.HandleUtilityCard(variant, targetCoords, caster, defender);
+            // utilityCardHandler.HandleUtilityCard(variant, targetCoords, caster, defender);
             return;
         }
 
         switch (variant)
-            {
-                case CardVariant.Thunder:
-                    Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
-                    break;
-                default:
-                    Console.WriteLine(
-                        $"[Server] Cast Card Variant {variant} on coords ({targetCoords.X},{targetCoords.Y})"
-                    );
-                    PrintCardArea(variant, targetCoords, gameState, defender);
-                    break;
-            }
-        CardHandler cardHandler = new(gameState);
-        var durationString = new Cards(variant).Duration!;
-        switch (durationString)
         {
-            case "instant":
-                
-                break;
-            case "permanent":
-                Console.WriteLine($"[Server] Activated Card: {variant}");
+            case CardVariant.Thunder:
+                Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
                 break;
             default:
-                try
-                {
-                    int duration = int.Parse(durationString);
-                    cardHandler.CardActivation(variant, duration);
-                    Console.WriteLine(
-                        $"[Server] Activated Card: {variant} for {duration} seconds"
-                    );
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    throw;
-                }
+                Console.WriteLine(
+                    $"[Server] Cast Card Variant {variant} on coords ({targetCoords.X},{targetCoords.Y})"
+                );
+                PrintCardArea(variant, targetCoords, gameState, defender);
+                break;
         }
     }
 
@@ -310,24 +317,11 @@ public static class CardAbilities
     /// <param name="card">The Card whose effect gets activated</param>
     /// <param name="passedTime">The time since last activation of the card. 0 if first time. Direct relationship
     /// between degree of effect and passed time needs to be implemented.</param>
-    internal static void HandleActivationEffect(Cards card, float passedTime)
+    internal static void HandleActivationEffect(GameState gameState, Cards card, float passedTime)
     {
         if (card.Variant == CardVariant.Thunder)
         {
-            thunderTimer -= passedTime / 1000f; // Konvertiere zu Sekunden
-
-            if (thunderTimer <= 0)
-            {
-                // Erzeuge neue Donnereinschläge
-                Console.WriteLine(
-                    $"[Server] Thunder strikes! Time since last activation: {passedTime}ms"
-                );
-                thunderTimer = THUNDER_INTERVAL;
-
-                // TODO: Implementiere die Logik für den Donnereinschlag
-                // Hier müssen wir die Koordinaten an den Client senden
-                // und die Treffer überprüfen
-            }
+            ThunderCard.HandleActivationEffect(gameState, passedTime);
         }
         else
         {
