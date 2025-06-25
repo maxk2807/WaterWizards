@@ -32,9 +32,9 @@ public class CardHandler(GameState gameState)
         }
         Cards? card = cardType switch
         {
-            "Utility" => RandomCard(GameState.UtilityStack), //TODO: Actually Paying
-            "Damage" => RandomCard(GameState.DamageStack), //TODO: Actually Paying
-            "Environment" => RandomCard(GameState.EnvironmentStack), //TODO: Actually Paying
+            "Utility" => RandomCard(GameState.UtilityStack),
+            "Damage" => RandomCard(GameState.DamageStack),
+            "Environment" => RandomCard(GameState.EnvironmentStack),
             "Healing" => RandomCard(GameState.HealingStack), // Healing hat eigenen Stack
             _ => throw new Exception(
                 "Invalid CardType: "
@@ -48,7 +48,7 @@ public class CardHandler(GameState gameState)
             return;
         }
 
-        int playerIndex = gameState.Server.ConnectedPeerList.IndexOf(peer); // Stelle sicher, dass du das korrekt umsetzen kannst
+        int playerIndex = gameState.Server.ConnectedPeerList.IndexOf(peer);
         int goldCost = card.Gold;
 
         if (goldHandler?.CanSpendGold(playerIndex, goldCost) ?? true)
