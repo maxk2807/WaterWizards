@@ -70,6 +70,8 @@ public class GameState
     public int Player1Gold { get; private set; } = 0;
     public int Player2Gold { get; private set; } = 0;
 
+    public bool IsPaused { get; set; } = false;
+
     private float _player1GoldFreezeTimer = 0f;
     private float _player2GoldFreezeTimer = 0f;
 

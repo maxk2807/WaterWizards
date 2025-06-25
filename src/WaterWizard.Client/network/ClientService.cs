@@ -147,6 +147,17 @@ public class ClientService(NetworkManager manager)
 
             switch (messageType)
             {
+                case "UpdatePauseState":
+                    bool isPaused = reader.GetBool();
+                    if (isPaused)
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().PauseGame();
+                    }
+                    else
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().ResumeGame();
+                    }
+                    break;
                 case "StartGame":
                     GameStateManager.Instance.SetStateToInGame();
                     break;
