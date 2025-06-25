@@ -43,9 +43,11 @@ public class CastingUI
         // Spezialbehandlung für battlefield-Ziele wie Paralize
         if (gameCard.card.Target!.Target == "battlefield")
         {
+            var txt = $"Klicken Sie irgendwo, um {gameCard.card.Variant} zu wirken";
+            var txtWidth = Raylib.MeasureText(txt, 20);
             Raylib.DrawText(
-                $"Klicken Sie irgendwo, um {gameCard.card.Variant} zu wirken",
-                (int)mousePos.X - 100,
+                txt,
+                (int)mousePos.X - (txtWidth / 2),
                 (int)mousePos.Y - 20,
                 20,
                 Color.Black
