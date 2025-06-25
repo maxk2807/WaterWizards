@@ -44,6 +44,11 @@ public class Cards
     /// </summary>
     public CardTarget? Target { get; private set; }
 
+    /// <summary>
+    /// Gibt die Goldkosten dieser Karte an.
+    /// Der Wert basiert auf der Kartenvariante und wird aus den statisch definierten Kartenwerten abgeleitet.
+    /// </summary>
+    public int Gold => cardStatsMapping[Variant].Gold;
     private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<
         CardVariant,
         CardType

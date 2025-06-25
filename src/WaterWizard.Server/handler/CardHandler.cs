@@ -4,12 +4,15 @@ using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Server.Card.environment;
 using WaterWizard.Shared;
+using WaterWizard.Server.handler;
 
 namespace WaterWizard.Server.handler;
 
 public class CardHandler(GameState gameState)
 {
     private readonly GameState? gameState = gameState;
+     private static readonly GoldHandler? goldHandler;
+    
 
     /// <summary>
     /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
@@ -17,8 +20,9 @@ public class CardHandler(GameState gameState)
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
-    public static void HandleCardBuying(NetManager server, NetPeer peer, NetPacketReader reader)
+    public static void HandleCardBuying(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState)
     {
+
         string cardType = reader.GetString();
         Console.WriteLine($"[Server] Trying to Buy {cardType} Card");
         if (GameState.UtilityStack == null || GameState.DamageStack == null || GameState.EnvironmentStack == null || GameState.HealingStack == null)
@@ -38,6 +42,30 @@ public class CardHandler(GameState gameState)
                     + " . Has to be a string of either: Utility, Damage, Environment or Healing"
             ),
         };
+        if (card == null)
+        {
+            Console.WriteLine("[Server] No card found in the stack, cannot buy card.");
+            return;
+        }
+
+        int playerIndex = gameState.Server.ConnectedPeerList.IndexOf(peer); // Stelle sicher, dass du das korrekt umsetzen kannst
+        int goldCost = card.Gold;
+
+        if (goldHandler?.CanSpendGold(playerIndex, goldCost) ?? true)
+        {
+            Console.WriteLine($"[Server] Player {playerIndex} has insufficient gold ({goldCost} required). Purchase cancelled.");
+            return;
+        }
+
+        bool success = goldHandler?.SpendGold(playerIndex, goldCost) ?? false;
+        if (!success)
+        {
+            Console.WriteLine($"[Server] Player {playerIndex} could not spend gold despite CanSpendGold check. Purchase cancelled.");
+            return;
+        }
+
+        Console.WriteLine($"[Server] Player {playerIndex} bought {cardType} card ({card.Variant}) for {goldCost} gold.");
+
         NetDataWriter writer = new();
         writer.Put("BoughtCard");
         writer.Put(card.Variant.ToString());
