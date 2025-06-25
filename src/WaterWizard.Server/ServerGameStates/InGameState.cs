@@ -51,11 +51,13 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 
     private void UpdateMana()
     {
+        if (gameState.IsPaused) return;
         manaHandler?.UpdateMana();
     }
 
     private void UpdateGold()
     {
+        if (gameState.IsPaused) return;
         goldHandler?.UpdateGold();
     }
 
@@ -110,10 +112,29 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "Surrender":
                 HandleSurrender(peer);
                 break;
+            case "PauseToggle":
+                HandlePauseToggle(serverInstance);
+                break;
             default:
                 Console.WriteLine($"[InGameState] Unbekannter Nachrichtentyp: {messageType}");
                 break;
         }
+    }
+
+    private void HandlePauseToggle(NetManager serverInstance)
+    {
+        gameState.IsPaused = !gameState.IsPaused;
+        Console.WriteLine($"[Server] Game pause state toggled to: {gameState.IsPaused}");
+
+        var writer = new NetDataWriter();
+        writer.Put("UpdatePauseState");
+        writer.Put(gameState.IsPaused);
+        
+        foreach (var p in serverInstance.ConnectedPeerList)
+        {
+            p.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        Console.WriteLine($"[Server] Sent pause state '{gameState.IsPaused}' to all clients.");
     }
 
     /// <summary>
