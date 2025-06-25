@@ -1,3 +1,4 @@
+using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen.ships;
@@ -228,5 +229,22 @@ public class HandleShips
                 "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
             );
         }
+    }
+
+    /// <summary>
+    /// Updates ship position after toggling fullscreen
+    /// </summary>
+    /// <param name="screenWidth">New screen width</param>
+    /// <param name="screenHeight">New screen height</param>
+    internal static void UpdateShipPositions(Vector2 oldBoardPosition, float oldCellSize)
+    {
+        GameStateManager.Instance.GameScreen.playerBoard!.Ships.ForEach(ship =>
+        {
+            var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            var prevX = (ship.X - oldBoardPosition.X) / oldCellSize;
+            var prevY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
+            ship.X = (int)(board.Position.X + prevX) * board.CellSize;
+            ship.Y = (int)(board.Position.Y + prevY) * board.CellSize;
+        });
     }
 }

@@ -1,6 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
@@ -431,7 +432,15 @@ public class GameScreen(
     {
         screenWidth = width;
         screenHeight = height;
+        var oldCellSize = playerBoard!.CellSize;
+        var oldBoardPosition = playerBoard.Position;
         Initialize();
+        UpdateShipPosition(oldBoardPosition, oldCellSize);
+    }
+
+    private static void UpdateShipPosition(Vector2 oldBoardPosition, int oldCellSize)
+    {
+        HandleShips.UpdateShipPositions(oldBoardPosition, oldCellSize);
     }
 
     public void Reset()
