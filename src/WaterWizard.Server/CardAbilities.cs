@@ -175,7 +175,6 @@ public static class CardAbilities
                 PrintCardArea(variant, targetCoords, gameState, defender);
                 break;
         }
-        CardHandler cardHandler = new(gameState);
         var durationString = new Cards(variant).Duration!;
         switch (durationString)
         {
