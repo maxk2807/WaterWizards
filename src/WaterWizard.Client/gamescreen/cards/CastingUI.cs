@@ -16,6 +16,11 @@ public class CastingUI
 
     private bool aiming = false;
     private GameCard? cardToAim;
+    /// <summary>
+    /// When Casting Battlefield Cards, checks if the first click on the card is over (mouse button is up again).
+    /// False if not up yet, true if was up already
+    /// </summary>
+    private bool firstUpBattleField;
 
     public void Draw()
     {
@@ -38,13 +43,23 @@ public class CastingUI
         // Spezialbehandlung für battlefield-Ziele wie Paralize
         if (gameCard.card.Target!.Target == "battlefield")
         {
+            var txt = $"Klicken Sie irgendwo, um {gameCard.card.Variant} zu wirken";
+            var txtWidth = Raylib.MeasureText(txt, 20);
             Raylib.DrawText(
-                $"Klicken Sie irgendwo, um {gameCard.card.Variant} zu wirken",
-                (int)mousePos.X - 100,
+                txt,
+                (int)mousePos.X - (txtWidth / 2),
                 (int)mousePos.Y - 20,
                 20,
                 Color.Black
             );
+            if (!firstUpBattleField && Raylib.IsMouseButtonUp(MouseButton.Left))
+            {
+                firstUpBattleField = true;
+            }
+            else if (!firstUpBattleField && !Raylib.IsMouseButtonUp(MouseButton.Left))
+            {
+                return;
+            }
 
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
@@ -214,6 +229,7 @@ public class CastingUI
 
     public void StartDrawingCardAim(GameCard gameCard)
     {
+        firstUpBattleField = false;
         aiming = true;
         cardToAim = gameCard;
     }
