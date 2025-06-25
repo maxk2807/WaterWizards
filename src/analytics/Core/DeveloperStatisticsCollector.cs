@@ -11,6 +11,28 @@ public class DeveloperStatisticsCollector
 {
     private readonly GitCommandExecutor _gitCommandExecutor;
 
+    private static readonly Dictionary<string, string> AuthorAliasMap = new()
+    {
+        // Justin Dewitz
+        {"justindewitz", "Justin Dewitz"},
+        {"justinjd00", "Justin Dewitz"},
+        {"jdewi001", "Justin Dewitz"},
+        {"justindew", "Justin Dewitz"},
+        // Max Kondratov
+        {"maxkondratov", "Max Kondratov"},
+        {"maxk2807", "Max Kondratov"},
+        {"max", "Max Kondratov"},
+        // Erick Zeiler
+        {"erickzeiler", "Erick Zeiler"},
+        {"erick", "Erick Zeiler"},
+        {"erickk0", "Erick Zeiler"},
+        // Julian
+        {"julian", "Julian"},
+        {"jlnhsrm", "Julian"},
+        // Paul
+        {"paul", "Paul"}
+    };
+
     public DeveloperStatisticsCollector(string repositoryPath)
     {
         _gitCommandExecutor = new GitCommandExecutor(repositoryPath);
@@ -91,27 +113,12 @@ public class DeveloperStatisticsCollector
     
     private static string NormalizeAuthorName(string authorName)
     {
-        var normalized = authorName.ToLowerInvariant().Trim();
-        
-        if (normalized == "erick" || normalized == "erickk0" || normalized == "erick zeiler")
-            return "Erick Zeiler";
-        
-        var nameMappings = new Dictionary<string, string>
-        {
-            { "justin", "Justin Dewitz" },
-            { "justinjd00", "Justin Dewitz" },
-            { "justindew", "Justin Dewitz" },
-            { "jdewi001", "Justin Dewitz" },
-            { "max", "Max Kondratov" },
-            { "maxk2807", "Max Kondratov" },
-            { "maxkondratov", "Max Kondratov" },
-            { "julian", "Julian" },
-            { "jlnhsrm", "Julian" },
-            { "paul", "Paul" }
-        };
-        if (nameMappings.ContainsKey(normalized))
-            return nameMappings[normalized];
-        return char.ToUpperInvariant(authorName[0]) + authorName.Substring(1).ToLowerInvariant();
+        var normalized = authorName.ToLowerInvariant().Replace(" ", "").Trim();
+        if (AuthorAliasMap.TryGetValue(normalized, out var canonical))
+            return canonical;
+        // Fallback: Erster Buchstabe groß, Rest klein, aber ohne Leerzeichen
+        var withSpaces = authorName.ToLowerInvariant().Trim();
+        return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(withSpaces);
     }
 
     private static bool IsFeatureCommit(string commitMessage)
