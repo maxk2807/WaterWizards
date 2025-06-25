@@ -1,4 +1,5 @@
 using WaterWizard.Analytics;
+using WaterWizard.Analytics.Models;
 
 namespace WaterWizard.Analytics.Program;
 
