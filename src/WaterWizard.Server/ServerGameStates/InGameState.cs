@@ -89,7 +89,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 ShipHandler.HandleShipPlacement(peer, reader, gameState);
                 break;
             case "BuyCard":
-                CardHandler.HandleCardBuying(serverInstance, peer, reader, gameState)
+                CardHandler.HandleCardBuying(serverInstance, peer, reader, gameState);
                 break;
             case "CastCard":
                 cardHandler.HandleCardCasting(serverInstance, peer, reader, gameState, paralizeHandler!, utilityCardHandler!);
