@@ -16,6 +16,11 @@ public class CastingUI
 
     private bool aiming = false;
     private GameCard? cardToAim;
+    /// <summary>
+    /// When Casting Battlefield Cards, checks if the first click on the card is over (mouse button is up again).
+    /// False if not up yet, true if was up already
+    /// </summary>
+    private bool firstUpBattleField;
 
     public void Draw()
     {
@@ -45,6 +50,14 @@ public class CastingUI
                 20,
                 Color.Black
             );
+            if (!firstUpBattleField && Raylib.IsMouseButtonUp(MouseButton.Left))
+            {
+                firstUpBattleField = true;
+            }
+            else if (!firstUpBattleField && !Raylib.IsMouseButtonUp(MouseButton.Left))
+            {
+                return;
+            }
 
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
@@ -214,6 +227,7 @@ public class CastingUI
 
     public void StartDrawingCardAim(GameCard gameCard)
     {
+        firstUpBattleField = false;
         aiming = true;
         cardToAim = gameCard;
     }
