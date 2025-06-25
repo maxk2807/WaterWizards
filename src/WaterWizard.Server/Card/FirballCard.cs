@@ -18,7 +18,6 @@ public class FireballCard : IDamageCard
 
     public bool ExecuteDamage(GameState gameState, Vector2 targetCoords, NetPeer attacker, NetPeer defender)
     {
-    // TODO: COMMENT -> WHY?
         int startX = (int)targetCoords.X - 1;
         int startY = (int)targetCoords.Y - 1;
 
@@ -75,10 +74,8 @@ public class FireballCard : IDamageCard
         return anyHit;
     }
 
-// TODO: auslagern
     public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer defender)
     {
-    // TODO: auslagern
         int boardWidth = 12;
         int boardHeight = 10;
 
