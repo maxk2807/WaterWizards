@@ -9,6 +9,7 @@ public enum CellState
     Miss,
     Unknown,
     Thunder,
-    HoveringEyeRevealed 
+    HoveringEyeRevealed,
+    Shield
 
 }

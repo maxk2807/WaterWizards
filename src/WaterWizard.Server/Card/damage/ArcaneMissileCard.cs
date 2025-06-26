@@ -67,6 +67,17 @@ public class ArcaneMissileCard : IDamageCard
 
             Console.WriteLine($"[Server] Arcane Missile #{missile + 1} targeting ({x}, {y})");
 
+            // Get defender's player index for shield check
+            int defenderIndex = gameState.GetPlayerIndex(defender);
+
+            // Check if this coordinate is protected by a shield
+            if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+            {
+                Console.WriteLine($"[Server] Arcane Missile #{missile + 1} at ({x}, {y}) blocked by shield!");
+                CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                continue;
+            }
+
             foreach (var ship in ships)
             {
                 if (x >= ship.X && x < ship.X + ship.Width &&

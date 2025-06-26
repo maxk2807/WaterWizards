@@ -76,6 +76,7 @@ public class Cards
         { CardVariant.MassMending, CardType.Healing },
         { CardVariant.PerfectMending, CardType.Healing },
         { CardVariant.Lifesteal, CardType.Healing },
+        { CardVariant.Shield, CardType.Healing },
     };
 
     private static readonly Dictionary<CardVariant, CardStats> cardStatsMapping = new Dictionary<
@@ -315,6 +316,16 @@ public class Cards
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.Shield,
+            new CardStats
+            {
+                Mana = 5,
+                CastTime = "instant",
+                Duration = "6",
+                Target = new(true, "3x3"),  // Set Ally = true to target player's own board
             }
         },
     };

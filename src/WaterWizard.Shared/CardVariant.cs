@@ -32,4 +32,5 @@ public enum CardVariant
     MassMending,
     PerfectMending,
     Lifesteal,
+    Shield,
 }

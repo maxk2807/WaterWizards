@@ -56,6 +56,17 @@ public class GreedHitCard : IDamageCard
         int x = (int)targetCoords.X;
         int y = (int)targetCoords.Y;
 
+        // Get defender's player index for shield check
+        int defenderIndex = gameState.GetPlayerIndex(defender);
+
+        // Check if this coordinate is protected by a shield
+        if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+        {
+            Console.WriteLine($"[Server] GreedHit attack at ({x}, {y}) blocked by shield!");
+            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            return false;
+        }
+
         var ships = ShipHandler.GetShips(defender);
         bool hit = false;
 

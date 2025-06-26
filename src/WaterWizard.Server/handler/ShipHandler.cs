@@ -179,7 +179,6 @@ public class ShipHandler
         writer.Put(ship.Y);
         writer.Put(ship.Width);
         writer.Put(ship.Height);
-        writer.Put(false);
 
         writer.Put(ship.DamagedCells.Count);
         foreach (var (damageX, damageY) in ship.DamagedCells)
