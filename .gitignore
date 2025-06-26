@@ -11,3 +11,6 @@ obj
 analytics/analytics_*.json
 analytics/analytics_*.md
 !analytics/analytics_latest.*
+# Test-Output
+*.trx
+TestResults/
