@@ -26,7 +26,7 @@ public class GameBoard
 
     private List<ThunderStrike> _activeThunderStrikes = [];
     private readonly Random _random = new();
-    
+
     // Shield effect tracking
     private Dictionary<(int x, int y), float> _shieldedCells = new();
     private class ShieldEffect
@@ -505,6 +505,9 @@ public class GameBoard
         aiming = false;
         cardToAim = null;
 
+        _shieldedCells.Clear();
+        _activeThunderStrikes.Clear();
+
         Console.WriteLine("[Client][GameBoard]GameBoard cleared.");
     }
 
@@ -560,21 +563,35 @@ public class GameBoard
     /// <param name="duration">Duration of the shield effect</param>
     public void AddShieldEffect(int x, int y, float duration)
     {
-        // Create a 3x3 shield area
-        for (int dx = 0; dx < 3; dx++)
+        Console.WriteLine($"[GameBoard] Adding shield effect at CENTER ({x}, {y}) with duration {duration}");
+        
+        for (int dx = -1; dx <= 1; dx++)  
         {
-            for (int dy = 0; dy < 3; dy++)
+            for (int dy = -1; dy <= 1; dy++)  
             {
                 int shieldX = x + dx;
                 int shieldY = y + dy;
                 
                 if (shieldX >= 0 && shieldX < GridWidth && shieldY >= 0 && shieldY < GridHeight)
                 {
-                    _shieldedCells[(shieldX, shieldY)] = duration;
-                    Console.WriteLine($"[GameBoard] Shield cell added at ({shieldX}, {shieldY}) for {duration} seconds");
+                    if (_shieldedCells.ContainsKey((shieldX, shieldY)))
+                    {
+                        _shieldedCells[(shieldX, shieldY)] = Math.Max(_shieldedCells[(shieldX, shieldY)], duration);
+                    }
+                    else
+                    {
+                        _shieldedCells[(shieldX, shieldY)] = duration;
+                    }
+                    Console.WriteLine($"[GameBoard] Shield cell added at ({shieldX}, {shieldY}) for {duration} seconds [offset: dx={dx}, dy={dy}]");
+                }
+                else
+                {
+                    Console.WriteLine($"[GameBoard] Shield cell ({shieldX}, {shieldY}) is OUT OF BOUNDS [offset: dx={dx}, dy={dy}]");
                 }
             }
         }
+        
+        Console.WriteLine($"[GameBoard] Shield placement complete. Total shielded cells: {_shieldedCells.Count}");
     }
 
     /// <summary>
@@ -584,14 +601,13 @@ public class GameBoard
     /// <param name="y">Y coordinate of the shield center</param>
     public void RemoveShieldEffect(int x, int y)
     {
-        // Remove the 3x3 shield area
-        for (int dx = 0; dx < 3; dx++)
+        for (int dx = -1; dx <= 1; dx++)
         {
-            for (int dy = 0; dy < 3; dy++)
+            for (int dy = -1; dy <= 1; dy++)
             {
                 int shieldX = x + dx;
                 int shieldY = y + dy;
-                
+
                 if (shieldX >= 0 && shieldX < GridWidth && shieldY >= 0 && shieldY < GridHeight)
                 {
                     _shieldedCells.Remove((shieldX, shieldY));
@@ -619,9 +635,8 @@ public class GameBoard
     public void UpdateShieldEffects(float deltaTime)
     {
         var keysToRemove = new List<(int, int)>();
-        var keysToUpdate = new List<(int, int)>();
 
-        foreach (var kvp in _shieldedCells)
+        foreach (var kvp in _shieldedCells.ToList())
         {
             var (x, y) = kvp.Key;
             float duration = kvp.Value - deltaTime;
@@ -632,7 +647,6 @@ public class GameBoard
             }
             else
             {
-                keysToUpdate.Add((x, y));
                 _shieldedCells[(x, y)] = duration;
             }
         }
@@ -690,7 +704,7 @@ public class GameBoard
             float duration = _shieldedCells[(x, y)];
             float alpha = Math.Min(1.0f, duration / 6.0f); // Fade out as duration decreases
             Color shieldColor = new Color(0, 255, 255, (int)(150 * alpha)); // Cyan with transparency
-            
+
             Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, shieldColor);
             Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, new Color(0, 200, 200, (int)(255 * alpha)));
         }
@@ -705,31 +719,31 @@ public class GameBoard
         {
             var (x, y) = kvp.Key;
             float duration = kvp.Value;
-            
+
             int posX = (int)Position.X + x * CellSize;
             int posY = (int)Position.Y + y * CellSize;
-            
-            float alpha = Math.Min(1.0f, duration / 6.0f); 
+
+            float alpha = Math.Min(1.0f, duration / 6.0f);
             int alphaValue = (int)(alpha * 150);
-            
+
             Color shieldColor = new(0, 255, 255, alphaValue);
             Raylib.DrawRectangle(posX, posY, CellSize, CellSize, shieldColor);
-            
+
             Color borderColor = new(0, 200, 200, Math.Min(255, alphaValue + 100));
             Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, borderColor);
-            
+
             int centerX = posX + CellSize / 2;
             int centerY = posY + CellSize / 2;
             int symbolSize = CellSize / 4;
-            
+
             Vector2[] points = new Vector2[]
             {
-                new(centerX, centerY - symbolSize),   
-                new(centerX + symbolSize, centerY),   
-                new(centerX, centerY + symbolSize),    
-                new(centerX - symbolSize, centerY)   
+                new(centerX, centerY - symbolSize),
+                new(centerX + symbolSize, centerY),
+                new(centerX, centerY + symbolSize),
+                new(centerX - symbolSize, centerY)
             };
-            
+
             Color symbolColor = new(255, 255, 255, Math.Min(255, alphaValue + 100));
             for (int i = 0; i < points.Length; i++)
             {
@@ -737,5 +751,14 @@ public class GameBoard
                 Raylib.DrawLineEx(points[i], points[next], 2f, symbolColor);
             }
         }
+    }
+    
+    /// <summary>
+    /// Clears all shield effects from the game board
+    /// </summary>
+    public void ClearAllShieldEffects()
+    {
+        _shieldedCells.Clear();
+        Console.WriteLine("[GameBoard] All shield effects cleared");
     }
 }

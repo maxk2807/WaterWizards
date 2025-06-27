@@ -325,7 +325,7 @@ public class Cards
                 Mana = 5,
                 CastTime = "instant",
                 Duration = "6",
-                Target = new(true, "3x3"),  // Set Ally = true to target player's own board
+                Target = new(true, "3x3"),
             }
         },
     };

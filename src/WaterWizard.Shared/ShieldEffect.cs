@@ -39,7 +39,10 @@ public class ShieldEffect
     {
         if (!IsActive) return false;
 
-        return x >= Position.X && x < Position.X + 3 &&
-               y >= Position.Y && y < Position.Y + 3;
+        bool isProtected = x >= Position.X - 1 && x <= Position.X + 1 &&
+                          y >= Position.Y - 1 && y <= Position.Y + 1;
+                          
+        Console.WriteLine($"[ShieldEffect] Checking protection at ({x}, {y}) vs center ({Position.X}, {Position.Y}): {(isProtected ? "PROTECTED" : "NOT PROTECTED")}");
+        return isProtected;
     }
 }
