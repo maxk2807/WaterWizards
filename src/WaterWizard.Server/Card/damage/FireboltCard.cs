@@ -52,6 +52,9 @@ public class FireboltCard : IDamageCard
         var ships = ShipHandler.GetShips(defender);
         bool anyHit = false;
 
+        // Get defender's player index for shield check
+        int defenderIndex = gameState.GetPlayerIndex(defender);
+
         for (int dx = 0; dx < (int)AreaOfEffect.X; dx++)
         {
             for (int dy = 0; dy < (int)AreaOfEffect.Y; dy++)
@@ -59,6 +62,14 @@ public class FireboltCard : IDamageCard
                 int x = startX + dx;
                 int y = startY + dy;
                 bool cellHit = false;
+
+                // Check if this coordinate is protected by a shield
+                if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+                {
+                    Console.WriteLine($"[Server] Firebolt attack at ({x}, {y}) blocked by shield!");
+                    CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                    continue;
+                }
 
                 foreach (var ship in ships)
                 {

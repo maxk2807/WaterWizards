@@ -78,6 +78,10 @@ public class GameState
     public bool IsPlayer1GoldFrozen => _player1GoldFreezeTimer > 0f;
     public bool IsPlayer2GoldFrozen => _player2GoldFreezeTimer > 0f;
 
+    // Shield management
+    private readonly List<ShieldEffect> _activeShields = new();
+    public IReadOnlyList<ShieldEffect> ActiveShields => _activeShields.AsReadOnly();
+
     /// <summary>
     /// Öffentlicher Zugriff auf den Server für Handler-Klassen
     /// </summary>
@@ -392,5 +396,50 @@ public class GameState
     {
         Console.WriteLine($"[Server] Processing surrender - Winner: {winner}, Surrendering: {surrenderingPlayer}");
         BroadcastGameOver(winner, surrenderingPlayer);
+    }
+
+    /// <summary>
+    /// Adds a new shield effect to the game state
+    /// </summary>
+    /// <param name="shieldEffect">The shield effect to add</param>
+    public void AddShieldEffect(ShieldEffect shieldEffect)
+    {
+        _activeShields.Add(shieldEffect);
+        Console.WriteLine($"[GameState] Shield added at ({shieldEffect.Position.X}, {shieldEffect.Position.Y}) for player {shieldEffect.PlayerIndex + 1}");
+    }
+
+    /// <summary>
+    /// Updates all active shield effects and removes expired ones
+    /// </summary>
+    /// <param name="deltaTime">Time elapsed since last update in seconds</param>
+    public void UpdateShields(float deltaTime)
+    {
+        for (int i = _activeShields.Count - 1; i >= 0; i--)
+        {
+            var shield = _activeShields[i];
+            shield.Update(deltaTime);
+
+            if (!shield.IsActive)
+            {
+                Card.utility.ShieldCard.SendShieldExpired(players, shield.PlayerIndex, (int)shield.Position.X, (int)shield.Position.Y);
+                _activeShields.RemoveAt(i);
+                Console.WriteLine($"[GameState] Shield expired and removed at ({shield.Position.X}, {shield.Position.Y}) for player {shield.PlayerIndex + 1}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Checks if a coordinate is protected by any active shield
+    /// </summary>
+    /// <param name="x">X coordinate</param>
+    /// <param name="y">Y coordinate</param>
+    /// <param name="playerIndex">The player index to check shields for</param>
+    /// <returns>True if the coordinate is protected by a shield</returns>
+    public bool IsCoordinateProtectedByShield(int x, int y, int playerIndex)
+    {
+        return _activeShields.Any(shield => 
+            shield.IsActive && 
+            shield.PlayerIndex == playerIndex && 
+            shield.IsCoordinateProtected(x, y));
     }
 }

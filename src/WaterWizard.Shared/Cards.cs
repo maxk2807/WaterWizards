@@ -64,6 +64,7 @@ public class Cards
         { CardVariant.ConeOfCold, CardType.Utility },
         { CardVariant.MinorIllusion, CardType.Utility },
         { CardVariant.Polymorph, CardType.Utility },
+        { CardVariant.Shield, CardType.Utility },
         // Environment Variants
         { CardVariant.Thunder, CardType.Environment },
         { CardVariant.Storm, CardType.Environment },
@@ -315,6 +316,16 @@ public class Cards
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.Shield,
+            new CardStats
+            {
+                Mana = 5,
+                CastTime = "instant",
+                Duration = "6",
+                Target = new(true, "3x3"),
             }
         },
     };

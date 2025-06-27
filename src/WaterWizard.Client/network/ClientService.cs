@@ -411,6 +411,12 @@ public class ClientService(NetworkManager manager)
                 case "HoveringEyeReveal":
                     HandleUtility.HandleHoveringEyeReveal(reader);
                     break;
+                case "ShieldCreated":
+                    HandleShield.HandleShieldCreated(reader);
+                    break;
+                case "ShieldExpired":
+                    HandleShield.HandleShieldExpired(reader);
+                    break;
             }
         }
         catch (Exception ex)

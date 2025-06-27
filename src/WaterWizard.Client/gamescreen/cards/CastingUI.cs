@@ -176,10 +176,8 @@ public class CastingUI
 
         if (hoveredCoords.HasValue)
         {
-            var onScreenX =
-                boardPos.X + (hoveredCoords.Value.X - (float)Math.Floor(aim.X / 2f)) * CellSize;
-            var onScreenY =
-                boardPos.Y + (hoveredCoords.Value.Y - (float)Math.Floor(aim.Y / 2f)) * CellSize;
+            var onScreenX = boardPos.X + (hoveredCoords.Value.X - (float)Math.Floor(aim.X / 2f)) * CellSize;
+            var onScreenY = boardPos.Y + (hoveredCoords.Value.Y - (float)Math.Floor(aim.Y / 2f)) * CellSize;
             var r = new Rectangle(onScreenX, onScreenY, aim.X * CellSize, aim.Y * CellSize);
             Raylib.DrawRectangleLinesEx(r, 2, Color.Red);
 

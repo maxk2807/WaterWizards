@@ -15,6 +15,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 
     private System.Timers.Timer? manaTimer;
     private System.Timers.Timer? goldTimer;
+    private System.Timers.Timer? shieldTimer;
     private ManaHandler? manaHandler;
     public ParalizeHandler? paralizeHandler;
     private GoldHandler? goldHandler;
@@ -47,6 +48,12 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         goldTimer.Elapsed += (sender, e) => UpdateGold();
         goldTimer.AutoReset = true;
         goldTimer.Start();
+
+        // Shield timer - updates every 100ms for precise shield expiration
+        shieldTimer = new System.Timers.Timer(100);
+        shieldTimer.Elapsed += (sender, e) => UpdateShields();
+        shieldTimer.AutoReset = true;
+        shieldTimer.Start();
     }
 
     private void UpdateMana()
@@ -61,6 +68,13 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         goldHandler?.UpdateGold();
     }
 
+    private void UpdateShields()
+    {
+        if (gameState.IsPaused) return;
+        // Update shields with delta time of 0.1 seconds (100ms timer interval)
+        gameState.UpdateShields(0.1f);
+    }
+
     /// <summary>
     /// Wird beim Verlassen des States aufgerufen (hier leer).
     /// </summary>
@@ -71,6 +85,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         
         goldTimer?.Stop();
         goldTimer?.Dispose();
+        
+        shieldTimer?.Stop();
+        shieldTimer?.Dispose();
     }
 
     public void HandleNetworkEvent(
