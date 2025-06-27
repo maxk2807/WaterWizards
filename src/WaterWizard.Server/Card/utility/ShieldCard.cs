@@ -5,28 +5,25 @@ using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
 
-namespace WaterWizard.Server.Card.healing;
+namespace WaterWizard.Server.Card.utility;
 
 /// <summary>
-/// Implementation of the Shield healing card
+/// Implementation of the Shield utility card
 /// Creates a protective 3x3 area that prevents damage for 6 seconds
 /// </summary>
-public class ShieldCard : IHealingCard
+public class ShieldCard : IUtilityCard
 {
     public CardVariant Variant => CardVariant.Shield;
 
     public Vector2 AreaOfEffect => new(3, 3);
 
-    public int BaseHealing => 0; // Shield doesn't heal, it protects
-
     public bool HasSpecialTargeting => false;
 
-    public bool ExecuteHealing(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteUtility(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
     {
         int startX = (int)targetCoords.X;
         int startY = (int)targetCoords.Y;
 
-        // Find the player index of the caster
         int casterIndex = -1;
         for (int i = 0; i < gameState.players.Length; i++)
         {
@@ -43,15 +40,12 @@ public class ShieldCard : IHealingCard
             return false;
         }
 
-        // Create shield effect
         var shieldEffect = new ShieldEffect(targetCoords, casterIndex, 6.0f);
         
-        // Add shield to game state (we'll need to add this to GameState)
         gameState.AddShieldEffect(shieldEffect);
 
         Console.WriteLine($"[ShieldCard] Shield created at ({startX}, {startY}) for player {casterIndex + 1}, duration: 6 seconds");
 
-        // Send shield creation message to both players
         SendShieldCreated(gameState.players, casterIndex, startX, startY, 6.0f);
 
         return true;
@@ -62,7 +56,6 @@ public class ShieldCard : IHealingCard
         int boardWidth = GameState.boardWidth;
         int boardHeight = GameState.boardHeight;
 
-        // Check if the 3x3 area fits within the board
         return targetCoords.X >= 0
             && targetCoords.Y >= 0
             && targetCoords.X + AreaOfEffect.X <= boardWidth
@@ -87,8 +80,6 @@ public class ShieldCard : IHealingCard
                 player.Send(writer, DeliveryMethod.ReliableOrdered);
             }
         }
-
-        Console.WriteLine($"[ShieldCard] Shield creation notification sent to all players: ({x},{y}) duration: {duration}s");
     }
 
     /// <summary>
@@ -108,7 +99,5 @@ public class ShieldCard : IHealingCard
                 player.Send(writer, DeliveryMethod.ReliableOrdered);
             }
         }
-
-        Console.WriteLine($"[ShieldCard] Shield expiration notification sent to all players: ({x},{y})");
     }
 }

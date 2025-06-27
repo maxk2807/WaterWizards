@@ -18,6 +18,7 @@ public enum CardVariant
     ConeOfCold,
     MinorIllusion,
     Polymorph,
+    Shield,
 
     // Environment Variants
     Thunder,
@@ -32,5 +33,4 @@ public enum CardVariant
     MassMending,
     PerfectMending,
     Lifesteal,
-    Shield,
 }

@@ -64,6 +64,7 @@ public class Cards
         { CardVariant.ConeOfCold, CardType.Utility },
         { CardVariant.MinorIllusion, CardType.Utility },
         { CardVariant.Polymorph, CardType.Utility },
+        { CardVariant.Shield, CardType.Utility },
         // Environment Variants
         { CardVariant.Thunder, CardType.Environment },
         { CardVariant.Storm, CardType.Environment },
@@ -76,7 +77,6 @@ public class Cards
         { CardVariant.MassMending, CardType.Healing },
         { CardVariant.PerfectMending, CardType.Healing },
         { CardVariant.Lifesteal, CardType.Healing },
-        { CardVariant.Shield, CardType.Healing },
     };
 
     private static readonly Dictionary<CardVariant, CardStats> cardStatsMapping = new Dictionary<

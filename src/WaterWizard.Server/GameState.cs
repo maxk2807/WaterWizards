@@ -421,8 +421,7 @@ public class GameState
 
             if (!shield.IsActive)
             {
-                // Notify clients that shield expired
-                Card.healing.ShieldCard.SendShieldExpired(players, shield.PlayerIndex, (int)shield.Position.X, (int)shield.Position.Y);
+                Card.utility.ShieldCard.SendShieldExpired(players, shield.PlayerIndex, (int)shield.Position.X, (int)shield.Position.Y);
                 _activeShields.RemoveAt(i);
                 Console.WriteLine($"[GameState] Shield expired and removed at ({shield.Position.X}, {shield.Position.Y}) for player {shield.PlayerIndex + 1}");
             }

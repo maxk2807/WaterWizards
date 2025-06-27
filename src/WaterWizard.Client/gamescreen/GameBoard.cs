@@ -314,6 +314,9 @@ public class GameBoard
         {
             strike.Draw(CellSize);
         }
+
+        // Shield-Effekte zeichnen
+        DrawShieldEffects();
     }
 
     /// <summary>
@@ -690,6 +693,49 @@ public class GameBoard
             
             Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, shieldColor);
             Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, new Color(0, 200, 200, (int)(255 * alpha)));
+        }
+    }
+
+    /// <summary>
+    /// Draws shield effects on the game board
+    /// </summary>
+    private void DrawShieldEffects()
+    {
+        foreach (var kvp in _shieldedCells)
+        {
+            var (x, y) = kvp.Key;
+            float duration = kvp.Value;
+            
+            int posX = (int)Position.X + x * CellSize;
+            int posY = (int)Position.Y + y * CellSize;
+            
+            float alpha = Math.Min(1.0f, duration / 6.0f); 
+            int alphaValue = (int)(alpha * 150);
+            
+            Color shieldColor = new(0, 255, 255, alphaValue);
+            Raylib.DrawRectangle(posX, posY, CellSize, CellSize, shieldColor);
+            
+            Color borderColor = new(0, 200, 200, Math.Min(255, alphaValue + 100));
+            Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, borderColor);
+            
+            int centerX = posX + CellSize / 2;
+            int centerY = posY + CellSize / 2;
+            int symbolSize = CellSize / 4;
+            
+            Vector2[] points = new Vector2[]
+            {
+                new(centerX, centerY - symbolSize),   
+                new(centerX + symbolSize, centerY),   
+                new(centerX, centerY + symbolSize),    
+                new(centerX - symbolSize, centerY)   
+            };
+            
+            Color symbolColor = new(255, 255, 255, Math.Min(255, alphaValue + 100));
+            for (int i = 0; i < points.Length; i++)
+            {
+                int next = (i + 1) % points.Length;
+                Raylib.DrawLineEx(points[i], points[next], 2f, symbolColor);
+            }
         }
     }
 }

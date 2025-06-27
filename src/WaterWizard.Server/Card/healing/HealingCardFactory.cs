@@ -15,7 +15,6 @@ public class HealingCardFactory
         return variant switch
         {
             CardVariant.Heal => new HealCard(),
-            CardVariant.Shield => new ShieldCard(),
             _ => null,
         };
     }
