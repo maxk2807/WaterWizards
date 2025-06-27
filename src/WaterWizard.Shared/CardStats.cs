@@ -10,6 +10,13 @@ public class CardStats
     /// </summary>
     public int Mana { get; set; }
 
+
+    /// <summary>
+    /// Gibt die Menge an Gold an, die benötigt wird, um die Karte zu wirken.
+    /// </summary>
+    public int Gold { get; set; }
+
+
     /// <summary>
     /// Gibt an, wie lange es dauert, bis der Effekt der Karte ausgelöst wird.
     /// Werte können z. B. "instant" oder eine Zeit in Sekunden (als Text) sein.
