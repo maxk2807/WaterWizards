@@ -6,9 +6,9 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Server.Card.environment;
 
-public class StormCard : IEnvironmentCard
+public class CallWindCard : IEnvironmentCard
 {
-    public CardVariant Variant => CardVariant.Storm;
+    public CardVariant Variant => CardVariant.CallWind;
 
     public Vector2 AreaOfEffect => new(); // battlefield
 
