@@ -17,26 +17,24 @@ public class StormCard : IEnvironmentCard
     public bool ExecuteEnvironment(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
     {
         Vector2 randomDirection = RandomDirection();
-        var casterShips = ShipHandler.GetShips(caster);
-        casterShips.ForEach(ship =>
+        HandleMoveShips(caster, randomDirection);
+        HandleMoveShips(opponent, randomDirection);
+        return true;
+    }
+
+    private static void HandleMoveShips(NetPeer client, Vector2 randomDirection)
+    {
+        var ships = ShipHandler.GetShips(client);
+        ships.ForEach(ship =>
         {
             //TODO: check for walls and rocks
             Vector2 oldCoords = new(ship.X, ship.Y);
             Vector2 newCoords = Vector2.Add(oldCoords, randomDirection);
+            Console.WriteLine($"ship: {(ship.X, ship.Y)}");
             ship.X = (int)newCoords.X;
             ship.Y = (int)newCoords.Y;
-            ShipHandler.HandlePositionUpdate(oldCoords, newCoords, caster);
+            ShipHandler.HandlePositionUpdate(oldCoords, newCoords, client);
         });
-        var opponentShips = ShipHandler.GetShips(opponent);
-        opponentShips.ForEach(ship =>
-        {
-            Vector2 oldCoords = new(ship.X, ship.Y);
-            Vector2 newCoords = Vector2.Add(oldCoords, randomDirection);
-            ship.X = (int)newCoords.X;
-            ship.Y = (int)newCoords.Y;
-            ShipHandler.HandlePositionUpdate(oldCoords, newCoords, opponent);
-        });
-        return true;
     }
 
     private static Vector2 RandomDirection()

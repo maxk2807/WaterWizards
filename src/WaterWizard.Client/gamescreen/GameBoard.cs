@@ -148,6 +148,50 @@ public class GameBoard
         }
     }
 
+    public void MoveShip(GameShip ship, Vector2 newCoords)
+    {
+        int startX = (int)((ship.X - Position.X) / CellSize);
+        int startY = (int)((ship.Y - Position.Y) / CellSize);
+        int width = ship.Width / CellSize;
+        int height = ship.Height / CellSize;
+
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+                {
+                    if (_gridStates[x, y] == CellState.Hit)
+                    {
+                        _gridStates[x, y] = CellState.Miss;
+                    }
+                    else if (_gridStates[x, y] == CellState.Ship)
+                    {
+                        _gridStates[x, y] = CellState.Empty;
+                    }
+                    else
+                    {
+                        _gridStates[x, y] = CellState.Unknown;
+                    }
+                }
+            }
+        }
+
+        startX = (int)((newCoords.X - Position.X) / CellSize);
+        startY = (int)((newCoords.Y - Position.Y) / CellSize);
+
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+                {
+                    _gridStates[x, y] = CellState.Ship;
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Converts screen coordinates to grid cell coordinates.
     /// Returns null if the coordinates are outside the board.
@@ -396,166 +440,166 @@ public class GameBoard
     /// <param name="Y">Y-Coordinate</param>
     public readonly record struct Point(int X, int Y);
 
-    public void SetCellState(int x, int y, CellState state)
+public void SetCellState(int x, int y, CellState state)
+{
+    if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
     {
-        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+        if (_gridStates[x, y] == CellState.Hit && state == CellState.Ship)
         {
-            if (_gridStates[x, y] == CellState.Hit && state == CellState.Ship)
-            {
-                _gridStates[x, y] = state;
-                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
-                return;
-            }
-
-            if ((_gridStates[x, y] == CellState.Hit || _gridStates[x, y] == CellState.Miss) &&
-                state != CellState.Hit && state != CellState.Miss)
-            {
-                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) already has final state {_gridStates[x, y]}, ignoring {state}");
-                return;
-            }
-
             _gridStates[x, y] = state;
             Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
+            return;
         }
-    }
 
-    /// <summary>
-    /// Marks a cell as hit or missed based on the attack result.
-    /// </summary>
-    /// <param name="x">X coordinate of the cell</param>
-    /// <param name="y">Y coordinate of the cell</param>
-    /// <param name="hit">True if the attack hit, false if it missed</param>
-    public void MarkCellAsHit(int x, int y, bool hit)
-    {
-        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+        if ((_gridStates[x, y] == CellState.Hit || _gridStates[x, y] == CellState.Miss) &&
+            state != CellState.Hit && state != CellState.Miss)
         {
-            _gridStates[x, y] = hit ? CellState.Hit : CellState.Miss;
-
-            Console.WriteLine(
-                $"[GameBoard] Cell ({x},{y}) marked as {(hit ? "HIT" : "MISS")} - State: {_gridStates[x, y]}"
-            );
+            Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) already has final state {_gridStates[x, y]}, ignoring {state}");
+            return;
         }
+
+        _gridStates[x, y] = state;
+        Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) = {state}");
     }
+}
 
-    /// <summary>
-    /// Marks a cell as revealed by hovering eye (different from attack reveals)
-    /// </summary>
-    /// <param name="x">The x coordinate</param>
-    /// <param name="y">The y coordinate</param>
-    /// <param name="hasShip">Whether there's a ship at this location</param>
-    public void MarkCellAsHoveringEyeRevealed(int x, int y, bool hasShip)
+/// <summary>
+/// Marks a cell as hit or missed based on the attack result.
+/// </summary>
+/// <param name="x">X coordinate of the cell</param>
+/// <param name="y">Y coordinate of the cell</param>
+/// <param name="hit">True if the attack hit, false if it missed</param>
+public void MarkCellAsHit(int x, int y, bool hit)
+{
+    if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
     {
-        if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
-        {
-            if (hasShip)
-            {
-                _gridStates[x, y] = CellState.Ship;
-            }
-            else
-            {
-                _gridStates[x, y] = CellState.HoveringEyeRevealed;
-            }
-        }
-    }
+        _gridStates[x, y] = hit ? CellState.Hit : CellState.Miss;
 
-    /// <summary>
-    /// Clears the game board, removing all ships and resetting cell states to Unknown.
-    /// </summary>
-    public void ClearBoard()
-    {
-        Ships.Clear();
-        for (int x = 0; x < GridWidth; x++)
-        {
-            for (int y = 0; y < GridHeight; y++)
-            {
-                _gridStates[x, y] = CellState.Unknown;
-            }
-        }
-        aiming = false;
-        cardToAim = null;
-
-        Console.WriteLine("[Client][GameBoard]GameBoard cleared.");
-    }
-
-    /// <summary>
-    /// Resets the cell states to Unknown without clearing the ships.
-    /// </summary>
-    public void ResetCellStates()
-    {
-        for (int x = 0; x < GridWidth; x++)
-        {
-            for (int y = 0; y < GridHeight; y++)
-            {
-                _gridStates[x, y] = CellState.Unknown;
-            }
-        }
-    }
-
-    public void AddThunderStrike(int x, int y, bool hit = false)
-    {
-        Vector2 position = new(
-            Position.X + (float)x * (float)CellSize + (float)CellSize / 2f,
-            Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
+        Console.WriteLine(
+            $"[GameBoard] Cell ({x},{y}) marked as {(hit ? "HIT" : "MISS")} - State: {_gridStates[x, y]}"
         );
-
-        var strike = new ThunderStrike(position, hit);
-        _activeThunderStrikes.Add(strike);
-
-        Console.WriteLine($"[GameBoard] Added thunder visual effect at ({x}, {y})");
-
-        SetCellState(x, y, hit ? CellState.Hit : CellState.Miss);
     }
+}
 
-    public void ResetThunderFields()
+/// <summary>
+/// Marks a cell as revealed by hovering eye (different from attack reveals)
+/// </summary>
+/// <param name="x">The x coordinate</param>
+/// <param name="y">The y coordinate</param>
+/// <param name="hasShip">Whether there's a ship at this location</param>
+public void MarkCellAsHoveringEyeRevealed(int x, int y, bool hasShip)
+{
+    if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
     {
-        for (int x = 0; x < GridWidth; x++)
+        if (hasShip)
         {
-            for (int y = 0; y < GridHeight; y++)
+            _gridStates[x, y] = CellState.Ship;
+        }
+        else
+        {
+            _gridStates[x, y] = CellState.HoveringEyeRevealed;
+        }
+    }
+}
+
+/// <summary>
+/// Clears the game board, removing all ships and resetting cell states to Unknown.
+/// </summary>
+public void ClearBoard()
+{
+    Ships.Clear();
+    for (int x = 0; x < GridWidth; x++)
+    {
+        for (int y = 0; y < GridHeight; y++)
+        {
+            _gridStates[x, y] = CellState.Unknown;
+        }
+    }
+    aiming = false;
+    cardToAim = null;
+
+    Console.WriteLine("[Client][GameBoard]GameBoard cleared.");
+}
+
+/// <summary>
+/// Resets the cell states to Unknown without clearing the ships.
+/// </summary>
+public void ResetCellStates()
+{
+    for (int x = 0; x < GridWidth; x++)
+    {
+        for (int y = 0; y < GridHeight; y++)
+        {
+            _gridStates[x, y] = CellState.Unknown;
+        }
+    }
+}
+
+public void AddThunderStrike(int x, int y, bool hit = false)
+{
+    Vector2 position = new(
+        Position.X + x * (float)CellSize + CellSize / 2f,
+        Position.Y + y * (float)CellSize + CellSize / 2f
+    );
+
+    var strike = new ThunderStrike(position, hit);
+    _activeThunderStrikes.Add(strike);
+
+    Console.WriteLine($"[GameBoard] Added thunder visual effect at ({x}, {y})");
+
+    SetCellState(x, y, hit ? CellState.Hit : CellState.Miss);
+}
+
+public void ResetThunderFields()
+{
+    for (int x = 0; x < GridWidth; x++)
+    {
+        for (int y = 0; y < GridHeight; y++)
+        {
+            if (_gridStates[x, y] == CellState.Thunder)
             {
-                if (_gridStates[x, y] == CellState.Thunder)
-                {
-                    _gridStates[x, y] = CellState.Unknown;
-                }
+                _gridStates[x, y] = CellState.Unknown;
             }
         }
-        _activeThunderStrikes.Clear();
     }
+    _activeThunderStrikes.Clear();
+}
 
-    private void DrawCell(int x, int y)
+private void DrawCell(int x, int y)
+{
+    int cellX = (int)Position.X + x * CellSize;
+    int cellY = (int)Position.Y + y * CellSize;
+
+    switch (_gridStates[x, y])
     {
-        int cellX = (int)Position.X + x * CellSize;
-        int cellY = (int)Position.Y + y * CellSize;
-
-        switch (_gridStates[x, y])
-        {
-            case CellState.Empty:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.LightGray);
-                break;
-            case CellState.Ship:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Gray);
-                break;
-            case CellState.Rock:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.DarkGray);
-                break;
-            case CellState.Hit:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Orange);
-                break;
-            case CellState.Miss:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Blue);
-                break;
-            case CellState.Unknown:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(135, 206, 235, 0));
-                break;
-            case CellState.Thunder:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(30, 30, 150, 255));
-                break;
-            case CellState.HoveringEyeRevealed:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(100, 150, 255, 100));
-                Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, Color.Blue);
-                break;
-            default:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Black);
-                break;
-        }
+        case CellState.Empty:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.LightGray);
+            break;
+        case CellState.Ship:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Gray);
+            break;
+        case CellState.Rock:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.DarkGray);
+            break;
+        case CellState.Hit:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Orange);
+            break;
+        case CellState.Miss:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Blue);
+            break;
+        case CellState.Unknown:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(135, 206, 235, 0));
+            break;
+        case CellState.Thunder:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(30, 30, 150, 255));
+            break;
+        case CellState.HoveringEyeRevealed:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(100, 150, 255, 100));
+            Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, Color.Blue);
+            break;
+        default:
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Black);
+            break;
     }
+}
 }

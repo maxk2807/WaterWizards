@@ -235,19 +235,25 @@ public class HandleShips
     {
         try
         {
-            Vector2 oldCoords = new(reader.GetInt(), reader.GetInt());
-            Vector2 newCoords = new(reader.GetInt(), reader.GetInt());
-            Console.WriteLine($"Move ship from {oldCoords} to {newCoords}");
             var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            int oldX = reader.GetInt();
+            int oldY = reader.GetInt();
+            int newX = reader.GetInt();
+            int newY = reader.GetInt();
+            Console.WriteLine($"old: {(oldX, oldY)}, new: {(newX, newY)}");
+            // Vector2 oldCoords = new(board.Position.X + oldX * board.CellSize, board.Position.X + oldY * board.CellSize);
+            // Vector2 newCoords = new(board.Position.Y + newX * board.CellSize, board.Position.Y + newY * board.CellSize);
+            // Console.WriteLine($"Move ship from {oldCoords} to {newCoords}");
             var ship = board.Ships.Find(ship =>
             {
-                return ship.X == board.Position.X + oldCoords.X * board.CellSize && ship.Y == board.Position.Y + oldCoords.Y * board.CellSize;
+                Console.WriteLine($"shipPos: {(ship.X, ship.Y)}");
+                return (ship.X - board.Position.X) / board.CellSize == oldX &&(ship.Y - board.Position.Y) / board.CellSize == oldY;
             });
-            //TODO: handle CellStates
             if (ship != null)
             {
-                ship.X = (int)newCoords.X;
-                ship.X = (int)newCoords.Y;
+                ship.X = (int)board.Position.X + newX * board.CellSize;
+                ship.Y = (int)board.Position.Y + newY * board.CellSize; 
+                board.MoveShip(ship, new((int)board.Position.X + newX * board.CellSize, (int)board.Position.Y + newY * board.CellSize));
             }
             else
             {
