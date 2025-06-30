@@ -19,9 +19,12 @@ public static class DamageCardFactory
         return variant switch
         {
             CardVariant.Firebolt => new FireboltCard(),
+            CardVariant.ArcaneMissile => new ArcaneMissileCard(),
+            CardVariant.GreedHit => new GreedHitCard(),
+            CardVariant.FrostBolt => new FrostBoltCard(),
             CardVariant.Fireball => new FireballCard(),
 
-            _ => null
+            _ => null,
         };
     }
 
