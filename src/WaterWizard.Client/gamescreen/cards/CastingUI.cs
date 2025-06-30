@@ -75,7 +75,7 @@ public class CastingUI
         }
         else if (IsTargetShip(gameCard))
         {
-            Console.WriteLine("Target Ship");
+            // Console.WriteLine("Target Ship");
             HandleShipTargeted(gameCard, mousePos);
         }
         else

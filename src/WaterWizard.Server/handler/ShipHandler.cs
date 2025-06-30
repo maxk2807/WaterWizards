@@ -228,7 +228,6 @@ public class ShipHandler
 
     public static void HandlePositionUpdate(Vector2 oldCoords, Vector2 newCoords, NetPeer client)
     {
-        Console.WriteLine($"oldCoords: {oldCoords}, newCoords: {newCoords}");
         var writer = new NetDataWriter();
         writer.Put("UpdateShipPosition");
         writer.Put((int)oldCoords.X);

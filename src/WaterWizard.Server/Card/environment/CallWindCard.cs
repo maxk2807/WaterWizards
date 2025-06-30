@@ -1,7 +1,9 @@
 using System.Numerics;
 using LiteNetLib;
+using Raylib_cs;
 using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
+using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server.Card.environment;
@@ -17,12 +19,12 @@ public class CallWindCard : IEnvironmentCard
     public bool ExecuteEnvironment(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
     {
         Vector2 randomDirection = RandomDirection();
-        HandleMoveShips(caster, randomDirection);
-        HandleMoveShips(opponent, randomDirection);
+        HandleMoveShips(gameState, caster, randomDirection);
+        HandleMoveShips(gameState, opponent, randomDirection);
         return true;
     }
 
-    private static void HandleMoveShips(NetPeer client, Vector2 randomDirection)
+    private static void HandleMoveShips(GameState gameState, NetPeer client, Vector2 randomDirection)
     {
         var ships = ShipHandler.GetShips(client);
         ships.ForEach(ship =>
@@ -30,11 +32,29 @@ public class CallWindCard : IEnvironmentCard
             //TODO: check for walls and rocks
             Vector2 oldCoords = new(ship.X, ship.Y);
             Vector2 newCoords = Vector2.Add(oldCoords, randomDirection);
-            Console.WriteLine($"ship: {(ship.X, ship.Y)}");
+            if (HandleOutsideBoard(ship, newCoords) || HandleOnRocks(gameState, client, ship, newCoords))
+            {
+                return;
+            }
             ship.X = (int)newCoords.X;
             ship.Y = (int)newCoords.Y;
             ShipHandler.HandlePositionUpdate(oldCoords, newCoords, client);
         });
+    }
+
+    private static bool HandleOnRocks(GameState gameState, NetPeer client, PlacedShip ship, Vector2 newCoords)
+    {
+        int playerIndex = gameState.GetPlayerIndex(client);
+        var rocks = RockHandler.GetRockPositions(gameState.boards[playerIndex]);
+        return rocks.Any(rock => rock.X >= newCoords.X && rock.X <= newCoords.X + ship.Width - 1
+            && rock.Y >= newCoords.Y && rock.Y <= newCoords.Y + ship.Height - 1);
+    }
+
+    private static bool HandleOutsideBoard(PlacedShip ship, Vector2 newCoords)
+    {
+        return newCoords.X < 0 || newCoords.Y < 0 //left and top of board
+         || newCoords.X + ship.Width - 1 >= GameState.boardWidth //right of board (incl. Width of ship)
+         || newCoords.Y + ship.Height - 1 >= GameState.boardHeight; //bottom of board (incl. Height of ship)
     }
 
     private static Vector2 RandomDirection()

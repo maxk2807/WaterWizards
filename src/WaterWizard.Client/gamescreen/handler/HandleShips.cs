@@ -241,9 +241,6 @@ public class HandleShips
             int newX = reader.GetInt();
             int newY = reader.GetInt();
             Console.WriteLine($"old: {(oldX, oldY)}, new: {(newX, newY)}");
-            // Vector2 oldCoords = new(board.Position.X + oldX * board.CellSize, board.Position.X + oldY * board.CellSize);
-            // Vector2 newCoords = new(board.Position.Y + newX * board.CellSize, board.Position.Y + newY * board.CellSize);
-            // Console.WriteLine($"Move ship from {oldCoords} to {newCoords}");
             var ship = board.Ships.Find(ship =>
             {
                 Console.WriteLine($"shipPos: {(ship.X, ship.Y)}");
@@ -253,7 +250,7 @@ public class HandleShips
             {
                 ship.X = (int)board.Position.X + newX * board.CellSize;
                 ship.Y = (int)board.Position.Y + newY * board.CellSize; 
-                board.MoveShip(ship, new((int)board.Position.X + newX * board.CellSize, (int)board.Position.Y + newY * board.CellSize));
+                board.MoveShip(ship, new(oldX, oldY), new(newX, newY));
             }
             else
             {
