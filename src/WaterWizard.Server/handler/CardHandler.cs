@@ -11,7 +11,6 @@ namespace WaterWizard.Server.handler;
 public class CardHandler(GameState gameState)
 {
     private readonly GameState? gameState = gameState;
-     private static readonly GoldHandler? goldHandler;
     
 
     /// <summary>
