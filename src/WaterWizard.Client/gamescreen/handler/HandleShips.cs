@@ -240,11 +240,9 @@ public class HandleShips
             int oldY = reader.GetInt();
             int newX = reader.GetInt();
             int newY = reader.GetInt();
-            Console.WriteLine($"old: {(oldX, oldY)}, new: {(newX, newY)}");
             var ship = board.Ships.Find(ship =>
             {
-                Console.WriteLine($"shipPos: {(ship.X, ship.Y)}");
-                return (ship.X - board.Position.X) / board.CellSize == oldX &&(ship.Y - board.Position.Y) / board.CellSize == oldY;
+                return (ship.X - (int)board.Position.X) / board.CellSize == oldX &&(ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
             });
             if (ship != null)
             {
