@@ -15,6 +15,7 @@ public class EnvironmentCardFactory
         return variant switch
         {
             CardVariant.Thunder => new ThunderCard(),
+            CardVariant.CallWind=> new CallWindCard(),
             _ => null,
         };
     }

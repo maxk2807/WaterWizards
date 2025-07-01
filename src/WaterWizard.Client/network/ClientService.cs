@@ -238,6 +238,18 @@ public class ClientService(NetworkManager manager)
                         );
                     }
                     break;
+                case "UpdateShipPosition":
+                    try
+                    {
+                        HandleShips.HandleUpdateShipPosition(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client Fehler beim Verarbeiten von UpdateShipPosition: {ex.Message}]"
+                        );
+                    }
+                    break;
                 case "BoughtCard":
                     try
                     {

@@ -173,6 +173,66 @@ public class GameBoard
     }
 
     /// <summary>
+    /// Handles Changing the Cell States of moving a Ship (e.g. due to CallWind Card Casting). 
+    /// </summary>
+    /// <param name="ship">the ship to be moved</param>
+    /// <param name="oldCoords">the old Coordinates of the ship (in board coords so the small numbers)</param>
+    /// <param name="newCoords">the new Coordinates of the ship (in board coords so small numbers)</param>
+    public void MoveShip(GameShip ship, Vector2 oldCoords, Vector2 newCoords)
+    {
+        int startX = (int)oldCoords.X;
+        int startY = (int)oldCoords.Y;
+        int width = ship.Width / CellSize;
+        int height = ship.Height / CellSize;
+        List<(int X, int Y)> hit = [];
+
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+                {
+                    if (_gridStates[x, y] == CellState.Hit)
+                    {
+                        hit.Add((x, y));
+                        _gridStates[x, y] = CellState.Miss;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Set to Unknown you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}");
+                        _gridStates[x, y] = CellState.Unknown;
+                    }
+                }
+            }
+        }
+
+
+
+        startX = (int)newCoords.X;
+        startY = (int)newCoords.Y;
+
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+                {
+                    if (hit.Any(cell => cell.X == x && cell.Y == y))
+                    {
+                        _gridStates[x, y] = CellState.Hit;
+
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Set to Ship you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}");
+                        _gridStates[x, y] = CellState.Ship;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Converts screen coordinates to grid cell coordinates.
     /// Returns null if the coordinates are outside the board.
     /// </summary>
@@ -528,8 +588,8 @@ public class GameBoard
     public void AddThunderStrike(int x, int y, bool hit = false)
     {
         Vector2 position = new(
-            Position.X + (float)x * (float)CellSize + (float)CellSize / 2f,
-            Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
+            Position.X + x * (float)CellSize + CellSize / 2f,
+            Position.Y + y * (float)CellSize + CellSize / 2f
         );
 
         var strike = new ThunderStrike(position, hit);

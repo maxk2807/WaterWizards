@@ -440,7 +440,7 @@ public class GameScreen(
 
     private static void UpdateShipPosition(Vector2 oldBoardPosition, int oldCellSize)
     {
-        HandleShips.UpdateShipPositions(oldBoardPosition, oldCellSize);
+        HandleShips.UpdateShipPositionsFullScreen(oldBoardPosition, oldCellSize);
     }
 
     public void Reset()

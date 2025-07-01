@@ -264,7 +264,7 @@ public class Cards
                 Mana = 4,
                 CastTime = "instant",
                 Duration = "instant",
-                Target = new("ship"),
+                Target = new("battlefield"),
             }
         },
         // Healing

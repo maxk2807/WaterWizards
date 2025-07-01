@@ -231,12 +231,44 @@ public class HandleShips
         }
     }
 
+    public static void HandleUpdateShipPosition(NetPacketReader reader)
+    {
+        try
+        {
+            var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            int oldX = reader.GetInt();
+            int oldY = reader.GetInt();
+            int newX = reader.GetInt();
+            int newY = reader.GetInt();
+            var ship = board.Ships.Find(ship =>
+            {
+                return (ship.X - (int)board.Position.X) / board.CellSize == oldX &&(ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
+            });
+            if (ship != null)
+            {
+                ship.X = (int)board.Position.X + newX * board.CellSize;
+                ship.Y = (int)board.Position.Y + newY * board.CellSize; 
+                board.MoveShip(ship, new(oldX, oldY), new(newX, newY));
+            }
+            else
+            {
+                throw new Exception("Ship not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Error in HandleUpdateShipPosition: {ex.Message}");
+            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
+            throw;
+        }
+    }
+
     /// <summary>
     /// Updates ship position after toggling fullscreen
     /// </summary>
     /// <param name="screenWidth">New screen width</param>
     /// <param name="screenHeight">New screen height</param>
-    internal static void UpdateShipPositions(Vector2 oldBoardPosition, float oldCellSize)
+    internal static void UpdateShipPositionsFullScreen(Vector2 oldBoardPosition, float oldCellSize)
     {
         GameStateManager.Instance.GameScreen.playerBoard!.Ships.ForEach(ship =>
         {
