@@ -343,8 +343,8 @@ public class CastingUI
             
             if (hoveredCoords.HasValue)
             {
-                float shipWidth = selectedShip.Width / CellSize;
-                float shipHeight = selectedShip.Height / CellSize;
+                float shipWidth = (float)selectedShip.Width / CellSize;
+                float shipHeight = (float)selectedShip.Height / CellSize;
                 
                 float previewX = boardPos.X + hoveredCoords.Value.X * CellSize;
                 float previewY = boardPos.Y + hoveredCoords.Value.Y * CellSize;

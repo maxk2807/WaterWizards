@@ -14,7 +14,7 @@ public class HandleUtility
     /// <param name="reader">The NetPacketReader containing the teleport data</param>
     public static void HandleShipTeleported(NetPacketReader reader)
     {
-        int shipId = reader.GetInt();
+        reader.GetInt();
         int originalX = reader.GetInt();
         int originalY = reader.GetInt();
         int newX = reader.GetInt();
