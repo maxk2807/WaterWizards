@@ -423,6 +423,9 @@ public class ClientService(NetworkManager manager)
                 case "HoveringEyeReveal":
                     HandleUtility.HandleHoveringEyeReveal(reader);
                     break;
+                case "ShipTeleported":
+                    HandleUtility.HandleShipTeleported(reader);
+                    break;
                 case "ShieldCreated":
                     HandleShield.HandleShieldCreated(reader);
                     break;
