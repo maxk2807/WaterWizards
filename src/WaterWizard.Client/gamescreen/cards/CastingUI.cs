@@ -346,8 +346,8 @@ public class CastingUI
                 float shipWidth = (float)selectedShip.Width / CellSize;
                 float shipHeight = (float)selectedShip.Height / CellSize;
                 
-                float previewX = boardPos.X + hoveredCoords.Value.X * CellSize;
-                float previewY = boardPos.Y + hoveredCoords.Value.Y * CellSize;
+                float previewX = boardPos.X + hoveredCoords.Value.X * (float)CellSize;
+                float previewY = boardPos.Y + hoveredCoords.Value.Y * (float)CellSize;
                 
                 var previewRect = new Rectangle(previewX, previewY, shipWidth * CellSize, shipHeight * CellSize);
                 Raylib.DrawRectangleLinesEx(previewRect, 2, Color.Green);
