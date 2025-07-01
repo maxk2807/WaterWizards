@@ -389,7 +389,8 @@ public class GameBoard
         return state switch
         {
             CellState.Empty => Color.LightGray,
-            CellState.Ship => Color.Gray,
+            // CellState.Ship => Color.Gray, //because of texture now blank
+            CellState.Ship => Color.Blank,
             CellState.Rock => Color.DarkGray,
             CellState.Hit => Color.Orange,
             CellState.Miss => Color.Blue,
