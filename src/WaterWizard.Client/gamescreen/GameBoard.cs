@@ -389,9 +389,10 @@ public class GameBoard
         return state switch
         {
             CellState.Empty => Color.LightGray,
-            CellState.Ship => Color.Gray,
+            // CellState.Ship => Color.Gray, //because of texture now blank
+            CellState.Ship => Color.Blank,
             CellState.Rock => Color.DarkGray,
-            CellState.Hit => Color.Orange,
+            CellState.Hit => Color.Blank,
             CellState.Miss => Color.Blue,
             CellState.Unknown => new Color(135, 206, 235, 0), //transparenz hinzugefügt um den background sichtbar zu machen 
             CellState.Thunder => new Color(30, 30, 150, 255), // Dunkelblau für Thunder

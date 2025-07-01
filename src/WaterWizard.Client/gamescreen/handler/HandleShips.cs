@@ -1,6 +1,7 @@
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Raylib_cs;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.network;
@@ -12,6 +13,26 @@ namespace WaterWizard.Client.gamescreen.handler;
 /// </summary>
 public class HandleShips
 {
+
+    public readonly static Texture2D Ship1 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship1.png");
+    public readonly static Texture2D Ship2 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship2.png");
+    public readonly static Texture2D Ship3 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship3.png");
+    public readonly static Texture2D Ship4 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship4.png");
+    public readonly static Texture2D Ship5 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship5.png");
+
+    public static Texture2D TextureFromLength(int length)
+    {
+        return length switch
+        {
+            1 => Ship1,
+            2 => Ship2,
+            3 => Ship3,
+            4 => Ship4,
+            5 => Ship5,
+            _ => throw new Exception($"[Client] Invalid Ship Length: {length}"),
+        };
+    }
+
     /// <summary>
     /// Handles the ship position message received from the server.
     /// </summary>
