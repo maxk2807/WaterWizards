@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
 using static WaterWizard.Client.gamescreen.GameBoard;
@@ -21,6 +22,10 @@ public class CastingUI
     /// False if not up yet, true if was up already
     /// </summary>
     private bool firstUpBattleField;
+    
+    private bool isTeleportSelectionPhase = false;
+    private int selectedShipIndex = -1;
+    private Vector2 selectedShipCoords = new();
 
     public void Draw()
     {
@@ -72,6 +77,10 @@ public class CastingUI
         if (IsTargeted(aim))
         {
             HandleTargeted(gameCard, mousePos, aim);
+        }
+        else if (IsTeleportCard(gameCard))
+        {
+            HandleTeleportCard(gameCard, mousePos);
         }
         else if (IsTargetShip(gameCard))
         {
@@ -138,6 +147,16 @@ public class CastingUI
     private static bool IsTargetShip(GameCard gameCard)
     {
         return gameCard.card.Target!.Target.Contains("ship");
+    }
+    
+    /// <summary>
+    /// Checks if the card is a teleport card.
+    /// </summary>
+    /// <param name="gameCard">The game card to check</param>
+    /// <returns>True if the card is a teleport card, false otherwise</returns>
+    private static bool IsTeleportCard(GameCard gameCard)
+    {
+        return gameCard.card.Variant == CardVariant.Teleport;
     }
 
     /// <summary>
@@ -225,10 +244,132 @@ public class CastingUI
         return (int)aim.X > 0 && (int)aim.Y > 0;
     }
 
+    /// <summary>
+    /// Starts drawing the aiming UI for a card that's about to be cast.
+    /// </summary>
+    /// <param name="gameCard">The game card to aim</param>
     public void StartDrawingCardAim(GameCard gameCard)
     {
         firstUpBattleField = false;
         aiming = true;
         cardToAim = gameCard;
+        
+        isTeleportSelectionPhase = false;
+        selectedShipIndex = -1;
+    }
+
+    /// <summary>
+    /// Handles the teleport card casting UI which requires two steps:
+    /// 1. Select a ship to teleport
+    /// 2. Select a destination for that ship
+    /// </summary>
+    /// <param name="gameCard">The teleport card being cast</param>
+    /// <param name="mousePos">Current mouse position</param>
+    private void HandleTeleportCard(GameCard gameCard, Vector2 mousePos)
+    {
+        GameBoard board = GameScreen.playerBoard!;
+        Point? hoveredCoords = board.GetCellFromScreenCoords(mousePos);
+        Vector2 boardPos = board.Position;
+        
+        if (!isTeleportSelectionPhase)
+        {
+            string txt = "Select a ship to teleport";
+            int txtWidth = Raylib.MeasureText(txt, 20);
+            Raylib.DrawText(
+                txt,
+                (int)mousePos.X - (txtWidth / 2),
+                (int)mousePos.Y - 20,
+                20,
+                Color.Black
+            );
+            
+            bool hoveringShip = false;
+            int shipIndex = -1;
+            GameShip? hoveredShip = null;
+            
+            if (hoveredCoords.HasValue)
+            {
+                for (int i = 0; i < board.Ships.Count; i++)
+                {
+                    var ship = board.Ships[i];
+                    bool isHovered = 
+                        hoveredCoords.Value.X >= (ship.X - boardPos.X) / CellSize &&
+                        hoveredCoords.Value.X < (ship.X + ship.Width - boardPos.X) / CellSize &&
+                        hoveredCoords.Value.Y >= (ship.Y - boardPos.Y) / CellSize &&
+                        hoveredCoords.Value.Y < (ship.Y + ship.Height - boardPos.Y) / CellSize;
+                        
+                    if (isHovered)
+                    {
+                        hoveringShip = true;
+                        hoveredShip = ship;
+                        shipIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            if (hoveringShip && hoveredShip != null)
+            {
+                var r = new Rectangle(hoveredShip.X, hoveredShip.Y, hoveredShip.Width, hoveredShip.Height);
+                Raylib.DrawRectangleLinesEx(r, 3, Color.Yellow);
+                
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+                {
+                    isTeleportSelectionPhase = true;
+                    selectedShipIndex = shipIndex;
+                    selectedShipCoords = new(
+                        (hoveredShip.X - boardPos.X) / CellSize, 
+                        (hoveredShip.Y - boardPos.Y) / CellSize
+                    );
+                    Console.WriteLine($"[Client] Selected ship {shipIndex} at ({selectedShipCoords.X}, {selectedShipCoords.Y}) for teleport");
+                }
+            }
+        }
+        else
+        {
+            string txt = "Select a destination";
+            int txtWidth = Raylib.MeasureText(txt, 20);
+            Raylib.DrawText(
+                txt,
+                (int)mousePos.X - (txtWidth / 2),
+                (int)mousePos.Y - 20,
+                20,
+                Color.Black
+            );
+            
+            GameShip selectedShip = board.Ships[selectedShipIndex];
+            var shipRect = new Rectangle(selectedShip.X, selectedShip.Y, selectedShip.Width, selectedShip.Height);
+            Raylib.DrawRectangleLinesEx(shipRect, 3, Color.Yellow);
+            
+            if (hoveredCoords.HasValue)
+            {
+                float shipWidth = selectedShip.Width / CellSize;
+                float shipHeight = selectedShip.Height / CellSize;
+                
+                float previewX = boardPos.X + hoveredCoords.Value.X * CellSize;
+                float previewY = boardPos.Y + hoveredCoords.Value.Y * CellSize;
+                
+                var previewRect = new Rectangle(previewX, previewY, shipWidth * CellSize, shipHeight * CellSize);
+                Raylib.DrawRectangleLinesEx(previewRect, 2, Color.Green);
+                
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+                {
+                    aiming = false;
+                    isTeleportSelectionPhase = false;
+                    
+                    NetworkManager.Instance.HandleTeleportCast(
+                        cardToAim!.card, 
+                        selectedShipIndex, 
+                        new Point(hoveredCoords.Value.X, hoveredCoords.Value.Y)
+                    );
+                }
+            }
+            
+            if (Raylib.IsMouseButtonPressed(MouseButton.Right))
+            {
+                isTeleportSelectionPhase = false;
+                selectedShipIndex = -1;
+            }
+        }
     }
 }

@@ -77,8 +77,11 @@ public class UtilityCardHandler
     /// </summary>
     private void HandleTeleport(Vector2 targetCoords, NetPeer caster, NetPeer defender)
     {
-        // TODO: Implementiere Schiff-Teleportation
-        Console.WriteLine($"[UtilityCardHandler] Teleport to ({targetCoords.X}, {targetCoords.Y})");
+        int shipId = (int)(targetCoords.X) >> 16;
+        int destinationX = (int)targetCoords.X & 0xFFFF;
+        int destinationY = (int)targetCoords.Y;
+        
+        Console.WriteLine($"[UtilityCardHandler] Teleport ship {shipId} to ({destinationX}, {destinationY})");
     }
 
     /// <summary>

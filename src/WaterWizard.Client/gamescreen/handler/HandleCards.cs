@@ -72,12 +72,42 @@ public class HandleCards
             writer.Put(hoveredCoords.X);
             writer.Put(hoveredCoords.Y);
             clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.Write("[Client] Karte wirken");
+            Console.WriteLine($"[Client] Karte wirken: {card.Variant} an Position ({hoveredCoords.X}, {hoveredCoords.Y})");
         }
         else
         {
             Console.WriteLine(
                 "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
+            );
+        }
+    }
+    
+    /// <summary>
+    /// Handles the casting of the teleport card with ship selection and destination.
+    /// </summary>
+    /// <param name="card">The teleport card to be cast.</param>
+    /// <param name="shipIndex">The index of the ship to teleport.</param>
+    /// <param name="destinationCoords">The destination coordinates.</param>
+    public void HandleTeleportCast(Cards card, int shipId, GameBoard.Point destinationCoords)
+    {
+        if (clientService.client != null && clientService.client.FirstPeer != null)
+        {
+            NetDataWriter writer = new();
+            writer.Put("CastCard");
+            writer.Put(card.Variant.ToString());
+            
+            // Encode ship ID in the higher 16 bits of X coordinate
+            int encodedX = (shipId << 16) | (destinationCoords.X & 0xFFFF);
+            writer.Put(encodedX);
+            writer.Put(destinationCoords.Y);
+            
+            clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine($"[Client] Teleport-Karte wirken: Schiff {shipId} zur Position ({destinationCoords.X}, {destinationCoords.Y})");
+        }
+        else
+        {
+            Console.WriteLine(
+                "[Client] Kein Server verbunden, Teleport konnte nicht gesendet werden."
             );
         }
     }
