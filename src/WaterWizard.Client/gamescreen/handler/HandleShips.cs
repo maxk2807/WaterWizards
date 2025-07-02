@@ -15,20 +15,25 @@ public class HandleShips
 {
 
     public readonly static Texture2D Ship1 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship1.png");
+    public readonly static Texture2D Ship1Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship1-Rotated.png");
     public readonly static Texture2D Ship2 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship2.png");
+    public readonly static Texture2D Ship2Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship2-Rotated.png");
     public readonly static Texture2D Ship3 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship3.png");
+    public readonly static Texture2D Ship3Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship3-Rotated.png");
     public readonly static Texture2D Ship4 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship4.png");
+    public readonly static Texture2D Ship4Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship4-Rotated.png");
     public readonly static Texture2D Ship5 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship5.png");
+    public readonly static Texture2D Ship5Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship5-Rotated.png");
 
-    public static Texture2D TextureFromLength(int length)
+    public static Texture2D TextureFromLength(bool rotated, int length)
     {
         return length switch
         {
-            1 => Ship1,
-            2 => Ship2,
-            3 => Ship3,
-            4 => Ship4,
-            5 => Ship5,
+            1 => rotated ? Ship1Rotated : Ship1,
+            2 => rotated ? Ship2Rotated : Ship2,
+            3 => rotated ? Ship3Rotated : Ship3,
+            4 => rotated ? Ship4Rotated : Ship4,
+            5 => rotated ? Ship5Rotated : Ship5,
             _ => throw new Exception($"[Client] Invalid Ship Length: {length}"),
         };
     }
