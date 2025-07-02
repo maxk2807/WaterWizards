@@ -432,6 +432,9 @@ public class ClientService(NetworkManager manager)
                 case "ShieldExpired":
                     HandleShield.HandleShieldExpired(reader);
                     break;
+                case "SummonShip":
+                    GameStateManager.Instance.GameScreen.EnableSingleShipPlacement();
+                    break;
             }
         }
         catch (Exception ex)

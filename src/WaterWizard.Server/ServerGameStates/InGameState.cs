@@ -82,10 +82,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     {
         manaTimer?.Stop();
         manaTimer?.Dispose();
-        
+
         goldTimer?.Stop();
         goldTimer?.Dispose();
-        
+
         shieldTimer?.Stop();
         shieldTimer?.Dispose();
     }
@@ -105,7 +105,20 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         switch (messageType)
         {
             case "PlaceShip":
-                ShipHandler.HandleShipPlacement(peer, reader, gameState);
+                // Prüfe, ob der Spieler Schiffe in der Spielphase platzieren darf
+                int playerIndex = gameState.GetPlayerIndex(peer);
+                if (gameState.AllowShipPlacementInGame != null && gameState.AllowShipPlacementInGame[playerIndex])
+                {
+                    ShipHandler.HandleShipPlacement(peer, reader, gameState);
+                    gameState.AllowShipPlacementInGame[playerIndex] = false; // Nach Platzierung wieder sperren
+                }
+                else
+                {
+                    var errorWriter = new NetDataWriter();
+                    errorWriter.Put("ShipPlacementError");
+                    errorWriter.Put("Schiffsplatzierung ist in der Spielphase nur mit der Karte 'Summon Ship' erlaubt!");
+                    peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
+                }
                 break;
             case "BuyCard":
                 CardHandler.HandleCardBuying(serverInstance, peer, reader);
@@ -146,7 +159,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         var writer = new NetDataWriter();
         writer.Put("UpdatePauseState");
         writer.Put(gameState.IsPaused);
-        
+
         foreach (var p in serverInstance.ConnectedPeerList)
         {
             p.Send(writer, DeliveryMethod.ReliableOrdered);

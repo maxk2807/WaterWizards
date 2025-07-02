@@ -22,7 +22,7 @@ public class CastingUI
     /// False if not up yet, true if was up already
     /// </summary>
     private bool firstUpBattleField;
-    
+
     private bool isTeleportSelectionPhase = false;
     private int selectedShipIndex = -1;
     private Vector2 selectedShipCoords = new();
@@ -42,6 +42,14 @@ public class CastingUI
     /// <param name="gameCard">The Card to Cast</param>
     private void DrawCastAim(GameCard gameCard)
     {
+        // Sonderbehandlung für SummonShip: sofort casten, kein Ziel auswählen
+        if (gameCard.card.Variant == WaterWizard.Shared.CardVariant.SummonShip)
+        {
+            aiming = false;
+            NetworkManager.HandleCast(gameCard.card, new Point(0, 0));
+            return;
+        }
+
         var mousePos = Raylib.GetMousePosition();
         Vector2 aim = gameCard.card.TargetAsVector();
 
@@ -148,7 +156,7 @@ public class CastingUI
     {
         return gameCard.card.Target!.Target.Contains("ship");
     }
-    
+
     /// <summary>
     /// Checks if the card is a teleport card.
     /// </summary>
@@ -253,7 +261,7 @@ public class CastingUI
         firstUpBattleField = false;
         aiming = true;
         cardToAim = gameCard;
-        
+
         isTeleportSelectionPhase = false;
         selectedShipIndex = -1;
     }
@@ -270,7 +278,7 @@ public class CastingUI
         GameBoard board = GameScreen.playerBoard!;
         Point? hoveredCoords = board.GetCellFromScreenCoords(mousePos);
         Vector2 boardPos = board.Position;
-        
+
         if (!isTeleportSelectionPhase)
         {
             string txt = "Select a ship to teleport";
@@ -282,22 +290,22 @@ public class CastingUI
                 20,
                 Color.Black
             );
-            
+
             bool hoveringShip = false;
             int shipIndex = -1;
             GameShip? hoveredShip = null;
-            
+
             if (hoveredCoords.HasValue)
             {
                 for (int i = 0; i < board.Ships.Count; i++)
                 {
                     var ship = board.Ships[i];
-                    bool isHovered = 
+                    bool isHovered =
                         hoveredCoords.Value.X >= (ship.X - boardPos.X) / CellSize &&
                         hoveredCoords.Value.X < (ship.X + ship.Width - boardPos.X) / CellSize &&
                         hoveredCoords.Value.Y >= (ship.Y - boardPos.Y) / CellSize &&
                         hoveredCoords.Value.Y < (ship.Y + ship.Height - boardPos.Y) / CellSize;
-                        
+
                     if (isHovered)
                     {
                         hoveringShip = true;
@@ -307,18 +315,18 @@ public class CastingUI
                     }
                 }
             }
-            
+
             if (hoveringShip && hoveredShip != null)
             {
                 var r = new Rectangle(hoveredShip.X, hoveredShip.Y, hoveredShip.Width, hoveredShip.Height);
                 Raylib.DrawRectangleLinesEx(r, 3, Color.Yellow);
-                
+
                 if (Raylib.IsMouseButtonPressed(MouseButton.Left))
                 {
                     isTeleportSelectionPhase = true;
                     selectedShipIndex = shipIndex;
                     selectedShipCoords = new(
-                        (hoveredShip.X - boardPos.X) / CellSize, 
+                        (hoveredShip.X - boardPos.X) / CellSize,
                         (hoveredShip.Y - boardPos.Y) / CellSize
                     );
                     Console.WriteLine($"[Client] Selected ship {shipIndex} at ({selectedShipCoords.X}, {selectedShipCoords.Y}) for teleport");
@@ -336,35 +344,35 @@ public class CastingUI
                 20,
                 Color.Black
             );
-            
+
             GameShip selectedShip = board.Ships[selectedShipIndex];
             var shipRect = new Rectangle(selectedShip.X, selectedShip.Y, selectedShip.Width, selectedShip.Height);
             Raylib.DrawRectangleLinesEx(shipRect, 3, Color.Yellow);
-            
+
             if (hoveredCoords.HasValue)
             {
                 float shipWidth = (float)selectedShip.Width / CellSize;
                 float shipHeight = (float)selectedShip.Height / CellSize;
-                
+
                 float previewX = boardPos.X + hoveredCoords.Value.X * (float)CellSize;
                 float previewY = boardPos.Y + hoveredCoords.Value.Y * (float)CellSize;
-                
+
                 var previewRect = new Rectangle(previewX, previewY, shipWidth * CellSize, shipHeight * CellSize);
                 Raylib.DrawRectangleLinesEx(previewRect, 2, Color.Green);
-                
+
                 if (Raylib.IsMouseButtonPressed(MouseButton.Left))
                 {
                     aiming = false;
                     isTeleportSelectionPhase = false;
-                    
+
                     NetworkManager.Instance.HandleTeleportCast(
-                        cardToAim!.card, 
-                        selectedShipIndex, 
+                        cardToAim!.card,
+                        selectedShipIndex,
                         new Point(hoveredCoords.Value.X, hoveredCoords.Value.Y)
                     );
                 }
             }
-            
+
             if (Raylib.IsMouseButtonPressed(MouseButton.Right))
             {
                 isTeleportSelectionPhase = false;

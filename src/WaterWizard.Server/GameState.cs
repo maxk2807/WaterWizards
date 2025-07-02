@@ -82,6 +82,9 @@ public class GameState
     private readonly List<ShieldEffect> _activeShields = new();
     public IReadOnlyList<ShieldEffect> ActiveShields => _activeShields.AsReadOnly();
 
+    // Erlaubt Schiffsplatzierung in der Spielphase (z.B. durch SummonShip)
+    public bool[] AllowShipPlacementInGame = new bool[2];
+
     /// <summary>
     /// Öffentlicher Zugriff auf den Server für Handler-Klassen
     /// </summary>
@@ -193,6 +196,8 @@ public class GameState
         this.manager = manager;
 
         activationTimer = new Timer(_ => CardHandler.UpdateActiveCards(this, 500), null, 0, 500);
+
+        AllowShipPlacementInGame = new bool[2] { false, false };
     }
 
     /// <summary>
@@ -386,7 +391,7 @@ public class GameState
         }
         return -1;
     }
-    
+
     /// <summary>
     /// Handles player surrender by triggering game over with the opponent as winner
     /// </summary>
@@ -437,9 +442,9 @@ public class GameState
     /// <returns>True if the coordinate is protected by a shield</returns>
     public bool IsCoordinateProtectedByShield(int x, int y, int playerIndex)
     {
-        return _activeShields.Any(shield => 
-            shield.IsActive && 
-            shield.PlayerIndex == playerIndex && 
+        return _activeShields.Any(shield =>
+            shield.IsActive &&
+            shield.PlayerIndex == playerIndex &&
             shield.IsCoordinateProtected(x, y));
     }
 }

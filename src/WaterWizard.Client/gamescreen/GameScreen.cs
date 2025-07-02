@@ -5,6 +5,7 @@ using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
+using WaterWizard.Client.gamestates;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -36,6 +37,8 @@ public class GameScreen(
     private Texture2D gameBackground;
     private Texture2D gridBackground;
     private Texture2D enemyGridBackground;
+
+    private bool allowSingleShipPlacement = false;
 
     public void LoadBackgroundAssets()
     {
@@ -201,10 +204,10 @@ public class GameScreen(
         Raylib.DrawTexturePro(
             gameBackground,
             new Rectangle(0, 0, gameBackground.Width, gameBackground.Height),
-            new Rectangle(0, 0, currentScreenWidth, currentScreenHeight),       
-            Vector2.Zero,                                                       
-            0f,                                                                 
-            Color.White                                                         
+            new Rectangle(0, 0, currentScreenWidth, currentScreenHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
         );
 
 
@@ -286,6 +289,12 @@ public class GameScreen(
 
         DrawRessourceField();
 
+        // ShipField zeichnen: Immer in der Platzierungsphase, oder im InGameState wenn allowSingleShipPlacement aktiv ist
+        if (GameStateManager.Instance.GetCurrentState() is PlacementPhaseState || allowSingleShipPlacement)
+        {
+            DrawShipField();
+        }
+
         // Update and Draw Game Boards
         GameBoard.Point? clickedCell = opponentBoard.Update();
         if (clickedCell.HasValue)
@@ -341,8 +350,6 @@ public class GameScreen(
                 Color.Black
             );
         }
-
-        DrawShipField();
 
         // Draw Back Button
         int backButtonWidth = 100;
@@ -562,5 +569,20 @@ public class GameScreen(
         int y = Random.Shared.Next(0, board.GridHeight - 1);
 
         board.AddThunderStrike(x, y);
+    }
+
+    public void EnableSingleShipPlacement()
+    {
+        allowSingleShipPlacement = true;
+        Console.WriteLine("allowSingleShipPlacement aktiviert!");
+        shipField?.Initialize();
+        Console.WriteLine("ShipField initialized, Schiffe: " + (shipField?.Ships.Count ?? -1));
+        if (shipField != null && shipField.Ships.Count > 0)
+        {
+            var random = new Random();
+            var randomShip = shipField.Ships.Keys.ElementAt(random.Next(shipField.Ships.Count));
+            Console.WriteLine("Starte Dragging für Schiff!");
+            randomShip.StartDragging();
+        }
     }
 }
