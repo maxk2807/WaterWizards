@@ -36,9 +36,9 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     /// </summary>
     public void Draw()
     {
-        Texture2D texture = HandleShips.TextureFromLength(Math.Max(Width / CellSize, Height / CellSize));
+        Texture2D texture = HandleShips.TextureFromLength(Rotated, Math.Max(Width / CellSize, Height / CellSize));
         Rectangle rec = new(X, Y, Width, Height);
-        Rectangle textureRec = new(0, 0, Rotated ? texture.Height : texture.Width, Rotated ? texture.Width : texture.Height);
+        Rectangle textureRec = new(0, 0, texture.Width, texture.Height);
         Raylib.DrawTexturePro(
             texture,
             textureRec,
