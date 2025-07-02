@@ -11,6 +11,9 @@ public class MainMenuState : IGameState
 
     private Texture2D menuBackground; //Hintergrund Variable
     private Texture2D titleAsset; //Hintergrund Variable
+    private static Texture2D joinButtonAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/MainMenu/JoinLobby.png");
+    private static Texture2D hostButtonAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/MainMenu/HostLobby.png");
+    private static Texture2D mapButtonAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/MainMenu/MapTest.png");
 
     public void LoadAssets()
     {
@@ -19,15 +22,6 @@ public class MainMenuState : IGameState
 
         if (titleAsset.Id != 0) return;
         titleAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/MainMenu/titleAsset.png");
-
-        // if (joinButtonAsset.Id != 0) return;
-        // titleAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/MainMenu/JoinLobby.png");
-
-        // if (hostButtonAsset.Id != 0) return;
-        // titleAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/MainMenu/HostLobby.png");
-
-        // if (mapButtonAsset.Id != 0) return;
-        // titleAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/MainMenu/.png");
     }
 
     public void UpdateAndDraw(GameStateManager manager)
@@ -89,56 +83,83 @@ public class MainMenuState : IGameState
         //     titleX += charWidth + letterSpacing;
         // }
 
-        Rectangle joinButton = new(
-            (float)manager.screenWidth / 2 - 100,
-            (float)manager.screenHeight / 2,
-            200,
-            40
-        );
-        Rectangle hostButton = new(
-            (float)manager.screenWidth / 2 - 100,
-            (float)manager.screenHeight / 2 + 60,
-            200,
-            40
-        );
+        HandleJoinButton(manager);
+        HandleHostButton(manager);
+        HandleMapButton(manager);
+    }
+
+    private static void HandleMapButton(GameStateManager manager)
+    {
         Rectangle mapButton = new(
-            (float)manager.screenWidth / 2 - 100,
-            (float)manager.screenHeight / 2 + 120,
-            200,
-            40
-        );
-        bool hoverJoin = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton);
-        if (hoverJoin && Raylib.IsMouseButtonReleased(MouseButton.Left))
-        {
-            manager.SetStateToLobbyList();
-        }
-        bool hoverHost = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton);
-        if (hoverHost && Raylib.IsMouseButtonReleased(MouseButton.Left))
-        {
-            manager.SetStateToHostingMenu();
-        }
+                    (float)manager.screenWidth / 2 - 100,
+                    (float)manager.screenHeight / 2 + 189,
+                    220,
+                    54
+                );
         bool hoverMap = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), mapButton);
         if (hoverMap && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             manager.SetStateToPlacementPhase();
         }
-        Raylib.DrawRectangleRec(joinButton, hoverJoin ? Color.DarkBlue : Color.Blue);
-        Raylib.DrawText(
-            "Join Lobby",
-            (int)joinButton.X + 50,
-            (int)joinButton.Y + 10,
-            20,
+        Rectangle textureRec = new(0, 0, mapButtonAsset.Width, mapButtonAsset.Height);
+        Raylib.DrawTexturePro(
+            mapButtonAsset,
+            textureRec,
+            mapButton,
+            Vector2.Zero,
+            0f,
             Color.White
         );
-        Raylib.DrawRectangleRec(hostButton, hoverHost ? Color.DarkBlue : Color.Blue);
-        Raylib.DrawText(
-            "Host Lobby",
-            (int)hostButton.X + 50,
-            (int)hostButton.Y + 10,
-            20,
+        Raylib.DrawRectangleRec(mapButton, hoverMap ? new(255, 255, 255, 31) : Color.Blank);
+    }
+
+    private static void HandleHostButton(GameStateManager manager)
+    {
+        Rectangle hostButton = new(
+                    (float)manager.screenWidth / 2 - 100,
+                    (float)manager.screenHeight / 2 + 92,
+                    246,
+                    72
+                );
+        bool hoverHost = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton);
+        if (hoverHost && Raylib.IsMouseButtonReleased(MouseButton.Left))
+        {
+            manager.SetStateToHostingMenu();
+        }
+        Rectangle textureRec = new(0, 0, hostButtonAsset.Width, hostButtonAsset.Height);
+        Raylib.DrawTexturePro(
+            hostButtonAsset,
+            textureRec,
+            hostButton,
+            Vector2.Zero,
+            0f,
             Color.White
         );
-        Raylib.DrawRectangleRec(mapButton, hoverMap ? Color.DarkBlue : Color.Blue);
-        Raylib.DrawText("Map Test", (int)mapButton.X + 50, (int)mapButton.Y + 10, 20, Color.White);
+        Raylib.DrawRectangleRec(hostButton, hoverHost ? new(255, 255, 255, 31) : Color.Blank);
+    }
+
+    private static void HandleJoinButton(GameStateManager manager)
+    {
+        Rectangle joinButton = new(
+                    (float)manager.screenWidth / 2 - 140,
+                    (float)manager.screenHeight / 2,
+                    246,
+                    72
+                );
+        bool hoverJoin = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton);
+        if (hoverJoin && Raylib.IsMouseButtonReleased(MouseButton.Left))
+        {
+            manager.SetStateToLobbyList();
+        }
+        Rectangle textureRec = new(0, 0, joinButtonAsset.Width, joinButtonAsset.Height);
+        Raylib.DrawTexturePro(
+            joinButtonAsset,
+            textureRec,
+            joinButton,
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+        Raylib.DrawRectangleRec(joinButton, hoverJoin ? new(255, 255, 255, 31) : Color.Blank);
     }
 }
