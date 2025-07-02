@@ -1,5 +1,6 @@
 using System.Numerics;
 using LiteNetLib;
+using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
 
@@ -21,7 +22,7 @@ public class FireballCard : IDamageCard
         int startX = (int)targetCoords.X - 1;
         int startY = (int)targetCoords.Y - 1;
 
-        var ships = gameState.GetShips(defender);
+        var ships = ShipHandler.GetShips(defender);
         bool anyHit = false;
 
         for (int dx = 0; dx < (int)AreaOfEffect.X; dx++)
@@ -48,12 +49,12 @@ public class FireballCard : IDamageCard
                             }
                             else
                             {
-                                gameState.SendCellReveal(attacker, defender, x, y, true);
+                                CellHandler.SendCellReveal(attacker, defender, x, y, true);
                             }
                         }
                         else
                         {
-                            gameState.SendCellReveal(attacker, defender, x, y, true);
+                            CellHandler.SendCellReveal(attacker, defender, x, y, true);
                         }
                         break;
                     }
@@ -61,7 +62,7 @@ public class FireballCard : IDamageCard
 
                 if (!cellHit)
                 {
-                    gameState.SendCellReveal(attacker, defender, x, y, false);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, false);
                 }
 
                 if (cellHit)
