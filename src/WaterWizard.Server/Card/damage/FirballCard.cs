@@ -12,11 +12,34 @@ namespace WaterWizard.Server.Card;
 /// </summary>
 public class FireballCard : IDamageCard
 {
+    /// <summary>
+    /// The variant of the card
+    /// </summary>
     public CardVariant Variant => CardVariant.Fireball;
+
+    /// <summary>
+    /// The area of effect as a Vector2 (width x height)
+    /// </summary>
     public Vector2 AreaOfEffect => new(3, 3);
+
+    /// <summary>
+    /// The base damage this card deals
+    /// </summary>
     public int BaseDamage => 3;
+
+    /// <summary>
+    /// Whether this card has special targeting rules
+    /// </summary>
     public bool HasSpecialTargeting => false;
 
+
+    /// <summary>
+    /// Executes the damage effect of the Firebolt card
+    /// </summary>
+    /// <param name="gameState">The current game state</param>
+    /// <param name="targetCoords">The coordinates targeted by the card</param>
+    /// <param name="attacker">The attacking player</param>
+    /// <param name="defender">The defending player</param>
     public bool ExecuteDamage(GameState gameState, Vector2 targetCoords, NetPeer attacker, NetPeer defender)
     {
         int startX = (int)targetCoords.X - 1;
@@ -75,6 +98,13 @@ public class FireballCard : IDamageCard
         return anyHit;
     }
 
+    /// <summary>
+    /// Validates if the target coordinates are valid for this card
+    /// </summary>
+    /// <param name="gameState">The current game state.</param>
+    /// <param name="targetCoords">The coordinates targeted by the card.</param>
+    /// <param name="defender">The defending player.</param>
+    /// <returns>True if the target area is within the board, otherwise false.</returns>
     public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer defender)
     {
         int boardWidth = 12;
