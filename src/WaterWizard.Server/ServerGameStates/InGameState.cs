@@ -15,6 +15,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 
     private System.Timers.Timer? manaTimer;
     private System.Timers.Timer? goldTimer;
+    private System.Timers.Timer? shieldTimer;
     private ManaHandler? manaHandler;
     public ParalizeHandler? paralizeHandler;
     private GoldHandler? goldHandler;
@@ -47,16 +48,31 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         goldTimer.Elapsed += (sender, e) => UpdateGold();
         goldTimer.AutoReset = true;
         goldTimer.Start();
+
+        // Shield timer - updates every 100ms for precise shield expiration
+        shieldTimer = new System.Timers.Timer(100);
+        shieldTimer.Elapsed += (sender, e) => UpdateShields();
+        shieldTimer.AutoReset = true;
+        shieldTimer.Start();
     }
 
     private void UpdateMana()
     {
+        if (gameState.IsPaused) return;
         manaHandler?.UpdateMana();
     }
 
     private void UpdateGold()
     {
+        if (gameState.IsPaused) return;
         goldHandler?.UpdateGold();
+    }
+
+    private void UpdateShields()
+    {
+        if (gameState.IsPaused) return;
+        // Update shields with delta time of 0.1 seconds (100ms timer interval)
+        gameState.UpdateShields(0.1f);
     }
 
     /// <summary>
@@ -66,9 +82,12 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     {
         manaTimer?.Stop();
         manaTimer?.Dispose();
-        
+
         goldTimer?.Stop();
         goldTimer?.Dispose();
+
+        shieldTimer?.Stop();
+        shieldTimer?.Dispose();
     }
 
     public void HandleNetworkEvent(
@@ -86,7 +105,20 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         switch (messageType)
         {
             case "PlaceShip":
-                ShipHandler.HandleShipPlacement(peer, reader, gameState);
+                // Prüfe, ob der Spieler Schiffe in der Spielphase platzieren darf
+                int playerIndex = gameState.GetPlayerIndex(peer);
+                if (gameState.AllowShipPlacementInGame != null && gameState.AllowShipPlacementInGame[playerIndex])
+                {
+                    ShipHandler.HandleShipPlacement(peer, reader, gameState);
+                    gameState.AllowShipPlacementInGame[playerIndex] = false; // Nach Platzierung wieder sperren
+                }
+                else
+                {
+                    var errorWriter = new NetDataWriter();
+                    errorWriter.Put("ShipPlacementError");
+                    errorWriter.Put("Schiffsplatzierung ist in der Spielphase nur mit der Karte 'Summon Ship' erlaubt!");
+                    peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
+                }
                 break;
             case "BuyCard":
                 CardHandler.HandleCardBuying(serverInstance, peer, reader);
@@ -110,10 +142,29 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "Surrender":
                 HandleSurrender(peer);
                 break;
+            case "PauseToggle":
+                HandlePauseToggle(serverInstance);
+                break;
             default:
                 Console.WriteLine($"[InGameState] Unbekannter Nachrichtentyp: {messageType}");
                 break;
         }
+    }
+
+    private void HandlePauseToggle(NetManager serverInstance)
+    {
+        gameState.IsPaused = !gameState.IsPaused;
+        Console.WriteLine($"[Server] Game pause state toggled to: {gameState.IsPaused}");
+
+        var writer = new NetDataWriter();
+        writer.Put("UpdatePauseState");
+        writer.Put(gameState.IsPaused);
+
+        foreach (var p in serverInstance.ConnectedPeerList)
+        {
+            p.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        Console.WriteLine($"[Server] Sent pause state '{gameState.IsPaused}' to all clients.");
     }
 
     /// <summary>

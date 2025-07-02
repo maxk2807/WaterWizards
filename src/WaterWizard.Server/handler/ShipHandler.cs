@@ -1,6 +1,7 @@
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Server;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
@@ -179,7 +180,6 @@ public class ShipHandler
         writer.Put(ship.Y);
         writer.Put(ship.Width);
         writer.Put(ship.Height);
-        writer.Put(false);
 
         writer.Put(ship.DamagedCells.Count);
         foreach (var (damageX, damageY) in ship.DamagedCells)
@@ -223,5 +223,16 @@ public class ShipHandler
         }
         caster.Send(writer, DeliveryMethod.ReliableOrdered);
 
+    }
+
+    public static void HandlePositionUpdate(Vector2 oldCoords, Vector2 newCoords, NetPeer client)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("UpdateShipPosition");
+        writer.Put((int)oldCoords.X);
+        writer.Put((int)oldCoords.Y);
+        writer.Put((int)newCoords.X);
+        writer.Put((int)newCoords.Y);
+        client.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 }

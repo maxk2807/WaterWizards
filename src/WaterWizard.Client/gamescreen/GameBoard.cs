@@ -27,6 +27,30 @@ public class GameBoard
     private List<ThunderStrike> _activeThunderStrikes = [];
     private readonly Random _random = new();
 
+    // Shield effect tracking
+    private Dictionary<(int x, int y), float> _shieldedCells = new();
+    private class ShieldEffect
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+        public float Duration { get; set; }
+        public float MaxDuration { get; } = 6.0f; // 6 seconds
+        public float Alpha => Math.Min(1.0f, Duration / MaxDuration);
+        public bool IsActive => Duration > 0;
+
+        public ShieldEffect(int x, int y)
+        {
+            X = x;
+            Y = y;
+            Duration = MaxDuration;
+        }
+
+        public void Update(float deltaTime)
+        {
+            Duration -= deltaTime;
+        }
+    }
+
     private class ThunderStrike
     {
         public Vector2 Position { get; set; }
@@ -149,6 +173,66 @@ public class GameBoard
     }
 
     /// <summary>
+    /// Handles Changing the Cell States of moving a Ship (e.g. due to CallWind Card Casting). 
+    /// </summary>
+    /// <param name="ship">the ship to be moved</param>
+    /// <param name="oldCoords">the old Coordinates of the ship (in board coords so the small numbers)</param>
+    /// <param name="newCoords">the new Coordinates of the ship (in board coords so small numbers)</param>
+    public void MoveShip(GameShip ship, Vector2 oldCoords, Vector2 newCoords)
+    {
+        int startX = (int)oldCoords.X;
+        int startY = (int)oldCoords.Y;
+        int width = ship.Width / CellSize;
+        int height = ship.Height / CellSize;
+        List<(int X, int Y)> hit = [];
+
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+                {
+                    if (_gridStates[x, y] == CellState.Hit)
+                    {
+                        hit.Add((x, y));
+                        _gridStates[x, y] = CellState.Miss;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Set to Unknown you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}");
+                        _gridStates[x, y] = CellState.Unknown;
+                    }
+                }
+            }
+        }
+
+
+
+        startX = (int)newCoords.X;
+        startY = (int)newCoords.Y;
+
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
+                {
+                    if (hit.Any(cell => cell.X == x && cell.Y == y))
+                    {
+                        _gridStates[x, y] = CellState.Hit;
+
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Set to Ship you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}");
+                        _gridStates[x, y] = CellState.Ship;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Converts screen coordinates to grid cell coordinates.
     /// Returns null if the coordinates are outside the board.
     /// </summary>
@@ -193,6 +277,9 @@ public class GameBoard
                 _activeThunderStrikes.RemoveAt(i);
             }
         }
+
+        // Update shield effects
+        UpdateShieldEffects(deltaTime);
 
         if (Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
@@ -287,6 +374,9 @@ public class GameBoard
         {
             strike.Draw(CellSize);
         }
+
+        // Shield-Effekte zeichnen
+        DrawShieldEffects();
     }
 
     /// <summary>
@@ -299,12 +389,14 @@ public class GameBoard
         return state switch
         {
             CellState.Empty => Color.LightGray,
-            CellState.Ship => Color.Gray,
+            // CellState.Ship => Color.Gray, //because of texture now blank
+            CellState.Ship => Color.Blank,
             CellState.Rock => Color.DarkGray,
-            CellState.Hit => Color.Orange,
+            CellState.Hit => Color.Blank,
             CellState.Miss => Color.Blue,
             CellState.Unknown => new Color(135, 206, 235, 0), //transparenz hinzugefügt um den background sichtbar zu machen 
             CellState.Thunder => new Color(30, 30, 150, 255), // Dunkelblau für Thunder
+            CellState.Shield => new Color(0, 255, 255, 100), // Cyan für Shield mit Transparenz
             _ => Color.Black,
         };
     }
@@ -474,6 +566,9 @@ public class GameBoard
         aiming = false;
         cardToAim = null;
 
+        _shieldedCells.Clear();
+        _activeThunderStrikes.Clear();
+
         Console.WriteLine("[Client][GameBoard]GameBoard cleared.");
     }
 
@@ -494,8 +589,8 @@ public class GameBoard
     public void AddThunderStrike(int x, int y, bool hit = false)
     {
         Vector2 position = new(
-            Position.X + (float)x * (float)CellSize + (float)CellSize / 2f,
-            Position.Y + (float)y * (float)CellSize + (float)CellSize / 2f
+            Position.X + x * (float)CellSize + CellSize / 2f,
+            Position.Y + y * (float)CellSize + CellSize / 2f
         );
 
         var strike = new ThunderStrike(position, hit);
@@ -521,6 +616,109 @@ public class GameBoard
         _activeThunderStrikes.Clear();
     }
 
+    /// <summary>
+    /// Adds a shield effect to the game board at the specified position
+    /// </summary>
+    /// <param name="x">X coordinate of the shield center</param>
+    /// <param name="y">Y coordinate of the shield center</param>
+    /// <param name="duration">Duration of the shield effect</param>
+    public void AddShieldEffect(int x, int y, float duration)
+    {
+        Console.WriteLine($"[GameBoard] Adding shield effect at CENTER ({x}, {y}) with duration {duration}");
+        
+        for (int dx = -1; dx <= 1; dx++)  
+        {
+            for (int dy = -1; dy <= 1; dy++)  
+            {
+                int shieldX = x + dx;
+                int shieldY = y + dy;
+                
+                if (shieldX >= 0 && shieldX < GridWidth && shieldY >= 0 && shieldY < GridHeight)
+                {
+                    if (_shieldedCells.ContainsKey((shieldX, shieldY)))
+                    {
+                        _shieldedCells[(shieldX, shieldY)] = Math.Max(_shieldedCells[(shieldX, shieldY)], duration);
+                    }
+                    else
+                    {
+                        _shieldedCells[(shieldX, shieldY)] = duration;
+                    }
+                    Console.WriteLine($"[GameBoard] Shield cell added at ({shieldX}, {shieldY}) for {duration} seconds [offset: dx={dx}, dy={dy}]");
+                }
+                else
+                {
+                    Console.WriteLine($"[GameBoard] Shield cell ({shieldX}, {shieldY}) is OUT OF BOUNDS [offset: dx={dx}, dy={dy}]");
+                }
+            }
+        }
+        
+        Console.WriteLine($"[GameBoard] Shield placement complete. Total shielded cells: {_shieldedCells.Count}");
+    }
+
+    /// <summary>
+    /// Removes a shield effect from the game board at the specified position
+    /// </summary>
+    /// <param name="x">X coordinate of the shield center</param>
+    /// <param name="y">Y coordinate of the shield center</param>
+    public void RemoveShieldEffect(int x, int y)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                int shieldX = x + dx;
+                int shieldY = y + dy;
+
+                if (shieldX >= 0 && shieldX < GridWidth && shieldY >= 0 && shieldY < GridHeight)
+                {
+                    _shieldedCells.Remove((shieldX, shieldY));
+                    Console.WriteLine($"[GameBoard] Shield cell removed at ({shieldX}, {shieldY})");
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Checks if a cell is currently shielded
+    /// </summary>
+    /// <param name="x">X coordinate</param>
+    /// <param name="y">Y coordinate</param>
+    /// <returns>True if the cell is shielded</returns>
+    public bool IsCellShielded(int x, int y)
+    {
+        return _shieldedCells.ContainsKey((x, y)) && _shieldedCells[(x, y)] > 0;
+    }
+
+    /// <summary>
+    /// Updates all active shield effects, reducing their duration and removing expired ones
+    /// </summary>
+    /// <param name="deltaTime">Time elapsed since last update in seconds</param>
+    public void UpdateShieldEffects(float deltaTime)
+    {
+        var keysToRemove = new List<(int, int)>();
+
+        foreach (var kvp in _shieldedCells.ToList())
+        {
+            var (x, y) = kvp.Key;
+            float duration = kvp.Value - deltaTime;
+
+            if (duration <= 0)
+            {
+                keysToRemove.Add((x, y));
+            }
+            else
+            {
+                _shieldedCells[(x, y)] = duration;
+            }
+        }
+
+        foreach (var key in keysToRemove)
+        {
+            _shieldedCells.Remove(key);
+            Console.WriteLine($"[GameBoard] Shield expired at ({key.Item1}, {key.Item2})");
+        }
+    }
+
     private void DrawCell(int x, int y)
     {
         int cellX = (int)Position.X + x * CellSize;
@@ -541,7 +739,10 @@ public class GameBoard
                 Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Orange);
                 break;
             case CellState.Miss:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Blue);
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.DarkBlue);
+                break;
+            case CellState.Shield:
+                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, GetColorForState(CellState.Shield));
                 break;
             case CellState.Unknown:
                 Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(135, 206, 235, 0));
@@ -557,5 +758,68 @@ public class GameBoard
                 Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Black);
                 break;
         }
+
+        // Draw shield effect overlay if cell is shielded
+        if (IsCellShielded(x, y))
+        {
+            float duration = _shieldedCells[(x, y)];
+            float alpha = Math.Min(1.0f, duration / 6.0f); // Fade out as duration decreases
+            Color shieldColor = new Color(0, 255, 255, (int)(150 * alpha)); // Cyan with transparency
+
+            Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, shieldColor);
+            Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, new Color(0, 200, 200, (int)(255 * alpha)));
+        }
+    }
+
+    /// <summary>
+    /// Draws shield effects on the game board
+    /// </summary>
+    private void DrawShieldEffects()
+    {
+        foreach (var kvp in _shieldedCells)
+        {
+            var (x, y) = kvp.Key;
+            float duration = kvp.Value;
+
+            int posX = (int)Position.X + x * CellSize;
+            int posY = (int)Position.Y + y * CellSize;
+
+            float alpha = Math.Min(1.0f, duration / 6.0f);
+            int alphaValue = (int)(alpha * 150);
+
+            Color shieldColor = new(0, 255, 255, alphaValue);
+            Raylib.DrawRectangle(posX, posY, CellSize, CellSize, shieldColor);
+
+            Color borderColor = new(0, 200, 200, Math.Min(255, alphaValue + 100));
+            Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, borderColor);
+
+            int centerX = posX + CellSize / 2;
+            int centerY = posY + CellSize / 2;
+            int symbolSize = CellSize / 4;
+
+            Vector2[] points = new Vector2[]
+            {
+                new(centerX, centerY - symbolSize),
+                new(centerX + symbolSize, centerY),
+                new(centerX, centerY + symbolSize),
+                new(centerX - symbolSize, centerY)
+            };
+
+            Color symbolColor = new(255, 255, 255, Math.Min(255, alphaValue + 100));
+            for (int i = 0; i < points.Length; i++)
+            {
+                int next = (i + 1) % points.Length;
+                Raylib.DrawLineEx(points[i], points[next], 2f, symbolColor);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Clears all shield effects from the game board
+    /// </summary>
+    public void ClearAllShieldEffects()
+    {
+        _shieldedCells.Clear();
+        Console.WriteLine("[GameBoard] All shield effects cleared");
     }
 }

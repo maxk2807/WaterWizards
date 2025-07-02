@@ -27,6 +27,18 @@ public class AttackHandler
             $"[Server] HandleAttack called: attacker={attacker}, defender={defender}, coords=({x},{y})"
         );
 
+        // Get defender's player index for shield check
+        int defenderIndex = gameState?.GetPlayerIndex(defender) ?? -1;
+
+        // Check if this coordinate is protected by a shield
+        if (defenderIndex != -1 && gameState != null && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+        {
+            Console.WriteLine($"[Server] Attack at ({x}, {y}) blocked by shield!");
+            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            SendAttackResult(attacker, defender, x, y, false, false);
+            return;
+        }
+
         var ships = ShipHandler.GetShips(defender);
         bool hit = false;
         PlacedShip? hitShip = null;

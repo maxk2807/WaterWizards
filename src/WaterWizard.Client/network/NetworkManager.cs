@@ -207,4 +207,16 @@ public class NetworkManager
         Console.WriteLine($"[Client] Unclear game result: {result}. Assuming defeat.");
         return false;
     }
+
+    /// <summary>
+    /// Handles the casting of the teleport card with ship selection and destination.
+    /// </summary>
+    /// <param name="card">The teleport card to be cast.</param>
+    /// <param name="shipIndex">The index of the ship to teleport.</param>
+    /// <param name="destinationCoords">The destination coordinates.</param>
+    public void HandleTeleportCast(Cards card, int shipIndex, GameBoard.Point destinationCoords)
+    {
+        var handleCards = new HandleCards();
+        handleCards.HandleTeleportCast(card, shipIndex, destinationCoords);
+    }
 }

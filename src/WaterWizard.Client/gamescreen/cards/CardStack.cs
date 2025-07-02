@@ -20,6 +20,7 @@ public class CardStack(GameScreen gameScreen, int x, int y)
     {
         //later calls to Network to get correct Cards
         cards.Add(new(gameScreen, new(Shared.CardVariant.Paralize)));
+        cards.Add(new(gameScreen, new(Shared.CardVariant.Shield)));
     }
 
     public void InitEnvironment()

@@ -147,6 +147,17 @@ public class ClientService(NetworkManager manager)
 
             switch (messageType)
             {
+                case "UpdatePauseState":
+                    bool isPaused = reader.GetBool();
+                    if (isPaused)
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().PauseGame();
+                    }
+                    else
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().ResumeGame();
+                    }
+                    break;
                 case "StartGame":
                     GameStateManager.Instance.SetStateToInGame();
                     break;
@@ -224,6 +235,18 @@ public class ClientService(NetworkManager manager)
                     {
                         Console.WriteLine(
                             $"[Client] Fehler beim Verarbeiten von ShipPosition: {ex.Message}"
+                        );
+                    }
+                    break;
+                case "UpdateShipPosition":
+                    try
+                    {
+                        HandleShips.HandleUpdateShipPosition(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client Fehler beim Verarbeiten von UpdateShipPosition: {ex.Message}]"
                         );
                     }
                     break;
@@ -399,6 +422,18 @@ public class ClientService(NetworkManager manager)
                     }
                 case "HoveringEyeReveal":
                     HandleUtility.HandleHoveringEyeReveal(reader);
+                    break;
+                case "ShipTeleported":
+                    HandleUtility.HandleShipTeleported(reader);
+                    break;
+                case "ShieldCreated":
+                    HandleShield.HandleShieldCreated(reader);
+                    break;
+                case "ShieldExpired":
+                    HandleShield.HandleShieldExpired(reader);
+                    break;
+                case "SummonShip":
+                    GameStateManager.Instance.GameScreen.EnableSingleShipPlacement();
                     break;
             }
         }

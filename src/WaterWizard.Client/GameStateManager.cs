@@ -2,6 +2,7 @@ using Raylib_cs;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
+using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client;
 
@@ -131,7 +132,7 @@ public class GameStateManager
         {
             if (currentState is InGameState)
             {
-                _gamePauseManager.TogglePause();
+                HandlePause.SendPauseToggleRequest();
             }
         }
         if (currentState is PreStartLobbyState)

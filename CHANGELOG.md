@@ -1,8 +1,10 @@
 # 🚀 WaterWizards Release Notes
 
-## 📋 What's New in v0.0.0
+## 📋 What's New in v0.0.29
 
 ### 🎮 Game Features
+- F268- Card Template added (571d93b) by Paul
+- F268-Card asset upload FireBolt and Thunder (b516b5a) by Paul
 - F268- Card Template added (c749f1a) by Paul
 - F268-Card asset upload FireBolt and Thunder (4884b2e) by Paul
 
@@ -17,6 +19,26 @@
 
 
 ### 📝 Other Changes
+- Aktualisierung der Analytics-Berichte: Anpassung der generierten Zeitstempel, Erhöhung der Gesamtanzahl der Dateien und Zeilen sowie Verbesserung der Qualitätsmetriken. Einführung einer Autor-Alias-Karte zur Normalisierung von Entwicklernamen in den Statistiken. (51082e8) by jdewi001
+- Implementierung von Code- und Entwicklerstatistiken-Collector-Klassen sowie Git-Statistiken- und Qualitätsmetriken-Berechnung. Einführung von Modellen für Code-, Entwickler-, Git- und Qualitätsmetriken. Verbesserung der Berichtsgenerierung für Repository-Analysen. (ccf54a7) by jdewi001
+- Pause-Management implementiert: PauseToggle-Anfrage vom Client an den Server gesendet und Server-Status aktualisiert. Neue Klasse HandlePause hinzugefügt, um die Pause-Logik zu verwalten. Spielzustand wird nun korrekt pausiert und fortgesetzt. (f7a5c57) by jdewi001
+- finished ThunderCard, implemented in CardAbilities (f321731) by maxk2807
+- should be fixed (7b24517) by maxk2807
+- Thunder Card Refactoring (27ee5ae) by maxk2807
+- Refactor card implementations and introduce new utility card (ef18abc) by erick
+- Thunder Card Refactoring (394702e) by maxk2807
+- Entfernen der CD-Pipeline-Konfiguration aus der Datei cd-pipeline.yml. Anpassungen im Release-Workflow zur Verwendung von PRs für die Changelog-Generierung und zur Verbesserung der Entwicklerstatistiken. Aktualisierung der Version in der WaterWizard.Server.csproj auf 0.0.29 und Anpassungen in den Analytics-Berichten zur Erfassung neuer Statistiken und Qualitätsmetriken. (949e595) by jdewi001
+- zurückverschoben (30917b8) by maxk2807
+- Utility Card Refactoring (3389d6a) by maxk2807
+- Hinzufügen eines Skripts zur automatischen Aktualisierung der Version in der .csproj-Datei basierend auf dem neuesten Git-Tag. Anpassungen im Release-Workflow zur Verwendung der aktuellen Projektversion oder des neuesten Tags. Aktualisierung der Analytics-Berichte mit neuen Statistiken und Qualitätsmetriken. (d814398) by jdewi001
+- Implement surrender mechanics: add surrender handling in client and server game states (d17d501) by Erickk0
+- Aktualisierung der Analytics-Berichte: Anpassung der generierten Zeitstempel, Erhöhung der Gesamtanzahl der Dateien und Zeilen sowie Verbesserung der Qualitätsmetriken. Die Statistiken wurden in den JSON- und Markdown-Dateien aktualisiert, um die neuesten Änderungen widerzuspiegeln. (cd5c69d) by jdewi001
+- Hinzufügen eines Analytics-Systems zur Generierung von Repository-Statistiken. Implementierung von Git- und Code-Statistiken, Entwickler-Aktivität und Qualitätsmetriken. Automatisierung der Ausführung über Git-Hooks (pre-commit, pre-merge, pre-receive) und Bereitstellung von JSON- und Markdown-Reports. Aktualisierung der .gitignore für Analytics-Berichte. (99c67f3) by jdewi001
+- Remove unnecessary calculations for gold freeze dot position in Draw method (aca1be2) by Erickk0
+- Add gold freeze mechanics and update handling in game state and client (7657a75) by Erickk0
+- card deletion (5458de2) by maxk2807
+- card deletion (aa3d60b) by maxk2807
+- interface and factory without functionality (bc59521) by maxk2807
 - Optimierung der Schleifen in RockFactory zur Verbesserung der Lesbarkeit: Entfernen unnötiger Typumwandlungen für die Koordinaten X und Y. (3d7474d) by jdewi001
 - Hinzufügen von CHANGELOG- und COMMIT_CONVENTIONS-Dokumenten sowie Automatisierung des Release-Prozesses mit intelligenten Changelogs. Implementierung von Workflows zur automatischen Generierung von Releases und Changelogs basierend auf Commit-Nachrichten. (fd589ee) by jdewi001
 - Hinzufügen von Start-Skripten und README für den WaterWizards Game Launcher. Implementierung von Skripten für Unix/macOS/Linux, Windows CMD und PowerShell zur einfachen Ausführung des Spiels. Dokumentation der Verwendung, Features und Troubleshooting im README. (1f1ced7) by jdewi001
@@ -80,4 +102,4 @@ cd WaterWizards
 
 ---
 
-*This changelog was generated on: 2025-06-18 12:06:05 UTC*
+*This changelog was generated on: 2025-06-25 10:09:57 UTC*

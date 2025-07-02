@@ -90,6 +90,17 @@ public class ThunderCard : IEnvironmentCard
     /// </summary>
     private static bool HandleThunderStrike(GameState gameState, NetPeer attacker, NetPeer targetPlayer, int x, int y)
     {
+        // Get target player's index for shield check
+        int targetPlayerIndex = gameState.GetPlayerIndex(targetPlayer);
+
+        // Check if this coordinate is protected by a shield
+        if (targetPlayerIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, targetPlayerIndex))
+        {
+            Console.WriteLine($"    Thunder strike at ({x}, {y}) blocked by shield!");
+            CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false);
+            return false;
+        }
+
         var ships = ShipHandler.GetShips(targetPlayer);
         bool hit = false;
 

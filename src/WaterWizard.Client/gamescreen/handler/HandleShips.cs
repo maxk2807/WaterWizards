@@ -1,5 +1,7 @@
+using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Raylib_cs;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.network;
@@ -11,6 +13,26 @@ namespace WaterWizard.Client.gamescreen.handler;
 /// </summary>
 public class HandleShips
 {
+
+    public readonly static Texture2D Ship1 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship1.png");
+    public readonly static Texture2D Ship2 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship2.png");
+    public readonly static Texture2D Ship3 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship3.png");
+    public readonly static Texture2D Ship4 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship4.png");
+    public readonly static Texture2D Ship5 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship5.png");
+
+    public static Texture2D TextureFromLength(int length)
+    {
+        return length switch
+        {
+            1 => Ship1,
+            2 => Ship2,
+            3 => Ship3,
+            4 => Ship4,
+            5 => Ship5,
+            _ => throw new Exception($"[Client] Invalid Ship Length: {length}"),
+        };
+    }
+
     /// <summary>
     /// Handles the ship position message received from the server.
     /// </summary>
@@ -228,5 +250,54 @@ public class HandleShips
                 "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
             );
         }
+    }
+
+    public static void HandleUpdateShipPosition(NetPacketReader reader)
+    {
+        try
+        {
+            var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            int oldX = reader.GetInt();
+            int oldY = reader.GetInt();
+            int newX = reader.GetInt();
+            int newY = reader.GetInt();
+            var ship = board.Ships.Find(ship =>
+            {
+                return (ship.X - (int)board.Position.X) / board.CellSize == oldX &&(ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
+            });
+            if (ship != null)
+            {
+                ship.X = (int)board.Position.X + newX * board.CellSize;
+                ship.Y = (int)board.Position.Y + newY * board.CellSize; 
+                board.MoveShip(ship, new(oldX, oldY), new(newX, newY));
+            }
+            else
+            {
+                throw new Exception("Ship not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Error in HandleUpdateShipPosition: {ex.Message}");
+            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Updates ship position after toggling fullscreen
+    /// </summary>
+    /// <param name="screenWidth">New screen width</param>
+    /// <param name="screenHeight">New screen height</param>
+    internal static void UpdateShipPositionsFullScreen(Vector2 oldBoardPosition, float oldCellSize)
+    {
+        GameStateManager.Instance.GameScreen.playerBoard!.Ships.ForEach(ship =>
+        {
+            var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            var prevX = (ship.X - oldBoardPosition.X) / oldCellSize;
+            var prevY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
+            ship.X = (int)(board.Position.X + prevX) * board.CellSize;
+            ship.Y = (int)(board.Position.Y + prevY) * board.CellSize;
+        });
     }
 }

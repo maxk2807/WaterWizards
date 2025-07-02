@@ -1,124 +1,133 @@
 # 📊 WaterWizards Repository Analytics Report
-## Generated: 2025-06-18 13:21:24 UTC
+## Generated: 2025-06-25 12:35:15 UTC
+
+## 🚀 Git Statistics
+- **Current Branch**: test-TestsForMostCases
+- **Total Commits**: 520
+- **Total Branches**: 45
+- **Uncommitted Changes**: 9
+- **Last Commit**: Merge pull request #318 from maxk2807/Feature-126-PauseButtonUpdate
+- **Last Commit Author**: Justin Dewitz
+- **Last Commit Date**: 2025-06-25 12:19:52
 
 ## 📝 Code Statistics
-- **Total Files**: 138
-- **Total Lines**: 21,403
-- **Code Lines**: 17,728
-- **Comment Lines**: 1,745
-- **Empty Lines**: 1,930
-- **Total Size**: 811.52 KB
+- **Total Files**: 162
+- **Total Lines**: 23,189
+- **Code Lines**: 19,257
+- **Comment Lines**: 1,825
+- **Empty Lines**: 2,107
+- **Total Size**: 894.10 KB
 
 ### 📁 Files by Type
-- **.cs**: 101 files
+- **.cs**: 124 files
 - **.md**: 15 files
 - **.json**: 10 files
+- **.yml**: 6 files
 - **.csproj**: 6 files
-- **.yml**: 5 files
 - **.sln**: 1 files
 
 ### 🔧 C# Specific Metrics
-- **C# Files**: 101
-- **Classes**: 103
-- **Methods**: 248
-- **Interfaces**: 4
-- **Properties**: 120
+- **C# Files**: 124
+- **Classes**: 121
+- **Methods**: 296
+- **Interfaces**: 6
+- **Properties**: 121
 
 ## 👥 Developer Statistics
 ### Erick Zeiler
 - **Aliases**: erick, Erick Zeiler, Erickk0
-- **Total Commits**: 220
+- **Total Commits**: 229
 - **First Commit**: 2025-04-23
-- **Last Commit**: 2025-06-18
-- **Days Active**: 56 days
-- **Commit Frequency**: 3.93 commits/day
+- **Last Commit**: 2025-06-25
+- **Days Active**: 63 days
+- **Commit Frequency**: 3.63 commits/day
 
 #### 📊 Commit Breakdown
-- **Feature Commits**: 68 (30.9%)
-- **Bug Fix Commits**: 41 (18.6%)
-- **Refactor Commits**: 1 (0.5%)
+- **Feature Commits**: 74 (32.3%)
+- **Bug Fix Commits**: 43 (18.8%)
+- **Refactor Commits**: 1 (0.4%)
 - **Documentation Commits**: 0 (0.0%)
 
 #### 📈 Activity Patterns
-- **Average Commits/Week**: 24.4
-- **Average Commits/Month**: 73.3
+- **Average Commits/Week**: 22.9
+- **Average Commits/Month**: 76.3
 - **Most Active Week**: 2025-W21 (37 commits)
 - **Most Active Month**: 2025-05 (101 commits)
 
 ### Max Kondratov
-- **Total Commits**: 102
+- **Total Commits**: 118
 - **First Commit**: 2025-04-23
-- **Last Commit**: 2025-06-18
-- **Days Active**: 56 days
-- **Commit Frequency**: 1.82 commits/day
+- **Last Commit**: 2025-06-25
+- **Days Active**: 63 days
+- **Commit Frequency**: 1.87 commits/day
 
 #### 📊 Commit Breakdown
-- **Feature Commits**: 9 (8.8%)
-- **Bug Fix Commits**: 29 (28.4%)
+- **Feature Commits**: 10 (8.5%)
+- **Bug Fix Commits**: 33 (28.0%)
 - **Refactor Commits**: 0 (0.0%)
 - **Documentation Commits**: 0 (0.0%)
 
 #### 📈 Activity Patterns
-- **Average Commits/Week**: 11.3
-- **Average Commits/Month**: 34.0
+- **Average Commits/Week**: 11.8
+- **Average Commits/Month**: 39.3
 - **Most Active Week**: 2025-W20 (26 commits)
 - **Most Active Month**: 2025-05 (70 commits)
 
 ### Justin Dewitz
 - **Aliases**: jdewi001, justinjd00
-- **Total Commits**: 64
+- **Total Commits**: 69
 - **First Commit**: 2025-04-23
-- **Last Commit**: 2025-06-18
-- **Days Active**: 56 days
-- **Commit Frequency**: 1.14 commits/day
+- **Last Commit**: 2025-06-25
+- **Days Active**: 63 days
+- **Commit Frequency**: 1.10 commits/day
 
 #### 📊 Commit Breakdown
-- **Feature Commits**: 30 (46.9%)
-- **Bug Fix Commits**: 3 (4.7%)
+- **Feature Commits**: 33 (47.8%)
+- **Bug Fix Commits**: 3 (4.3%)
 - **Refactor Commits**: 0 (0.0%)
 - **Documentation Commits**: 0 (0.0%)
 
 #### 📈 Activity Patterns
-- **Average Commits/Week**: 10.7
-- **Average Commits/Month**: 21.3
+- **Average Commits/Week**: 9.9
+- **Average Commits/Month**: 23.0
 - **Most Active Week**: 2025-W17 (23 commits)
 - **Most Active Month**: 2025-04 (32 commits)
 
 ### Justin dewitz
-- **Total Commits**: 43
+- **Total Commits**: 49
 - **First Commit**: 2025-04-23
-- **Last Commit**: 2025-06-18
-- **Days Active**: 56 days
-- **Commit Frequency**: 0.77 commits/day
+- **Last Commit**: 2025-06-25
+- **Days Active**: 63 days
+- **Commit Frequency**: 0.78 commits/day
 
 #### 📊 Commit Breakdown
-- **Feature Commits**: 12 (27.9%)
-- **Bug Fix Commits**: 5 (11.6%)
+- **Feature Commits**: 18 (36.7%)
+- **Bug Fix Commits**: 5 (10.2%)
 - **Refactor Commits**: 0 (0.0%)
 - **Documentation Commits**: 0 (0.0%)
 
 #### 📈 Activity Patterns
 - **Average Commits/Week**: 5.4
-- **Average Commits/Month**: 14.3
-- **Most Active Week**: 2025-W17 (10 commits)
+- **Average Commits/Month**: 16.3
+- **Most Active Week**: 2025-W25 (10 commits)
 - **Most Active Month**: 2025-05 (18 commits)
 
 ### Max kondratov
-- **Total Commits**: 22
+- **Total Commits**: 27
 - **First Commit**: 2025-05-03
-- **Last Commit**: 2025-06-18
-- **Days Active**: 46 days
-- **Commit Frequency**: 0.48 commits/day
+- **Last Commit**: 2025-06-25
+- **Days Active**: 53 days
+- **Commit Frequency**: 0.51 commits/day
 
 #### 📊 Commit Breakdown
-- **Feature Commits**: 4 (18.2%)
+- **Feature Commits**: 4 (14.8%)
 - **Bug Fix Commits**: 0 (0.0%)
 - **Refactor Commits**: 0 (0.0%)
 - **Documentation Commits**: 0 (0.0%)
 
 #### 📈 Activity Patterns
-- **Average Commits/Week**: 3.1
-- **Average Commits/Month**: 11.0
+- **Average Commits/Week**: 3.4
+- **Average Commits/Month**: 13.5
 - **Most Active Week**: 2025-W18 (6 commits)
 - **Most Active Month**: 2025-05 (18 commits)
 
@@ -126,8 +135,8 @@
 - **Total Commits**: 20
 - **First Commit**: 2025-05-14
 - **Last Commit**: 2025-06-11
-- **Days Active**: 35 days
-- **Commit Frequency**: 0.57 commits/day
+- **Days Active**: 42 days
+- **Commit Frequency**: 0.48 commits/day
 
 #### 📊 Commit Breakdown
 - **Feature Commits**: 7 (35.0%)
@@ -142,44 +151,44 @@
 - **Most Active Month**: 2025-06 (11 commits)
 
 ### Paul
-- **Total Commits**: 6
+- **Total Commits**: 8
 - **First Commit**: 2025-06-11
 - **Last Commit**: 2025-06-18
-- **Days Active**: 7 days
-- **Commit Frequency**: 0.86 commits/day
+- **Days Active**: 14 days
+- **Commit Frequency**: 0.57 commits/day
 
 #### 📊 Commit Breakdown
-- **Feature Commits**: 3 (50.0%)
-- **Bug Fix Commits**: 1 (16.7%)
+- **Feature Commits**: 5 (62.5%)
+- **Bug Fix Commits**: 1 (12.5%)
 - **Refactor Commits**: 0 (0.0%)
 - **Documentation Commits**: 0 (0.0%)
 
 #### 📈 Activity Patterns
-- **Average Commits/Week**: 3.0
-- **Average Commits/Month**: 6.0
-- **Most Active Week**: 2025-W25 (4 commits)
-- **Most Active Month**: 2025-06 (6 commits)
+- **Average Commits/Week**: 4.0
+- **Average Commits/Month**: 8.0
+- **Most Active Week**: 2025-W25 (6 commits)
+- **Most Active Month**: 2025-06 (8 commits)
 
 ## 🎯 Quality Metrics
-- **Code to Comment Ratio**: 10.16
-- **Empty Lines Percentage**: 9.0%
-- **Average File Size**: 5.88 KB
-- **Average Lines Per File**: 155.0
+- **Code to Comment Ratio**: 10.55
+- **Empty Lines Percentage**: 9.1%
+- **Average File Size**: 5.52 KB
+- **Average Lines Per File**: 143.0
 - **Average Methods Per Class**: 2.4
-- **Average Properties Per Class**: 1.2
-- **Code Complexity**: 71.5 lines/method
-- **Documentation Coverage**: 16.9 lines/class
+- **Average Properties Per Class**: 1.0
+- **Code Complexity**: 65.1 lines/method
+- **Documentation Coverage**: 15.1 lines/class
 
 ### 👥 Team Statistics
 - **Total Developers**: 7
 - **Most Active Developer**: Erick Zeiler
-- **Top Developer Score**: 94.9
-- **Top Developer Breakdown**: Commits: 220, Features: 68, Bugfixes: 41, Weekly Avg: 24.4, Docs: 0
-- **Average Commits Per Developer**: 68.1
+- **Top Developer Score**: 99.2
+- **Top Developer Breakdown**: Commits: 229, Features: 74, Bugfixes: 43, Weekly Avg: 22.9, Docs: 0
+- **Average Commits Per Developer**: 74.3
 
 ### 📈 Project Velocity
-- **Repository Age**: 56 days (0.2 years)
-- **Project Velocity**: 8.52 commits/day
+- **Repository Age**: 63 days (0.2 years)
+- **Project Velocity**: 8.25 commits/day
 - **Most Active Week**: 2025-W20
 - **Most Active Month**: 2025-05
 
@@ -188,15 +197,15 @@
 
 **What makes us special:**
 - **7 talented developers** working together
-- **8.5 commits per day** average velocity
-- **68.1 commits per developer** showing dedication
-- **10.2 code-to-comment ratio** indicating good documentation
-- **9.0% empty lines** showing clean, readable code
+- **8.3 commits per day** average velocity
+- **74.3 commits per developer** showing dedication
+- **10.6 code-to-comment ratio** indicating good documentation
+- **9.1% empty lines** showing clean, readable code
 
 **🏅 Top Contributors:**
-- 🥇 **Erick Zeiler**: 220 commits (68 features, 41 bugfixes)
-- 🥈 **Max Kondratov**: 102 commits (9 features, 29 bugfixes)
-- 🥉 **Justin Dewitz**: 64 commits (30 features, 3 bugfixes)
+- 🥇 **Erick Zeiler**: 229 commits (74 features, 43 bugfixes)
+- 🥈 **Max Kondratov**: 118 commits (10 features, 33 bugfixes)
+- 🥉 **Justin Dewitz**: 69 commits (33 features, 3 bugfixes)
 
 ---
 *This report was automatically generated by the CodeAnalytics system*

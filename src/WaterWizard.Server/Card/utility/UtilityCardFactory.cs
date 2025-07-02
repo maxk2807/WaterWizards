@@ -16,6 +16,9 @@ public class UtilityCardFactory
         {
             CardVariant.Paralize => new ParalizeCard(),
             CardVariant.HoveringEye => new HoveringEyeCard(),
+            CardVariant.SummonShip => new SummonShipCard(),
+            CardVariant.Shield => new ShieldCard(),
+            CardVariant.Teleport => new TeleportCard(),
             _ => null,
         };
     }
