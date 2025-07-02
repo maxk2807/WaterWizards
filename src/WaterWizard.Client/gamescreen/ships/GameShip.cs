@@ -1,4 +1,6 @@
+using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
@@ -12,10 +14,17 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     public int Width = width;
     public int Height = height;
 
+    public bool Rotated => Math.Max(Width / CellSize, Height / CellSize) == Width / CellSize;
+
+    private int CellSize => gameScreen.playerBoard!.CellSize;
+
     public HashSet<(int X, int Y)> DamagedCells { get; private set; } = new();
     public bool IsDestroyed =>
         DamagedCells.Count
-        >= (Width * Height / (gameScreen.playerBoard!.CellSize * gameScreen.playerBoard.CellSize));
+        >= (Width * Height / (CellSize * CellSize));
+
+    public bool IsRevealed { get; set; } = false;
+    public float Transparency { get; set; } = 1.0f;
 
     public void AddDamage(int cellX, int cellY)
     {
@@ -27,26 +36,45 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     /// </summary>
     public void Draw()
     {
+        Texture2D texture = HandleShips.TextureFromLength(Math.Max(Width / CellSize, Height / CellSize));
         Rectangle rec = new(X, Y, Width, Height);
+        Rectangle textureRec = new(0, 0, Rotated ? texture.Height : texture.Width, Rotated ? texture.Width : texture.Height);
+        Raylib.DrawTexturePro(
+            texture,
+            textureRec,
+            rec,
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
 
-        Color shipColor = DamagedCells.Count > 0 ? Color.Maroon : Color.DarkPurple;
+
+        Color shipColor = DamagedCells.Count > 0 ? new(190, 33, 55, 0.3f) : new Color(112, 31, 126, 0.3f);
         if (IsDestroyed)
-            shipColor = Color.Black;
+            shipColor = new(255, 255, 255, 0.3f);
 
-        Raylib.DrawRectangleRec(rec, shipColor);
-
-        int cellSize = gameScreen.playerBoard!.CellSize;
-        foreach (var (damageX, damageY) in DamagedCells)
+        if (IsRevealed && Transparency < 1.0f)
         {
-            int pixelX = X + (damageX * cellSize);
-            int pixelY = Y + (damageY * cellSize);
+            shipColor = new Color(shipColor.R, shipColor.G, shipColor.B, 0.3f);
+        }
 
-            Raylib.DrawCircle(
-                pixelX + cellSize / 2,
-                pixelY + cellSize / 2,
-                cellSize / 4f,
-                Color.Red
-            );
+        // Raylib.DrawRectangleRec(rec, shipColor);
+
+
+        if (!IsRevealed || Transparency >= 1.0f)
+        {
+            foreach (var (damageX, damageY) in DamagedCells)
+            {
+                int pixelX = X + (damageX * CellSize);
+                int pixelY = Y + (damageY * CellSize);
+
+                Raylib.DrawCircle(
+                    pixelX + CellSize / 2,
+                    pixelY + CellSize / 2,
+                    CellSize / 4f,
+                    Color.Red
+                );
+            }
         }
     }
 }

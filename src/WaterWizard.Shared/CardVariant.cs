@@ -18,6 +18,7 @@ public enum CardVariant
     ConeOfCold,
     MinorIllusion,
     Polymorph,
+    Shield,
 
     // Environment Variants
     Thunder,

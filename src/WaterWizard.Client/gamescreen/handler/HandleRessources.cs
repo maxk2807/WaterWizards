@@ -32,7 +32,37 @@ public class HandleRessources
         int gold = reader.GetInt();
         Console.WriteLine($"[Client] Spieler {playerIndex} hat nun {gold} Gold.");
 
-        GameStateManager.Instance.SetGold(playerIndex, gold);
-        // TODO: UI-Anzeige für Gold aktualisieren
+        var ressourceField = GameStateManager.Instance.GameScreen.ressourceField!;
+        ressourceField.SetGold(gold);
+        ressourceField.GoldFieldUpdate();
+    }
+
+    /// <summary>
+    /// Hnadles the Message effect of the Gold Freeze and shows it on the client that the gold is frozen
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
+    public static void HandleGoldFreeze(NetPacketReader reader)
+    {
+        int playerIndex = reader.GetInt();
+        bool isFrozen = reader.GetBool();
+        int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
+
+        Console.WriteLine($"[Client] GoldFreezeStatus empfangen - PlayerIndex: {playerIndex}, IsFrozen: {isFrozen}");
+        Console.WriteLine($"[Client] Mein PlayerIndex: {myPlayerIndex}");
+        Console.WriteLine($"[Client] Betrifft mich: {playerIndex == myPlayerIndex}");
+
+        if (playerIndex == myPlayerIndex)
+        {
+            var ressourceField = GameStateManager.Instance.GameScreen?.ressourceField;
+            if (ressourceField != null)
+            {
+                ressourceField.SetGoldFrozen(isFrozen);
+                Console.WriteLine($"[Client] Gold-Freeze-Status in RessourceField gesetzt: {isFrozen}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"[Client] Gold-Freeze-Status betrifft mich nicht, ignoriere");
+        }
     }
 }

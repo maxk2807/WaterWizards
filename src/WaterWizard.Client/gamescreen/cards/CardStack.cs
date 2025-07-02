@@ -13,18 +13,26 @@ public class CardStack(GameScreen gameScreen, int x, int y)
     {
         //later calls to Network to get correct Cards
         cards.Add(new(gameScreen, new(Shared.CardVariant.Firebolt)));
+        cards.Add(new(gameScreen, new(Shared.CardVariant.GreedHit)));
     }
 
     public void InitUtility()
     {
         //later calls to Network to get correct Cards
-        cards.Add(new(gameScreen, new(Shared.CardVariant.Heal)));
+        cards.Add(new(gameScreen, new(Shared.CardVariant.Paralize)));
+        cards.Add(new(gameScreen, new(Shared.CardVariant.Shield)));
     }
 
     public void InitEnvironment()
     {
         //later calls to Network to get correct Cards
         cards.Add(new(gameScreen, new(Shared.CardVariant.Thunder)));
+    }
+
+    public void InitHealing()
+    {
+        //later calls to Network to get correct Cards
+        cards.Add(new(gameScreen, new(Shared.CardVariant.Heal)));
     }
 
     public void Draw()

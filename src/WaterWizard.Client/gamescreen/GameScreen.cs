@@ -1,9 +1,11 @@
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
+using WaterWizard.Client.gamestates;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -32,12 +34,47 @@ public class GameScreen(
     private float _thunderTimer = 0;
     private const float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Donnereinschlägen
 
+    private Texture2D gameBackground;
+    private Texture2D gridBackground;
+    private Texture2D enemyGridBackground;
+
+    private bool allowSingleShipPlacement = false;
+
+    public void LoadBackgroundAssets()
+    {
+        if (gameBackground.Id != 0) return;
+        gameBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/BasicBackground.png");
+        //Hintergrund für das Spielbrett
+    }
+
+    public void LoadBoardBackground() //Hintergrund für das Grid
+    {
+        if (gridBackground.Id != 0) return;
+        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+
+
+        if (enemyGridBackground.Id != 0) return;
+        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+    }
+
+    public void LoadUiBackground() //Ui hintergrund
+    {
+        if (gridBackground.Id != 0) return;
+        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+
+
+        if (enemyGridBackground.Id != 0) return;
+        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+    }
+
     /// <summary>
     /// Initialize all elements rendered on the GameScreen:
     ///  the two Boards, Cardhands and Cardstacks as well as the //TODO: Graveyard and GameTimer
     /// </summary>
     public void Initialize()
     {
+        LoadBackgroundAssets(); //Laden der Assets
+
         cardWidth = (int)Math.Round(screenWidth * (1 / 12f));
         cardHeight = (int)Math.Round(screenHeight * (7 / 45f));
         ZonePadding = screenWidth * 0.02f;
@@ -160,6 +197,59 @@ public class GameScreen(
             return;
         }
 
+        //Draw der Assets
+        LoadBackgroundAssets();
+
+        //Raylib.DrawTexture(gameBackground, 0, 0, Color.White); //Hintergrund zuerst zeichnen
+        Raylib.DrawTexturePro(
+            gameBackground,
+            new Rectangle(0, 0, gameBackground.Width, gameBackground.Height),
+            new Rectangle(0, 0, currentScreenWidth, currentScreenHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
+
+        LoadBoardBackground();
+
+        //Raylib.DrawTexture(gridBackground, (int)playerBoard.Position.X, (int)playerBoard.Position.Y, Color.White);
+
+        Raylib.DrawTexturePro(
+            gridBackground,
+            new Rectangle(0, 0, gridBackground.Width, gridBackground.Height), // Quelle: ganzes Bild
+            new Rectangle(
+                playerBoard.Position.X,
+                playerBoard.Position.Y,
+                playerBoard.GridWidth * (float)playerBoard.CellSize,
+                playerBoard.GridHeight * (float)playerBoard.CellSize
+            ),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
+
+        //Raylib.DrawTexture(enemyGridBackground, (int)opponentBoard.Position.X, (int)opponentBoard.Position.Y, Color.White);
+
+        Raylib.DrawTexturePro(
+            enemyGridBackground,
+            new Rectangle(0, 0, enemyGridBackground.Width, enemyGridBackground.Height),
+            new Rectangle(
+                opponentBoard.Position.X,
+                opponentBoard.Position.Y,
+                opponentBoard.GridWidth * (float)opponentBoard.CellSize,
+                opponentBoard.GridHeight * (float)opponentBoard.CellSize
+            ),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
+
+        LoadBoardBackground();
+
+
         // Calculate dynamic layout values inside Draw
         cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));
         cardHeight = (int)Math.Round(currentScreenHeight * (7 / 45f));
@@ -198,6 +288,12 @@ public class GameScreen(
         DrawCardStacksField();
 
         DrawRessourceField();
+
+        // ShipField zeichnen: Immer in der Platzierungsphase, oder im InGameState wenn allowSingleShipPlacement aktiv ist
+        if (GameStateManager.Instance.GetCurrentState() is PlacementPhaseState || allowSingleShipPlacement)
+        {
+            DrawShipField();
+        }
 
         // Update and Draw Game Boards
         GameBoard.Point? clickedCell = opponentBoard.Update();
@@ -254,8 +350,6 @@ public class GameScreen(
                 Color.Black
             );
         }
-
-        DrawShipField();
 
         // Draw Back Button
         int backButtonWidth = 100;
@@ -345,7 +439,15 @@ public class GameScreen(
     {
         screenWidth = width;
         screenHeight = height;
+        var oldCellSize = playerBoard!.CellSize;
+        var oldBoardPosition = playerBoard.Position;
         Initialize();
+        UpdateShipPosition(oldBoardPosition, oldCellSize);
+    }
+
+    private static void UpdateShipPosition(Vector2 oldBoardPosition, int oldCellSize)
+    {
+        HandleShips.UpdateShipPositionsFullScreen(oldBoardPosition, oldCellSize);
     }
 
     public void Reset()
@@ -448,6 +550,8 @@ public class GameScreen(
             _thunderTimer = THUNDER_INTERVAL;
         }
 
+        activeCards?.Update(deltaTime);
+
         // Update active cards
         if (activeCards != null)
         {
@@ -465,5 +569,20 @@ public class GameScreen(
         int y = Random.Shared.Next(0, board.GridHeight - 1);
 
         board.AddThunderStrike(x, y);
+    }
+
+    public void EnableSingleShipPlacement()
+    {
+        allowSingleShipPlacement = true;
+        Console.WriteLine("allowSingleShipPlacement aktiviert!");
+        shipField?.Initialize();
+        Console.WriteLine("ShipField initialized, Schiffe: " + (shipField?.Ships.Count ?? -1));
+        if (shipField != null && shipField.Ships.Count > 0)
+        {
+            var random = new Random();
+            var randomShip = shipField.Ships.Keys.ElementAt(random.Next(shipField.Ships.Count));
+            Console.WriteLine("Starte Dragging für Schiff!");
+            randomShip.StartDragging();
+        }
     }
 }

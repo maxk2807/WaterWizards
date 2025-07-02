@@ -1,6 +1,9 @@
+using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Raylib_cs;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
@@ -10,6 +13,26 @@ namespace WaterWizard.Client.gamescreen.handler;
 /// </summary>
 public class HandleShips
 {
+
+    public readonly static Texture2D Ship1 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship1.png");
+    public readonly static Texture2D Ship2 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship2.png");
+    public readonly static Texture2D Ship3 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship3.png");
+    public readonly static Texture2D Ship4 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship4.png");
+    public readonly static Texture2D Ship5 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship5.png");
+
+    public static Texture2D TextureFromLength(int length)
+    {
+        return length switch
+        {
+            1 => Ship1,
+            2 => Ship2,
+            3 => Ship3,
+            4 => Ship4,
+            5 => Ship5,
+            _ => throw new Exception($"[Client] Invalid Ship Length: {length}"),
+        };
+    }
+
     /// <summary>
     /// Handles the ship position message received from the server.
     /// </summary>
@@ -99,31 +122,56 @@ public class HandleShips
     /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleShipReveal(NetPacketReader reader)
     {
-        int x = reader.GetInt();
-        int y = reader.GetInt();
-        int width = reader.GetInt();
-        int height = reader.GetInt();
-
-        var opponentBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-        if (opponentBoard != null)
+        try
         {
-            int pixelX = (int)opponentBoard.Position.X + x * opponentBoard.CellSize;
-            int pixelY = (int)opponentBoard.Position.Y + y * opponentBoard.CellSize;
-            int pixelWidth = width * opponentBoard.CellSize;
-            int pixelHeight = height * opponentBoard.CellSize;
+            int x = reader.GetInt();
+            int y = reader.GetInt();
+            int width = reader.GetInt();
+            int height = reader.GetInt();
+            
+            int damageCount = reader.GetInt();
+            var damagedCells = new HashSet<(int X, int Y)>();
+            
+            Console.WriteLine($"[Client] HandleShipReveal: Ship at ({x},{y}) size {width}x{height}, damageCount={damageCount}");
+            
+            for (int i = 0; i < damageCount; i++)
+            {
+                int damageX = reader.GetInt();
+                int damageY = reader.GetInt();
+                damagedCells.Add((damageX, damageY));
+                Console.WriteLine($"[Client] HandleShipReveal: Damage at ({damageX},{damageY})");
+            }
 
-            opponentBoard.putShip(
-                new GameShip(
-                    GameStateManager.Instance.GameScreen,
-                    pixelX,
-                    pixelY,
-                    ShipType.DEFAULT,
-                    pixelWidth,
-                    pixelHeight
-                )
-            );
+            var targetBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
 
-            Console.WriteLine($"[Client] Ship revealed: ({x},{y}) size {width}x{height}");
+            if (targetBoard != null)
+            {
+                for (int dx = 0; dx < width; dx++)
+                {
+                    for (int dy = 0; dy < height; dy++)
+                    {
+                        int cellX = x + dx;
+                        int cellY = y + dy;
+                        
+                        if (cellX >= 0 && cellX < targetBoard.GridWidth && cellY >= 0 && cellY < targetBoard.GridHeight)
+                        {
+                            if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
+                            {
+                                targetBoard.SetCellState(cellX, cellY, CellState.Ship);
+                            }
+                        }
+                    }
+                }
+
+                Console.WriteLine(
+                    $"[Client] Ship revealed on opponent board: ({x},{y}) size {width}x{height} with {damageCount} damage cells - marked cells as Ship state"
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Error in HandleShipReveal: {ex.Message}");
+            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -202,5 +250,54 @@ public class HandleShips
                 "[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden."
             );
         }
+    }
+
+    public static void HandleUpdateShipPosition(NetPacketReader reader)
+    {
+        try
+        {
+            var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            int oldX = reader.GetInt();
+            int oldY = reader.GetInt();
+            int newX = reader.GetInt();
+            int newY = reader.GetInt();
+            var ship = board.Ships.Find(ship =>
+            {
+                return (ship.X - (int)board.Position.X) / board.CellSize == oldX &&(ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
+            });
+            if (ship != null)
+            {
+                ship.X = (int)board.Position.X + newX * board.CellSize;
+                ship.Y = (int)board.Position.Y + newY * board.CellSize; 
+                board.MoveShip(ship, new(oldX, oldY), new(newX, newY));
+            }
+            else
+            {
+                throw new Exception("Ship not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Client] Error in HandleUpdateShipPosition: {ex.Message}");
+            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Updates ship position after toggling fullscreen
+    /// </summary>
+    /// <param name="screenWidth">New screen width</param>
+    /// <param name="screenHeight">New screen height</param>
+    internal static void UpdateShipPositionsFullScreen(Vector2 oldBoardPosition, float oldCellSize)
+    {
+        GameStateManager.Instance.GameScreen.playerBoard!.Ships.ForEach(ship =>
+        {
+            var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            var prevX = (ship.X - oldBoardPosition.X) / oldCellSize;
+            var prevY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
+            ship.X = (int)(board.Position.X + prevX) * board.CellSize;
+            ship.Y = (int)(board.Position.Y + prevY) * board.CellSize;
+        });
     }
 }

@@ -7,8 +7,11 @@ public enum CellState
 {
     Empty,
     Ship,
+    Rock,
     Hit,
     Miss,
     Unknown,
     Thunder,
+    HoveringEyeRevealed,
+    Shield
 }

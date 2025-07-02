@@ -1,0 +1,64 @@
+@startuml
+
+' WaterWizards - Sequenzdiagramm
+
+title WaterWizards - Spielablauf (Sequence Diagram)
+
+actor Spieler
+participant "Client" as Client
+participant "GameStateManager" as GSM
+participant "NetworkManager" as NM
+participant "Server" as Server
+participant "GameState" as GS
+
+== Spielstart ==
+Spieler -> Client: Spiel starten
+Client -> GSM: Initialize()
+GSM -> NM: DiscoverLobbies()
+NM -> Server: RequestLobbyList()
+Server -> NM: ReturnLobbyList()
+NM -> GSM: ShowLobbyList()
+GSM -> Client: ShowMainMenu()
+
+== Lobby beitreten ==
+Spieler -> Client: Lobby auswählen
+Client -> NM: ConnectToServer(ip, port)
+NM -> Server: ConnectionRequest()
+Server -> GS: AddPlayerToLobby()
+GS -> Server: ConfirmPlayerAdded()
+Server -> NM: AcceptConnection()
+NM -> GSM: ConnectionEstablished()
+GSM -> Client: ShowLobby()
+
+== Spielstart (Ready) ==
+Spieler -> Client: Ready klicken
+Client -> NM: SendReady()
+NM -> Server: PlayerReady()
+Server -> GS: CheckAllReady()
+alt Alle Spieler bereit
+    GS -> Server: StartGame()
+    Server -> NM: NotifyGameStart()
+    NM -> GSM: ShowGameScreen()
+end
+
+== Spielzug (Rundenbasiert) ==
+loop Solange Spiel läuft
+    Spieler -> Client: Aktion wählen (z.B. Schiff platzieren, angreifen, Karte kaufen)
+    Client -> NM: SendAction(action)
+    NM -> Server: ForwardAction(action)
+    Server -> GS: ProcessAction(action)
+    GS -> Server: ActionResult(result)
+    Server -> NM: SendUpdate(result)
+    NM -> GSM: UpdateGameState(result)
+    GSM -> Client: UpdateDisplay()
+end
+
+== Spielende ==
+GS -> Server: CheckWinCondition()
+alt Spiel vorbei
+    Server -> NM: NotifyGameOver()
+    NM -> GSM: ShowGameResult()
+    GSM -> Client: ShowWinner()
+end
+
+@enduml 

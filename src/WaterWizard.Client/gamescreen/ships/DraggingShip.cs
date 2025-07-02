@@ -2,6 +2,7 @@ using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
+using WaterWizard.Client.Gamescreen;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
@@ -55,15 +56,29 @@ public class DraggingShip
     private bool IsShipSizeLimitReached(int size)
     {
         // Prüfe, ob die Platzierungsphase aktiv ist
+        if (GameStateManager.Instance.GetCurrentState() is InGameState)
+            return false;
         if (GameStateManager.Instance.GetCurrentState() is not PlacementPhaseState)
             return false;
-
         // Prüfe, ob das Limit serverseitig gemeldet wurde
         if (gameScreen.IsShipSizeLimitReached(size))
             return true;
-
         int placed = gameScreen.playerBoard!.Ships.Count(s => Math.Max(s.Width, s.Height) == size);
         return PlacementLimits.TryGetValue(size, out int limit) && placed >= limit;
+    }
+
+    private bool IsShipPlacementAllowed()
+    {
+        bool allowed = false;
+        // Während der Platzierungsphase immer erlaubt
+        if (GameStateManager.Instance.GetCurrentState() is PlacementPhaseState)
+            allowed = true;
+        // Im InGameState nur, wenn das Flag gesetzt ist
+        var field = gameScreen.GetType().GetField("allowSingleShipPlacement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (GameStateManager.Instance.GetCurrentState() is InGameState && field != null && field.GetValue(gameScreen) is bool allowedFlag && allowedFlag)
+            allowed = true;
+        Console.WriteLine($"IsShipPlacementAllowed: {allowed}");
+        return allowed;
     }
 
     /// <summary>
@@ -109,6 +124,7 @@ public class DraggingShip
     /// </summary>
     public void Draw()
     {
+        Console.WriteLine($"Draw() aufgerufen, dragging: {dragging}");
         Rectangle rec = new(X, Y, Width, Height);
 
         // Wenn das Limit erreicht ist, Schiff ausgegraut zeichnen
@@ -119,8 +135,8 @@ public class DraggingShip
         Raylib.DrawRectangleRec(rec, shipColor);
         Raylib.DrawText(currentNumber.ToString(), X + Width / 2, Y + Height / 2, 10, Color.White);
 
-        // Nur Dragging erlauben, wenn das Limit nicht erreicht ist
-        if (!limitReached)
+        // Nur Dragging erlauben, wenn das Limit nicht erreicht ist und Platzierung erlaubt ist
+        if (!limitReached && IsShipPlacementAllowed())
             HandleDragging();
     }
 
@@ -288,6 +304,14 @@ public class DraggingShip
             );
             confirming = false;
             DraggedShipRectangle = new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
+
+            // Nach Platzierung im InGameState das Flag zurücksetzen
+            if (GameStateManager.Instance.GetCurrentState() is InGameState)
+            {
+                var prop = gameScreen.GetType().GetProperty("allowSingleShipPlacement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (prop != null)
+                    prop.SetValue(gameScreen, false);
+            }
         }
     }
 
@@ -364,7 +388,7 @@ public class DraggingShip
 
     /// <summary>
     /// Checks whether the Placement of ship is obstructed by being out of bounds
-    /// of the board or obstructed by other ships //TODO: and Rocks
+    /// of the board or obstructed by other ships or rocks
     /// </summary>
     /// <param name="dragShip"></param>
     /// <returns>Whether the placement is valid or not</returns>
@@ -376,6 +400,11 @@ public class DraggingShip
             || dragShip.Y < board.Position.Y
             || dragShip.X + dragShip.Width > board.Position.X + (float)board.GridWidth * CellSize
             || dragShip.Y + dragShip.Height > board.Position.Y + (float)board.GridHeight * CellSize;
+
+        if (isOutOfBounds)
+            return false;
+
+        // Prüfe Kollision mit anderen Schiffen
         bool collidesWithShips = false;
         foreach (var ship in gameScreen.playerBoard!.Ships)
         {
@@ -384,8 +413,35 @@ public class DraggingShip
             if (collidesWithShips)
                 break;
         }
-        return !(isOutOfBounds || collidesWithShips);
-        //TODO: Check for other ships and rocks
+
+        if (collidesWithShips)
+            return false;
+
+        // Prüfe Kollision mit Steinen
+        bool collidesWithRocks = false;
+        int startX = (int)((dragShip.X - board.Position.X) / CellSize);
+        int startY = (int)((dragShip.Y - board.Position.Y) / CellSize);
+        int width = (int)(dragShip.Width / CellSize);
+        int height = (int)(dragShip.Height / CellSize);
+
+        for (int x = startX; x < startX + width; x++)
+        {
+            for (int y = startY; y < startY + height; y++)
+            {
+                if (x >= 0 && x < board.GridWidth && y >= 0 && y < board.GridHeight)
+                {
+                    if (board._gridStates[x, y] == CellState.Rock)
+                    {
+                        collidesWithRocks = true;
+                        break;
+                    }
+                }
+            }
+            if (collidesWithRocks)
+                break;
+        }
+
+        return !collidesWithRocks;
     }
 
     /// <summary>
@@ -406,5 +462,19 @@ public class DraggingShip
         }
         else
             return null;
+    }
+
+    public void StartDragging()
+    {
+        dragging = true;
+        firstDown = false;
+        // Setze das Schiff direkt unter den Mauszeiger
+        var mousePos = Raylib.GetMousePosition();
+        DraggedShipRectangle.X = mousePos.X - DraggedShipRectangle.Width / 2f;
+        DraggedShipRectangle.Y = mousePos.Y - DraggedShipRectangle.Height / 2f;
+        offset = new(
+            mousePos.X - DraggedShipRectangle.X,
+            mousePos.Y - DraggedShipRectangle.Y
+        );
     }
 }

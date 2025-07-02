@@ -147,6 +147,17 @@ public class ClientService(NetworkManager manager)
 
             switch (messageType)
             {
+                case "UpdatePauseState":
+                    bool isPaused = reader.GetBool();
+                    if (isPaused)
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().PauseGame();
+                    }
+                    else
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().ResumeGame();
+                    }
+                    break;
                 case "StartGame":
                     GameStateManager.Instance.SetStateToInGame();
                     break;
@@ -227,6 +238,18 @@ public class ClientService(NetworkManager manager)
                         );
                     }
                     break;
+                case "UpdateShipPosition":
+                    try
+                    {
+                        HandleShips.HandleUpdateShipPosition(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client Fehler beim Verarbeiten von UpdateShipPosition: {ex.Message}]"
+                        );
+                    }
+                    break;
                 case "BoughtCard":
                     try
                     {
@@ -262,6 +285,19 @@ public class ClientService(NetworkManager manager)
                     {
                         Console.WriteLine(
                             $"[Client] Fehler beim Verarbeiten von ShipSync: {ex.Message}"
+                        );
+                    }
+                    break;
+
+                case "RockSync":
+                    try
+                    {
+                        HandleRocks.HandleRockSync(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Client] Fehler beim Verarbeiten von RockSync: {ex.Message}"
                         );
                     }
                     break;
@@ -312,88 +348,92 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
                 case "ThunderStrike":
-                    string targetPlayerAddress = reader.GetString();
+                    int targetBoardIndex = reader.GetInt();
                     int strikeX = reader.GetInt();
                     int strikeY = reader.GetInt();
-                    bool hit = reader.GetBool();
+                    bool thunderHit = reader.GetBool();
 
-                    Console.WriteLine("\n[Client] Received Thunder Strike");
-                    Console.WriteLine("----------------------------------------");
-                    Console.WriteLine($"Target Player Address: {targetPlayerAddress}");
-                    Console.WriteLine($"Strike Coordinates: ({strikeX}, {strikeY})");
-                    Console.WriteLine($"Hit: {hit}");
-
-                    Console.WriteLine($"\nAddress Comparison:");
-                    Console.WriteLine($"- Target Address (full): {targetPlayerAddress}");
-                    Console.WriteLine($"- My Address (full): {myEndPoint}");
-
-                    // Wurde mein Board getroffen?
-                    bool myBoardWasHit = false;
-                    if (myEndPoint != null)
+                    var gameScreen = GameStateManager.Instance.GameScreen;
+                    if (gameScreen != null)
                     {
-                        // Vergleiche die Adressen ohne den "127.0.0.1:" Teil
-                        string targetPort = targetPlayerAddress.Split(':').LastOrDefault() ?? "";
-                        string myPort = myEndPoint.Split(':').LastOrDefault() ?? "";
-                        Console.WriteLine($"Port Comparison:");
-                        Console.WriteLine($"- Target Port: {targetPort}");
-                        Console.WriteLine($"- My Port: {myPort}");
-                        myBoardWasHit = targetPort == myPort;
-                    }
-                    Console.WriteLine($"\nResult:");
-                    Console.WriteLine($"- Was my board hit? {myBoardWasHit}");
-                    Console.WriteLine(
-                        $"- Will show on: {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
-                    );
+                        int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
 
-                    // Wenn mein Board getroffen wurde -> auf meinem playerBoard anzeigen
-                    // Wenn das gegnerische Board getroffen wurde -> auf meinem opponentBoard anzeigen
-                    var targetBoard = myBoardWasHit
-                        ? GameStateManager.Instance.GameScreen.playerBoard // Mein Board wurde getroffen
-                        : GameStateManager.Instance.GameScreen.opponentBoard; // Gegnerisches Board wurde getroffen
-
-                    Console.WriteLine($"\nBoard Status:");
-                    Console.WriteLine(
-                        $"- playerBoard is null: {GameStateManager.Instance.GameScreen.playerBoard == null}"
-                    );
-                    Console.WriteLine(
-                        $"- opponentBoard is null: {GameStateManager.Instance.GameScreen.opponentBoard == null}"
-                    );
-                    Console.WriteLine($"- targetBoard is null: {targetBoard == null}");
-
-                    if (targetBoard != null)
-                    {
-                        // Füge zuerst den visuellen Blitzeffekt hinzu
-                        targetBoard.AddThunderStrike(strikeX, strikeY);
-
-                        // Dann setze den Zellstatus basierend auf dem Treffer
-                        if (hit)
+                        GameBoard? targetBoard = null;
+                        Console.WriteLine($"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}");
+                        if (targetBoardIndex == myPlayerIndex)
                         {
-                            targetBoard.SetCellState(
-                                strikeX,
-                                strikeY,
-                                WaterWizard.Client.Gamescreen.CellState.Hit
-                            );
-                            Console.WriteLine(
-                                $"Set Hit at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
-                            );
+                            targetBoard = gameScreen.playerBoard;
+                            Console.WriteLine($"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
                         }
                         else
                         {
-                            targetBoard.SetCellState(
-                                strikeX,
-                                strikeY,
-                                WaterWizard.Client.Gamescreen.CellState.Thunder
-                            );
-                            Console.WriteLine(
-                                $"Set Thunder at ({strikeX}, {strikeY}) on {(myBoardWasHit ? "playerBoard (bottom)" : "opponentBoard (top)")}"
-                            );
+                            targetBoard = gameScreen.opponentBoard;
+                            Console.WriteLine($"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
                         }
+
+                        targetBoard?.AddThunderStrike(strikeX, strikeY, thunderHit);
                     }
-                    Console.WriteLine("----------------------------------------\n");
                     break;
                 case "ThunderReset":
                     GameStateManager.Instance.GameScreen.playerBoard?.ResetThunderFields();
                     GameStateManager.Instance.GameScreen.opponentBoard?.ResetThunderFields();
+                    break;
+                case "ShipHeal":
+                    bool success = reader.GetBool();
+                    if (success)
+                    {
+                        int X = reader.GetInt();
+                        int Y = reader.GetInt();
+                        GameStateManager.Instance.GameScreen.playerBoard!.SetCellState(
+                                X,
+                                Y,
+                                Gamescreen.CellState.Ship
+                            );
+                        Console.WriteLine($"[Client] Healed At ({X},{Y})");
+                        break;
+                    }
+                    Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
+                    break;
+
+                case "PlayerIndex":
+                    int playerIndex = reader.GetInt();
+                    GameStateManager.Instance.MyPlayerIndex = playerIndex;
+                    Console.WriteLine($"[Client] Received player index: {playerIndex}");
+                    break;
+                case "UpdateMana":
+                    {
+                        HandleRessources.HandleUpdateMana(reader);
+                        break;
+                    }
+                case "UpdateGold":
+                    {
+                        HandleRessources.HandleUpdateGold(reader);
+                        break;
+                    }
+                case "GoldFreezeStatus":
+                    {
+                        HandleRessources.HandleGoldFreeze(reader);
+                        break;
+                    }
+                case "ParalizeStatus":
+                    {
+                        HandleParalize.HandleParalizeStatus(reader);
+                        break;
+                    }
+                case "HoveringEyeReveal":
+                    HandleUtility.HandleHoveringEyeReveal(reader);
+                    break;
+                case "ShipTeleported":
+                    HandleUtility.HandleShipTeleported(reader);
+                    break;
+                case "ShieldCreated":
+                    HandleShield.HandleShieldCreated(reader);
+                    break;
+                case "ShieldExpired":
+                    HandleShield.HandleShieldExpired(reader);
+                    break;
+                case "SummonShip":
+                    GameStateManager.Instance.GameScreen.EnableSingleShipPlacement();
                     break;
             }
         }

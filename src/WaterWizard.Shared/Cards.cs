@@ -64,6 +64,7 @@ public class Cards
         { CardVariant.ConeOfCold, CardType.Utility },
         { CardVariant.MinorIllusion, CardType.Utility },
         { CardVariant.Polymorph, CardType.Utility },
+        { CardVariant.Shield, CardType.Utility },
         // Environment Variants
         { CardVariant.Thunder, CardType.Environment },
         { CardVariant.Storm, CardType.Environment },
@@ -131,7 +132,7 @@ public class Cards
                 Mana = 5,
                 CastTime = "2",
                 Duration = "instant",
-                Target = new("random 1x1"),
+                Target = new("1x1"),
             }
         },
         {
@@ -152,7 +153,7 @@ public class Cards
                 Mana = 2,
                 CastTime = "instant",
                 Duration = "permanent",
-                Target = new("1x1"),
+                Target = new("2x1"),
             }
         },
         {
@@ -181,8 +182,8 @@ public class Cards
             {
                 Mana = 4,
                 CastTime = "instant",
-                Duration = "2",
-                Target = new("ship"),
+                Duration = "6",
+                Target = new("battlefield"),
             }
         },
         {
@@ -263,7 +264,7 @@ public class Cards
                 Mana = 4,
                 CastTime = "instant",
                 Duration = "instant",
-                Target = new("ship"),
+                Target = new("battlefield"),
             }
         },
         // Healing
@@ -315,6 +316,16 @@ public class Cards
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.Shield,
+            new CardStats
+            {
+                Mana = 5,
+                CastTime = "instant",
+                Duration = "6",
+                Target = new(true, "3x3"),
             }
         },
     };
