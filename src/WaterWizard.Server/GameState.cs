@@ -89,6 +89,13 @@ public class GameState
     /// Öffentlicher Zugriff auf den Server für Handler-Klassen
     /// </summary>
     public NetManager Server => server;
+    /// <summary>
+    /// Dictionary that tracks the cards each player currently has in their hand.
+    /// Key: NetPeer representing the player
+    /// Value: List of Cards representing the player's current hand
+    /// </summary>
+    public Dictionary<NetPeer, List<Cards>> PlayerHands { get; private set; } = new();
+
 
     public bool IsPlacementPhase()
     {
@@ -446,5 +453,41 @@ public class GameState
             shield.IsActive &&
             shield.PlayerIndex == playerIndex &&
             shield.IsCoordinateProtected(x, y));
+    }
+
+
+    /// <summary>
+    /// Removes a specific card from a player's hand on the server side.
+    /// This is called when a player casts a card to maintain server-side validation.
+    /// </summary>
+    /// <param name="player">The NetPeer representing the player whose hand to modify</param>
+    /// <param name="card">The card to remove from the player's hand (matched by Variant)</param>
+    /// <returns>True if the card was found and removed successfully, false if the card was not found in the player's hand</returns>
+    public bool RemoveCardFromPlayerHand(NetPeer player, Cards card)
+    {
+        if (PlayerHands.TryGetValue(player, out var hand))
+        {
+            var cardToRemove = hand.FirstOrDefault(c => c.Variant == card.Variant);
+            if (cardToRemove != null)
+            {
+                hand.Remove(cardToRemove);
+                Console.WriteLine($"[GameState] Removed card {card.Variant} from player {player}'s hand");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Initializes an empty hand for a player if they don't already have one.
+    /// This should be called when a player joins the game or when setting up the initial game state.
+    /// </summary>
+    /// <param name="player">The NetPeer representing the player whose hand to initialize</param>
+    public void InitializePlayerHand(NetPeer player)
+    {
+        if (!PlayerHands.ContainsKey(player))
+        {
+            PlayerHands[player] = new List<Cards>();
+        }
     }
 }

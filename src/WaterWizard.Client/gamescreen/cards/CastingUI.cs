@@ -27,6 +27,8 @@ public class CastingUI
     private int selectedShipIndex = -1;
     private Vector2 selectedShipCoords = new();
 
+    public GameHand? PlayerHand { get; private set; }
+
     public void Draw()
     {
         if (aiming)
@@ -47,6 +49,7 @@ public class CastingUI
         {
             aiming = false;
             NetworkManager.HandleCast(gameCard.card, new Point(0, 0));
+            RemoveCardFromHand(gameCard.card); 
             return;
         }
 
@@ -78,6 +81,7 @@ public class CastingUI
             {
                 aiming = false;
                 NetworkManager.HandleCast(cardToAim!.card, new Point(0, 0));
+                RemoveCardFromHand(cardToAim.card); // Add this line
             }
             return;
         }
@@ -149,6 +153,8 @@ public class CastingUI
         {
             aiming = false;
             NetworkManager.HandleCast(cardToAim!.card, new((int)shipCoords.X, (int)shipCoords.Y));
+            
+            RemoveCardFromHand(cardToAim.card);
         }
     }
 
@@ -212,6 +218,8 @@ public class CastingUI
             {
                 aiming = false;
                 NetworkManager.HandleCast(cardToAim!.card, hoveredCoords.Value);
+                
+                RemoveCardFromHand(cardToAim.card);
             }
         }
     }
@@ -239,6 +247,8 @@ public class CastingUI
         {
             aiming = false;
             NetworkManager.HandleCast(cardToAim!.card, new((int)shipCoords.X, (int)shipCoords.Y));
+            
+            RemoveCardFromHand(cardToAim.card);
         }
     }
 
@@ -370,6 +380,8 @@ public class CastingUI
                         selectedShipIndex,
                         new Point(hoveredCoords.Value.X, hoveredCoords.Value.Y)
                     );
+                    
+                    RemoveCardFromHand(cardToAim.card);
                 }
             }
 
@@ -379,5 +391,15 @@ public class CastingUI
                 selectedShipIndex = -1;
             }
         }
+    }
+
+    /// <summary>
+    /// Removes a Card from the player's hand after casting it.
+    /// </summary>
+    /// <param name="card">The Card that will be removed</param>
+    private void RemoveCardFromHand(Cards card)
+    {
+        var playerHand = GameScreen.playerHand;
+        playerHand?.RemoveCard(card);
     }
 }
