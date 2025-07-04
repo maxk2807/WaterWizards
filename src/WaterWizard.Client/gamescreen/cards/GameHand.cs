@@ -85,6 +85,8 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     internal virtual void HandleCast(GameCard gameCard)
     {
         CastingUI.Instance.StartDrawingCardAim(gameCard);
+        
+        RemoveCard(gameCard);
     }
 
     /// <summary>
@@ -150,5 +152,27 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     public void EmptyHand()
     {
         Cards.Clear();
+    }
+
+    /// <summary>
+    /// Removes a Card from the Hand by its GameCard instance.
+    /// </summary>
+    /// <param name="cardToRemove">The Card that will be removed after Casting</param>
+    public void RemoveCard(GameCard cardToRemove)
+    {
+        Cards.Remove(cardToRemove);
+    }
+
+    /// <summary>
+    /// Removes a Card from the Hand by its Cards enum value.
+    /// </summary>
+    /// <param name="cardToRemove">The Card that will be removed after Casting</param>
+    public void RemoveCard(Cards cardToRemove)
+    {
+        var gameCard = Cards.Find(gc => gc.card == cardToRemove);
+        if (gameCard != null)
+        {
+            Cards.Remove(gameCard);
+        }
     }
 }
