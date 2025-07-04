@@ -11,7 +11,9 @@ public class GameCard(GameScreen gameScreen, Cards card)
     private int Width => gameScreen.cardWidth;
     private int Height => gameScreen.cardHeight;
 
-    private static Texture2D cardTemplate = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/CardTemplate.png");
+    private static Texture2D cardTemplateAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/CardTemplate.png");
+    private static Texture2D allyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/ally.png");
+    private static Texture2D enemyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/enemy.png");
 
     /// <summary>
     /// Draw the individual Card at the given coordinates.
@@ -26,9 +28,9 @@ public class GameCard(GameScreen gameScreen, Cards card)
         Rectangle card = new(x, y, Width, Height);
         if (front)
         {
-            Rectangle cardTemplateRec = new(0, 0, cardTemplate.Width, cardTemplate.Height);
+            Rectangle cardTemplateRec = new(0, 0, cardTemplateAsset.Width, cardTemplateAsset.Height);
             Raylib.DrawTexturePro(
-                cardTemplate,
+                cardTemplateAsset,
                 cardTemplateRec,
                 card,
                 Vector2.Zero,
@@ -36,13 +38,34 @@ public class GameCard(GameScreen gameScreen, Cards card)
                 Color.White
             );
 
-            string cardBackText = this.card.Variant.ToString();
-            int textWidth = Raylib.MeasureText(cardBackText, 10);
+            string variantText = this.card.Variant.ToString();
+            int variantTextWidth = Raylib.MeasureText(variantText, 10);
             Raylib.DrawText(
-                cardBackText,
-                x + (Width - textWidth - 10) / 2,
+                variantText,
+                x + (Width - variantTextWidth - 10) / 2,
                 y + Height / 8 - 3,
                 10,
+                Color.White
+            );
+
+            string targetText = this.card.Target!.Target.ToString();
+            int targetTextWidth = Raylib.MeasureText(variantText, 10);
+            Raylib.DrawText(
+                targetText,
+                x + (Width - targetTextWidth - 10) / 2,
+                y + Height * 3 / 4 - 10,
+                10,
+                Color.White
+            );
+
+            Rectangle allyIconRec = new(0, 0, allyIconAsset.Width, allyIconAsset.Height);
+            Rectangle rec = new(x + (Width - targetTextWidth) / 2f + 30, y + Height * 3 / 4f - 10, 16, 16);
+            Raylib.DrawTexturePro(
+                allyIconAsset,
+                allyIconRec,
+                rec,
+                Vector2.Zero,
+                0f,
                 Color.White
             );
         }
