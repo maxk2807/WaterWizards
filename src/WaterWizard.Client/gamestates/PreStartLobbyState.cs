@@ -34,8 +34,8 @@ public class PreStartLobbyState : IGameState
             textBackground,
             new(0, 0, textBackground.Width, textBackground.Height),
             new(
-                (availableWidth - 470) / 2,
-                manager.screenHeight / 10 - 40,
+                (availableWidth - 470) / 2f,
+                (float)manager.screenHeight / 10 - 40,
                 470,
                 315),
             Vector2.Zero,

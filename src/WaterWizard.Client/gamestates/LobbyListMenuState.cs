@@ -33,10 +33,10 @@ public class LobbyListMenuState : IGameState
             textBackground,
             new(0, 0, textBackground.Width, textBackground.Height),
             new(
-                (manager.screenWidth - 640) / 2,
-                manager.screenHeight / 10 - 40,
+                (manager.screenWidth - 640) / 2f,
+                (float)manager.screenHeight / 10 - 40,
                 640,
-                270 + lobbies.Count * 30),
+                270 + lobbies.Count * 30f),
             Vector2.Zero,
             0f,
             Color.White
