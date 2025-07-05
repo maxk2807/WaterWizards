@@ -12,14 +12,17 @@ namespace WaterWizardTests
         {
             // Arrange
             var gameBoard = CreateTestGameBoard();
-            var screenPos = new Vector2(150, 150); // Within board bounds
+            var screenPos = new Vector2(150, 150); 
             
             // Act
             var result = gameBoard.GetCellFromScreenCoords(screenPos);
             
             // Assert
             Assert.NotNull(result);
-            Assert.True(result.Value.X >= 0 && result.Value.Y >= 0);
+            if (result != null)
+            {
+                Assert.True(result.Value.X >= 0 && result.Value.Y >= 0);
+            }
         }
 
         [Fact]
@@ -27,7 +30,7 @@ namespace WaterWizardTests
         {
             // Arrange
             var gameBoard = CreateTestGameBoard();
-            var screenPos = new Vector2(50, 50); // Outside board bounds
+            var screenPos = new Vector2(50, 50); 
             
             // Act
             var result = gameBoard.GetCellFromScreenCoords(screenPos);
@@ -47,7 +50,7 @@ namespace WaterWizardTests
             var result = gameBoard.IsPointOutside(screenPos);
             
             // Assert
-            Assert.False((bool)result);
+            Assert.False(result);
         }
 
         [Fact]
@@ -87,7 +90,7 @@ namespace WaterWizardTests
             var result = gameBoard.IsCellShielded(0, 0);
             
             // Assert
-            Assert.False((bool)result);
+            Assert.False(result);
         }
 
         private GameBoard CreateTestGameBoard()
