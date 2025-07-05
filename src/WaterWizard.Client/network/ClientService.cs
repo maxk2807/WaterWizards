@@ -435,6 +435,9 @@ public class ClientService(NetworkManager manager)
                 case "SummonShip":
                     GameStateManager.Instance.GameScreen.EnableSingleShipPlacement();
                     break;
+                case "OpponentUsedCard":
+                    HandleCards.HandleOpponentUsedCard(reader);
+                    break;
             }
         }
         catch (Exception ex)

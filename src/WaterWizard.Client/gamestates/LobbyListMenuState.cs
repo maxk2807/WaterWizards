@@ -8,15 +8,8 @@ namespace WaterWizard.Client.gamestates;
 public class LobbyListMenuState : IGameState
 {
 
-    private Texture2D menuBackground;
-
-    public void LoadAssets()
-{
-    if (menuBackground.Id != 0) return; // Falls bereits geladen, nichts tun
-
-    menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
-}
-
+    private static Texture2D menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
+    private static Texture2D textBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/TitleMenuBackground.png");
 
     public void UpdateAndDraw(GameStateManager manager)
     {
@@ -25,14 +18,25 @@ public class LobbyListMenuState : IGameState
 
     private void DrawLobbyListMenu(GameStateManager manager)
     {
-        LoadAssets();
-
-        //Raylib.DrawTexture(menuBackground, 0, 0, Color.White);
-
         Raylib.DrawTexturePro(
             menuBackground,
             new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),
             new Rectangle(0, 0, manager.screenWidth, manager.screenHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
+        var lobbies = NetworkManager.Instance.GetDiscoveredLobbies();
+
+        Raylib.DrawTexturePro(
+            textBackground,
+            new(0, 0, textBackground.Width, textBackground.Height),
+            new(
+                (manager.screenWidth - 640) / 2f,
+                (float)manager.screenHeight / 10 - 40,
+                640,
+                270 + lobbies.Count * 30f),
             Vector2.Zero,
             0f,
             Color.White
@@ -47,7 +51,6 @@ public class LobbyListMenuState : IGameState
             30,
             Color.DarkBlue
         );
-        var lobbies = NetworkManager.Instance.GetDiscoveredLobbies();
         if (lobbies.Count == 0)
         {
             int noLobbiesWidth = Raylib.MeasureText("Suche nach verfügbaren Lobbies...", 20);

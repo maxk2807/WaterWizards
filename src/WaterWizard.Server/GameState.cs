@@ -94,7 +94,7 @@ public class GameState
     /// Key: NetPeer representing the player
     /// Value: List of Cards representing the player's current hand
     /// </summary>
-    public Dictionary<NetPeer, List<Cards>> PlayerHands { get; private set; } = new();
+    public Dictionary<NetPeer, List<Cards>> PlayerHands { get; set; } = [];
 
 
     public bool IsPlacementPhase()

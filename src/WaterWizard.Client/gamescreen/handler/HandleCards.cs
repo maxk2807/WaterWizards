@@ -81,7 +81,7 @@ public class HandleCards
             );
         }
     }
-    
+
     /// <summary>
     /// Handles the casting of the teleport card with ship selection and destination.
     /// </summary>
@@ -95,12 +95,12 @@ public class HandleCards
             NetDataWriter writer = new();
             writer.Put("CastCard");
             writer.Put(card.Variant.ToString());
-            
+
             // Encode ship ID in the higher 16 bits of X coordinate
             int encodedX = (shipId << 16) | (destinationCoords.X & 0xFFFF);
             writer.Put(encodedX);
             writer.Put(destinationCoords.Y);
-            
+
             clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
             Console.WriteLine($"[Client] Teleport-Karte wirken: Schiff {shipId} zur Position ({destinationCoords.X}, {destinationCoords.Y})");
         }
@@ -109,6 +109,35 @@ public class HandleCards
             Console.WriteLine(
                 "[Client] Kein Server verbunden, Teleport konnte nicht gesendet werden."
             );
+        }
+    }
+    
+    /// <summary>
+    /// Handles notification that the opponent used a card
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the card information</param>
+    public static void HandleOpponentUsedCard(NetPacketReader reader)
+    {
+        Console.WriteLine("[Client] Received OpponentUsedCard message");
+        var cardVariant = reader.GetString();
+        Console.WriteLine($"[Client] Card variant: {cardVariant}");
+        
+        if (Enum.TryParse<CardVariant>(cardVariant, out var variant))
+        {
+            var opponentHand = GameStateManager.Instance.GameScreen.opponentHand;
+            if (opponentHand != null && opponentHand.Cards.Count > 0)
+            {
+                opponentHand.Cards.RemoveAt(0);
+                Console.WriteLine($"[Client] Opponent used card {variant}, removed from opponent hand display. Remaining cards: {opponentHand.Cards.Count}");
+            }
+            else
+            {
+                Console.WriteLine($"[Client] Could not remove card - opponent hand is null or empty");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"[Client] Failed to parse card variant: {cardVariant}");
         }
     }
 }

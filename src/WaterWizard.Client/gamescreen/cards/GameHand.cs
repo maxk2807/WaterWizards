@@ -85,8 +85,6 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     internal virtual void HandleCast(GameCard gameCard)
     {
         CastingUI.Instance.StartDrawingCardAim(gameCard);
-        
-        RemoveCard(gameCard);
     }
 
     /// <summary>

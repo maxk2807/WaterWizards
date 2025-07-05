@@ -12,16 +12,12 @@ public class PreStartLobbyState : IGameState
         DrawPreStartLobby(manager);
     }
 
-    private Texture2D menuBackground;
+    private static Texture2D menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
+    private static Texture2D textBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/TitleMenuBackground.png");
+
 
     private void DrawPreStartLobby(GameStateManager manager)
     {
-
-        if (menuBackground.Id == 0)
-            {
-                menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
-            }
-
         Raylib.DrawTexturePro(
             menuBackground,
             new Rectangle(0, 0, menuBackground.Width, menuBackground.Height),
@@ -31,10 +27,23 @@ public class PreStartLobbyState : IGameState
             Color.White
         );
 
+        var players = NetworkManager.Instance.GetConnectedPlayers();
+        float availableWidth = manager.screenWidth - (manager.screenWidth * 0.3f + 40);
 
+        Raylib.DrawTexturePro(
+            textBackground,
+            new(0, 0, textBackground.Width, textBackground.Height),
+            new(
+                (availableWidth - 470) / 2f,
+                (float)manager.screenHeight / 10 - 40,
+                470,
+                315),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
 
         manager.ChatLog.Draw(manager.screenWidth, manager.screenHeight);
-        float availableWidth = manager.screenWidth - (manager.screenWidth * 0.3f + 40);
         int titleWidth = Raylib.MeasureText("Waiting for players...", 30);
         Raylib.DrawText(
             "Waiting for players...",
@@ -43,7 +52,7 @@ public class PreStartLobbyState : IGameState
             30,
             Color.DarkBlue
         );
-        var players = NetworkManager.Instance.GetConnectedPlayers();
+        
         string playerCountText = $"Connected Players: {players.Count}";
         int playerCountWidth = Raylib.MeasureText(playerCountText, 20);
         Raylib.DrawText(
