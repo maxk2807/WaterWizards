@@ -89,13 +89,47 @@ public class CardHandler(GameState gameState)
                 Console.WriteLine("[Server] GameState is null, cannot handle CardCast.");
                 return;
             }
+
             if (defender != null)
             {
                 Console.WriteLine($"[CardHandler] Gegner gefunden: {defender.ToString()} (Port: {defender.Port})");
                 Console.WriteLine($"[CardHandler] Starte Kartenausführung für {variant}...");
 
-                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
+                if (gameState.PlayerHands == null)
+                {
+                    Console.WriteLine("[CardHandler] WARNING: PlayerHands is null - initializing empty hands");
+                    gameState.PlayerHands = [];
+                }
 
+                if (gameState.PlayerHands.TryGetValue(peer, out var hand))
+                {
+                    Console.WriteLine($"[CardHandler] Player {peer} has {hand.Count} cards in hand");
+                    foreach (var card in hand)
+                    {
+                        Console.WriteLine($"[CardHandler] - {card.Variant}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[CardHandler] Player {peer} has no hand tracked on server - this might be normal for testing");
+                }
+
+                
+                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
+                
+                var cardToRemove = new Cards(variant);
+                bool cardRemoved = gameState.RemoveCardFromPlayerHand(peer, cardToRemove);
+                
+                if (cardRemoved)
+                {
+                    Console.WriteLine($"[CardHandler] Successfully removed {variant} from player hand");
+                }
+                else
+                {
+                    Console.WriteLine($"[CardHandler] Could not remove {variant} from player hand (hand might not be tracked)");
+                }
+                
+                NotifyOpponentCardUsed(defender, variant);
                 Console.WriteLine($"[CardHandler] Kartenausführung für {variant} abgeschlossen");
             }
             else
@@ -107,6 +141,20 @@ public class CardHandler(GameState gameState)
         {
             Console.WriteLine($"[Server] Casting Failed. Variant {cardVariantString} unknown");
         }
+    }
+
+    /// <summary>
+    /// Notifies the opponent that a card was used (for visual hand updates)
+    /// </summary>
+    /// <param name="opponent">The opponent to notify</param>
+    /// <param name="usedCard">The card that was used</param>
+    private static void NotifyOpponentCardUsed(NetPeer opponent, CardVariant usedCard)
+    {
+        var writer = new NetDataWriter();
+        writer.Put("OpponentUsedCard");
+        writer.Put(usedCard.ToString());
+        opponent.Send(writer, DeliveryMethod.ReliableOrdered);
+        Console.WriteLine($"[Server] Notified opponent about card usage: {usedCard}");
     }
 
     internal static void CardActivation(GameState gameState, CardVariant variant, int duration)
