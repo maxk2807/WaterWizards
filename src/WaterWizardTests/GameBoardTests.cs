@@ -64,7 +64,7 @@ namespace WaterWizardTests
             var result = gameBoard.IsPointOutside(screenPos);
             
             // Assert
-            Assert.True((bool)result);
+            Assert.True(result);
         }
 
         [Fact]
