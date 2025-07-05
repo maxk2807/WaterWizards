@@ -16,6 +16,6 @@
     <Using Include="Xunit" />
     <ProjectReference Include="..\WaterWizard.Client\WaterWizard.Client.csproj" />
     <ProjectReference Include="..\WaterWizard.Shared\WaterWizard.Shared.csproj" />
-    <ProjectReference Include="..\WaterWizard.Shared\WaterWizard.Server.csproj" />
+    <ProjectReference Include="..\WaterWizard.Server\WaterWizard.Server.csproj" />
   </ItemGroup>
 </Project>
