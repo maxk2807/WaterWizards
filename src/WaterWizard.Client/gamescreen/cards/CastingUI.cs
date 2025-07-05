@@ -49,7 +49,7 @@ public class CastingUI
         {
             aiming = false;
             NetworkManager.HandleCast(gameCard.card, new Point(0, 0));
-            RemoveCardFromHand(gameCard.card); 
+            RemoveCardFromHand(gameCard.card);
             return;
         }
 
@@ -153,7 +153,7 @@ public class CastingUI
         {
             aiming = false;
             NetworkManager.HandleCast(cardToAim!.card, new((int)shipCoords.X, (int)shipCoords.Y));
-            
+
             RemoveCardFromHand(cardToAim.card);
         }
     }
@@ -218,7 +218,7 @@ public class CastingUI
             {
                 aiming = false;
                 NetworkManager.HandleCast(cardToAim!.card, hoveredCoords.Value);
-                
+
                 RemoveCardFromHand(cardToAim.card);
             }
         }
@@ -247,7 +247,7 @@ public class CastingUI
         {
             aiming = false;
             NetworkManager.HandleCast(cardToAim!.card, new((int)shipCoords.X, (int)shipCoords.Y));
-            
+
             RemoveCardFromHand(cardToAim.card);
         }
     }
@@ -380,7 +380,7 @@ public class CastingUI
                         selectedShipIndex,
                         new Point(hoveredCoords.Value.X, hoveredCoords.Value.Y)
                     );
-                    
+
                     RemoveCardFromHand(cardToAim.card);
                 }
             }
@@ -401,5 +401,20 @@ public class CastingUI
     {
         var playerHand = GameScreen.playerHand;
         playerHand?.RemoveCard(card);
+    }
+    
+    /// <summary>
+    /// Cancels the current card casting process and resets all casting-related state.
+    /// This stops the aiming phase and clears any selected targets without executing the cast.
+    /// </summary>
+    public void CancelCasting()
+    {
+        if (aiming)
+        {
+            aiming = false;
+            cardToAim = null;
+            isTeleportSelectionPhase = false;
+            selectedShipIndex = -1;
+        }
     }
 }
