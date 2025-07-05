@@ -16,7 +16,7 @@ public class NetworkManager
     public readonly int hostPort = 7777;
     public int? LobbyCountdownSeconds { get; set; }
 
-    private NetworkManager()
+    public NetworkManager()
     {
         hostService = new(this);
         clientService = new(this);
@@ -136,7 +136,7 @@ public class NetworkManager
         hostService.BroadcastStartGame();
     }
 
-    internal bool IsClientReady()
+    public bool IsClientReady()
     {
         return clientService.IsClientReady();
     }
