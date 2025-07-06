@@ -6,7 +6,7 @@ public class RessourceField(GameScreen gameScreen)
 {
     private float Mana;
     private string manaString = "";
-    private float Gold;
+    public float Gold { private set; get; }
     private string goldString = "";
     private bool isParalized = false;
     private string paralizeString = "PARALYZED";
