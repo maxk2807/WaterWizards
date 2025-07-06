@@ -70,7 +70,7 @@ public class GameCard(GameScreen gameScreen, Cards card)
             Rectangle manaRec = new(0, 0, manaIconAsset.Width, manaIconAsset.Height);
             Rectangle manaTargetRec = new(
                 x + (Width - manaWidth) / 2f,
-                (float)(y + Height * 3f / 4f + fontSize),
+                y + Height * 3f / 4f + fontSize,
                 iconSize,
                 iconSize
             );
