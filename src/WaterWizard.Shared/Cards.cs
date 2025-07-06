@@ -44,6 +44,11 @@ public class Cards
     /// </summary>
     public CardTarget? Target { get; private set; }
 
+    /// <summary>
+    /// Gibt die Goldkosten dieser Karte an.
+    /// Der Wert basiert auf der Kartenvariante und wird aus den statisch definierten Kartenwerten abgeleitet.
+    /// </summary>
+    public int Gold => cardStatsMapping[Variant].Gold;
     private static readonly Dictionary<CardVariant, CardType> cardTypeMapping = new Dictionary<
         CardVariant,
         CardType
@@ -90,6 +95,7 @@ public class Cards
             new CardStats
             {
                 Mana = 1,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new("1x1"),
@@ -100,6 +106,7 @@ public class Cards
             new CardStats
             {
                 Mana = 2,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new("random 1x1"),
@@ -110,6 +117,7 @@ public class Cards
             new CardStats
             {
                 Mana = 2,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new("1x1"),
@@ -120,6 +128,7 @@ public class Cards
             new CardStats
             {
                 Mana = 7,
+                Gold = 2,
                 CastTime = "3",
                 Duration = "instant",
                 Target = new("3x3"),
@@ -130,6 +139,7 @@ public class Cards
             new CardStats
             {
                 Mana = 5,
+                Gold = 2,
                 CastTime = "2",
                 Duration = "instant",
                 Target = new("1x1"),
@@ -140,6 +150,7 @@ public class Cards
             new CardStats
             {
                 Mana = 2,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "3",
                 Target = new("1x1"),
@@ -151,6 +162,7 @@ public class Cards
             new CardStats
             {
                 Mana = 2,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "permanent",
                 Target = new("2x1"),
@@ -161,6 +173,7 @@ public class Cards
             new CardStats
             {
                 Mana = 10,
+                Gold = 2,
                 CastTime = "4",
                 Duration = "permanent",
                 Target = new("ship"),
@@ -171,6 +184,7 @@ public class Cards
             new CardStats
             {
                 Mana = 5,
+                Gold = 2,
                 CastTime = "1",
                 Duration = "permanent",
                 Target = new(true, "ship"),
@@ -181,6 +195,7 @@ public class Cards
             new CardStats
             {
                 Mana = 4,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "6",
                 Target = new("battlefield"),
@@ -191,6 +206,7 @@ public class Cards
             new CardStats
             {
                 Mana = 5,
+                Gold = 2,
                 CastTime = "2",
                 Duration = "5",
                 Target = new("3x3"),
@@ -201,6 +217,7 @@ public class Cards
             new CardStats
             {
                 Mana = 3,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "10",
                 Target = new("1x1"),
@@ -211,6 +228,7 @@ public class Cards
             new CardStats
             {
                 Mana = 3,
+                Gold = 2,
                 CastTime = "3",
                 Duration = "permanent",
                 Target = new("ship"),
@@ -222,6 +240,7 @@ public class Cards
             new CardStats
             {
                 Mana = 6,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "5",
                 Target = new("battlefield"),
@@ -232,6 +251,7 @@ public class Cards
             new CardStats
             {
                 Mana = 6,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "permanent",
                 Target = new("battlefield"),
@@ -242,6 +262,7 @@ public class Cards
             new CardStats
             {
                 Mana = 5,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "permanent",
                 Target = new("random 1x1"),
@@ -252,6 +273,7 @@ public class Cards
             new CardStats
             {
                 Mana = 4,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "permanent",
                 Target = new("battlefield"),
@@ -262,6 +284,7 @@ public class Cards
             new CardStats
             {
                 Mana = 4,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new("battlefield"),
@@ -273,6 +296,7 @@ public class Cards
             new CardStats
             {
                 Mana = 4,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),
@@ -283,6 +307,7 @@ public class Cards
             new CardStats
             {
                 Mana = 2,
+                Gold = 2,
                 CastTime = "1",
                 Duration = "6",
                 Target = new(true, "ship"),
@@ -293,6 +318,7 @@ public class Cards
             new CardStats
             {
                 Mana = 6,
+                Gold = 2,
                 CastTime = "3",
                 Duration = "instant",
                 Target = new(true, "ship"),
@@ -303,6 +329,7 @@ public class Cards
             new CardStats
             {
                 Mana = 6,
+                Gold = 2,
                 CastTime = "2",
                 Duration = "instant",
                 Target = new(true, "ship"),
@@ -313,6 +340,7 @@ public class Cards
             new CardStats
             {
                 Mana = 4,
+                Gold = 2,
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),

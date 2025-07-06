@@ -6,6 +6,7 @@ using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
 using WaterWizard.Client.gamestates;
+using System.Security.Cryptography;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -560,15 +561,11 @@ public class GameScreen(
                 card.card.Update(deltaTime);
             }
         }
-    }
+        if (Raylib.IsMouseButtonPressed(MouseButton.Right))
+        {
+            CastingUI.Instance.CancelCasting();
+        }
 
-    private void CreateThunderStrike(GameBoard board)
-    {
-        // Zufällige Position für den 2x2 Einschlag finden
-        int x = Random.Shared.Next(0, board.GridWidth - 1);
-        int y = Random.Shared.Next(0, board.GridHeight - 1);
-
-        board.AddThunderStrike(x, y);
     }
 
     public void EnableSingleShipPlacement()

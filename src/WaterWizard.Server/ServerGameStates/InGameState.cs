@@ -121,7 +121,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 }
                 break;
             case "BuyCard":
-                CardHandler.HandleCardBuying(serverInstance, peer, reader);
+                CardHandler.HandleCardBuying(serverInstance, peer, reader, gameState);
                 break;
             case "CastCard":
                 cardHandler.HandleCardCasting(serverInstance, peer, reader, gameState, paralizeHandler!, utilityCardHandler!);
