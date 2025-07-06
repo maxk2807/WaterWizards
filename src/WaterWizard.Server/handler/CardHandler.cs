@@ -5,13 +5,13 @@ using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Server.Card.environment;
 using WaterWizard.Shared;
 using WaterWizard.Server.handler;
+using WaterWizard.Server.ServerGameStates;
 
 namespace WaterWizard.Server.handler;
 
 public class CardHandler(GameState gameState)
 {
     private readonly GameState? gameState = gameState;
-    private static readonly GoldHandler? goldHandler;
 
     /// <summary>
     /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
@@ -49,10 +49,12 @@ public class CardHandler(GameState gameState)
 
         int playerIndex = gameState.Server.ConnectedPeerList.IndexOf(peer);
         int goldCost = card.Gold;
+        InGameState? inGame = gameState.manager.CurrentState as InGameState;
+        GoldHandler goldHandler = inGame!.goldHandler!;
 
-        if (goldHandler?.CanSpendGold(playerIndex, goldCost) ?? true)
+        if (!goldHandler.CanSpendGold(playerIndex, goldCost))
         {
-            Console.WriteLine($"[Server] Player {playerIndex} has insufficient gold ({goldCost} required). Purchase cancelled.");
+            Console.WriteLine($"[Server] Player {playerIndex} has insufficient gold: {(playerIndex == 0 ? gameState.Player1Gold : gameState.Player2Gold )} ({goldCost} required). Purchase cancelled.");
             return;
         }
 
