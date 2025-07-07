@@ -11,6 +11,11 @@ public class GameCard(GameScreen gameScreen, Cards card)
     private int Width => gameScreen.cardWidth;
     private int Height => gameScreen.cardHeight;
 
+    private static Texture2D cardTemplateAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/CardTemplate.png");
+    private static Texture2D allyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/ally.png");
+    private static Texture2D enemyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/enemy.png");
+    private static Texture2D manaIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/mana.png");
+
     /// <summary>
     /// Draw the individual Card at the given coordinates.
     /// The Card currently consists of the given color, and a black outline.
@@ -22,10 +27,75 @@ public class GameCard(GameScreen gameScreen, Cards card)
     public void Draw(int x, int y, bool front)
     {
         Rectangle card = new(x, y, Width, Height);
-        Raylib.DrawRectangleRec(card, GetColorFromCardType(front));
-        Raylib.DrawRectangleLinesEx(card, 2, Color.Black);
-        if (!front)
+        if (front)
         {
+            Rectangle cardTemplateRec = new(0, 0, cardTemplateAsset.Width, cardTemplateAsset.Height);
+            Raylib.DrawTexturePro(
+                cardTemplateAsset,
+                cardTemplateRec,
+                card,
+                Vector2.Zero,
+                0f,
+                Color.White
+            );
+
+            int fontSize = 10;
+
+            string variantText = this.card.Variant.ToString();
+            int variantTextWidth = Raylib.MeasureText(variantText, fontSize);
+            Raylib.DrawText(
+                variantText,
+                x + (Width - variantTextWidth - fontSize) / 2,
+                y + Height / 8 - 3,
+                fontSize,
+                Color.White
+            );
+
+            fontSize = 15;
+
+            string targetText = $"{(this.card.Target!.Ally ? "ally " : "")}{this.card.Target.Target}";
+            int targetTextWidth = Raylib.MeasureText(targetText, fontSize);
+            Raylib.DrawText(
+                targetText,
+                x + (Width - targetTextWidth) / 2,
+                y + Height * 3 / 4 - fontSize,
+                fontSize,
+                Color.White
+            );
+
+            int iconSize = 20;
+            string manaText = $": {this.card.Mana}";
+            int manaWidth = Raylib.MeasureText(manaText, fontSize) + iconSize;
+
+            Rectangle manaRec = new(0, 0, manaIconAsset.Width, manaIconAsset.Height);
+            Rectangle manaTargetRec = new(
+                x + (Width - manaWidth) / 2f,
+                y + Height * 3f / 4f + fontSize,
+                iconSize,
+                iconSize
+            );
+            Raylib.DrawTexturePro(
+                manaIconAsset,
+                manaRec,
+                manaTargetRec,
+                Vector2.Zero,
+                0f,
+                Color.White
+            );
+
+            Raylib.DrawText(
+                manaText,
+                x + (Width - manaWidth) / 2 + iconSize,
+                y + Height * 3 / 4 + fontSize,
+                fontSize,
+                Color.White
+            );
+        }
+        else
+        {
+            Raylib.DrawRectangleRec(card, GetColorFromCardType(front));
+            Raylib.DrawRectangleLinesEx(card, 2, Color.Black);
+
             string cardBackText = this.card.Type.ToString();
             int textWidth = Raylib.MeasureText(cardBackText, 10);
             Raylib.DrawText(

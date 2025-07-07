@@ -489,7 +489,12 @@ public class GameScreen(
     {
         if (Enum.TryParse<CardVariant>(variant, true, out var cardVariant))
         {
-            playerHand!.AddCard(new(cardVariant));
+            Cards card;
+            playerHand!.AddCard(card = new(cardVariant));
+            int goldAmount = card.Gold;
+            var ressourceField = GameStateManager.Instance.GameScreen.ressourceField!;
+            ressourceField.SetGold((int)(ressourceField.Gold - goldAmount));
+            ressourceField.GoldFieldUpdate();
         }
         else
         {
