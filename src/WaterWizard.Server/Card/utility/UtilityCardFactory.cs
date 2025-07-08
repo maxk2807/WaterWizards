@@ -19,6 +19,7 @@ public class UtilityCardFactory
             CardVariant.SummonShip => new SummonShipCard(),
             CardVariant.Shield => new ShieldCard(),
             CardVariant.Teleport => new TeleportCard(),
+            CardVariant.ConeOfCold => new ConeOfColdCard(),
             _ => null,
         };
     }
