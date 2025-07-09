@@ -16,7 +16,7 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
     private System.Timers.Timer? manaTimer;
     private System.Timers.Timer? goldTimer;
     private System.Timers.Timer? shieldTimer;
-    private ManaHandler? manaHandler;
+    public ManaHandler? manaHandler;
     public ParalizeHandler? paralizeHandler;
     public GoldHandler? goldHandler;
     private UtilityCardHandler? utilityCardHandler;
