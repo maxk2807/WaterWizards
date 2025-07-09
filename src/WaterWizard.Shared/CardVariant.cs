@@ -16,21 +16,16 @@ public enum CardVariant
     Teleport,
     Paralize,
     ConeOfCold,
-    MinorIllusion,
-    Polymorph,
     Shield,
 
     // Environment Variants
     Thunder,
-    Storm,
     SpawnRocks,
     RiseSun,
     CallWind,
 
     // Healing Variants
     Heal,
-    Mending,
-    MassMending,
     PerfectMending,
     Lifesteal,
 }
