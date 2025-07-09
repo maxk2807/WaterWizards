@@ -1,3 +1,12 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - Erickk0: 99 Zeilen
+// - erick: 4 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public Vector2 AreaOfEffect => new(3, 3);   (Erickk0: 85 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;

@@ -1,3 +1,12 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - erick: 62 Zeilen
+// - maxk2807: 2 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Shared;

@@ -1,3 +1,15 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 176 Zeilen
+// - justinjd00: 91 Zeilen
+// - jdewi001: 65 Zeilen
+// - erick: 35 Zeilen
+// - Erickk0: 11 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - private static readonly Random random = new();   (maxk2807: 169 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server.Card;

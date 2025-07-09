@@ -1,3 +1,14 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 144 Zeilen
+// - maxk2807: 19 Zeilen
+// - Paul: 13 Zeilen
+// - erick: 2 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+using WaterWizard.Client.Assets.Sounds.Manager;
 using Raylib_cs;
 using System.Numerics;
 using WaterWizard.Client.gamescreen;
@@ -111,6 +122,7 @@ public class PreStartLobbyState : IGameState
             );
             if (allReady && hoverStart && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
+                Raylib.PlaySound(SoundManager.ButtonSound);
                 NetworkManager.Instance.BroadcastStartGame();
             }
         }
@@ -139,6 +151,7 @@ public class PreStartLobbyState : IGameState
             );
             if (hoverReady && Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
+                Raylib.PlaySound(SoundManager.ButtonSound);
                 NetworkManager.Instance.ToggleReadyStatus();
             }
         }
@@ -164,6 +177,7 @@ public class PreStartLobbyState : IGameState
         );
         if (hoverBack && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
+            Raylib.PlaySound(SoundManager.ButtonSound);
             NetworkManager.Instance.Shutdown();
             manager.SetStateToMainMenu();
         }

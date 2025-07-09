@@ -1,3 +1,12 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - erick: 104 Zeilen
+// - Erickk0: 33 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public Vector2 AreaOfEffect => new(1, 1);   (erick: 84 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server.handler;

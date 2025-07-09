@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 139 Zeilen
+// - erick: 66 Zeilen
+// - Erickk0: 17 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public static NetworkManager Instance => instance ??= new NetworkManager();   (maxk2807: 131 Zeilen)
+// ===============================================
+
 using LiteNetLib;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamescreen.handler;

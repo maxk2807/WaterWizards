@@ -1,3 +1,17 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - Erickk0: 214 Zeilen
+// - erick: 131 Zeilen
+// - jdewi001: 60 Zeilen
+// - maxk2807: 42 Zeilen
+// - jlnhsrm: 24 Zeilen
+// - justinjd00: 21 Zeilen
+// - Max Kondratov: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - private readonly List<ShieldEffect> _activeShields = new();   (Erickk0: 206 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;

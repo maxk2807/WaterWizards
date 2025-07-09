@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 83 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using LiteNetLib;
 
 namespace WaterWizard.Client.gamescreen.handler;

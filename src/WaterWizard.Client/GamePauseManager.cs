@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 65 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System;
 using Raylib_cs;
 

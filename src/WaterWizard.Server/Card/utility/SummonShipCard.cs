@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 31 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public Vector2 AreaOfEffect => new(1, 1);   (justinjd00: 19 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;

@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 48 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Shared;

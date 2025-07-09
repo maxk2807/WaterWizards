@@ -1,3 +1,16 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 194 Zeilen
+// - justinjd00: 100 Zeilen
+// - jdewi001: 60 Zeilen
+// - erick: 53 Zeilen
+// - Erickk0: 51 Zeilen
+// - Erick Zeiler: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;

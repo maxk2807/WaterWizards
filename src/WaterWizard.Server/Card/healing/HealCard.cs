@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 50 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public Vector2 AreaOfEffect => new();   (maxk2807: 38 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server.handler;

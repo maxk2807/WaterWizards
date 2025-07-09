@@ -1,6 +1,15 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - erick: 120 Zeilen
+// - Erickk0: 9 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using Raylib_cs;
 using WaterWizard.Client.network;
-
+using WaterWizard.Client.Assets.Sounds.Manager;
 namespace WaterWizard.Client.gamestates;
 
 public class GameOverState(bool isWinner, string winnerMessage = "") : IGameState
@@ -114,6 +123,7 @@ public class GameOverState(bool isWinner, string winnerMessage = "") : IGameStat
 
         if (Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
+            Raylib.PlaySound(SoundManager.ButtonSound);
             if (hoverPlayAgain)
             {
                 manager.ResetGame();

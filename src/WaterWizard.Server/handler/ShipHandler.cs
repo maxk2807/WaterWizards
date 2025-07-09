@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - erick: 187 Zeilen
+// - maxk2807: 35 Zeilen
+// - Erickk0: 16 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;

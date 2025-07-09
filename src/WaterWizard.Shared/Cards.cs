@@ -1,3 +1,16 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 285 Zeilen
+// - justinjd00: 108 Zeilen
+// - jdewi001: 35 Zeilen
+// - jlnhsrm: 28 Zeilen
+// - Erickk0: 11 Zeilen
+// - erick: 5 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Linq;
 
 namespace WaterWizard.Shared;

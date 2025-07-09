@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 327 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using WaterWizard.Analytics.Models;
@@ -276,7 +284,6 @@ public static class CodeAnalytics
     {
         try
         {
-            // Alle historischen Reports finden
             var jsonFiles = Directory.GetFiles(analyticsDir, "analytics_*.json")
                 .Where(f => !f.EndsWith("latest.json"))
                 .OrderByDescending(f => f)
@@ -287,10 +294,8 @@ public static class CodeAnalytics
                 .OrderByDescending(f => f)
                 .ToList();
             
-            // Alte Reports löschen (behalte nur die neuesten)
             var filesToDelete = jsonFiles.Skip(maxReports).Concat(markdownFiles.Skip(maxReports));
             
-            // Zusätzlich: Lösche unnötige Dateien im analytics-Verzeichnis
             var allFiles = Directory.GetFiles(analyticsDir, "*.*", SearchOption.TopDirectoryOnly);
             var unnecessaryFiles = allFiles.Where(file => 
             {

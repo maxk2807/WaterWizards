@@ -1,3 +1,17 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 259 Zeilen
+// - jdewi001: 151 Zeilen
+// - justinjd00: 47 Zeilen
+// - erick: 13 Zeilen
+// - Erickk0: 8 Zeilen
+// - Erick Zeiler: 2 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - private Rectangle Rectangle => new(X, Y, Width, Height);   (maxk2807: 7 Zeilen)
+// - private Vector2 offset = new();   (maxk2807: 231 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamestates;
