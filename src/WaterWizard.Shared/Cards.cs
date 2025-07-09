@@ -209,7 +209,7 @@ public class Cards
                 Gold = 2,
                 CastTime = "2",
                 Duration = "5",
-                Target = new("3x3"),
+                Target = new("2x2"),
             }
         },
         {
