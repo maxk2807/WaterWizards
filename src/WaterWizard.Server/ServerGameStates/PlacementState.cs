@@ -1,3 +1,15 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 88 Zeilen
+// - maxk2807: 12 Zeilen
+// - erick: 6 Zeilen
+// - Erickk0: 6 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - private readonly Dictionary<string, bool> placementReady = new();   (jdewi001: 18 Zeilen)
+// - public void OnExit() {   (jdewi001: 62 Zeilen)
+// ===============================================
+
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Server.handler;

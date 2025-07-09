@@ -1,3 +1,12 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 110 Zeilen
+// - jdewi001: 10 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Diagnostics;
 using LiteNetLib;
 using LiteNetLib.Utils;

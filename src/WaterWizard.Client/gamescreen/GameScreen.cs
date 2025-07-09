@@ -1,3 +1,16 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 292 Zeilen
+// - jdewi001: 141 Zeilen
+// - Paul: 78 Zeilen
+// - justinjd00: 32 Zeilen
+// - erick: 32 Zeilen
+// - Erickk0: 15 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - private HashSet<int> shipSizeLimitReached = new();   (maxk2807: 241 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen.cards;

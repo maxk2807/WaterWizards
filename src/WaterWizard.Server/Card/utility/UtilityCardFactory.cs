@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - Paul: 32 Zeilen
+// - erick: 4 Zeilen
+// - justinjd00: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
 

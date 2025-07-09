@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 26 Zeilen
+// - jlnhsrm: 7 Zeilen
+// - jdewi001: 4 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 namespace WaterWizard.Shared;
 
 /// <summary>

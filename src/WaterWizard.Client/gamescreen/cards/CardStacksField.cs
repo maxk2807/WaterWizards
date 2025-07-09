@@ -1,3 +1,14 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 54 Zeilen
+// - justinjd00: 40 Zeilen
+// - jdewi001: 14 Zeilen
+// - erick: 2 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Runtime.CompilerServices;
 using Raylib_cs;
 using WaterWizard.Client.network;

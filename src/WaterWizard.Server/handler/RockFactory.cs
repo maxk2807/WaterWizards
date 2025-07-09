@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 193 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - private static readonly Random _random = new();   (jdewi001: 182 Zeilen)
+// ===============================================
+
 using System.Drawing;
 using WaterWizard.Shared;
 

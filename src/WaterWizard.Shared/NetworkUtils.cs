@@ -1,3 +1,14 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 44 Zeilen
+// - Erickk0: 5 Zeilen
+// - jdewi001: 2 Zeilen
+// - Erick Zeiler: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System;
 using System.Net;
 using System.Net.Http;

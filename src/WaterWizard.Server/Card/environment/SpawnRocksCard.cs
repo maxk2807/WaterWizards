@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 32 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public Vector2 AreaOfEffect => new();   (justinjd00: 20 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server.handler;

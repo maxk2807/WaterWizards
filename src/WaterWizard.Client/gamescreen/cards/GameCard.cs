@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 122 Zeilen
+// - jdewi001: 34 Zeilen
+// - justinjd00: 2 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Shared;

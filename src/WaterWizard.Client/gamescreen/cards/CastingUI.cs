@@ -1,3 +1,15 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 210 Zeilen
+// - erick: 141 Zeilen
+// - justinjd00: 46 Zeilen
+// - Erickk0: 23 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public static CastingUI Instance => instance ??= new();   (maxk2807: 13 Zeilen)
+// - private Vector2 selectedShipCoords = new();   (maxk2807: 187 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.gamescreen.ships;

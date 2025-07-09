@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 38 Zeilen
+// - jdewi001: 8 Zeilen
+// - erick: 6 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 namespace WaterWizard.Shared;
 
 public class CardTarget

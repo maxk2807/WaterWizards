@@ -1,3 +1,15 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 69 Zeilen
+// - Paul: 60 Zeilen
+// - jdewi001: 30 Zeilen
+// - justinjd00: 3 Zeilen
+// - erick: 3 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using Raylib_cs;
 using System.Numerics;
 

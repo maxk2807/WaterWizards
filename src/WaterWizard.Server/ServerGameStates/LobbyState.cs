@@ -1,3 +1,14 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - erick: 113 Zeilen
+// - jdewi001: 71 Zeilen
+// - Erickk0: 18 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public void OnEnter() {   (jdewi001: 6 Zeilen)
+// - public void OnExit() {   (erick: 111 Zeilen)
+// ===============================================
+
 namespace WaterWizard.Server.ServerGameStates;
 
 using LiteNetLib;

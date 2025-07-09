@@ -1,3 +1,14 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 144 Zeilen
+// - maxk2807: 19 Zeilen
+// - Paul: 13 Zeilen
+// - erick: 2 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using Raylib_cs;
 using System.Numerics;
 using WaterWizard.Client.gamescreen;
