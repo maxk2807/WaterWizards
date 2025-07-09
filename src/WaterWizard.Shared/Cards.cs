@@ -67,19 +67,14 @@ public class Cards
         { CardVariant.Teleport, CardType.Utility },
         { CardVariant.Paralize, CardType.Utility },
         { CardVariant.ConeOfCold, CardType.Utility },
-        { CardVariant.MinorIllusion, CardType.Utility },
-        { CardVariant.Polymorph, CardType.Utility },
         { CardVariant.Shield, CardType.Utility },
         // Environment Variants
         { CardVariant.Thunder, CardType.Environment },
-        { CardVariant.Storm, CardType.Environment },
         { CardVariant.SpawnRocks, CardType.Environment },
         { CardVariant.RiseSun, CardType.Environment },
         { CardVariant.CallWind, CardType.Environment },
         // Healing Variants
         { CardVariant.Heal, CardType.Healing },
-        { CardVariant.Mending, CardType.Healing },
-        { CardVariant.MassMending, CardType.Healing },
         { CardVariant.PerfectMending, CardType.Healing },
         { CardVariant.Lifesteal, CardType.Healing },
     };
@@ -212,28 +207,6 @@ public class Cards
                 Target = new("2x2"),
             }
         },
-        {
-            CardVariant.MinorIllusion,
-            new CardStats
-            {
-                Mana = 3,
-                Gold = 2,
-                CastTime = "instant",
-                Duration = "10",
-                Target = new("1x1"),
-            }
-        },
-        {
-            CardVariant.Polymorph,
-            new CardStats
-            {
-                Mana = 3,
-                Gold = 2,
-                CastTime = "3",
-                Duration = "permanent",
-                Target = new("ship"),
-            }
-        },
         // Environment
         {
             CardVariant.Thunder,
@@ -243,17 +216,6 @@ public class Cards
                 Gold = 2,
                 CastTime = "instant",
                 Duration = "5",
-                Target = new("battlefield"),
-            }
-        },
-        {
-            CardVariant.Storm,
-            new CardStats
-            {
-                Mana = 6,
-                Gold = 2,
-                CastTime = "instant",
-                Duration = "permanent",
                 Target = new("battlefield"),
             }
         },
@@ -298,28 +260,6 @@ public class Cards
                 Mana = 4,
                 Gold = 2,
                 CastTime = "instant",
-                Duration = "instant",
-                Target = new(true, "ship"),
-            }
-        },
-        {
-            CardVariant.Mending,
-            new CardStats
-            {
-                Mana = 2,
-                Gold = 2,
-                CastTime = "1",
-                Duration = "6",
-                Target = new(true, "ship"),
-            }
-        },
-        {
-            CardVariant.MassMending,
-            new CardStats
-            {
-                Mana = 6,
-                Gold = 2,
-                CastTime = "3",
                 Duration = "instant",
                 Target = new(true, "ship"),
             }

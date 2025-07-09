@@ -49,14 +49,6 @@ public class UtilityCardHandler
                 Console.WriteLine($"[UtilityCardHandler] ConeOfCold-Karte aktiviert!");
                 HandleConeOfCold(targetCoords, caster, defender);
                 break;
-            case CardVariant.MinorIllusion:
-                Console.WriteLine($"[UtilityCardHandler] MinorIllusion-Karte aktiviert!");
-                HandleMinorIllusion(targetCoords, caster, defender);
-                break;
-            case CardVariant.Polymorph:
-                Console.WriteLine($"[UtilityCardHandler] Polymorph-Karte aktiviert!");
-                HandlePolymorph(targetCoords, caster, defender);
-                break;
             default:
                 Console.WriteLine($"[UtilityCardHandler] Unbekannte Utility-Karte: {variant}");
                 break;
