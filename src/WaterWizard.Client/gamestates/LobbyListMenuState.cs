@@ -14,6 +14,7 @@ using Raylib_cs;
 using System.Numerics;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.network;
+using WaterWizard.Client.Assets.Sounds.Manager;
 
 namespace WaterWizard.Client.gamestates;
 
@@ -146,6 +147,7 @@ public class LobbyListMenuState : IGameState
         );
         if (hoverBack && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
+            Raylib.PlaySound(SoundManager.ButtonSound);
             NetworkManager.Instance.Shutdown();
             manager.SetStateToMainMenu();
         }

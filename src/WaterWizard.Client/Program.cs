@@ -12,13 +12,15 @@
 ﻿using System;
 using Raylib_cs;
 using WaterWizard.Client;
-
+using WaterWizard.Client.Assets.Sounds.Manager;
 class Program
 {
     static void Main()
     {
         try
         {
+            Raylib.InitAudioDevice();
+            SoundManager.LoadSounds();
             const int defaultWidth = 1200;
             const int defaultHeight = 900;
 
@@ -76,6 +78,10 @@ class Program
             Console.WriteLine(ex.StackTrace);
             Console.WriteLine("Drücke eine beliebige Taste zum Beenden...");
             Console.ReadKey();
+        }
+        finally{
+            SoundManager.UnloadSounds();
+            Raylib.CloseAudioDevice();
         }
     }
 }

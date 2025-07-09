@@ -12,6 +12,7 @@
 
 using Raylib_cs;
 using System.Numerics;
+using WaterWizard.Client.Assets.Sounds.Manager;
 
 
 namespace WaterWizard.Client.gamestates;
@@ -73,28 +74,6 @@ public class MainMenuState : IGameState
 
         Raylib.DrawTexturePro(titleAsset, new Rectangle(0, 0, titleAsset.Width, titleAsset.Height), destRect, new Vector2(0, 0), 0.0f, Color.White);
 
-
-        // string title = "Welcome to WaterWizards!";
-        // float letterSpacing = 3;
-        // float totalTitleWidth = 0;
-        // for (int i = 0; i < title.Length; i++)
-        // {
-        //     totalTitleWidth += Raylib.MeasureText(title[i].ToString(), 30) + letterSpacing;
-        // }
-        // totalTitleWidth -= letterSpacing;
-        // titleAnimTime += Raylib.GetFrameTime() * TITLE_ANIM_SPEED;
-        // float titleVerticalPosition = (float)System.Math.Sin(titleAnimTime) * TITLE_FLOAT_AMPLITUDE;
-        // float titleX = (manager.screenWidth - totalTitleWidth) / 2;
-        // int titleY = manager.screenHeight / 4 + (int)titleVerticalPosition;
-        // for (int i = 0; i < title.Length; i++)
-        // {
-        //     float hue = (titleAnimTime * 0.3f + i * 0.05f) % 1.0f;
-        //     Color charColor = manager.ColorFromHSV(hue * 360, 0.7f, 0.9f);
-        //     int charWidth = Raylib.MeasureText(title[i].ToString(), 30);
-        //     Raylib.DrawText(title[i].ToString(), (int)titleX, titleY, 30, charColor);
-        //     titleX += charWidth + letterSpacing;
-        // }
-
         HandleJoinButton(manager);
         HandleHostButton(manager);
         HandleMapButton(manager);
@@ -111,6 +90,7 @@ public class MainMenuState : IGameState
         bool hoverMap = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), mapButton);
         if (hoverMap && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
+            Raylib.PlaySound(SoundManager.ButtonSound);
             manager.SetStateToPlacementPhase();
         }
         Rectangle textureRec = new(0, 0, mapButtonAsset.Width, mapButtonAsset.Height);
@@ -136,6 +116,7 @@ public class MainMenuState : IGameState
         bool hoverHost = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), hostButton);
         if (hoverHost && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
+            Raylib.PlaySound(SoundManager.ButtonSound);
             manager.SetStateToHostingMenu();
         }
         Rectangle textureRec = new(0, 0, hostButtonAsset.Width, hostButtonAsset.Height);
@@ -161,6 +142,7 @@ public class MainMenuState : IGameState
         bool hoverJoin = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton);
         if (hoverJoin && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
+            Raylib.PlaySound(SoundManager.ButtonSound);
             manager.SetStateToLobbyList();
         }
         Rectangle textureRec = new(0, 0, joinButtonAsset.Width, joinButtonAsset.Height);
