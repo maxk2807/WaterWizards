@@ -74,6 +74,7 @@ public class Cards
         { CardVariant.Fireball, CardType.Damage },
         { CardVariant.GreedHit, CardType.Damage },
         { CardVariant.FrostBolt, CardType.Damage },
+        { CardVariant.LifeSteal, CardType.Damage },
         // Utility Variants
         { CardVariant.HoveringEye, CardType.Utility },
         { CardVariant.SummonShip, CardType.Utility },
@@ -89,7 +90,6 @@ public class Cards
         // Healing Variants
         { CardVariant.Heal, CardType.Healing },
         { CardVariant.PerfectMending, CardType.Healing },
-        { CardVariant.Lifesteal, CardType.Healing },
     };
 
     private static readonly Dictionary<CardVariant, CardStats> cardStatsMapping = new Dictionary<
@@ -161,6 +161,18 @@ public class Cards
                 Gold = 2,
                 CastTime = "instant",
                 Duration = "3",
+                Target = new("1x1"),
+            }
+        },
+
+        {
+            CardVariant.LifeSteal,
+            new CardStats
+            {
+                Mana = 4,
+                Gold = 2,
+                CastTime = "instant",
+                Duration = "instant",
                 Target = new("1x1"),
             }
         },
@@ -284,17 +296,6 @@ public class Cards
                 Mana = 6,
                 Gold = 2,
                 CastTime = "2",
-                Duration = "instant",
-                Target = new(true, "ship"),
-            }
-        },
-        {
-            CardVariant.Lifesteal,
-            new CardStats
-            {
-                Mana = 4,
-                Gold = 2,
-                CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),
             }
