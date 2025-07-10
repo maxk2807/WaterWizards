@@ -20,6 +20,7 @@ public enum CardVariant
     Fireball,
     GreedHit,
     FrostBolt,
+    LifeSteal,
 
     // Utility Variants
     HoveringEye,
@@ -38,5 +39,4 @@ public enum CardVariant
     // Healing Variants
     Heal,
     PerfectMending,
-    Lifesteal,
 }

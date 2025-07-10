@@ -31,6 +31,7 @@ public static class DamageCardFactory
             CardVariant.GreedHit => new GreedHitCard(),
             CardVariant.FrostBolt => new FrostBoltCard(),
             CardVariant.Fireball => new FireballCard(),
+            CardVariant.LifeSteal => new LifeStealCard(),
 
             _ => null,
         };
