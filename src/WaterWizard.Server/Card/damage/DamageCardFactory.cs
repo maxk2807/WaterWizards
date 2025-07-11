@@ -1,3 +1,11 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jlnhsrm: 41 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using WaterWizard.Server.Card;
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
@@ -23,6 +31,7 @@ public static class DamageCardFactory
             CardVariant.GreedHit => new GreedHitCard(),
             CardVariant.FrostBolt => new FrostBoltCard(),
             CardVariant.Fireball => new FireballCard(),
+            CardVariant.LifeSteal => new LifeStealCard(),
 
             _ => null,
         };

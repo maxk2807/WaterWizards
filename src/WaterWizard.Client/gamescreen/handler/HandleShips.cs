@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - erick: 167 Zeilen
+// - maxk2807: 76 Zeilen
+// - Erickk0: 65 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -133,12 +143,12 @@ public class HandleShips
             int y = reader.GetInt();
             int width = reader.GetInt();
             int height = reader.GetInt();
-            
+
             int damageCount = reader.GetInt();
             var damagedCells = new HashSet<(int X, int Y)>();
-            
+
             Console.WriteLine($"[Client] HandleShipReveal: Ship at ({x},{y}) size {width}x{height}, damageCount={damageCount}");
-            
+
             for (int i = 0; i < damageCount; i++)
             {
                 int damageX = reader.GetInt();
@@ -157,7 +167,7 @@ public class HandleShips
                     {
                         int cellX = x + dx;
                         int cellY = y + dy;
-                        
+
                         if (cellX >= 0 && cellX < targetBoard.GridWidth && cellY >= 0 && cellY < targetBoard.GridHeight)
                         {
                             if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
@@ -268,12 +278,12 @@ public class HandleShips
             int newY = reader.GetInt();
             var ship = board.Ships.Find(ship =>
             {
-                return (ship.X - (int)board.Position.X) / board.CellSize == oldX &&(ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
+                return (ship.X - (int)board.Position.X) / board.CellSize == oldX && (ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
             });
             if (ship != null)
             {
                 ship.X = (int)board.Position.X + newX * board.CellSize;
-                ship.Y = (int)board.Position.Y + newY * board.CellSize; 
+                ship.Y = (int)board.Position.Y + newY * board.CellSize;
                 board.MoveShip(ship, new(oldX, oldY), new(newX, newY));
             }
             else
@@ -287,6 +297,27 @@ public class HandleShips
             Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Handles the ship healing message received from the server.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
+    public static void ShipHeal(NetPacketReader reader)
+    {
+        bool success = reader.GetBool();
+        if (success)
+        {
+            int X = reader.GetInt();
+            int Y = reader.GetInt();
+            GameStateManager.Instance.GameScreen.playerBoard!.SetCellState(
+                    X,
+                    Y,
+                    CellState.Ship
+                );
+            Console.WriteLine($"[Client] Healed At ({X},{Y})");
+        }
+        Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
     }
 
     /// <summary>

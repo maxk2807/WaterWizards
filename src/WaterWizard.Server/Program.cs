@@ -1,3 +1,14 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 180 Zeilen
+// - justinjd00: 64 Zeilen
+// - Erickk0: 60 Zeilen
+// - erick: 28 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Server.ServerGameStates;

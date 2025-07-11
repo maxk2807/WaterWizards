@@ -1,3 +1,16 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 194 Zeilen
+// - justinjd00: 100 Zeilen
+// - jdewi001: 60 Zeilen
+// - erick: 53 Zeilen
+// - Erickk0: 51 Zeilen
+// - Erick Zeiler: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -379,22 +392,8 @@ public class ClientService(NetworkManager manager)
                     GameStateManager.Instance.GameScreen.opponentBoard?.ResetThunderFields();
                     break;
                 case "ShipHeal":
-                    bool success = reader.GetBool();
-                    if (success)
-                    {
-                        int X = reader.GetInt();
-                        int Y = reader.GetInt();
-                        GameStateManager.Instance.GameScreen.playerBoard!.SetCellState(
-                                X,
-                                Y,
-                                Gamescreen.CellState.Ship
-                            );
-                        Console.WriteLine($"[Client] Healed At ({X},{Y})");
-                        break;
-                    }
-                    Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
+                    HandleShips.ShipHeal(reader);
                     break;
-
                 case "PlayerIndex":
                     int playerIndex = reader.GetInt();
                     GameStateManager.Instance.MyPlayerIndex = playerIndex;

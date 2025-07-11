@@ -1,3 +1,15 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - erick: 152 Zeilen
+// - Erickk0: 50 Zeilen
+// - jlnhsrm: 28 Zeilen
+// - justinjd00: 17 Zeilen
+// - maxk2807: 13 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -101,7 +113,7 @@ public class CardHandler(GameState gameState)
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
     public void HandleCardCasting(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState, ParalizeHandler paralizeHandler, UtilityCardHandler utilityCardHandler)
     {
-        //TODO: Handle Mana Cost
+        
         string cardVariantString = reader.GetString();
         int cardX = reader.GetInt();
         int cardY = reader.GetInt();
@@ -123,6 +135,30 @@ public class CardHandler(GameState gameState)
             {
                 Console.WriteLine($"[CardHandler] Gegner gefunden: {defender.ToString()} (Port: {defender.Port})");
                 Console.WriteLine($"[CardHandler] Starte Kartenausführung für {variant}...");
+                // Mana-cost-handling
+                int playerIndex = gameState.Server.ConnectedPeerList.IndexOf(peer);
+                int manaCost = new Cards(variant).Mana;
+                InGameState? inGame = gameState.manager.CurrentState as InGameState;
+                ManaHandler manaHandler = inGame!.manaHandler!;
+
+
+                if (!manaHandler.CanSpendMana(playerIndex, manaCost))
+                {
+                    Console.WriteLine($"[Server] Player {playerIndex} has insufficient mana: " +
+                        $"{(playerIndex == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana)} " +
+                        $"({manaCost} required). Cast cancelled.");
+                    return;
+                }
+
+                bool success = manaHandler.SpendMana(playerIndex, manaCost);
+                if (!success)
+                {
+                    Console.WriteLine($"[Server] Player {playerIndex} could not spend mana despite CanSpendMana check. Cast cancelled.");
+                    return;
+                }
+
+                Console.WriteLine($"[Server] Player {playerIndex} casted card {variant} for {manaCost} mana.");
+                // end of Mana-cost-handling
 
                 if (gameState.PlayerHands == null)
                 {

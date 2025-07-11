@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 107 Zeilen
+// - erick: 5 Zeilen
+// - maxk2807: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server;
@@ -48,14 +58,6 @@ public class UtilityCardHandler
             case CardVariant.ConeOfCold:
                 Console.WriteLine($"[UtilityCardHandler] ConeOfCold-Karte aktiviert!");
                 HandleConeOfCold(targetCoords, caster, defender);
-                break;
-            case CardVariant.MinorIllusion:
-                Console.WriteLine($"[UtilityCardHandler] MinorIllusion-Karte aktiviert!");
-                HandleMinorIllusion(targetCoords, caster, defender);
-                break;
-            case CardVariant.Polymorph:
-                Console.WriteLine($"[UtilityCardHandler] Polymorph-Karte aktiviert!");
-                HandlePolymorph(targetCoords, caster, defender);
                 break;
             default:
                 Console.WriteLine($"[UtilityCardHandler] Unbekannte Utility-Karte: {variant}");

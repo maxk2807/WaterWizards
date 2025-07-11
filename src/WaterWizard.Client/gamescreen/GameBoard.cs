@@ -1,3 +1,19 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - Erickk0: 269 Zeilen
+// - jdewi001: 194 Zeilen
+// - erick: 186 Zeilen
+// - maxk2807: 125 Zeilen
+// - justinjd00: 50 Zeilen
+// - Paul: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - private readonly Random _random = new();   (jdewi001: 1 Zeilen)
+// - private Dictionary<(int x, int y), float> _shieldedCells = new();   (Erickk0: 22 Zeilen)
+// - private readonly Random random = new();   (jdewi001: 161 Zeilen)
+// - public readonly record struct Point(int X, int Y);   (erick: 178 Zeilen)
+// ===============================================
+
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Client.Gamescreen;

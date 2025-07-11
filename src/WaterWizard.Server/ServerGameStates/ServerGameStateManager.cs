@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - jdewi001: 29 Zeilen
+// - Erickk0: 9 Zeilen
+// - maxk2807: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 namespace WaterWizard.Server.ServerGameStates;
 
 using LiteNetLib;

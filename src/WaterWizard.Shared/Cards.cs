@@ -1,3 +1,16 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 285 Zeilen
+// - justinjd00: 108 Zeilen
+// - jdewi001: 35 Zeilen
+// - jlnhsrm: 28 Zeilen
+// - Erickk0: 11 Zeilen
+// - erick: 5 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Linq;
 
 namespace WaterWizard.Shared;
@@ -61,27 +74,22 @@ public class Cards
         { CardVariant.Fireball, CardType.Damage },
         { CardVariant.GreedHit, CardType.Damage },
         { CardVariant.FrostBolt, CardType.Damage },
+        { CardVariant.LifeSteal, CardType.Damage },
         // Utility Variants
         { CardVariant.HoveringEye, CardType.Utility },
         { CardVariant.SummonShip, CardType.Utility },
         { CardVariant.Teleport, CardType.Utility },
         { CardVariant.Paralize, CardType.Utility },
         { CardVariant.ConeOfCold, CardType.Utility },
-        { CardVariant.MinorIllusion, CardType.Utility },
-        { CardVariant.Polymorph, CardType.Utility },
         { CardVariant.Shield, CardType.Utility },
         // Environment Variants
         { CardVariant.Thunder, CardType.Environment },
-        { CardVariant.Storm, CardType.Environment },
         { CardVariant.SpawnRocks, CardType.Environment },
         { CardVariant.RiseSun, CardType.Environment },
         { CardVariant.CallWind, CardType.Environment },
         // Healing Variants
         { CardVariant.Heal, CardType.Healing },
-        { CardVariant.Mending, CardType.Healing },
-        { CardVariant.MassMending, CardType.Healing },
         { CardVariant.PerfectMending, CardType.Healing },
-        { CardVariant.Lifesteal, CardType.Healing },
     };
 
     private static readonly Dictionary<CardVariant, CardStats> cardStatsMapping = new Dictionary<
@@ -156,6 +164,18 @@ public class Cards
                 Target = new("1x1"),
             }
         },
+
+        {
+            CardVariant.LifeSteal,
+            new CardStats
+            {
+                Mana = 4,
+                Gold = 2,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new("1x1"),
+            }
+        },
         // Utility
         {
             CardVariant.HoveringEye,
@@ -209,29 +229,7 @@ public class Cards
                 Gold = 2,
                 CastTime = "2",
                 Duration = "5",
-                Target = new("3x3"),
-            }
-        },
-        {
-            CardVariant.MinorIllusion,
-            new CardStats
-            {
-                Mana = 3,
-                Gold = 2,
-                CastTime = "instant",
-                Duration = "10",
-                Target = new("1x1"),
-            }
-        },
-        {
-            CardVariant.Polymorph,
-            new CardStats
-            {
-                Mana = 3,
-                Gold = 2,
-                CastTime = "3",
-                Duration = "permanent",
-                Target = new("ship"),
+                Target = new("2x2"),
             }
         },
         // Environment
@@ -243,17 +241,6 @@ public class Cards
                 Gold = 2,
                 CastTime = "instant",
                 Duration = "5",
-                Target = new("battlefield"),
-            }
-        },
-        {
-            CardVariant.Storm,
-            new CardStats
-            {
-                Mana = 6,
-                Gold = 2,
-                CastTime = "instant",
-                Duration = "permanent",
                 Target = new("battlefield"),
             }
         },
@@ -303,45 +290,12 @@ public class Cards
             }
         },
         {
-            CardVariant.Mending,
-            new CardStats
-            {
-                Mana = 2,
-                Gold = 2,
-                CastTime = "1",
-                Duration = "6",
-                Target = new(true, "ship"),
-            }
-        },
-        {
-            CardVariant.MassMending,
-            new CardStats
-            {
-                Mana = 6,
-                Gold = 2,
-                CastTime = "3",
-                Duration = "instant",
-                Target = new(true, "ship"),
-            }
-        },
-        {
             CardVariant.PerfectMending,
             new CardStats
             {
                 Mana = 6,
                 Gold = 2,
                 CastTime = "2",
-                Duration = "instant",
-                Target = new(true, "ship"),
-            }
-        },
-        {
-            CardVariant.Lifesteal,
-            new CardStats
-            {
-                Mana = 4,
-                Gold = 2,
-                CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),
             }

@@ -1,3 +1,13 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - maxk2807: 122 Zeilen
+// - jdewi001: 34 Zeilen
+// - justinjd00: 2 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
 using System.Numerics;
 using Raylib_cs;
 using WaterWizard.Shared;
@@ -15,6 +25,7 @@ public class GameCard(GameScreen gameScreen, Cards card)
     private static Texture2D allyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/ally.png");
     private static Texture2D enemyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/enemy.png");
     private static Texture2D manaIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/mana.png");
+    private static Texture2D goldIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/gold.png");
 
     /// <summary>
     /// Draw the individual Card at the given coordinates.
@@ -96,13 +107,43 @@ public class GameCard(GameScreen gameScreen, Cards card)
             Raylib.DrawRectangleRec(card, GetColorFromCardType(front));
             Raylib.DrawRectangleLinesEx(card, 2, Color.Black);
 
+            int fontSize = 16;
+
             string cardBackText = this.card.Type.ToString();
-            int textWidth = Raylib.MeasureText(cardBackText, 10);
+            int cardBackTextWidth = Raylib.MeasureText(cardBackText, fontSize);
             Raylib.DrawText(
                 cardBackText,
-                x + (Width - textWidth) / 2,
-                y + (Height - 10) / 2,
-                10,
+                x + (Width - cardBackTextWidth) / 2,
+                y + (Height / 2) - fontSize,
+                fontSize,
+                Color.Black
+            );
+
+            int iconSize = 32;
+            string goldText = $": {this.card.Gold}";
+            int goldWidth = Raylib.MeasureText(goldText, fontSize) + iconSize;
+
+            Rectangle goldRec = new(0, 0, goldIconAsset.Width, goldIconAsset.Height);
+            Rectangle goldTargetRec = new(
+                x + (Width - goldWidth) / 2f,
+                y + (Height - fontSize) / 2f + fontSize,
+                iconSize,
+                iconSize
+            );
+            Raylib.DrawTexturePro(
+                goldIconAsset,
+                goldRec,
+                goldTargetRec,
+                Vector2.Zero,
+                0f,
+                Color.White
+            );
+
+            Raylib.DrawText(
+                goldText,
+                x + (Width - goldWidth) / 2 + iconSize,
+                y + (Height / 2) + fontSize,
+                fontSize,
                 Color.Black
             );
         }

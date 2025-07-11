@@ -1,3 +1,20 @@
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 151 Zeilen
+// - jdewi001: 108 Zeilen
+// - Erickk0: 28 Zeilen
+// - erick: 26 Zeilen
+// - jlnhsrm: 17 Zeilen
+// - maxk2807: 2 Zeilen
+// - Max Kondratov: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// - public void SetStateToMainMenu() => currentState = new MainMenuState();   (jdewi001: 2 Zeilen)
+// - public void SetStateToConnectingMenu() => currentState = new ConnectingMenuState();   (jdewi001: 13 Zeilen)
+// - public void SetStateToLobby() => currentState = new PreStartLobbyState();   (jdewi001: 2 Zeilen)
+// - public void SetStateToPlacementPhase() => currentState = new PlacementPhaseState();   (justinjd00: 50 Zeilen)
+// ===============================================
+
 using Raylib_cs;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamestates;
