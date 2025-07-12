@@ -309,16 +309,7 @@ public class GameScreen(
             DrawShipField();
         }
 
-        // Update and Draw Game Boards
-        GameBoard.Point? clickedCell = opponentBoard.Update();
-        if (clickedCell.HasValue)
-        {
-            NetworkManager.SendAttack(clickedCell.Value.X, clickedCell.Value.Y);
-            Console.WriteLine(
-                $"Attack initiated at ({clickedCell.Value.X}, {clickedCell.Value.Y})"
-            );
-            // TODO: Send attack command
-        }
+        
 
         // Draw board titles (rest of the code is mostly the same as previous fix)
         opponentBoard.Draw();
