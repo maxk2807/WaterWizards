@@ -66,6 +66,14 @@ public class HandleCards
         }
     }
 
+    public static void HandleCardManaSpent(NetPacketReader reader)
+    {
+        var variantString = reader.GetString();
+        var variant = Enum.Parse<CardVariant>(variantString);
+        var playerHand = GameStateManager.Instance.GameScreen.playerHand;
+        playerHand!.RemoveCard(new Cards(variant));
+    }
+
     /// <summary>
     /// Handles the casting of a card at the specified coordinates.
     /// </summary>
@@ -120,7 +128,7 @@ public class HandleCards
             );
         }
     }
-    
+
     /// <summary>
     /// Handles notification that the opponent used a card
     /// </summary>
@@ -130,7 +138,7 @@ public class HandleCards
         Console.WriteLine("[Client] Received OpponentUsedCard message");
         var cardVariant = reader.GetString();
         Console.WriteLine($"[Client] Card variant: {cardVariant}");
-        
+
         if (Enum.TryParse<CardVariant>(cardVariant, out var variant))
         {
             var opponentHand = GameStateManager.Instance.GameScreen.opponentHand;

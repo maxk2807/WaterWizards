@@ -100,6 +100,8 @@ public class ManaHandler
     public bool SpendMana(int playerIndex, int manaCost)
     {
         var mana = playerIndex == 0 ? gameState.Player1Mana : gameState.Player2Mana;
-        return mana.Spend(manaCost);
+        bool spent = mana.Spend(manaCost);
+        if (spent) SendManaUpdates();
+        return spent;
     }
 }
