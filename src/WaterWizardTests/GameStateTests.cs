@@ -6,25 +6,19 @@ namespace WaterWizardTests
 {
     public class GameStateTests
     {
-        // Helper method to create a minimal GameState for testing
         private GameState CreateTestGameState()
         {
-            // Create a minimal NetManager setup without Config
             var listener = new EventBasedNetListener();
             var netManager = new NetManager(listener);
             
-            // Create a minimal ServerGameStateManager
             var stateManager = new ServerGameStateManager(netManager);
             
-            // We'll need to work around the constructor validation
-            // For now, let's create the GameState with minimal setup
             try
             {
                 return new GameState(netManager, stateManager);
             }
             catch (InvalidOperationException)
             {
-                // If we can't create due to no connected peers, we'll need to test differently
                 return null;
             }
         }
@@ -32,11 +26,9 @@ namespace WaterWizardTests
         [Fact]
         public void GameState_PlayerIndex_ReturnsMinusOneForNullPlayer()
         {
-            // Since we can't easily mock NetPeer, we'll test the null case
             var gameState = CreateTestGameState();
             if (gameState == null)
             {
-                // Skip test if we can't create a GameState
                 return;
             }
 
@@ -108,22 +100,20 @@ namespace WaterWizardTests
                 return;
             }
 
-            // Freeze for 2 seconds
             gameState.FreezeGoldGeneration(0, 2);
             
-            // Verify initially frozen
             Assert.True(gameState.IsPlayerGoldFrozen(0));
 
-            // Act - Update timer by 1 second (1000ms)
+            // Act
             gameState.UpdateGoldFreezeTimers(1000f);
 
-            // Assert - Should still be frozen
+            // Assert
             Assert.True(gameState.IsPlayerGoldFrozen(0));
 
-            // Act - Update timer by another 1.5 seconds (1500ms)
+            // Act
             gameState.UpdateGoldFreezeTimers(1500f);
 
-            // Assert - Should no longer be frozen (total 2.5 seconds elapsed)
+            // Assert 
             Assert.False(gameState.IsPlayerGoldFrozen(0));
         }
 
@@ -137,25 +127,25 @@ namespace WaterWizardTests
                 return;
             }
 
-            // Act - Freeze both players
+            // Act
             gameState.FreezeGoldGeneration(0, 2);
             gameState.FreezeGoldGeneration(1, 3);
 
-            // Assert - Both should be frozen
+            // Assert 
             Assert.True(gameState.IsPlayerGoldFrozen(0));
             Assert.True(gameState.IsPlayerGoldFrozen(1));
 
-            // Act - Update timers by 2.5 seconds
+            // Act
             gameState.UpdateGoldFreezeTimers(2500f);
 
-            // Assert - Player 0 should be unfrozen, Player 1 still frozen
+            // Assert 
             Assert.False(gameState.IsPlayerGoldFrozen(0));
             Assert.True(gameState.IsPlayerGoldFrozen(1));
 
-            // Act - Update timers by another 1 second
+            // Act 
             gameState.UpdateGoldFreezeTimers(1000f);
 
-            // Assert - Both should be unfrozen
+            // Assert
             Assert.False(gameState.IsPlayerGoldFrozen(0));
             Assert.False(gameState.IsPlayerGoldFrozen(1));
         }
@@ -170,7 +160,7 @@ namespace WaterWizardTests
                 return;
             }
 
-            // Act & Assert - Method should not throw
+            // Act & Assert
             var exception = Record.Exception(() => gameState.CheckGameOver());
             Assert.Null(exception);
         }
@@ -185,8 +175,7 @@ namespace WaterWizardTests
                 return;
             }
 
-            // The players array should be initialized but may have null entries
-            // Act & Assert - Should return -1 for any non-existent player
+            // Act & Assert
             int result = gameState.GetPlayerIndex(null);
             Assert.Equal(-1, result);
         }
@@ -201,7 +190,7 @@ namespace WaterWizardTests
                 return;
             }
 
-            // Act & Assert - Initial gold should be 0
+            // Act & Assert 
             Assert.Equal(0, gameState.Player1Gold);
             Assert.Equal(0, gameState.Player2Gold);
         }
