@@ -230,4 +230,27 @@ public static class LobbyHandler
         }
         GameStateManager.Instance.SetStateToLobby();
     }
+    public static void HandlePlayerJoin(NetPeer peer, string playerName, List<Player> connectedPlayers, Action updatePlayerListCallback)
+    {
+        var playerToUpdate = connectedPlayers.FirstOrDefault(p =>
+            p.Address == peer.ToString()
+        );
+        
+        if (playerToUpdate != null)
+        {
+            playerToUpdate.Name = playerName;
+            updatePlayerListCallback(); // Broadcast the updated player list to all clients
+        }
+        else
+        {
+            // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
+            Console.WriteLine(
+                $"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}"
+            );
+            // Optionally, handle this by adding the player if it's a valid scenario,
+            // though players are typically added during PeerConnectedEvent.
+            // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
+            // updatePlayerListCallback();
+        }
+    }
 }

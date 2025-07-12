@@ -9,6 +9,7 @@
 using System.Net;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
@@ -177,26 +178,8 @@ public class HostService(NetworkManager manager)
                     manager.HandleLobbyCountdown(reader);
                     break;
                 case "PlayerJoin":
-                    string playerName = reader.GetString(); // Name sent by the client
-                    var playerToUpdate = ConnectedPlayers.FirstOrDefault(p =>
-                        p.Address == peer.ToString()
-                    );
-                    if (playerToUpdate != null)
-                    {
-                        playerToUpdate.Name = playerName;
-                        UpdatePlayerList(); // Broadcast the updated player list to all clients
-                    }
-                    else
-                    {
-                        // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
-                        Console.WriteLine(
-                            $"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}"
-                        );
-                        // Optionally, handle this by adding the player if it's a valid scenario,
-                        // though players are typically added during PeerConnectedEvent.
-                        // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
-                        // UpdatePlayerList();
-                    }
+                    string playerName = reader.GetString();
+                    LobbyHandler.HandlePlayerJoin(peer, playerName, ConnectedPlayers, UpdatePlayerList);
                     break;
                 default:
                     Console.WriteLine(
