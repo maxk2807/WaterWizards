@@ -122,9 +122,11 @@ public class HandleAttacks
         }
     }
 
-// float transparency = 0.5f;
-//         writer.Put(transparency);
 
+    /// <summary>
+    /// Sends an attack to the server with the specified coordinates.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleCellReveal(NetPacketReader reader)
     {
         int revealX = reader.GetInt();
@@ -195,5 +197,38 @@ public class HandleAttacks
         Console.WriteLine(
             $"[Client] Cell revealed: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")} isDefender={isDefender}"
         );
+    }
+
+    /// <summary>
+    /// Handles the game over message received from the server, determining if the player won or lost.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
+    public static void HandleThunderStrike(NetPacketReader reader)
+    {
+        int targetBoardIndex = reader.GetInt();
+        int strikeX = reader.GetInt();
+        int strikeY = reader.GetInt();
+        bool thunderHit = reader.GetBool();
+
+        var gameScreen = GameStateManager.Instance.GameScreen;
+        if (gameScreen != null)
+        {
+            int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
+
+            GameBoard? targetBoard = null;
+            Console.WriteLine($"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}");
+            if (targetBoardIndex == myPlayerIndex)
+            {
+                targetBoard = gameScreen.playerBoard;
+                Console.WriteLine($"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
+            }
+            else
+            {
+                targetBoard = gameScreen.opponentBoard;
+                Console.WriteLine($"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
+            }
+
+            targetBoard?.AddThunderStrike(strikeX, strikeY, thunderHit);
+        }
     }
 }

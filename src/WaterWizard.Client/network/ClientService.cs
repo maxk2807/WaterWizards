@@ -361,30 +361,13 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
                 case "ThunderStrike":
-                    int targetBoardIndex = reader.GetInt();
-                    int strikeX = reader.GetInt();
-                    int strikeY = reader.GetInt();
-                    bool thunderHit = reader.GetBool();
-
-                    var gameScreen = GameStateManager.Instance.GameScreen;
-                    if (gameScreen != null)
+                    try
                     {
-                        int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
-
-                        GameBoard? targetBoard = null;
-                        Console.WriteLine($"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}");
-                        if (targetBoardIndex == myPlayerIndex)
-                        {
-                            targetBoard = gameScreen.playerBoard;
-                            Console.WriteLine($"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
-                        }
-                        else
-                        {
-                            targetBoard = gameScreen.opponentBoard;
-                            Console.WriteLine($"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
-                        }
-
-                        targetBoard?.AddThunderStrike(strikeX, strikeY, thunderHit);
+                        HandleAttacks.HandleThunderStrike(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Client] Error processing ThunderStrike: {ex.Message}");
                     }
                     break;
                 case "ThunderReset":
