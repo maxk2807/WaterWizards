@@ -404,6 +404,11 @@ public class ClientService(NetworkManager manager)
                         HandleRessources.HandleUpdateMana(reader);
                         break;
                     }
+                case "CardManaSpent":
+                    {
+                        HandleCards.HandleCardManaSpent(reader);
+                        break;
+                    }
                 case "UpdateGold":
                     {
                         HandleRessources.HandleUpdateGold(reader);

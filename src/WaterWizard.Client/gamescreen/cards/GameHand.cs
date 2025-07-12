@@ -178,7 +178,7 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
     /// <param name="cardToRemove">The Card that will be removed after Casting</param>
     public void RemoveCard(Cards cardToRemove)
     {
-        var gameCard = Cards.Find(gc => gc.card == cardToRemove);
+        var gameCard = Cards.Find(gc => gc.card.Variant == cardToRemove.Variant);
         if (gameCard != null)
         {
             Cards.Remove(gameCard);

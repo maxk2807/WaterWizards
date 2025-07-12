@@ -66,7 +66,7 @@ public class CardHandler(GameState gameState)
 
         if (!goldHandler.CanSpendGold(playerIndex, goldCost))
         {
-            Console.WriteLine($"[Server] Player {playerIndex} has insufficient gold: {(playerIndex == 0 ? gameState.Player1Gold : gameState.Player2Gold )} ({goldCost} required). Purchase cancelled.");
+            Console.WriteLine($"[Server] Player {playerIndex} has insufficient gold: {(playerIndex == 0 ? gameState.Player1Gold : gameState.Player2Gold)} ({goldCost} required). Purchase cancelled.");
             return;
         }
 
@@ -113,7 +113,7 @@ public class CardHandler(GameState gameState)
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
     public void HandleCardCasting(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState, ParalizeHandler paralizeHandler, UtilityCardHandler utilityCardHandler)
     {
-        
+
         string cardVariantString = reader.GetString();
         int cardX = reader.GetInt();
         int cardY = reader.GetInt();
@@ -151,7 +151,11 @@ public class CardHandler(GameState gameState)
                 }
 
                 bool success = manaHandler.SpendMana(playerIndex, manaCost);
-                if (!success)
+                if (success)
+                {
+                    SendCardManaSpent(peer, variant);
+                }
+                else
                 {
                     Console.WriteLine($"[Server] Player {playerIndex} could not spend mana despite CanSpendMana check. Cast cancelled.");
                     return;
@@ -179,12 +183,12 @@ public class CardHandler(GameState gameState)
                     Console.WriteLine($"[CardHandler] Player {peer} has no hand tracked on server - this might be normal for testing");
                 }
 
-                
+
                 CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
-                
+
                 var cardToRemove = new Cards(variant);
                 bool cardRemoved = gameState.RemoveCardFromPlayerHand(peer, cardToRemove);
-                
+
                 if (cardRemoved)
                 {
                     Console.WriteLine($"[CardHandler] Successfully removed {variant} from player hand");
@@ -193,7 +197,7 @@ public class CardHandler(GameState gameState)
                 {
                     Console.WriteLine($"[CardHandler] Could not remove {variant} from player hand (hand might not be tracked)");
                 }
-                
+
                 NotifyOpponentCardUsed(defender, variant);
                 Console.WriteLine($"[CardHandler] Kartenausführung für {variant} abgeschlossen");
             }
@@ -206,6 +210,15 @@ public class CardHandler(GameState gameState)
         {
             Console.WriteLine($"[Server] Casting Failed. Variant {cardVariantString} unknown");
         }
+    }
+
+
+    private void SendCardManaSpent(NetPeer peer, CardVariant variant)
+    {
+        NetDataWriter writer = new();
+        writer.Put("CardManaSpent");
+        writer.Put(variant.ToString());
+        peer.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 
     /// <summary>
