@@ -122,9 +122,11 @@ public class HandleAttacks
         }
     }
 
-    // float transparency = 0.5f;
-    //         writer.Put(transparency);
 
+    /// <summary>
+    /// Sends an attack to the server with the specified coordinates.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleCellReveal(NetPacketReader reader)
     {
         int revealX = reader.GetInt();
@@ -197,6 +199,10 @@ public class HandleAttacks
         );
     }
 
+    /// <summary>
+    /// Handles the game over message received from the server, determining if the player won or lost.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleThunderStrike(NetPacketReader reader)
     {
         int targetBoardIndex = reader.GetInt();

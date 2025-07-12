@@ -230,12 +230,20 @@ public static class LobbyHandler
         }
         GameStateManager.Instance.SetStateToLobby();
     }
+    
+    /// <summary>
+    /// Handles a player joining the lobby.
+    /// </summary>
+    /// <param name="peer">The network peer representing the joining player.</param>
+    /// <param name="playerName">The name of the player joining the lobby.</param>
+    /// <param name="connectedPlayers">The list of currently connected players.</param>
+    /// <param name="updatePlayerListCallback">A callback to update the player list (e.g., UI refresh or broadcast).</param>
     public static void HandlePlayerJoin(NetPeer peer, string playerName, List<Player> connectedPlayers, Action updatePlayerListCallback)
     {
         var playerToUpdate = connectedPlayers.FirstOrDefault(p =>
             p.Address == peer.ToString()
         );
-        
+
         if (playerToUpdate != null)
         {
             playerToUpdate.Name = playerName;
