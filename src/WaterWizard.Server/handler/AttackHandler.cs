@@ -118,7 +118,7 @@ public class AttackHandler
     /// <param name="y">The y-coordinate of the attack</param>
     /// <param name="hit">Whether the attack hit a ship</param>
     /// <param name="shipDestroyed">Whether the ship was destroyed</param>
-    private static void SendAttackResult(
+    public static void SendAttackResult(
         NetPeer attacker,
         NetPeer defender,
         int x,
