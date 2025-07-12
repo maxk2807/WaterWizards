@@ -69,12 +69,9 @@ public class HandleCards
     public static void HandleCardManaSpent(NetPacketReader reader)
     {
         var variantString = reader.GetString();
-        Console.WriteLine($"variantString: {variantString}");
         var variant = Enum.Parse<CardVariant>(variantString);
-        Console.WriteLine($"variant: {variant}");
         var playerHand = GameStateManager.Instance.GameScreen.playerHand;
         playerHand!.RemoveCard(new Cards(variant));
-        Console.WriteLine($"playerHand: {playerHand.Cards}");
     }
 
     /// <summary>
