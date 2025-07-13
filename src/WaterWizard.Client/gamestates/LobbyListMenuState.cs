@@ -97,6 +97,7 @@ public class LobbyListMenuState : IGameState
                     {
                         string ip = lobby.IP.Split(':')[0];
                         NetworkManager.Instance.ConnectToServer(ip, 7777);
+                        Raylib.PlaySound(SoundManager.ButtonSound);
                     }
                 }
                 Raylib.DrawText(
@@ -121,6 +122,7 @@ public class LobbyListMenuState : IGameState
                 {
                     string ip = lobby.IP.Split(':')[0];
                     NetworkManager.Instance.ConnectToServer(ip, 7777);
+                    Raylib.PlaySound(SoundManager.ButtonSound);
                 }
                 yPos += 40;
             }
@@ -175,6 +177,7 @@ public class LobbyListMenuState : IGameState
         if (hoverRefresh && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             LobbyHandler.RefreshLobbies();
+            Raylib.PlaySound(SoundManager.ButtonSound);
         }
         int manualBtnWidth = 300;
         Rectangle manualIpButton = new Rectangle(
@@ -203,6 +206,7 @@ public class LobbyListMenuState : IGameState
         if (hoverManualIp && Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             manager.SetStateToConnectingMenu();
+            Raylib.PlaySound(SoundManager.ButtonSound);
         }
     }
 }
