@@ -20,6 +20,7 @@ using WaterWizard.Client.network;
 using WaterWizard.Shared;
 using WaterWizard.Client.gamestates;
 using System.Security.Cryptography;
+using WaterWizard.Client.Assets.Sounds.Manager;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -495,6 +496,7 @@ public class GameScreen(
         {
             Cards card;
             playerHand!.AddCard(card = new(cardVariant));
+            Raylib.PlaySound(SoundManager.CardSound);
             int goldAmount = card.Gold;
             var ressourceField = GameStateManager.Instance.GameScreen.ressourceField!;
             ressourceField.SetGold((int)(ressourceField.Gold - goldAmount));
@@ -515,6 +517,7 @@ public class GameScreen(
         )
         {
             opponentHand!.AddCard(cards[0]);
+            Raylib.PlaySound(SoundManager.CardSound);
         }
         else
         {

@@ -10,6 +10,7 @@
 // ===============================================
 
 using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.network;
 
@@ -52,6 +53,7 @@ public class PlacementPhaseState : IGameState
         {
             HandleShips.SendPlacementReady(NetworkManager.Instance);
             IsReady = true;
+            Raylib.PlaySound(SoundManager.ButtonSound);
             //manager.SetStateToInGame();
         }
 
