@@ -9,6 +9,8 @@ public static class SoundManager
     public static List<Sound> Explosions { get; private set; } = [];
     public static Sound MissSound;
     public static Sound HealSound;
+    public static Sound FireballSound;
+    public static Sound ThunderSound;
 
     public static void LoadSounds()
     {
@@ -20,6 +22,8 @@ public static class SoundManager
         Raylib.SetSoundVolume(Explosions[1], 0.5f);
         MissSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/miss.wav");
         HealSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Heal/repair.wav");
+        FireballSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Fire/fireball.wav");
+        ThunderSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Thunder/thunder.wav");
     }
 
     public static void UnloadSounds()
@@ -29,6 +33,7 @@ public static class SoundManager
         Explosions.ForEach(Raylib.UnloadSound);
         Raylib.UnloadSound(MissSound);
         Raylib.UnloadSound(HealSound);
+        Raylib.UnloadSound(FireballSound);
     }
 
     public static Sound RandomExplosion()
@@ -42,6 +47,8 @@ public static class SoundManager
         return variant switch
         {
             CardVariant.Heal => HealSound,
+            CardVariant.Fireball => FireballSound,
+            CardVariant.Thunder => ThunderSound,
             _ => new(),
         };
     }
