@@ -1,4 +1,6 @@
 \documentclass{beamer}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
 
 \title{WaterWizards}
 \author{Justin Dewitz, Max Kondratov, Erick Zeiler, Julian <Nachname>}
@@ -57,14 +59,23 @@
 
 \section{Technologie + Architektur}
 \begin{frame}
-\frametitle{Technologie + Architektur}
-  \begin{itemize}
-    \item Raylib für das Rendern des Spiels auf dem Client
-    \item LiteNetLib für die Client-Server-Verbindung
-  \end{itemize}
+\frametitle{Backend - Client Kommunikation}
+\begin{columns}
+  \begin{column}{0.55\textwidth}
+    \begin{itemize}
+      \item LiteNetLib für die Client-Server-Verbindung
+      \begin{enumerate}
+        \item UDP für die Echtzeit-Kommunikation
+        \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
+      \end{enumerate}
+      \item Event-Driven Architektur
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.7\textwidth}
+    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
+  \end{column}
+\end{columns}
 \end{frame}
-
-
 
 \subsection{UI}
 \begin{frame}
