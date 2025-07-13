@@ -9,6 +9,8 @@
 
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
@@ -164,6 +166,7 @@ public class HandleAttacks
                                 int relativeX = revealX - shipCellX;
                                 int relativeY = revealY - shipCellY;
                                 ship.AddDamage(relativeX, relativeY);
+                                Raylib.PlaySound(SoundManager.RandomExplosion());
                                 Console.WriteLine(
                                     $"[Client] Added damage to ship at ({relativeX},{relativeY})"
                                 );
