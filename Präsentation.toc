@@ -1,0 +1,11 @@
+\beamer@sectionintoc {1}{Einleitung}{3}{0}{1}
+\beamer@sectionintoc {2}{Rollen des Projektes}{4}{0}{2}
+\beamer@subsectionintoc {2}{1}{Ansprechpartner}{5}{0}{2}
+\beamer@sectionintoc {3}{Tech Stack}{6}{0}{3}
+\beamer@sectionintoc {4}{Architektur}{7}{0}{4}
+\beamer@subsectionintoc {4}{1}{UI}{8}{0}{4}
+\beamer@subsectionintoc {4}{2}{Server/Backend}{9}{0}{4}
+\beamer@subsectionintoc {4}{3}{Shared}{10}{0}{4}
+\beamer@subsectionintoc {4}{4}{Backend - Client Kommunukation}{11}{0}{4}
+\beamer@sectionintoc {5}{Wiki}{12}{0}{5}
+\beamer@sectionintoc {6}{Erfahrungen und Fazit}{13}{0}{6}
