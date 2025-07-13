@@ -16,6 +16,9 @@ using WaterWizard.Client.Assets.Sounds.Manager;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert den Hauptmenü-Zustand des Spiels.
+/// </summary>
 public class MainMenuState : IGameState
 {
     private const float TITLE_ANIM_SPEED = 1.5f;
@@ -33,6 +36,9 @@ public class MainMenuState : IGameState
         "src/WaterWizard.Client/Assets/Ui/MainMenu/MapTest.png"
     );
 
+    /// <summary>
+    /// Lädt die benötigten Assets für das Hauptmenü.
+    /// </summary>
     public void LoadAssets()
     {
         if (menuBackground.Id != 0)
@@ -48,6 +54,10 @@ public class MainMenuState : IGameState
         );
     }
 
+    /// <summary>
+    /// Aktualisiert und zeichnet das Hauptmenü.
+    /// </summary>
+    /// <param name="manager">GameStateManager mit Zugriff auf Komponenten und Status</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         LoadAssets();

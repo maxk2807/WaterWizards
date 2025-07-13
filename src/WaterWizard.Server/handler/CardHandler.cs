@@ -21,13 +21,15 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Server.handler;
 
+/// <summary>
+/// Verwaltet das Kaufen und Ausspielen von Karten sowie die Kommunikation mit den Clients bezüglich Kartenaktionen.
+/// </summary>
 public class CardHandler(GameState gameState)
 {
     private readonly GameState? gameState = gameState;
 
     /// <summary>
-    /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
-    /// of the <see cref="CardType"/> given in <paramref name="reader"/>
+    /// Verarbeitet den Kauf einer Karte durch einen Client und sendet die Karte zurück.
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
@@ -121,8 +123,7 @@ public class CardHandler(GameState gameState)
     }
 
     /// <summary>
-    /// Handles the Casting of Cards from the <see cref="NetPeer"/>s hand. //TODO: handle Mana Cost.
-    /// Calls the Ability in <see cref="CardAbilities"/>
+    /// Verarbeitet das Ausspielen einer Karte durch einen Client und führt die Kartenfähigkeit aus.
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>

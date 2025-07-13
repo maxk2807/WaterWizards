@@ -11,17 +11,17 @@ using System;
 namespace WaterWizard.Shared;
 
 /// <summary>
-/// Provides a unique session ID for each game session.
+/// Repräsentiert eine eindeutige Sitzungs-ID für ein Spiel.
 /// </summary>
 public class GameSessionId
 {
     /// <summary>
-    /// The unique session ID string (GUID).
+    /// Die eindeutige Sitzungs-ID-Zeichenfolge (GUID).
     /// </summary>
     public string SessionId { get; }
 
     /// <summary>
-    /// Creates a new unique session ID.
+    /// Erstellt eine neue eindeutige Sitzungs-ID.
     /// </summary>
     public GameSessionId()
     {
@@ -29,7 +29,7 @@ public class GameSessionId
     }
 
     /// <summary>
-    /// Creates a session ID from an existing string (e.g., received from server).
+    /// Erstellt eine Sitzungs-ID aus einer vorhandenen Zeichenfolge (z.B. von Server empfangen).
     /// </summary>
     public GameSessionId(string sessionId)
     {

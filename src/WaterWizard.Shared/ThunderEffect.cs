@@ -13,6 +13,9 @@ using System.Numerics;
 
 namespace WaterWizard.Shared;
 
+/// <summary>
+/// Repräsentiert einen aktiven Blitzeffekt auf dem Spielfeld.
+/// </summary>
 public class ThunderEffect
 {
     private readonly float _totalDuration = 5f; // Gesamtdauer des Effekts in Sekunden

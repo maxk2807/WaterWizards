@@ -12,6 +12,9 @@ using System.Numerics;
 
 namespace WaterWizard.Shared;
 
+/// <summary>
+/// Repräsentiert einen aktiven Schild-Effekt auf dem Spielfeld.
+/// </summary>
 public class ShieldEffect
 {
     public Vector2 Position { get; }
@@ -39,7 +42,7 @@ public class ShieldEffect
     }
 
     /// <summary>
-    /// Checks if the given coordinates are protected by this shield
+    /// Dauer des Schilds in Sekunden.
     /// </summary>
     /// <param name="x">X coordinate to check</param>
     /// <param name="y">Y coordinate to check</param>

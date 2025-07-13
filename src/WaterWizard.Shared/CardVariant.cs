@@ -11,6 +11,9 @@
 
 namespace WaterWizard.Shared;
 
+/// <summary>
+/// Definiert alle konkreten Varianten von Karten im Spiel.
+/// </summary>
 public enum CardVariant
 {
     // Damage Variants

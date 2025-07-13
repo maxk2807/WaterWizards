@@ -16,7 +16,7 @@ using WaterWizard.Shared;
 namespace WaterWizard.Server.handler;
 
 /// <summary>
-/// Handles ship-related operations for players in the game.
+/// Verwaltet Schiffsoperationen für Spieler im Spiel (Platzierung, Abfrage, Heilung, etc.).
 /// </summary>
 public class ShipHandler
 {

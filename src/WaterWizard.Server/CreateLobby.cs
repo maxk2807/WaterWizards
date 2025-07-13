@@ -14,14 +14,17 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Server;
 
+/// <summary>
+/// Verwaltet die Erstellung und Verwaltung von Lobbies auf dem Server.
+/// </summary>
 public static class LobbyManager
 {
     private static readonly ConcurrentDictionary<string, Lobby> Lobbies = new();
 
     /// <summary>
-    /// Creates a new lobby and logs its session ID.
-    /// /// </summary>
-    /// <returns>The created lobby.</returns>
+    /// Erstellt eine neue Lobby und loggt deren SessionId.
+    /// </summary>
+    /// <returns>Die erstellte Lobby</returns>
     public static Lobby CreateLobby()
     {
         var sessionId = new GameSessionId();
@@ -31,14 +34,20 @@ public static class LobbyManager
         return lobby;
     }
 
+    /// <summary>
+    /// Gibt eine Lobby anhand der SessionId zurück.
+    /// </summary>
     public static Lobby? GetLobby(string sessionId) =>
         Lobbies.TryGetValue(sessionId, out var lobby) ? lobby : null;
 
+    /// <summary>
+    /// Gibt alle aktiven Lobbies zurück.
+    /// </summary>
     public static IEnumerable<Lobby> GetAllLobbies() => Lobbies.Values;
 
     /// <summary>
-    /// Logs all active lobbies.
-    /// /// </summary>
+    /// Loggt alle aktiven Lobbies.
+    /// </summary>
     public static void LogAllLobbies()
     {
         foreach (var lobby in LobbyManager.GetAllLobbies())
@@ -48,8 +57,14 @@ public static class LobbyManager
     }
 }
 
+/// <summary>
+/// Repräsentiert eine Spiel-Lobby mit SessionId und Spielerlisten.
+/// </summary>
 public class Lobby
 {
+    /// <summary>
+    /// Die SessionId der Lobby.
+    /// </summary>
     public GameSessionId SessionId { get; }
     private readonly Dictionary<LiteNetLib.NetPeer, string> players = new();
     private readonly HashSet<LiteNetLib.NetPeer> readyPlayers = new();

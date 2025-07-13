@@ -12,25 +12,28 @@ using LiteNetLib.Utils;
 
 namespace WaterWizard.Server.handler;
 
+/// <summary>
+/// Verwaltet Angriffe zwischen Spielern, prüft Treffer und synchronisiert den Spielzustand.
+/// </summary>
 public class AttackHandler
 {
     private static GameState? gameState;
 
-    // Add a method to set the game state
+    /// <summary>
+    /// Initialisiert den Handler mit dem aktuellen Spielzustand.
+    /// </summary>
     public static void Initialize(GameState state)
     {
         gameState = state;
     }
 
     /// <summary>
-    /// Handles the attack from one player to another.
-    /// Checks if the attack hits a ship and updates the game state accordingly.
-    /// If a ship is hit, it checks if the ship is destroyed and sends the result to both players.
+    /// Verarbeitet einen Angriff und prüft, ob ein Schiff getroffen oder zerstört wurde.
     /// </summary>
-    /// <param name="attacker">The player who initiated the attack</param>
-    /// <param name="defender">The player who was attacked</param>
-    /// <param name="x">The x-coordinate of the attack</param>
-    /// <param name="y">The y-coordinate of the attack</param>
+    /// <param name="attacker">Angreifender Spieler</param>
+    /// <param name="defender">Verteidigender Spieler</param>
+    /// <param name="x">X-Koordinate des Angriffs</param>
+    /// <param name="y">Y-Koordinate des Angriffs</param>
     public static void HandleAttack(NetPeer attacker, NetPeer defender, int x, int y)
     {
         Console.WriteLine(
@@ -98,14 +101,14 @@ public class AttackHandler
         }
 
         /// <summary>
-        /// Sends the result of the attack to both players.
-        /// /// </summary>
-        /// <param name="attacker">The player who initiated the attack</param>
-        /// <param name="defender">The player who was attacked</param>
-        /// <param name="x">The x-coordinate of the attack</param>
-        /// <param name="y">The y-coordinate of the attack</param>
-        /// <param name="hit">Whether the attack hit a ship</param>
-        /// <param name="shipDestroyed">Whether the ship was destroyed</param>
+        /// Sendet das Ergebnis eines Angriffs an beide Spieler.
+        /// </summary>
+        /// <param name="attacker">Angreifender Spieler</param>
+        /// <param name="defender">Verteidigender Spieler</param>
+        /// <param name="x">X-Koordinate</param>
+        /// <param name="y">Y-Koordinate</param>
+        /// <param name="hit">Ob ein Schiff getroffen wurde</param>
+        /// <param name="shipDestroyed">Ob das Schiff zerstört wurde</param>
         SendAttackResult(attacker, defender, x, y, hit, hitShip?.IsDestroyed ?? false);
 
         if (hit && hitShip?.IsDestroyed == true)

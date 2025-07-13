@@ -9,4 +9,7 @@
 
 namespace WaterWizard.Shared;
 
+/// <summary>
+/// Repräsentiert ein Schiff im Spiel. Kann als Basisklasse für verschiedene Schiffstypen erweitert werden.
+/// </summary>
 public class Ship { }

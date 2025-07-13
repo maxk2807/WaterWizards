@@ -24,6 +24,9 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen;
 
+/// <summary>
+/// Stellt die zentrale Spielfläche dar und verwaltet Boards, Karten, Schiffe und Ressourcenanzeige.
+/// </summary>
 public class GameScreen(
     GameStateManager gameStateManager,
     int screenWidth,
@@ -96,8 +99,7 @@ public class GameScreen(
     }
 
     /// <summary>
-    /// Initialize all elements rendered on the GameScreen:
-    ///  the two Boards, Cardhands and Cardstacks as well as the //TODO: Graveyard and GameTimer
+    /// Initialisiert alle UI-Elemente und Spielfelder auf dem GameScreen.
     /// </summary>
     public void Initialize()
     {
@@ -128,11 +130,20 @@ public class GameScreen(
 
     private HashSet<int> shipSizeLimitReached = new();
 
+    /// <summary>
+    /// Markiert, dass das Limit für eine bestimmte Schiffsgröße erreicht wurde.
+    /// </summary>
+    /// <param name="size">Schiffsgröße</param>
     public void MarkShipSizeLimitReached(int size)
     {
         shipSizeLimitReached.Add(size);
     }
 
+    /// <summary>
+    /// Prüft, ob das Limit für eine bestimmte Schiffsgröße erreicht wurde.
+    /// </summary>
+    /// <param name="size">Schiffsgröße</param>
+    /// <returns>True, wenn das Limit erreicht ist</returns>
     public bool IsShipSizeLimitReached(int size)
     {
         return shipSizeLimitReached.Contains(size);
@@ -205,6 +216,9 @@ public class GameScreen(
         }
     }
 
+    /// <summary>
+    /// Initialisiert die aktiven Karten.
+    /// </summary>
     public void InitializeActiveCards()
     {
         activeCards = new(this);

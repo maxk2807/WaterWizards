@@ -17,6 +17,9 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
 
+/// <summary>
+/// Verwaltet die Netzwerkkommunikation, Lobby-Discovery und Verbindungen für den Client.
+/// </summary>
 public class NetworkManager
 {
     private static NetworkManager? instance;
@@ -36,7 +39,7 @@ public class NetworkManager
     }
 
     /// <summary>
-    /// Starts discovering available server lobbies on the network.
+    /// Startet die Suche nach verfügbaren Lobbies im Netzwerk.
     /// </summary>
     public void DiscoverLobbies()
     {
@@ -57,20 +60,25 @@ public class NetworkManager
     }
 
     /// <summary>
-    /// Returns the list of discovered lobbies.
+    /// Gibt die Liste der gefundenen Lobbies zurück.
     /// </summary>
     public List<LobbyInfo> GetDiscoveredLobbies() => discoveredLobbies;
 
+    /// <summary>
+    /// Gibt den Host-Port zurück.
+    /// </summary>
     public int GetHostPort() => hostPort;
 
+    /// <summary>
+    /// Prüft, ob ein Spieler verbunden ist.
+    /// </summary>
     public bool IsPlayerConnected() =>
         hostService.ArePlayersConnected() || clientService.IsServerConnected();
 
     /// <summary>
-    /// Verarbeitet den Countdown für die Lobby.
+    /// Verarbeitet den Lobby-Countdown.
     /// </summary>
-    /// <param name="reader">Der NetPacketReader, der die Nachricht enthält.</param>
-    /// <returns></returns>
+    /// <param name="reader">Netzwerkleser mit Countdown-Daten</param>
     public void HandleLobbyCountdown(NetPacketReader reader)
     {
         int secondsLeft = reader.GetInt();
@@ -86,8 +94,7 @@ public class NetworkManager
     }
 
     /// <summary>
-    /// Verarbeitet eingehende und ausgehende Netzwerkereignisse.
-    /// Muss aufgerufen werden, um Nachrichten zu empfangen und zu senden.
+    /// Verarbeitet Netzwerkereignisse (Empfang/Senden von Nachrichten).
     /// </summary>
     public void PollEvents()
     {
