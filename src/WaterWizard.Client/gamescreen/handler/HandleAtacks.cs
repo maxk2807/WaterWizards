@@ -135,6 +135,11 @@ public class HandleAttacks
         int revealY = reader.GetInt();
         bool isHit = reader.GetBool();
         bool isDefender = reader.GetBool();
+        
+        if (isHit)
+            Raylib.PlaySound(SoundManager.RandomExplosion());
+        else
+            Raylib.PlaySound(SoundManager.MissSound);
 
         var gameScreen = GameStateManager.Instance.GameScreen;
         if (gameScreen != null)
@@ -166,7 +171,6 @@ public class HandleAttacks
                                 int relativeX = revealX - shipCellX;
                                 int relativeY = revealY - shipCellY;
                                 ship.AddDamage(relativeX, relativeY);
-                                Raylib.PlaySound(SoundManager.RandomExplosion());
                                 Console.WriteLine(
                                     $"[Client] Added damage to ship at ({relativeX},{relativeY})"
                                 );

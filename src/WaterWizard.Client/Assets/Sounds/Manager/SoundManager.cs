@@ -5,7 +5,8 @@ public static class SoundManager
 {
     public static Sound CardSound;
     public static Sound ButtonSound;
-    public static List<Sound> Explosions { get; private set; } = []; 
+    public static List<Sound> Explosions { get; private set; } = [];
+    public static Sound MissSound;
 
     public static void LoadSounds()
     {
@@ -13,6 +14,7 @@ public static class SoundManager
         ButtonSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/ButtonClick.wav");
         Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion1.wav"));
         Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion2.wav"));
+        MissSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/miss.wav");
     }
 
     public static void UnloadSounds()
@@ -20,6 +22,7 @@ public static class SoundManager
         Raylib.UnloadSound(CardSound);
         Raylib.UnloadSound(ButtonSound);
         Explosions.ForEach(Raylib.UnloadSound);
+        Raylib.UnloadSound(MissSound);
     }
 
     public static Sound RandomExplosion()
