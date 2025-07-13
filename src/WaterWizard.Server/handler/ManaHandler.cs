@@ -13,7 +13,7 @@ using WaterWizard.Server;
 namespace WaterWizard.Server.handler;
 
 /// <summary>
-/// Verwaltet die Mana-Logik und berücksichtigt Paralize-Effekte.
+/// Verwaltet die Mana-Logik und berücksichtigt Paralyse-Effekte.
 /// </summary>
 public class ManaHandler
 {
@@ -27,7 +27,7 @@ public class ManaHandler
     }
 
     /// <summary>
-    /// Aktualisiert das Mana für beide Spieler und berücksichtigt Paralize-Effekte
+    /// Aktualisiert das Mana für beide Spieler und berücksichtigt Paralyse-Effekte.
     /// </summary>
     public void UpdateMana()
     {
@@ -80,11 +80,11 @@ public class ManaHandler
     }
 
     /// <summary>
-    /// Prüft, ob ein Spieler genug Mana hat, um eine Karte zu spielen
+    /// Prüft, ob ein Spieler genug Mana hat, um eine Karte zu spielen.
     /// </summary>
     /// <param name="playerIndex">Index des Spielers (0 oder 1)</param>
     /// <param name="manaCost">Mana-Kosten der Karte</param>
-    /// <returns>True wenn der Spieler genug Mana hat</returns>
+    /// <returns>True, wenn der Spieler genug Mana hat</returns>
     public bool CanSpendMana(int playerIndex, int manaCost)
     {
         var mana = playerIndex == 0 ? gameState.Player1Mana : gameState.Player2Mana;
@@ -92,11 +92,11 @@ public class ManaHandler
     }
 
     /// <summary>
-    /// Gibt Mana für eine Karte aus
+    /// Gibt Mana für eine Karte aus.
     /// </summary>
     /// <param name="playerIndex">Index des Spielers (0 oder 1)</param>
     /// <param name="manaCost">Mana-Kosten der Karte</param>
-    /// <returns>True wenn das Mana erfolgreich ausgegeben wurde</returns>
+    /// <returns>True, wenn das Mana erfolgreich ausgegeben wurde</returns>
     public bool SpendMana(int playerIndex, int manaCost)
     {
         var mana = playerIndex == 0 ? gameState.Player1Mana : gameState.Player2Mana;

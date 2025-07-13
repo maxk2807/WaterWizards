@@ -8,6 +8,9 @@
 
 namespace WaterWizard.Server.handler;
 
+/// <summary>
+/// Handler für windbezogene Spiellogik (Platzhalter für zukünftige Erweiterungen).
+/// </summary>
 public class WindHandler
 {
     

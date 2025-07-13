@@ -21,16 +21,20 @@ using WaterWizard.Server.ServerGameStates;
 
 namespace WaterWizard.Server.handler;
 
+/// <summary>
+/// Verwaltet das Kaufen und Ausspielen von Karten sowie die Kommunikation mit den Clients bezüglich Kartenaktionen.
+/// </summary>
 public class CardHandler(GameState gameState)
 {
     private readonly GameState? gameState = gameState;
 
     /// <summary>
-    /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
-    /// of the <see cref="CardType"/> given in <paramref name="reader"/>
+    /// Verarbeitet den Kauf einer Karte durch einen Client und sendet die Karte zurück.
     /// </summary>
-    /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
-    /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
+    /// <param name="server">NetManager-Instanz</param>
+    /// <param name="peer">Client, der die Anfrage sendet</param>
+    /// <param name="reader">Netzwerkleser mit den Daten</param>
+    /// <param name="gameState">Aktueller Spielzustand</param>
     public static void HandleCardBuying(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState)
     {
 
@@ -106,11 +110,14 @@ public class CardHandler(GameState gameState)
     }
 
     /// <summary>
-    /// Handles the Casting of Cards from the <see cref="NetPeer"/>s hand. //TODO: handle Mana Cost.
-    /// Calls the Ability in <see cref="CardAbilities"/>
+    /// Verarbeitet das Ausspielen einer Karte durch einen Client und führt die Kartenfähigkeit aus.
     /// </summary>
-    /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
-    /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
+    /// <param name="server">NetManager-Instanz</param>
+    /// <param name="peer">Client, der die Anfrage sendet</param>
+    /// <param name="reader">Netzwerkleser mit den Daten</param>
+    /// <param name="gameState">Aktueller Spielzustand</param>
+    /// <param name="paralizeHandler">Handler für Paralyse-Karten</param>
+    /// <param name="utilityCardHandler">Handler für Utility-Karten</param>
     public void HandleCardCasting(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState, ParalizeHandler paralizeHandler, UtilityCardHandler utilityCardHandler)
     {
 

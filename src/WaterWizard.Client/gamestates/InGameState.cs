@@ -15,12 +15,15 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert den Spielzustand während eines laufenden Spiels (In-Game).
+/// </summary>
 public class InGameState : IGameState
 {
     /// <summary>
-    /// Updates the game state and draws the game screen or pause overlay based on the game pause status.
+    /// Aktualisiert den Spielzustand und zeichnet das Spielfeld oder das Pause-Overlay.
     /// </summary>
-    /// <param name="manager">The GameStateManager instance that provides access to game components, screen dimensions, pause state, and rendering systems.</param>
+    /// <param name="manager">GameStateManager mit Zugriff auf Komponenten und Status</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         if (Raylib.IsKeyPressed(KeyboardKey.S))
@@ -78,9 +81,9 @@ public class InGameState : IGameState
     }
 
     /// <summary>
-    /// Draws the game screen, including the game state and any relevant UI elements.
+    /// Zeichnet das Spielfeld und relevante UI-Elemente.
     /// </summary>
-    /// <param name="manager">The GameStateManager instance that provides access to game components, screen dimensions, pause state, and rendering systems.</param>
+    /// <param name="manager">GameStateManager mit Zugriff auf Komponenten und Status</param>
     private static void DrawGameScreen(GameStateManager manager)
     {
         manager.GameScreen.Draw(manager.screenWidth, manager.screenHeight);

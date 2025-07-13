@@ -13,6 +13,7 @@
 using Raylib_cs;
 using WaterWizard.Client;
 using WaterWizard.Client.Assets.Sounds.Manager;
+
 class Program
 {
     static void Main()
