@@ -8,12 +8,15 @@
 
 namespace WaterWizard.Shared
 {
+    /// <summary>
+    /// Repräsentiert die Mana-Ressource eines Spielers.
+    /// </summary>
     public class Mana
     {
         /// <summary>
-        /// The current amount of mana.
+        /// Der aktuelle Manawert des Spielers.
         /// </summary>
-        public int CurrentMana { get; private set; }
+        public int CurrentMana { get; set; }
 
         public Mana(int initialAmount = 0)
         {
