@@ -7,7 +7,7 @@
 // - jlnhsrm: 17 Zeilen
 // - maxk2807: 2 Zeilen
 // - Max Kondratov: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public void SetStateToMainMenu() => currentState = new MainMenuState();   (jdewi001: 2 Zeilen)
 // - public void SetStateToConnectingMenu() => currentState = new ConnectingMenuState();   (jdewi001: 13 Zeilen)
@@ -17,9 +17,9 @@
 
 using Raylib_cs;
 using WaterWizard.Client.gamescreen;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
-using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client;
 

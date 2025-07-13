@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 130 Zeilen
 // - Erickk0: 13 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -21,6 +21,7 @@ public class AttackHandler
     {
         gameState = state;
     }
+
     /// <summary>
     /// Handles the attack from one player to another.
     /// Checks if the attack hits a ship and updates the game state accordingly.
@@ -40,7 +41,11 @@ public class AttackHandler
         int defenderIndex = gameState?.GetPlayerIndex(defender) ?? -1;
 
         // Check if this coordinate is protected by a shield
-        if (defenderIndex != -1 && gameState != null && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+        if (
+            defenderIndex != -1
+            && gameState != null
+            && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex)
+        )
         {
             Console.WriteLine($"[Server] Attack at ({x}, {y}) blocked by shield!");
             CellHandler.SendCellReveal(attacker, defender, x, y, false, "Attack");

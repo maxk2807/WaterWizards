@@ -3,7 +3,7 @@
 // - justinjd00: 113 Zeilen
 // - jdewi001: 40 Zeilen
 // - maxk2807: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private readonly List<string> _messages = new List<string>();   (justinjd00: 107 Zeilen)
 // ===============================================

@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 51 Zeilen
 // - Erickk0: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -40,7 +40,9 @@ public class HandleCell
                         y,
                         isHit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
                     );
-                    Console.WriteLine($"[Client] Defender - Cell revealed on own board: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+                    Console.WriteLine(
+                        $"[Client] Defender - Cell revealed on own board: ({x},{y}) = {(isHit ? "hit" : "miss")}"
+                    );
                 }
             }
             else
@@ -53,7 +55,9 @@ public class HandleCell
                         y,
                         isHit ? Gamescreen.CellState.Hit : Gamescreen.CellState.Miss
                     );
-                    Console.WriteLine($"[Client] Attacker - Cell revealed on opponent board: ({x},{y}) = {(isHit ? "hit" : "miss")}");
+                    Console.WriteLine(
+                        $"[Client] Attacker - Cell revealed on opponent board: ({x},{y}) = {(isHit ? "hit" : "miss")}"
+                    );
                 }
             }
         }

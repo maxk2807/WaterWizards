@@ -3,7 +3,7 @@
 // - maxk2807: 122 Zeilen
 // - jdewi001: 34 Zeilen
 // - justinjd00: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -21,11 +21,21 @@ public class GameCard(GameScreen gameScreen, Cards card)
     private int Width => gameScreen.cardWidth;
     private int Height => gameScreen.cardHeight;
 
-    private static Texture2D cardTemplateAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/CardTemplate.png");
-    private static Texture2D allyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/ally.png");
-    private static Texture2D enemyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/enemy.png");
-    private static Texture2D manaIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/mana.png");
-    private static Texture2D goldIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/gold.png");
+    private static Texture2D cardTemplateAsset = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Cards/CardTemplate.png"
+    );
+    private static Texture2D allyIconAsset = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Cards/Icons/ally.png"
+    );
+    private static Texture2D enemyIconAsset = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Cards/Icons/enemy.png"
+    );
+    private static Texture2D manaIconAsset = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Cards/Icons/mana.png"
+    );
+    private static Texture2D goldIconAsset = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Cards/Icons/gold.png"
+    );
 
     /// <summary>
     /// Draw the individual Card at the given coordinates.
@@ -40,7 +50,12 @@ public class GameCard(GameScreen gameScreen, Cards card)
         Rectangle card = new(x, y, Width, Height);
         if (front)
         {
-            Rectangle cardTemplateRec = new(0, 0, cardTemplateAsset.Width, cardTemplateAsset.Height);
+            Rectangle cardTemplateRec = new(
+                0,
+                0,
+                cardTemplateAsset.Width,
+                cardTemplateAsset.Height
+            );
             Raylib.DrawTexturePro(
                 cardTemplateAsset,
                 cardTemplateRec,
@@ -64,7 +79,8 @@ public class GameCard(GameScreen gameScreen, Cards card)
 
             fontSize = 15;
 
-            string targetText = $"{(this.card.Target!.Ally ? "ally " : "")}{this.card.Target.Target}";
+            string targetText =
+                $"{(this.card.Target!.Ally ? "ally " : "")}{this.card.Target.Target}";
             int targetTextWidth = Raylib.MeasureText(targetText, fontSize);
             Raylib.DrawText(
                 targetText,

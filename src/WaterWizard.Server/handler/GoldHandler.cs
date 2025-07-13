@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 114 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -35,29 +35,37 @@ public class GoldHandler
         if (!gameState.IsPlayerGoldFrozen(0))
         {
             int merchantShipCount = GetMerchantShipCount(0);
-            int goldToAdd = 1 + merchantShipCount; 
-            
+            int goldToAdd = 1 + merchantShipCount;
+
             gameState.SetGold(0, gameState.Player1Gold + goldToAdd);
-            Console.WriteLine($"[GoldHandler] Player 1 Gold +{goldToAdd} (Neuer Stand: {gameState.Player1Gold})");
+            Console.WriteLine(
+                $"[GoldHandler] Player 1 Gold +{goldToAdd} (Neuer Stand: {gameState.Player1Gold})"
+            );
         }
         else
         {
             Console.WriteLine("[GoldHandler] Player 1 gold generation frozen - no gold gained");
-            Console.WriteLine($"[GoldHandler] Player 1 Gold bleibt bei {gameState.Player1Gold} (Gold-Freeze-Effekt aktiv)");
+            Console.WriteLine(
+                $"[GoldHandler] Player 1 Gold bleibt bei {gameState.Player1Gold} (Gold-Freeze-Effekt aktiv)"
+            );
         }
 
         if (!gameState.IsPlayerGoldFrozen(1))
         {
             int merchantShipCount = GetMerchantShipCount(1);
-            int goldToAdd = 1 + merchantShipCount; 
-            
+            int goldToAdd = 1 + merchantShipCount;
+
             gameState.SetGold(1, gameState.Player2Gold + goldToAdd);
-            Console.WriteLine($"[GoldHandler] Player 2 Gold +{goldToAdd} (Neuer Stand: {gameState.Player2Gold})");
+            Console.WriteLine(
+                $"[GoldHandler] Player 2 Gold +{goldToAdd} (Neuer Stand: {gameState.Player2Gold})"
+            );
         }
         else
         {
             Console.WriteLine("[GoldHandler] Player 2 gold generation frozen - no gold gained");
-            Console.WriteLine($"[GoldHandler] Player 2 Gold bleibt bei {gameState.Player2Gold} (Gold-Freeze-Effekt aktiv)");
+            Console.WriteLine(
+                $"[GoldHandler] Player 2 Gold bleibt bei {gameState.Player2Gold} (Gold-Freeze-Effekt aktiv)"
+            );
         }
 
         SendGoldUpdates();

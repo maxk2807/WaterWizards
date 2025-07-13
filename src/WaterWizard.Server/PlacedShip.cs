@@ -3,7 +3,7 @@
 // - erick: 21 Zeilen
 // - maxk2807: 7 Zeilen
 // - Erickk0: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -35,6 +35,4 @@ public class PlacedShip
     {
         return DamagedCells.Remove((cellX, cellY));
     }
-
-    
 }
