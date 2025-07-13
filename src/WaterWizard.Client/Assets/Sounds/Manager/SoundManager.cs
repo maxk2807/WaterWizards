@@ -4,10 +4,12 @@ namespace WaterWizard.Client.Assets.Sounds.Manager;
 
 public static class SoundManager
 {
+    public static Sound WinSound;
     public static Sound CardSound;
     public static Sound ButtonSound;
     public static List<Sound> Explosions { get; private set; } = [];
     public static Sound MissSound;
+    public static Sound Magic1 { get; private set; }
     public static Sound HealSound;
     public static Sound FireboltSound;
     public static Sound FireballSound;
@@ -15,6 +17,7 @@ public static class SoundManager
 
     public static void LoadSounds()
     {
+        WinSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/win.wav");
         CardSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/DrawCard.wav");
         ButtonSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/ButtonClick.wav");
         Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion1.wav"));
@@ -22,6 +25,7 @@ public static class SoundManager
         Raylib.SetSoundVolume(Explosions[0], 0.5f);
         Raylib.SetSoundVolume(Explosions[1], 0.5f);
         MissSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/miss.wav");
+        Magic1 = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Magic/magic1.wav");
         HealSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Heal/repair.wav");
         FireboltSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Fire/firebolt.wav");
         FireballSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Fire/fireball.wav");
@@ -30,10 +34,12 @@ public static class SoundManager
 
     public static void UnloadSounds()
     {
+        Raylib.UnloadSound(WinSound);
         Raylib.UnloadSound(CardSound);
         Raylib.UnloadSound(ButtonSound);
         Explosions.ForEach(Raylib.UnloadSound);
         Raylib.UnloadSound(MissSound);
+        Raylib.UnloadSound(Magic1);
         Raylib.UnloadSound(HealSound);
         Raylib.UnloadSound(FireboltSound);
         Raylib.UnloadSound(FireballSound);
@@ -50,6 +56,7 @@ public static class SoundManager
     {
         return variant switch
         {
+            CardVariant.MagicAttack => Magic1,
             CardVariant.Heal => HealSound,
             CardVariant.Fireball => FireballSound,
             CardVariant.Thunder => ThunderSound,
