@@ -15,9 +15,9 @@
 \tableofcontents
 \end{frame}
 
-\section{Demo + Einleitung}
+\section{Einleitung}
 \begin{frame}
-\frametitle{Demo + Einleitung}
+\frametitle{Einleitung}
 \begin{itemize}
   \item Was ist WaterWizards?
   \begin{enumerate}
@@ -31,6 +31,18 @@
     \item Durch Real-Time wird es dynamischer
     \item Für jede Altersgruppe interessant
   \end{enumerate}
+  \item Was macht WaterWizards besonders?
+    \begin{enumerate}
+      \item Kombination aus Strategie und schnellen Entscheidungen
+      \item Zauber und Karten bringen neue Dynamik ins Spiel
+      \item Multiplayer und Echtzeit sorgen für Spannung
+    \end{enumerate}
+  \item Für wen ist das Spiel gedacht?
+    \begin{enumerate}
+      \item Strategie-Fans
+      \item Familien und Freunde
+      \item Alle Altersgruppen
+    \end{enumerate}
 \end{itemize}
 \end{frame}
 
@@ -59,54 +71,99 @@
 
 \section{Technologie + Architektur}
 \begin{frame}
-\frametitle{Backend - Client Kommunikation}
-\begin{columns}
-  \begin{column}{0.55\textwidth}
-    \begin{itemize}
-      \item LiteNetLib für die Client-Server-Verbindung
-      \begin{enumerate}
-        \item UDP für die Echtzeit-Kommunikation
-        \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
-      \end{enumerate}
-      \item Event-Driven Architektur
-    \end{itemize}
-  \end{column}
-  \begin{column}{0.7\textwidth}
-    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
-  \end{column}
-\end{columns}
+\frametitle{Technologie + Architektur}
+  \begin{itemize}
+    \item Programiersprache: C\#
+    \item Raylib für die grafische Darstellung
+    \item LiteNetLib für die Client-Server-Verbindung
+    \item Nuke für das Build-System
+    \item CodeQl für die statische Code-Analyse
+    \item GitHub Actions für die CD-Pipeline
+    \item GitHub Pages für die Dokumentation
+    \item Event-Driven Architektur
+    \item Docker für die Containerisierung
+    \item Hetzner Server für das Hosting
+  \end{itemize}
 \end{frame}
 
 \subsection{UI}
 \begin{frame}
   \frametitle{UI}
+  \begin{itemize}
+    \item Raylib für die grafische Darstellung
+    \item GameScreen als Hauptkomponente
+    \item GameBoard für die Spielbretter
+    \item GameShip für die Schiffe
+    \item GameCard für die Karten
+    \item GameHand für die Hand der Spieler
+  \end{itemize} 
 \end{frame}
 
 \subsection{GameScreen}
 \begin{frame}
 \frametitle{GameScreen}
-  GameScreen enthält alles, was auf dem Bildschirm gezeigt wird:
-  \begin{enumerate}
-    \item Die beiden Spielbretter (GameBoard) mit Schiffen (GameShip) und Steinen
-    \item Die Karten (GameCard) auf der Hand (GameHand) der Spieler
-    \item Die Kartenstapel (CardStack) der einzelnen Kartentypen (CardType)
-  \end{enumerate}
+  \begin{itemize}
+    \item GameScreen enthält alles, was auf dem Bildschirm gezeigt wird
+      \begin{enumerate}
+        \item Die beiden Spielbretter (GameBoard) mit Schiffen (GameShip) und Steinen
+        \item Die Karten (GameCard) auf der Hand (GameHand) der Spieler
+        \item Die Kartenstapel (CardStack) der einzelnen Kartentypen (CardType)
+      \end{enumerate}
+  \end{itemize}
+  
 \end{frame}
 
 
 \subsection{Server/Backend}
 \begin{frame}
 \frametitle{Server/Backend}
+  \begin{itemize}
+    \item Das Backend ist in C\# mit der Library LiteNetLib geschrieben
+    \item Ein globaler Server der eine Lobby auf Hetzner bereitstellt
+    \item Server wird in Docker-Containern ausgeführt
+  \end{itemize}
 \end{frame}
 
 \subsection{Shared}
 \begin{frame}
 \frametitle{Shared}
+  \begin{itemize}
+    \item Shared enthält alle Klassen, die sowohl im Client als auch im Server verwendet werden
+    \item Enthält die Definitionen der Karten und der Kartentypen
+    \item Enthält die Definitionen der Schiffe und der Schiffs-Typen
+  \end{itemize}
 \end{frame}
 
-\subsection{Backend - Client Kommunukation}
+\subsection{Backend - Client Kommunikation}
 \begin{frame}
 \frametitle{Backend - Client Kommunikation}
+\begin{columns}
+  \begin{column}{0.45\textwidth}
+    Event-Driven Architektur
+    \begin{itemize}
+      \item UDP für die Echtzeit-Kommunikation
+      \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.55\textwidth}
+    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\section{Technische Erfahrungen}
+\begin{frame}
+\frametitle{Technische Erfahrungen}
+\end{frame}
+
+\section{Analyse}
+\begin{frame}
+\frametitle{Analyse}
+\begin{columns}
+  \begin{column}{1\textwidth}
+    \includegraphics[width=\textwidth]{GitHub-Insights.png}
+  \end{column}
+\end{columns}
 \end{frame}
 
 \section{Wiki}
@@ -120,5 +177,6 @@
 \frametitle{Erfahrungen und Fazit}
 
 \end{frame}
+
 
 \end{document}

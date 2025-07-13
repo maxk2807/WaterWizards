@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.13)  13 JUL 2025 21:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.13)  14 JUL 2025 00:06
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -668,11 +668,11 @@ Dictionary: translator-theorem-dictionary, Language: English
 [2
 
 ]
-LaTeX Font Info:    Trying to load font information for U+msa on input line 35.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 47.
  (c:/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 35.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 47.
  (c:/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
@@ -692,21 +692,10 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 [6
 
 ]
-<./images/Server-Client-Logs.png, id=236, 916.92563pt x 469.755pt>
-File: ./images/Server-Client-Logs.png Graphic file (type png)
-<use ./images/Server-Client-Logs.png>
-Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 78.
-(pdftex.def)             Requested size: 215.10196pt x 110.1989pt.
-
-Overfull \hbox (19.91696pt too wide) detected at line 78
-[][][] $[]$[][][][][][][][] $[]$[][][][][][] 
- []
-
-
 
 [7
 
- <./images/Server-Client-Logs.png>]
+]
 
 [8
 
@@ -723,16 +712,36 @@ Overfull \hbox (19.91696pt too wide) detected at line 78
 [11
 
 ]
+<./images/Server-Client-Logs.png, id=371, 916.92563pt x 469.755pt>
+File: ./images/Server-Client-Logs.png Graphic file (type png)
+<use ./images/Server-Client-Logs.png>
+Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 152.
+(pdftex.def)             Requested size: 169.01036pt x 86.58075pt.
+
 
 [12
 
-]
+ <./images/Server-Client-Logs.png>]
 
 [13
 
 ]
+<./images/GitHub-Insights.png, id=423, 673.76718pt x 517.18219pt>
+File: ./images/GitHub-Insights.png Graphic file (type png)
+<use ./images/GitHub-Insights.png>
+Package pdftex.def Info: ./images/GitHub-Insights.png  used on input line 167.
+(pdftex.def)             Requested size: 307.28987pt x 235.87856pt.
+
 
 [14
+
+ <./images/GitHub-Insights.png>]
+
+[15
+
+]
+
+[16
 
 ]
 \tf@nav=\write6
@@ -750,21 +759,21 @@ LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-07-11>
  ***********
 Package rerunfilecheck Info: File `Präsentation.out' has not changed.
-(rerunfilecheck)             Checksum: 93D16FDF3343C52B2BBCD53386E3492D;1519.
+(rerunfilecheck)             Checksum: 19C207F067A473B1F7ADDD5D96C5CFAD;1714.
  ) 
 Here is how much of TeX's memory you used:
- 21375 strings out of 469754
- 406669 string characters out of 5481967
- 784300 words of memory out of 5000000
- 49297 multiletter control sequences out of 15000+600000
+ 21393 strings out of 469754
+ 406870 string characters out of 5481967
+ 788298 words of memory out of 5000000
+ 49309 multiletter control sequences out of 15000+600000
  633748 words of font info for 65 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 101i,14n,107p,456b,672s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 101i,14n,107p,456b,568s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on Präsentation.pdf (14 pages, 137994 bytes).
+Output written on Präsentation.pdf (16 pages, 176819 bytes).
 PDF statistics:
- 463 PDF objects out of 1000 (max. 8388607)
- 428 compressed objects within 5 object streams
- 41 named destinations out of 1000 (max. 500000)
- 144 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 526 PDF objects out of 1000 (max. 8388607)
+ 487 compressed objects within 5 object streams
+ 47 named destinations out of 1000 (max. 500000)
+ 165 words of extra memory for PDF output out of 10000 (max. 10000000)
 

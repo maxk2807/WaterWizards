@@ -1,11 +1,11 @@
 # Fdb version 4
-["pdflatex"] 1752435612.24129 "c:/Users/erick/Repos/WaterWizards/presentation/Präsentation.tex" "Präsentation.pdf" "Präsentation" 1752435613.16108 0
-  "Präsentation.aux" 1752435613 5400 2bddf4302d6ba9e2d506b07a81f06de9 "pdflatex"
-  "Präsentation.nav" 1752435613 3238 cd42f9aa4dd841aecb52f600d94acf39 "pdflatex"
-  "Präsentation.out" 1752435613 1519 93d16fdf3343c52b2bbcd53386e3492d "pdflatex"
-  "Präsentation.tex" 1752435611 2960 7840e5f93afa945c9d574c2bd420da0f ""
-  "Präsentation.toc" 1752435613 649 54f6294832a6a20c80c6ab53296a63ae "pdflatex"
-  "c:/Users/erick/Repos/WaterWizards/presentation/Präsentation.tex" 1752435611 2960 7840e5f93afa945c9d574c2bd420da0f ""
+["pdflatex"] 1752444383.53804 "c:/Users/erick/Repos/WaterWizards/presentation/Präsentation.tex" "Präsentation.pdf" "Präsentation" 1752444384.48277 0
+  "Präsentation.aux" 1752444384 6214 458a1f01f3500d2218030f6ee9337ad4 "pdflatex"
+  "Präsentation.nav" 1752444384 3740 821a399253087d7674a98aad51202118 "pdflatex"
+  "Präsentation.out" 1752444384 1714 19c207f067a473b1f7addd5d96c5cfad "pdflatex"
+  "Präsentation.tex" 1752444383 4940 134ccb14de8ae11e876533c2280761bc ""
+  "Präsentation.toc" 1752444384 745 d75e7da7570eb894d4764fc9c24a13cb "pdflatex"
+  "c:/Users/erick/Repos/WaterWizards/presentation/Präsentation.tex" 1752444383 4940 134ccb14de8ae11e876533c2280761bc ""
   "c:/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1752432051 1004 54797486969f23fa377b128694d548df ""
   "c:/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1752432051 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
   "c:/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm" 1752432051 916 f87d7c45f9c908e672703b83b72241a3 ""
@@ -182,7 +182,8 @@
   "c:/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1752432197 77129 1673afd84b401507251acf2750ccce42 ""
   "c:/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1752432211 2251738 272abbc862f80ae86d17efad5d71b635 ""
   "c:/texlive/2025/texmf.cnf" 1752432196 713 e69b156964470283e0530f5060668171 ""
-  "images/Server-Client-Logs.png" 1752433808 188768 9126a27bbd533db565c79d2b4d2e9605 ""
+  "images/GitHub-Insights.png" 1752444198 53205 df5c95835c2bf3e5383aab12b3b3e432 ""
+  "images/Server-Client-Logs.png" 1752440417 188768 9126a27bbd533db565c79d2b4d2e9605 ""
   (generated)
   "Präsentation.aux"
   "Präsentation.log"
