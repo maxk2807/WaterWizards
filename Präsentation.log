@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.7)  13 JUL 2025 14:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.7)  13 JUL 2025 14:36
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -681,9 +681,7 @@ Dictionary: translator-numbers-dictionary, Language: English
 Dictionary: translator-theorem-dictionary, Language: English 
 ) (./Präsentation.nav) [1
 
-{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-No file Präsentation.toc.
-[2
+{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./Präsentation.toc) [2
 
 ]
 LaTeX Font Info:    Trying to load font information for U+msa on input line 33.
@@ -734,29 +732,22 @@ File: ot1mathkerncmss.fd 2020/01/31 Fontinst v1.933 font definitions for OT1/mat
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
-
-
-Package rerunfilecheck Warning: File `Präsentation.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `Präsentation.out':
-(rerunfilecheck)             Before: D41D8CD98F00B204E9800998ECF8427E;0
-(rerunfilecheck)             After:  4F27588B3D1A4FA9BFF8619C737CFB5E;1286.
+Package rerunfilecheck Info: File `Präsentation.out' has not changed.
+(rerunfilecheck)             Checksum: 4F27588B3D1A4FA9BFF8619C737CFB5E;1286.
  ) 
 Here is how much of TeX's memory you used:
- 21384 strings out of 474116
- 411494 string characters out of 5743683
+ 21419 strings out of 474116
+ 412326 string characters out of 5743683
  1935187 words of memory out of 5000000
- 43274 multiletter control sequences out of 15000+600000
+ 43307 multiletter control sequences out of 15000+600000
  565124 words of font info for 61 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,14n,123p,430b,561s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on Präsentation.pdf (13 pages, 53703 bytes).
+Output written on Präsentation.pdf (13 pages, 55637 bytes).
 PDF statistics:
- 384 PDF objects out of 1000 (max. 8388607)
- 353 compressed objects within 4 object streams
+ 429 PDF objects out of 1000 (max. 8388607)
+ 398 compressed objects within 4 object streams
  38 named destinations out of 1000 (max. 500000)
- 43 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 131 words of extra memory for PDF output out of 10000 (max. 10000000)
 
