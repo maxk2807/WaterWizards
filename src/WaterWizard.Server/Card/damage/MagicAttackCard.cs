@@ -1,5 +1,6 @@
 using System.Numerics;
 using LiteNetLib;
+using Raylib_cs;
 using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
@@ -92,16 +93,6 @@ public class MagicAttackCard : IDamageCard
 
     public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer defender)
     {
-        var ships = ShipHandler.GetShips(defender);
-
-        foreach (var ship in ships)
-        {
-            if (targetCoords.X >= ship.X && targetCoords.X < ship.X + ship.Width && targetCoords.Y >= ship.Y && targetCoords.Y < ship.Y + ship.Height)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return targetCoords.X >= 0 && targetCoords.X < 12 && targetCoords.Y >= 0 && targetCoords.Y < 12;
     }
 }

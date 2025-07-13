@@ -135,6 +135,11 @@ public class HandleAttacks
         int revealY = reader.GetInt();
         bool isHit = reader.GetBool();
         bool isDefender = reader.GetBool();
+        
+        if (isHit)
+            Raylib.PlaySound(SoundManager.RandomExplosion());
+        else
+            Raylib.PlaySound(SoundManager.MissSound);
 
         var gameScreen = GameStateManager.Instance.GameScreen;
         if (gameScreen != null)
