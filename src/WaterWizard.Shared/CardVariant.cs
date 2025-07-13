@@ -42,4 +42,5 @@ public enum CardVariant
     // Healing Variants
     Heal,
     PerfectMending,
+    MassMending,
 }
