@@ -1,4 +1,5 @@
 using Raylib_cs;
+using WaterWizard.Shared;
 namespace WaterWizard.Client.Assets.Sounds.Manager;
 
 public static class SoundManager
@@ -7,6 +8,7 @@ public static class SoundManager
     public static Sound ButtonSound;
     public static List<Sound> Explosions { get; private set; } = [];
     public static Sound MissSound;
+    public static Sound HealSound;
 
     public static void LoadSounds()
     {
@@ -17,6 +19,7 @@ public static class SoundManager
         Raylib.SetSoundVolume(Explosions[0], 0.5f);
         Raylib.SetSoundVolume(Explosions[1], 0.5f);
         MissSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/miss.wav");
+        HealSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Heal/repair.wav");
     }
 
     public static void UnloadSounds()
@@ -25,11 +28,21 @@ public static class SoundManager
         Raylib.UnloadSound(ButtonSound);
         Explosions.ForEach(Raylib.UnloadSound);
         Raylib.UnloadSound(MissSound);
+        Raylib.UnloadSound(HealSound);
     }
 
     public static Sound RandomExplosion()
     {
         int i = new Random().Next(0, Explosions.Count);
         return Explosions[i];
+    }
+
+    public static Sound GetCardSound(CardVariant variant)
+    {
+        return variant switch
+        {
+            CardVariant.Heal => HealSound,
+            _ => new(),
+        };
     }
 }
