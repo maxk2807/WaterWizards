@@ -22,6 +22,9 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
 
+/// <summary>
+/// Verwaltet die Client-spezifische Netzwerklogik, Verbindungen und Events.
+/// </summary>
 public class ClientService(NetworkManager manager)
 {
     public NetManager? client;
@@ -33,6 +36,9 @@ public class ClientService(NetworkManager manager)
     public GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
 
+    /// <summary>
+    /// Initialisiert den Client für die Lobby-Suche (Discovery).
+    /// </summary>
     public void InitializeClientForDiscovery()
     {
         CleanupIfRunning();
@@ -51,6 +57,9 @@ public class ClientService(NetworkManager manager)
             LobbyHandler.HandleLobbyInfoResponse(manager, remoteEndPoint, reader);
     }
 
+    /// <summary>
+    /// Beendet laufende Client-Verbindungen.
+    /// </summary>
     public void CleanupIfRunning()
     {
         if (client != null && client.IsRunning)
@@ -60,26 +69,41 @@ public class ClientService(NetworkManager manager)
         }
     }
 
+    /// <summary>
+    /// Prüft, ob der Client mit einem Server verbunden ist.
+    /// </summary>
     public bool IsServerConnected() =>
         client != null
         && client.FirstPeer != null
         && client.FirstPeer.ConnectionState == ConnectionState.Connected;
 
+    /// <summary>
+    /// Verarbeitet Netzwerkereignisse (Empfang/Senden von Nachrichten).
+    /// </summary>
     public void PollEvents()
     {
         client?.PollEvents();
     }
 
+    /// <summary>
+    /// Beendet die Client-Verbindung.
+    /// </summary>
     public void Shutdown()
     {
         client?.Stop();
     }
 
+    /// <summary>
+    /// Prüft, ob der Client bereit ist.
+    /// </summary>
     public bool IsClientReady()
     {
         return clientReady;
     }
 
+    /// <summary>
+    /// Setzt Event-Handler für Netzwerkereignisse.
+    /// </summary>
     public void SetupClientEventHandlers()
     {
         if (clientListener == null)
