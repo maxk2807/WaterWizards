@@ -1,54 +1,63 @@
-/// <summary>
-/// Stellt Hilfsmethoden für Netzwerkoperationen bereit, z.B. zum Ermitteln der lokalen und öffentlichen IP-Adresse.
-/// </summary>
-public static class NetworkUtils
+// ===============================================
+// Autoren-Statistik (automatisch generiert):
+// - justinjd00: 44 Zeilen
+// - Erickk0: 5 Zeilen
+// - jdewi001: 2 Zeilen
+// - Erick Zeiler: 1 Zeilen
+// 
+// Methoden/Funktionen in dieser Datei (Hauptautor):
+// (Keine Methoden/Funktionen gefunden)
+// ===============================================
+
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Sockets;
+using System.Threading.Tasks;
+
+namespace WaterWizard.Shared
 {
-    /// <summary>
-    /// Gibt die lokale IP-Adresse des aktuellen Rechners zurück.
-    /// </summary>
-    /// <returns>Lokale IPv4-Adresse als String</returns>
-    public static string GetLocalIPAddress()
+    public static class NetworkUtils
     {
-        try
+        public static string GetLocalIPAddress()
         {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
+            try
             {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                var host = Dns.GetHostEntry(Dns.GetHostName());
+                foreach (var ip in host.AddressList)
                 {
-                    return ip.ToString();
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        return ip.ToString();
+                    }
                 }
+                return "127.0.0.1";
             }
-            return "127.0.0.1";
-        }
-        catch
-        {
-            return "127.0.0.1";
-        }
-    }
-
-    /// <summary>
-    /// Gibt die öffentliche IP-Adresse des aktuellen Rechners zurück.
-    /// </summary>
-    /// <returns>Öffentliche IPv4-Adresse als String</returns>
-    public static string GetPublicIPAddress()
-    {
-        try
-        {
-            using var client = new HttpClient();
-            // Abrufen derffentlichen IP-Adresse von einem externen Dienst
-            var response = client.GetStringAsync("https://api.ipify.org").Result;
-            if (response == null)
+            catch
             {
-                return "funktioniert nicht";
+                return "127.0.0.1";
             }
-
-            return response;
         }
-        catch (Exception ex)
+
+        public static string GetPublicIPAddress()
         {
-            Console.WriteLine($"Fehler beim Abrufen derffentlichen IP-Adresse: {ex.Message}");
-            return "Unbekannt";
+            try
+            {
+                using var client = new HttpClient();
+                // Abrufen der �ffentlichen IP-Adresse von einem externen Dienst
+                var response = client.GetStringAsync("https://api.ipify.org").Result;
+                if (response == null)
+                {
+                    return "funktioniert nicht";
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler beim Abrufen der �ffentlichen IP-Adresse: {ex.Message}");
+                return "Unbekannt";
+            }
         }
     }
 }
