@@ -48,7 +48,8 @@ public class CellHandler
     /// <param name="x">X coordinate</param>
     /// <param name="y">Y coordinate</param>
     /// <param name="isHit">Whether it was a hit or miss</param>
-    public static void SendCellReveal(NetPeer attacker, NetPeer defender, int x, int y, bool isHit)
+    /// <param name="cardVariant">Which Card is it?</param>
+    public static void SendCellReveal(NetPeer attacker, NetPeer defender, int x, int y, bool isHit, string cardVariant)
     {
         var attackerWriter = new NetDataWriter();
         attackerWriter.Put("CellReveal");
@@ -56,6 +57,7 @@ public class CellHandler
         attackerWriter.Put(y);
         attackerWriter.Put(isHit);
         attackerWriter.Put(false);
+        attackerWriter.Put(cardVariant);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
         var defenderWriter = new NetDataWriter();
@@ -64,6 +66,7 @@ public class CellHandler
         defenderWriter.Put(y);
         defenderWriter.Put(isHit);
         defenderWriter.Put(true);
+        defenderWriter.Put(cardVariant);
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(

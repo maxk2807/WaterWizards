@@ -12,7 +12,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using Raylib_cs;
 using WaterWizard.Client.network;
-
+using WaterWizard.Client.Assets.Sounds.Manager;
 namespace WaterWizard.Client.gamestates;
 
 public class InGameState : IGameState
@@ -23,6 +23,7 @@ public class InGameState : IGameState
     /// <param name="manager">The GameStateManager instance that provides access to game components, screen dimensions, pause state, and rendering systems.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
+        Raylib.UpdateMusicStream(SoundManager.PauseSound);
         if (Raylib.IsKeyPressed(KeyboardKey.S))
         {
             HandleSurrender();
@@ -45,9 +46,19 @@ public class InGameState : IGameState
                 40,
                 Color.Yellow
             );
+            // PauseMusic als Loop abspielen
+            if (!Raylib.IsMusicStreamPlaying(SoundManager.PauseSound))
+            {
+                Raylib.PlayMusicStream(SoundManager.PauseSound);
+            }
         }
         else
         {
+            // Falls PauseMusic läuft, stoppen
+            if (Raylib.IsMusicStreamPlaying(SoundManager.PauseSound))
+            {
+                Raylib.StopMusicStream(SoundManager.PauseSound);
+            }
             DrawGameScreen(manager);
 
             string surrenderHint = "Press 'S' to Surrender";

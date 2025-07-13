@@ -76,7 +76,7 @@ public class FireboltCard : IDamageCard
                 if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
                 {
                     Console.WriteLine($"[Server] Firebolt attack at ({x}, {y}) blocked by shield!");
-                    CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, false, "FireBolt");
                     continue;
                 }
 
@@ -100,12 +100,12 @@ public class FireboltCard : IDamageCard
                             }
                             else
                             {
-                                CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                                CellHandler.SendCellReveal(attacker, defender, x, y, true, "FireBolt");
                             }
                         }
                         else
                         {
-                            CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                            CellHandler.SendCellReveal(attacker, defender, x, y, true, "FireBolt");
                         }
                         break;
                     }
@@ -113,7 +113,7 @@ public class FireboltCard : IDamageCard
 
                 if (!cellHit)
                 {
-                    CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, false, "FireBolt");
                 }
 
                 if (cellHit)

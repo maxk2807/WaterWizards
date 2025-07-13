@@ -351,6 +351,8 @@ public class DraggingShip
             (int)(DraggedShipRectangle.Width / CellSize),
             (int)(DraggedShipRectangle.Height / CellSize)
         );
+        // Sound abspielen: Erst Spawn, dann Teleport
+        Raylib.PlaySound(WaterWizard.Client.Assets.Sounds.Manager.SoundManager.SpawnSound);
     }
 
     /// <summary>

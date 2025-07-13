@@ -226,6 +226,10 @@ public class CastingUI
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
                 aiming = false;
+                if (gameCard.card.Variant == CardVariant.HoveringEye)
+                {
+                    Raylib.PlaySound(WaterWizard.Client.Assets.Sounds.Manager.SoundManager.SweeperSound);
+                }
                 NetworkManager.HandleCast(cardToAim!.card, hoveredCoords.Value);
 
             }
@@ -381,7 +385,7 @@ public class CastingUI
                 {
                     aiming = false;
                     isTeleportSelectionPhase = false;
-
+                    Raylib.PlaySound(WaterWizard.Client.Assets.Sounds.Manager.SoundManager.TeleportSound);
                     NetworkManager.Instance.HandleTeleportCast(
                         cardToAim!.card,
                         selectedShipIndex,

@@ -80,12 +80,12 @@ public class FireballCard : IDamageCard
                             }
                             else
                             {
-                                CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                                CellHandler.SendCellReveal(attacker, defender, x, y, true, "FireBall");
                             }
                         }
                         else
                         {
-                            CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                            CellHandler.SendCellReveal(attacker, defender, x, y, true, "FireBall");
                         }
                         break;
                     }
@@ -93,7 +93,7 @@ public class FireballCard : IDamageCard
 
                 if (!cellHit)
                 {
-                    CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, false, "FireBall");
                 }
 
                 if (cellHit)

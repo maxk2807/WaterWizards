@@ -15,6 +15,11 @@ public static class SoundManager
     public static Sound FireboltSound;
     public static Sound FireballSound;
     public static Sound ThunderSound;
+    public static Sound SpawnSound;
+    public static Sound SweeperSound;
+    public static Sound TeleportSound;
+    public static Music PauseSound;
+    public static Sound GreedSound;
 
     public static void LoadSounds()
     {
@@ -33,6 +38,12 @@ public static class SoundManager
         FireboltSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Fire/firebolt.wav");
         FireballSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Fire/fireball.wav");
         ThunderSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Thunder/thunder.wav");
+        SpawnSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Spawn/spawn.wav");
+        SweeperSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Sweeper/sweeper.wav");
+        TeleportSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Teleport/teleport.wav");
+        PauseSound = Raylib.LoadMusicStream("src/WaterWizard.Client/Assets/Sounds/Pause/pause2.mp3");
+        Raylib.SetMusicVolume(PauseSound, 0.5f);
+        GreedSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/GreedSound/greedSound.wav");
     }
 
     public static void UnloadSounds()
@@ -48,6 +59,11 @@ public static class SoundManager
         Raylib.UnloadSound(FireboltSound);
         Raylib.UnloadSound(FireballSound);
         Raylib.UnloadSound(ThunderSound);
+        Raylib.UnloadSound(SpawnSound);
+        Raylib.UnloadSound(SweeperSound);
+        Raylib.UnloadSound(TeleportSound);
+        Raylib.UnloadMusicStream(PauseSound);
+        Raylib.UnloadSound(GreedSound);
     }
 
     public static Sound RandomExplosion()
@@ -65,6 +81,10 @@ public static class SoundManager
             CardVariant.Fireball => FireballSound,
             CardVariant.Thunder => ThunderSound,
             CardVariant.Firebolt => FireboltSound,
+            CardVariant.Teleport => TeleportSound,
+            CardVariant.HoveringEye => SweeperSound,
+            CardVariant.SummonShip => SpawnSound,
+            CardVariant.GreedHit => GreedSound,
             _ => new(),
         };
     }

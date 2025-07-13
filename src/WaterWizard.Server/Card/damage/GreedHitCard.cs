@@ -71,7 +71,7 @@ public class GreedHitCard : IDamageCard
         if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
         {
             Console.WriteLine($"[Server] GreedHit attack at ({x}, {y}) blocked by shield!");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "GreedHit");
             return false;
         }
 
@@ -99,12 +99,12 @@ public class GreedHitCard : IDamageCard
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "GreedHit");
                     }
                 }
                 else
                 {
-                    CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, true, "GreedHit");
                 }
                 break;
             }
@@ -113,7 +113,7 @@ public class GreedHitCard : IDamageCard
         if (!hit)
         {
             Console.WriteLine($"[Server] GreedHit missed at ({x}, {y})");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "GreedHit");
         }
 
         return hit;
