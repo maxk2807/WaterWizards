@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 61 Zeilen
 // - jdewi001: 4 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================

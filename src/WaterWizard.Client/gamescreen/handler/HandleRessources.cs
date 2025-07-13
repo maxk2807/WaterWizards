@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 38 Zeilen
 // - Erickk0: 30 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -56,7 +56,9 @@ public class HandleRessources
         bool isFrozen = reader.GetBool();
         int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
 
-        Console.WriteLine($"[Client] GoldFreezeStatus empfangen - PlayerIndex: {playerIndex}, IsFrozen: {isFrozen}");
+        Console.WriteLine(
+            $"[Client] GoldFreezeStatus empfangen - PlayerIndex: {playerIndex}, IsFrozen: {isFrozen}"
+        );
         Console.WriteLine($"[Client] Mein PlayerIndex: {myPlayerIndex}");
         Console.WriteLine($"[Client] Betrifft mich: {playerIndex == myPlayerIndex}");
 
@@ -66,7 +68,9 @@ public class HandleRessources
             if (ressourceField != null)
             {
                 ressourceField.SetGoldFrozen(isFrozen);
-                Console.WriteLine($"[Client] Gold-Freeze-Status in RessourceField gesetzt: {isFrozen}");
+                Console.WriteLine(
+                    $"[Client] Gold-Freeze-Status in RessourceField gesetzt: {isFrozen}"
+                );
             }
         }
         else

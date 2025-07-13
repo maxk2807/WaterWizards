@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 47 Zeilen
 // - Paul: 7 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -39,7 +39,7 @@ namespace WaterWizardTests
                 Mana = 5,
                 CastTime = "2",
                 Duration = "permanent",
-                Target = target
+                Target = target,
             };
 
             // Assert

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - erick: 176 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(1, 1);   (erick: 159 Zeilen)
 // ===============================================
@@ -23,23 +23,30 @@ public class TeleportCard : IUtilityCard
 {
     public CardVariant Variant => CardVariant.Teleport;
 
-    public Vector2 AreaOfEffect => new(1, 1); 
+    public Vector2 AreaOfEffect => new(1, 1);
 
-    public bool HasSpecialTargeting => true; 
+    public bool HasSpecialTargeting => true;
 
-    public bool ExecuteUtility(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteUtility(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         int destinationX = (int)targetCoords.X;
         int destinationY = (int)targetCoords.Y;
 
         int shipIndex = (int)(targetCoords.X) >> 16;
-        
+
         destinationX &= 0xFFFF;
 
-        Console.WriteLine($"[Server] Teleport attempting to move ship index {shipIndex} to ({destinationX}, {destinationY})");
+        Console.WriteLine(
+            $"[Server] Teleport attempting to move ship index {shipIndex} to ({destinationX}, {destinationY})"
+        );
 
         var ships = ShipHandler.GetShips(caster);
-        
+
         if (shipIndex < 0 || shipIndex >= ships.Count)
         {
             Console.WriteLine($"[Server] Teleport failed - invalid ship index {shipIndex}");
@@ -50,10 +57,12 @@ public class TeleportCard : IUtilityCard
 
         int originalX = shipToTeleport.X;
         int originalY = shipToTeleport.Y;
-        
+
         if (!IsValidShipPosition(gameState, shipToTeleport, destinationX, destinationY, caster))
         {
-            Console.WriteLine($"[Server] Teleport failed - invalid destination position ({destinationX}, {destinationY})");
+            Console.WriteLine(
+                $"[Server] Teleport failed - invalid destination position ({destinationX}, {destinationY})"
+            );
             return false;
         }
 
@@ -62,37 +71,58 @@ public class TeleportCard : IUtilityCard
         {
             for (int dy = 0; dy < shipToTeleport.Height; dy++)
             {
-                if (originalX + dx >= 0 && originalX + dx < GameState.boardWidth &&
-                    originalY + dy >= 0 && originalY + dy < GameState.boardHeight)
+                if (
+                    originalX + dx >= 0
+                    && originalX + dx < GameState.boardWidth
+                    && originalY + dy >= 0
+                    && originalY + dy < GameState.boardHeight
+                )
                 {
-                    gameState.boards[playerIndex][originalX + dx, originalY + dy].CellState = CellState.Empty;
+                    gameState.boards[playerIndex][originalX + dx, originalY + dy].CellState =
+                        CellState.Empty;
                 }
             }
         }
 
         shipToTeleport.X = destinationX;
         shipToTeleport.Y = destinationY;
-        
+
         for (int dx = 0; dx < shipToTeleport.Width; dx++)
         {
             for (int dy = 0; dy < shipToTeleport.Height; dy++)
             {
-                gameState.boards[playerIndex][destinationX + dx, destinationY + dy].CellState = CellState.Ship;
+                gameState.boards[playerIndex][destinationX + dx, destinationY + dy].CellState =
+                    CellState.Ship;
             }
         }
 
-        Console.WriteLine($"[Server] Ship {shipIndex} teleported from ({originalX}, {originalY}) to ({destinationX}, {destinationY})");
+        Console.WriteLine(
+            $"[Server] Ship {shipIndex} teleported from ({originalX}, {originalY}) to ({destinationX}, {destinationY})"
+        );
 
-        SendTeleportNotification(caster, opponent, shipIndex, originalX, originalY, destinationX, destinationY);
+        SendTeleportNotification(
+            caster,
+            opponent,
+            shipIndex,
+            originalX,
+            originalY,
+            destinationX,
+            destinationY
+        );
 
         return true;
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         int destinationX = (int)targetCoords.X & 0xFFFF;
         int destinationY = (int)targetCoords.Y;
-        
+
         int shipIndex = (int)targetCoords.X >> 16;
 
         var ships = ShipHandler.GetShips(caster);
@@ -100,7 +130,7 @@ public class TeleportCard : IUtilityCard
         {
             return false;
         }
-        
+
         var shipToTeleport = ships[shipIndex];
 
         return IsValidShipPosition(gameState, shipToTeleport, destinationX, destinationY, caster);
@@ -109,12 +139,23 @@ public class TeleportCard : IUtilityCard
     /// <summary>
     /// Checks if the new position for the ship is valid
     /// </summary>
-    private bool IsValidShipPosition(GameState gameState, PlacedShip ship, int newX, int newY, NetPeer caster)
+    private bool IsValidShipPosition(
+        GameState gameState,
+        PlacedShip ship,
+        int newX,
+        int newY,
+        NetPeer caster
+    )
     {
         int boardWidth = GameState.boardWidth;
         int boardHeight = GameState.boardHeight;
 
-        if (newX < 0 || newY < 0 || newX + ship.Width > boardWidth || newY + ship.Height > boardHeight)
+        if (
+            newX < 0
+            || newY < 0
+            || newX + ship.Width > boardWidth
+            || newY + ship.Height > boardHeight
+        )
         {
             return false;
         }
@@ -128,22 +169,26 @@ public class TeleportCard : IUtilityCard
                 continue;
             }
 
-            if (newX < otherShip.X + otherShip.Width &&
-                newX + ship.Width > otherShip.X &&
-                newY < otherShip.Y + otherShip.Height &&
-                newY + ship.Height > otherShip.Y)
+            if (
+                newX < otherShip.X + otherShip.Width
+                && newX + ship.Width > otherShip.X
+                && newY < otherShip.Y + otherShip.Height
+                && newY + ship.Height > otherShip.Y
+            )
             {
                 return false;
             }
         }
-        
+
         int playerIndex = gameState.GetPlayerIndex(caster);
         var rocks = RockHandler.GetRockPositions(gameState.boards[playerIndex]);
-        bool collidesWithRocks = rocks.Any(rock => 
-            rock.X >= newX && rock.X < newX + ship.Width && 
-            rock.Y >= newY && rock.Y < newY + ship.Height
+        bool collidesWithRocks = rocks.Any(rock =>
+            rock.X >= newX
+            && rock.X < newX + ship.Width
+            && rock.Y >= newY
+            && rock.Y < newY + ship.Height
         );
-        
+
         if (collidesWithRocks)
         {
             return false;
@@ -156,8 +201,14 @@ public class TeleportCard : IUtilityCard
     /// Sends teleport notification to both players
     /// </summary>
     private static void SendTeleportNotification(
-        NetPeer caster, NetPeer opponent, 
-        int shipIndex, int originalX, int originalY, int newX, int newY)
+        NetPeer caster,
+        NetPeer opponent,
+        int shipIndex,
+        int originalX,
+        int originalY,
+        int newX,
+        int newY
+    )
     {
         var casterWriter = new NetDataWriter();
         casterWriter.Put("ShipTeleported");
@@ -166,7 +217,7 @@ public class TeleportCard : IUtilityCard
         casterWriter.Put(originalY);
         casterWriter.Put(newX);
         casterWriter.Put(newY);
-        casterWriter.Put(false); 
+        casterWriter.Put(false);
         caster.Send(casterWriter, DeliveryMethod.ReliableOrdered);
 
         var opponentWriter = new NetDataWriter();
@@ -176,9 +227,11 @@ public class TeleportCard : IUtilityCard
         opponentWriter.Put(originalY);
         opponentWriter.Put(newX);
         opponentWriter.Put(newY);
-        opponentWriter.Put(true); 
+        opponentWriter.Put(true);
         opponent.Send(opponentWriter, DeliveryMethod.ReliableOrdered);
 
-        Console.WriteLine($"[Server] Teleport notification sent to both players for ship {shipIndex}");
+        Console.WriteLine(
+            $"[Server] Teleport notification sent to both players for ship {shipIndex}"
+        );
     }
 }

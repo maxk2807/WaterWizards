@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 50 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new();   (maxk2807: 38 Zeilen)
 // ===============================================
@@ -24,7 +24,12 @@ public class HealCard : IHealingCard
 
     public bool HasSpecialTargeting => true; // targets ships
 
-    public bool ExecuteHealing(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteHealing(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         var shipToHeal = FindShip(targetCoords, caster);
         if (shipToHeal != null)
@@ -43,7 +48,12 @@ public class HealCard : IHealingCard
         return false;
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         PlacedShip? targetShip = FindShip(targetCoords, caster); //valid target when targeting ship
         return targetShip != null;
@@ -52,7 +62,9 @@ public class HealCard : IHealingCard
     private static PlacedShip? FindShip(Vector2 targetCoords, NetPeer caster)
     {
         var ships = ShipHandler.GetShips(caster);
-        var ship = ships.Find(ship => ship.X == (int)targetCoords.X && ship.Y == (int)targetCoords.Y);
+        var ship = ships.Find(ship =>
+            ship.X == (int)targetCoords.X && ship.Y == (int)targetCoords.Y
+        );
         return ship;
     }
 }

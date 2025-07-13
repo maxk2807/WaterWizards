@@ -1,13 +1,13 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - erick: 32 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Xunit;
 using WaterWizard.Shared;
+using Xunit;
 
 namespace WaterWizardTests
 {
@@ -19,7 +19,7 @@ namespace WaterWizardTests
             // Arrange & Act
             var session1 = new GameSessionId();
             var session2 = new GameSessionId();
-            
+
             // Assert
             Assert.NotEqual(session1.SessionId, session2.SessionId);
         }
@@ -29,10 +29,10 @@ namespace WaterWizardTests
         {
             // Arrange
             var customId = "test-session-123";
-            
+
             // Act
             var session = new GameSessionId(customId);
-            
+
             // Assert
             Assert.Equal(customId, session.SessionId);
         }

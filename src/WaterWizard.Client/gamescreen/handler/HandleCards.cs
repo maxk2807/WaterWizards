@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 109 Zeilen
 // - Erickk0: 34 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -92,7 +92,9 @@ public class HandleCards
             writer.Put(hoveredCoords.X);
             writer.Put(hoveredCoords.Y);
             clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine($"[Client] Karte wirken: {card.Variant} an Position ({hoveredCoords.X}, {hoveredCoords.Y})");
+            Console.WriteLine(
+                $"[Client] Karte wirken: {card.Variant} an Position ({hoveredCoords.X}, {hoveredCoords.Y})"
+            );
         }
         else
         {
@@ -122,7 +124,9 @@ public class HandleCards
             writer.Put(destinationCoords.Y);
 
             clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine($"[Client] Teleport-Karte wirken: Schiff {shipId} zur Position ({destinationCoords.X}, {destinationCoords.Y})");
+            Console.WriteLine(
+                $"[Client] Teleport-Karte wirken: Schiff {shipId} zur Position ({destinationCoords.X}, {destinationCoords.Y})"
+            );
         }
         else
         {
@@ -148,11 +152,15 @@ public class HandleCards
             if (opponentHand != null && opponentHand.Cards.Count > 0)
             {
                 opponentHand.Cards.RemoveAt(0);
-                Console.WriteLine($"[Client] Opponent used card {variant}, removed from opponent hand display. Remaining cards: {opponentHand.Cards.Count}");
+                Console.WriteLine(
+                    $"[Client] Opponent used card {variant}, removed from opponent hand display. Remaining cards: {opponentHand.Cards.Count}"
+                );
             }
             else
             {
-                Console.WriteLine($"[Client] Could not remove card - opponent hand is null or empty");
+                Console.WriteLine(
+                    $"[Client] Could not remove card - opponent hand is null or empty"
+                );
             }
         }
         else

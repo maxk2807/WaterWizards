@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 62 Zeilen
 // - maxk2807: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -49,7 +49,14 @@ public class CellHandler
     /// <param name="y">Y coordinate</param>
     /// <param name="isHit">Whether it was a hit or miss</param>
     /// <param name="cardVariant">Which Card is it?</param>
-    public static void SendCellReveal(NetPeer attacker, NetPeer defender, int x, int y, bool isHit, string cardVariant)
+    public static void SendCellReveal(
+        NetPeer attacker,
+        NetPeer defender,
+        int x,
+        int y,
+        bool isHit,
+        string cardVariant
+    )
     {
         var attackerWriter = new NetDataWriter();
         attackerWriter.Put("CellReveal");

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 31 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(1, 1);   (justinjd00: 19 Zeilen)
 // ===============================================
@@ -22,7 +22,12 @@ public class SummonShipCard : IUtilityCard
 
     public bool HasSpecialTargeting => false;
 
-    public bool ExecuteUtility(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteUtility(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         // Spielerindex ermitteln
         int playerIndex = gameState.GetPlayerIndex(caster);
@@ -34,6 +39,10 @@ public class SummonShipCard : IUtilityCard
         return true;
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
-        => true;
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    ) => true;
 }

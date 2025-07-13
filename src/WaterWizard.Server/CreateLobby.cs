@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 45 Zeilen
 // - Erickk0: 5 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private static readonly ConcurrentDictionary<string, Lobby> Lobbies = new();   (erick: 31 Zeilen)
 // - private readonly Dictionary<LiteNetLib.NetPeer, string> players = new();   (erick: 1 Zeilen)

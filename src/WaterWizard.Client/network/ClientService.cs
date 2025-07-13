@@ -6,7 +6,7 @@
 // - erick: 53 Zeilen
 // - Erickk0: 51 Zeilen
 // - Erick Zeiler: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -407,30 +407,30 @@ public class ClientService(NetworkManager manager)
                     Console.WriteLine($"[Client] Received player index: {playerIndex}");
                     break;
                 case "UpdateMana":
-                    {
-                        HandleRessources.HandleUpdateMana(reader);
-                        break;
-                    }
+                {
+                    HandleRessources.HandleUpdateMana(reader);
+                    break;
+                }
                 case "CardManaSpent":
-                    {
-                        HandleCards.HandleCardManaSpent(reader);
-                        break;
-                    }
+                {
+                    HandleCards.HandleCardManaSpent(reader);
+                    break;
+                }
                 case "UpdateGold":
-                    {
-                        HandleRessources.HandleUpdateGold(reader);
-                        break;
-                    }
+                {
+                    HandleRessources.HandleUpdateGold(reader);
+                    break;
+                }
                 case "GoldFreezeStatus":
-                    {
-                        HandleRessources.HandleGoldFreeze(reader);
-                        break;
-                    }
+                {
+                    HandleRessources.HandleGoldFreeze(reader);
+                    break;
+                }
                 case "ParalizeStatus":
-                    {
-                        HandleParalize.HandleParalizeStatus(reader);
-                        break;
-                    }
+                {
+                    HandleParalize.HandleParalizeStatus(reader);
+                    break;
+                }
                 case "HoveringEyeReveal":
                     HandleUtility.HandleHoveringEyeReveal(reader);
                     break;

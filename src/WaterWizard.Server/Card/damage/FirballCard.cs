@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jlnhsrm: 118 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(3, 3);   (jlnhsrm: 96 Zeilen)
 // ===============================================
@@ -40,7 +40,6 @@ public class FireballCard : IDamageCard
     /// </summary>
     public bool HasSpecialTargeting => false;
 
-
     /// <summary>
     /// Executes the damage effect of the Firebolt card
     /// </summary>
@@ -48,7 +47,12 @@ public class FireballCard : IDamageCard
     /// <param name="targetCoords">The coordinates targeted by the card</param>
     /// <param name="attacker">The attacking player</param>
     /// <param name="defender">The defending player</param>
-    public bool ExecuteDamage(GameState gameState, Vector2 targetCoords, NetPeer attacker, NetPeer defender)
+    public bool ExecuteDamage(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer attacker,
+        NetPeer defender
+    )
     {
         int startX = (int)targetCoords.X - 1;
         int startY = (int)targetCoords.Y - 1;
@@ -66,8 +70,12 @@ public class FireballCard : IDamageCard
 
                 foreach (var ship in ships)
                 {
-                    if (x >= ship.X && x < ship.X + ship.Width &&
-                        y >= ship.Y && y < ship.Y + ship.Height)
+                    if (
+                        x >= ship.X
+                        && x < ship.X + ship.Width
+                        && y >= ship.Y
+                        && y < ship.Y + ship.Height
+                    )
                     {
                         cellHit = true;
                         bool newDamage = ship.DamageCell(x, y);
@@ -80,7 +88,14 @@ public class FireballCard : IDamageCard
                             }
                             else
                             {
-                                CellHandler.SendCellReveal(attacker, defender, x, y, true, "FireBall");
+                                CellHandler.SendCellReveal(
+                                    attacker,
+                                    defender,
+                                    x,
+                                    y,
+                                    true,
+                                    "FireBall"
+                                );
                             }
                         }
                         else
@@ -118,9 +133,9 @@ public class FireballCard : IDamageCard
         int boardWidth = 12;
         int boardHeight = 10;
 
-        return targetCoords.X >= 1 &&
-               targetCoords.Y >= 1 &&
-               targetCoords.X + 2 < boardWidth &&
-               targetCoords.Y + 2 < boardHeight;
+        return targetCoords.X >= 1
+            && targetCoords.Y >= 1
+            && targetCoords.X + 2 < boardWidth
+            && targetCoords.Y + 2 < boardHeight;
     }
 }

@@ -4,13 +4,13 @@
 // - Erickk0: 29 Zeilen
 // - Paul: 21 Zeilen
 // - maxk2807: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Raylib_cs;
 using System.Numerics;
+using Raylib_cs;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
@@ -21,8 +21,11 @@ public class ConnectingMenuState : IGameState
 
     private void LoadAssets()
     {
-        if (menuBackground.Id != 0) return;
-        menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
+        if (menuBackground.Id != 0)
+            return;
+        menuBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png"
+        );
     }
 
     public void UpdateAndDraw(GameStateManager manager)
@@ -42,7 +45,6 @@ public class ConnectingMenuState : IGameState
             0f,
             Color.White
         );
-
 
         Raylib.DrawText(
             "Enter IP Address:",

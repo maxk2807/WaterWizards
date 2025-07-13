@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 7 Zeilen
 // - Paul: 4 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -16,5 +16,5 @@ public enum ShipType
     ONEFIELDSHIP,
     TWOFIELDSHIP,
     FOURFIELDSHIP,
-    FIVEFIELDSHIP
+    FIVEFIELDSHIP,
 }

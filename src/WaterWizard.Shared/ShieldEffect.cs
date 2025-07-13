@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 43 Zeilen
 // - erick: 5 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -49,12 +49,18 @@ public class ShieldEffect
     /// <returns>True if the coordinates are within the shield's 3x3 area</returns>
     public bool IsCoordinateProtected(int x, int y)
     {
-        if (!IsActive) return false;
+        if (!IsActive)
+            return false;
 
-        bool isProtected = x >= Position.X - 1 && x <= Position.X + 1 &&
-                          y >= Position.Y - 1 && y <= Position.Y + 1;
-                          
-        Console.WriteLine($"[ShieldEffect] Checking protection at ({x}, {y}) vs center ({Position.X}, {Position.Y}): {(isProtected ? "PROTECTED" : "NOT PROTECTED")}");
+        bool isProtected =
+            x >= Position.X - 1
+            && x <= Position.X + 1
+            && y >= Position.Y - 1
+            && y <= Position.Y + 1;
+
+        Console.WriteLine(
+            $"[ShieldEffect] Checking protection at ({x}, {y}) vs center ({Position.X}, {Position.Y}): {(isProtected ? "PROTECTED" : "NOT PROTECTED")}"
+        );
         return isProtected;
     }
 }

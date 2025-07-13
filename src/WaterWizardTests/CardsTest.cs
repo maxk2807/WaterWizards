@@ -1,16 +1,16 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 79 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using WaterWizard.Shared;
-using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using WaterWizard.Shared;
+using Xunit;
 
 namespace WaterWizardTests
 {
@@ -78,7 +78,7 @@ namespace WaterWizardTests
         public void ActivateEffect_ThunderCard_ActivatesThunderEffect()
         {
             var card = new Cards(CardVariant.Thunder);
-            var battlefields = new List<Cell[,]> { new Cell[5,5] };
+            var battlefields = new List<Cell[,]> { new Cell[5, 5] };
             card.SetBattlefieldInfo(battlefields, 5);
             card.ActivateEffect();
             Assert.True(card.HasActiveEffect);

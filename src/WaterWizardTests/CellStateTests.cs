@@ -1,13 +1,13 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - erick: 23 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Xunit;
 using WaterWizard.Shared;
+using Xunit;
 
 namespace WaterWizardTests
 {
@@ -23,7 +23,7 @@ namespace WaterWizardTests
         {
             // Arrange & Act
             var cellState = state;
-            
+
             // Assert
             Assert.True(Enum.IsDefined(typeof(CellState), cellState));
         }

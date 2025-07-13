@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 99 Zeilen
 // - erick: 4 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(3, 3);   (Erickk0: 85 Zeilen)
 // ===============================================
@@ -28,7 +28,12 @@ public class ShieldCard : IUtilityCard
 
     public bool HasSpecialTargeting => false;
 
-    public bool ExecuteUtility(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteUtility(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         int startX = (int)targetCoords.X;
         int startY = (int)targetCoords.Y;
@@ -50,17 +55,24 @@ public class ShieldCard : IUtilityCard
         }
 
         var shieldEffect = new ShieldEffect(targetCoords, casterIndex, 6.0f);
-        
+
         gameState.AddShieldEffect(shieldEffect);
 
-        Console.WriteLine($"[ShieldCard] Shield created at ({startX}, {startY}) for player {casterIndex + 1}, duration: 6 seconds");
+        Console.WriteLine(
+            $"[ShieldCard] Shield created at ({startX}, {startY}) for player {casterIndex + 1}, duration: 6 seconds"
+        );
 
         SendShieldCreated(gameState.players, casterIndex, startX, startY, 6.0f);
 
         return true;
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         int boardWidth = GameState.boardWidth;
         int boardHeight = GameState.boardHeight;
@@ -74,7 +86,13 @@ public class ShieldCard : IUtilityCard
     /// <summary>
     /// Sends shield creation notification to all players
     /// </summary>
-    private static void SendShieldCreated(NetPeer[] players, int casterIndex, int x, int y, float duration)
+    private static void SendShieldCreated(
+        NetPeer[] players,
+        int casterIndex,
+        int x,
+        int y,
+        float duration
+    )
     {
         foreach (var player in players)
         {

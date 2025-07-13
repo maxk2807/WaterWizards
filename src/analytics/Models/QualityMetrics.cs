@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 34 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -21,7 +21,7 @@ public class QualityMetrics
     public double AverageCommitsPerDeveloper { get; set; }
     public double TopDeveloperScore { get; set; }
     public string TopDeveloperBreakdown { get; set; } = "";
-    
+
     // Erweiterte Metriken
     public int TotalPullRequests { get; set; }
     public int MergedPullRequests { get; set; }
@@ -39,4 +39,4 @@ public class QualityMetrics
     public double IssueResolutionRate { get; set; }
     public string MostProductiveDay { get; set; } = "";
     public string MostProductiveHour { get; set; } = "";
-} 
+}

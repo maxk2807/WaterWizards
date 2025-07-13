@@ -3,7 +3,7 @@
 // - jdewi001: 36 Zeilen
 // - Erickk0: 32 Zeilen
 // - erick: 10 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -11,8 +11,9 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Raylib_cs;
-using WaterWizard.Client.network;
 using WaterWizard.Client.Assets.Sounds.Manager;
+using WaterWizard.Client.network;
+
 namespace WaterWizard.Client.gamestates;
 
 /// <summary>
@@ -71,7 +72,8 @@ public class InGameState : IGameState
                 manager.screenWidth - hintWidth - 10,
                 10,
                 12,
-                Color.Gray);
+                Color.Gray
+            );
         }
     }
 

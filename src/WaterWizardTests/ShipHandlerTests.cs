@@ -2,12 +2,10 @@ using Xunit;
 
 namespace WaterWizardTests;
 
-
-
 public enum ShipOrientation
 {
     Horizontal,
-    Vertical
+    Vertical,
 }
 
 public static class ShipHandler

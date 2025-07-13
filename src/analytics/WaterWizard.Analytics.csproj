@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -9,9 +8,7 @@
     <RootNamespace>WaterWizard.Analytics</RootNamespace>
     <Description>Code Analytics System für WaterWizards Repository-Statistiken</Description>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="8.0.0" />
   </ItemGroup>
-
-</Project> 
+</Project>

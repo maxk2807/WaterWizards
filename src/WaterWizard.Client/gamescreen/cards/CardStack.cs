@@ -5,7 +5,7 @@
 // - justinjd00: 7 Zeilen
 // - Erickk0: 1 Zeilen
 // - erick: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================

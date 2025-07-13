@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 72 Zeilen
 // - Erickk0: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private readonly Random _random = new();   (jdewi001: 60 Zeilen)
 // ===============================================

@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 20 Zeilen
 // - jdewi001: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================

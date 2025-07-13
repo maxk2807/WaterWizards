@@ -1,5 +1,6 @@
 using Raylib_cs;
 using WaterWizard.Shared;
+
 namespace WaterWizard.Client.Assets.Sounds.Manager;
 
 public static class SoundManager
@@ -28,8 +29,12 @@ public static class SoundManager
         DefeatSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/GameOver/defeat2.mp3");
         CardSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/DrawCard.wav");
         ButtonSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/ButtonClick.wav");
-        Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion1.wav"));
-        Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion2.wav"));
+        Explosions.Add(
+            Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion1.wav")
+        );
+        Explosions.Add(
+            Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion2.wav")
+        );
         Raylib.SetSoundVolume(Explosions[0], 0.5f);
         Raylib.SetSoundVolume(Explosions[1], 0.5f);
         MissSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/miss.wav");
@@ -40,10 +45,16 @@ public static class SoundManager
         ThunderSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Thunder/thunder.wav");
         SpawnSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Spawn/spawn.wav");
         SweeperSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Sweeper/sweeper.wav");
-        TeleportSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Teleport/teleport.wav");
-        PauseSound = Raylib.LoadMusicStream("src/WaterWizard.Client/Assets/Sounds/Pause/pause2.mp3");
+        TeleportSound = Raylib.LoadSound(
+            "src/WaterWizard.Client/Assets/Sounds/Teleport/teleport.wav"
+        );
+        PauseSound = Raylib.LoadMusicStream(
+            "src/WaterWizard.Client/Assets/Sounds/Pause/pause2.mp3"
+        );
         Raylib.SetMusicVolume(PauseSound, 0.5f);
-        GreedSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/GreedSound/greedSound.wav");
+        GreedSound = Raylib.LoadSound(
+            "src/WaterWizard.Client/Assets/Sounds/GreedSound/greedSound.wav"
+        );
     }
 
     public static void UnloadSounds()

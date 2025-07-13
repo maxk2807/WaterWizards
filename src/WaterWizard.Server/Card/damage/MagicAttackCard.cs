@@ -17,7 +17,12 @@ public class MagicAttackCard : IDamageCard
 
     public bool HasSpecialTargeting => false;
 
-    public bool ExecuteDamage(GameState gameState, Vector2 targetCoords, NetPeer attacker, NetPeer defender)
+    public bool ExecuteDamage(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer attacker,
+        NetPeer defender
+    )
     {
         bool didDamage = false;
 
@@ -28,7 +33,11 @@ public class MagicAttackCard : IDamageCard
         int defenderIndex = gameState?.GetPlayerIndex(defender) ?? -1;
 
         // Check if this coordinate is protected by a shield
-        if (defenderIndex != -1 && gameState != null && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+        if (
+            defenderIndex != -1
+            && gameState != null
+            && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex)
+        )
         {
             Console.WriteLine($"[Server] Attack at ({x}, {y}) blocked by shield!");
             CellHandler.SendCellReveal(attacker, defender, x, y, false, "MagicAttack");
@@ -82,7 +91,14 @@ public class MagicAttackCard : IDamageCard
             CellHandler.SendCellReveal(attacker, defender, x, y, false, "MagicAttack"); // Updated to include defender
             didDamage = false;
         }
-        AttackHandler.SendAttackResult(attacker, defender, x, y, hit, hitShip?.IsDestroyed ?? false);
+        AttackHandler.SendAttackResult(
+            attacker,
+            defender,
+            x,
+            y,
+            hit,
+            hitShip?.IsDestroyed ?? false
+        );
 
         if (hit && hitShip?.IsDestroyed == true)
         {
@@ -93,6 +109,9 @@ public class MagicAttackCard : IDamageCard
 
     public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer defender)
     {
-        return targetCoords.X >= 0 && targetCoords.X < 12 && targetCoords.Y >= 0 && targetCoords.Y < 12;
+        return targetCoords.X >= 0
+            && targetCoords.X < 12
+            && targetCoords.Y >= 0
+            && targetCoords.Y < 12;
     }
 }

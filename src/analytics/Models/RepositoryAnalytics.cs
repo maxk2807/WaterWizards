@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 15 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -20,4 +20,4 @@ public class RepositoryAnalytics
     public CodeStatistics? CodeStatistics { get; set; }
     public List<DeveloperStatistics>? DeveloperStatistics { get; set; }
     public QualityMetrics? QualityMetrics { get; set; }
-} 
+}

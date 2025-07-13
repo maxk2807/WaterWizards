@@ -2,14 +2,15 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 120 Zeilen
 // - Erickk0: 9 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
 using Raylib_cs;
-using WaterWizard.Client.network;
 using WaterWizard.Client.Assets.Sounds.Manager;
+using WaterWizard.Client.network;
+
 namespace WaterWizard.Client.gamestates;
 
 public class GameOverState(bool isWinner, string winnerMessage = "") : IGameState

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 32 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new();   (justinjd00: 20 Zeilen)
 // ===============================================
@@ -22,7 +22,12 @@ public class SpawnRocksCard : IEnvironmentCard
 
     public bool HasSpecialTargeting => false;
 
-    public bool ExecuteEnvironment(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteEnvironment(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         // Für beide Spieler je einen Stein platzieren
         for (int playerIndex = 0; playerIndex < gameState.boards.Length; playerIndex++)
@@ -35,6 +40,10 @@ public class SpawnRocksCard : IEnvironmentCard
         return true;
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer defender)
-        => true;
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer defender
+    ) => true;
 }
