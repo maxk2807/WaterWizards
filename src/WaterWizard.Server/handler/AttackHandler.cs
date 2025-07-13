@@ -46,7 +46,7 @@ public class AttackHandler
         if (defenderIndex != -1 && gameState != null && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
         {
             Console.WriteLine($"[Server] Attack at ({x}, {y}) blocked by shield!");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "Attack");
             SendAttackResult(attacker, defender, x, y, false, false);
             return;
         }
@@ -77,13 +77,13 @@ public class AttackHandler
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "Attack");
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
-                    CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, true, "Attack");
                 }
                 break;
             }
@@ -92,7 +92,7 @@ public class AttackHandler
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false); // Updated to include defender
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "Attack"); // Updated to include defender
         }
 
         /// <summary>

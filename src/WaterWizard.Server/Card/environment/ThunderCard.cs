@@ -106,7 +106,7 @@ public class ThunderCard : IEnvironmentCard
         if (targetPlayerIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, targetPlayerIndex))
         {
             Console.WriteLine($"    Thunder strike at ({x}, {y}) blocked by shield!");
-            CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false);
+            CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false, "Thunder");
             return false;
         }
 
@@ -132,12 +132,12 @@ public class ThunderCard : IEnvironmentCard
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true);
+                        CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true, "Thunder");
                     }
                 }
                 else
                 {
-                    CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true);
+                    CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true, "Thunder");
                 }
                 break;
             }
@@ -146,7 +146,7 @@ public class ThunderCard : IEnvironmentCard
         if (!hit)
         {
             Console.WriteLine($"    Thunder missed at ({x}, {y})");
-            CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false);
+            CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false, "Thunder");
         }
 
         return hit;

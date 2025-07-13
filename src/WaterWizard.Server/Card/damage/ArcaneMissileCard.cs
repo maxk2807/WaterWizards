@@ -83,7 +83,7 @@ public class ArcaneMissileCard : IDamageCard
             if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
             {
                 Console.WriteLine($"[Server] Arcane Missile #{missile + 1} at ({x}, {y}) blocked by shield!");
-                CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                CellHandler.SendCellReveal(attacker, defender, x, y, false, "ArcaneMissile");
                 continue;
             }
 
@@ -106,12 +106,12 @@ public class ArcaneMissileCard : IDamageCard
                         }
                         else
                         {
-                            CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                            CellHandler.SendCellReveal(attacker, defender, x, y, true, "ArcaneMissile");
                         }
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "ArcaneMissile");
                     }
                     break;
                 }
@@ -120,7 +120,7 @@ public class ArcaneMissileCard : IDamageCard
             if (!cellHit)
             {
                 Console.WriteLine($"[Server] Arcane Missile #{missile + 1} missed at ({x}, {y})");
-                CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                CellHandler.SendCellReveal(attacker, defender, x, y, false, "ArcaneMissile");
             }
 
             if (cellHit)

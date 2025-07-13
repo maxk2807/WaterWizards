@@ -9,6 +9,8 @@
 
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
 
@@ -72,6 +74,7 @@ public class HandleCards
         var variant = Enum.Parse<CardVariant>(variantString);
         var playerHand = GameStateManager.Instance.GameScreen.playerHand;
         playerHand!.RemoveCard(new Cards(variant));
+        Raylib.PlaySound(SoundManager.GetCardSound(variant));
     }
 
     /// <summary>

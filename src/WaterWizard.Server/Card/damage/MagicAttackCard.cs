@@ -31,7 +31,7 @@ public class MagicAttackCard : IDamageCard
         if (defenderIndex != -1 && gameState != null && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
         {
             Console.WriteLine($"[Server] Attack at ({x}, {y}) blocked by shield!");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "MagicAttack");
             AttackHandler.SendAttackResult(attacker, defender, x, y, false, false);
             return false;
         }
@@ -62,14 +62,14 @@ public class MagicAttackCard : IDamageCard
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "MagicAttack");
                     }
                     didDamage = true;
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
-                    CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, true, "MagicAttack");
                     didDamage = false;
                 }
                 break;
@@ -79,7 +79,7 @@ public class MagicAttackCard : IDamageCard
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false); // Updated to include defender
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "MagicAttack"); // Updated to include defender
             didDamage = false;
         }
         AttackHandler.SendAttackResult(attacker, defender, x, y, hit, hitShip?.IsDestroyed ?? false);

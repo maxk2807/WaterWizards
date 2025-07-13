@@ -135,9 +135,30 @@ public class HandleAttacks
         int revealY = reader.GetInt();
         bool isHit = reader.GetBool();
         bool isDefender = reader.GetBool();
+        string cardVariant = reader.GetString();
         
         if (isHit)
-            Raylib.PlaySound(SoundManager.RandomExplosion());
+        {
+            switch (cardVariant)
+            {
+                case "GreedHit":
+                    Raylib.PlaySound(SoundManager.GreedSound);
+                    break;
+                case "Firebolt":
+                    Raylib.PlaySound(SoundManager.FireboltSound);
+                    break;
+                case "Fireball":
+                    Raylib.PlaySound(SoundManager.FireballSound);
+                    break;
+                case "MagicAttack":
+                    Raylib.PlaySound(SoundManager.Magic1);
+                    break;
+                default:
+                    // Fallback für unbekannte Karten oder normale Treffer
+                    Raylib.PlaySound(SoundManager.RandomExplosion());
+                    break;
+            }
+        }
         else
             Raylib.PlaySound(SoundManager.MissSound);
 

@@ -71,7 +71,7 @@ public class FrostBoltCard : IDamageCard
         if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
         {
             Console.WriteLine($"[Server] FrostBolt attack at ({x}, {y}) blocked by shield!");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "FrostBolt");
             return false;
         }
 
@@ -100,12 +100,12 @@ public class FrostBoltCard : IDamageCard
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "FrostBolt");
                     }
                 }
                 else
                 {
-                    CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, true, "FrostBolt");
                 }
                 break;
             }
@@ -114,7 +114,7 @@ public class FrostBoltCard : IDamageCard
         if (!hit)
         {
             Console.WriteLine($"[Server] FrostBolt missed at ({x}, {y})");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "FrostBolt");
         }
 
         return hit;

@@ -9,6 +9,8 @@
 // ===============================================
 
 using LiteNetLib;
+using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Shared;
@@ -192,6 +194,7 @@ public class NetworkManager
         Instance.LobbyCountdownSeconds = null;
 
         GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
+        Raylib.PlaySound(isWinner ? SoundManager.WinSound : SoundManager.DefeatSound);
     }
 
     /// <summary>

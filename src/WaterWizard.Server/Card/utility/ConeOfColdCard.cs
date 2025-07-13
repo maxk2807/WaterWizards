@@ -87,7 +87,7 @@ public class ConeOfColdCard : IUtilityCard
                 if (opponentIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, opponentIndex))
                 {
                     Console.WriteLine($"[Server] ConeOfCold attack at ({x}, {y}) blocked by shield!");
-                    CellHandler.SendCellReveal(caster, opponent, x, y, false);
+                    CellHandler.SendCellReveal(caster, opponent, x, y, false, "ConeOfCold");
                     continue;
                 }
 
@@ -125,12 +125,12 @@ public class ConeOfColdCard : IUtilityCard
                             }
                             else
                             {
-                                CellHandler.SendCellReveal(caster, opponent, x, y, true);
+                                CellHandler.SendCellReveal(caster, opponent, x, y, true, "ConeOfCold");
                             }
                         }
                         else
                         {
-                            CellHandler.SendCellReveal(caster, opponent, x, y, true);
+                            CellHandler.SendCellReveal(caster, opponent, x, y, true, "ConeOfCold");
                         }
                         break;
                     }
@@ -139,7 +139,7 @@ public class ConeOfColdCard : IUtilityCard
                 if (!hitAtThisPosition)
                 {
                     Console.WriteLine($"[Server] ConeOfCold MISSED at ({x}, {y})");
-                    CellHandler.SendCellReveal(caster, opponent, x, y, false);
+                    CellHandler.SendCellReveal(caster, opponent, x, y, false, "ConeOfCold");
                 }
             }
         }
