@@ -14,6 +14,8 @@ public static class SoundManager
         ButtonSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/ButtonClick.wav");
         Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion1.wav"));
         Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion2.wav"));
+        Raylib.SetSoundVolume(Explosions[0], 0.5f);
+        Raylib.SetSoundVolume(Explosions[1], 0.5f);
         MissSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/miss.wav");
     }
 
