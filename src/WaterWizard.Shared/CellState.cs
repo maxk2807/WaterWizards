@@ -11,16 +11,45 @@
 
 namespace WaterWizard.Shared;
 
+/// <summary>
+/// Beschreibt die möglichen Zustände einer Zelle auf dem Spielfeld.
+/// </summary>
 public enum CellState
 {
+    /// <summary>
+    /// Die Zelle ist leer.
+    /// </summary>
     Empty,
+    /// <summary>
+    /// Die Zelle enthält ein Schiff.
+    /// </summary>
     Ship,
+    /// <summary>
+    /// Die Zelle enthält einen Felsen.
+    /// </summary>
     Rock,
+    /// <summary>
+    /// Die Zelle wurde getroffen.
+    /// </summary>
     Hit,
+    /// <summary>
+    /// Die Zelle wurde verfehlt.
+    /// </summary>
     Miss,
+    /// <summary>
+    /// Der Zustand der Zelle ist unbekannt.
+    /// </summary>
     Unknown,
+    /// <summary>
+    /// Die Zelle ist von einem Blitzeffekt betroffen.
+    /// </summary>
     Thunder,
+    /// <summary>
+    /// Die Zelle wurde durch das "Hovering Eye" aufgedeckt.
+    /// </summary>
     HoveringEyeRevealed,
+    /// <summary>
+    /// Die Zelle ist durch einen Schild geschützt.
+    /// </summary>
     Shield
-
 }

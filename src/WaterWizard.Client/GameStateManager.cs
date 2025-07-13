@@ -24,10 +24,13 @@ using WaterWizard.Client.gamescreen.handler;
 namespace WaterWizard.Client;
 
 /// <summary>
-/// Manages the game state and provides access to various game components.
+/// Verwaltet den aktuellen Spielzustand, die wichtigsten Komponenten und die Zustandswechsel.
 /// </summary>
 public class GameStateManager
 {
+    /// <summary>
+    /// Gibt den aktuellen Spielzustand zurück.
+    /// </summary>
     public IGameState GetCurrentState() => currentState;
 
     private static GameStateManager? instance;
@@ -68,6 +71,11 @@ public class GameStateManager
 
     public int MyPlayerIndex { get; set; } = -1; //new
 
+    /// <summary>
+    /// Initialisiert den GameStateManager mit Bildschirmgröße.
+    /// </summary>
+    /// <param name="screenWidth">Breite des Spielfensters</param>
+    /// <param name="screenHeight">Höhe des Spielfensters</param>
     public static void Initialize(int screenWidth, int screenHeight)
     {
         if (instance == null)
@@ -125,10 +133,10 @@ public class GameStateManager
     }
 
     /// <summary>
-    /// Updates the screen dimensions when the window size changes.
+    /// Aktualisiert die Bildschirmgröße und passt alle Komponenten an.
     /// </summary>
-    /// <param name="width">New screen width.</param>
-    /// <param name="height">New screen height.</param>
+    /// <param name="width">Neue Breite</param>
+    /// <param name="height">Neue Höhe</param>
     public void UpdateScreenSize(int width, int height)
     {
         screenWidth = width;
@@ -138,8 +146,7 @@ public class GameStateManager
     }
 
     /// <summary>
-    /// Aktualisiert den Spielzustand und zeichnet die entsprechende
-    /// Benutzeroberfläche. Diese Methode muss in jedem Frame aufgerufen werden.
+    /// Aktualisiert den Spielzustand und zeichnet die UI. Muss in jedem Frame aufgerufen werden.
     /// </summary>
     public void UpdateAndDraw()
     {

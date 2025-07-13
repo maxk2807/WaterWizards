@@ -9,10 +9,25 @@
 
 namespace WaterWizard.Shared;
 
+/// <summary>
+/// Definiert die Haupttypen von Karten im Spiel.
+/// </summary>
 public enum CardType
 {
+    /// <summary>
+    /// Schadenskarte (z. B. Firebolt, Thunder).
+    /// </summary>
     Damage,
-    Utility,
-    Environment,
+    /// <summary>
+    /// Heilkarte (z. B. Heal).
+    /// </summary>
     Healing,
+    /// <summary>
+    /// Umgebungskarte (z. B. Thunder, Rocks).
+    /// </summary>
+    Environment,
+    /// <summary>
+    /// Utility-Karte (z. B. Shield, Teleport).
+    /// </summary>
+    Utility
 }

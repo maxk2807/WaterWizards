@@ -13,14 +13,14 @@ using WaterWizard.Shared;
 namespace WaterWizard.Server;
 
 /// <summary>
-/// Responsible for creating and logging the server-side GameSessionId.
+/// Verwaltet die Erstellung und das Logging der GameSessionId auf Serverseite.
 /// </summary>
 public static class GameSessionIdManager
 {
     private static GameSessionId? _sessionId;
 
     /// <summary>
-    /// Creates a new GameSessionId and logs it.
+    /// Erstellt eine neue GameSessionId und loggt sie.
     /// </summary>
     public static void CreateAndLogSessionId()
     {
@@ -29,14 +29,14 @@ public static class GameSessionIdManager
     }
 
     /// <summary>
-    /// Gets the current GameSessionId.
+    /// Gibt die aktuelle GameSessionId zurück.
     /// </summary>
     public static GameSessionId? SessionId => _sessionId;
 
     /// <summary>
-    /// Logs the current GameSessionId.
+    /// Loggt die aktuelle GameSessionId.
     /// </summary>
-    /// <param name="message">The message to log.</param>
+    /// <param name="message">Die zu loggende Nachricht</param>
     private static void Log(string message)
     {
         Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {message}");
