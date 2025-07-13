@@ -5,6 +5,7 @@ namespace WaterWizard.Client.Assets.Sounds.Manager;
 public static class SoundManager
 {
     public static Sound WinSound;
+    public static Sound DefeatSound;
     public static Sound CardSound;
     public static Sound ButtonSound;
     public static List<Sound> Explosions { get; private set; } = [];
@@ -17,7 +18,9 @@ public static class SoundManager
 
     public static void LoadSounds()
     {
-        WinSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/win.wav");
+        WinSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/GameOver/win.wav");
+        Raylib.SetSoundVolume(WinSound, 0.5f);
+        DefeatSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/GameOver/defeat2.mp3");
         CardSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/DrawCard.wav");
         ButtonSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/ButtonClick.wav");
         Explosions.Add(Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion1.wav"));
@@ -35,6 +38,7 @@ public static class SoundManager
     public static void UnloadSounds()
     {
         Raylib.UnloadSound(WinSound);
+        Raylib.UnloadSound(DefeatSound);
         Raylib.UnloadSound(CardSound);
         Raylib.UnloadSound(ButtonSound);
         Explosions.ForEach(Raylib.UnloadSound);

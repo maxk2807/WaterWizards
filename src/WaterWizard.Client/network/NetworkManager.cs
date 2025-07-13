@@ -187,7 +187,7 @@ public class NetworkManager
         Instance.LobbyCountdownSeconds = null;
 
         GameStateManager.Instance.SetStateToGameOver(isWinner, winnerMessage);
-        Raylib.PlaySound(isWinner ? SoundManager.WinSound : SoundManager.WinSound);
+        Raylib.PlaySound(isWinner ? SoundManager.WinSound : SoundManager.DefeatSound);
     }
 
     /// <summary>
