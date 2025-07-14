@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  14 JUL 2025 17:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  14 JUL 2025 18:01
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -962,26 +962,46 @@ LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
 [11
 
 ]
+<./images/GameScreen.png, id=432, 899.61093pt x 683.55376pt>
+File: ./images/GameScreen.png Graphic file (type png)
+<use ./images/GameScreen.png>
+Package pdftex.def Info: ./images/GameScreen.png  used on input line 261.
+(pdftex.def)             Requested size: 307.28987pt x 233.48994pt.
+
 
 [12
 
-]
+ <./images/GameScreen.png>]
+<./images/UI-Struktur.png, id=458, 725.71124pt x 475.7775pt>
+File: ./images/UI-Struktur.png Graphic file (type png)
+<use ./images/UI-Struktur.png>
+Package pdftex.def Info: ./images/UI-Struktur.png  used on input line 266.
+(pdftex.def)             Requested size: 307.28987pt x 201.45862pt.
+
 
 [13
 
-]
+ <./images/UI-Struktur.png>]
 
 [14
 
 ]
-<./images/Server-Client-Logs.png, id=507, 916.92563pt x 469.755pt>
+
+[15
+
+]
+
+[16
+
+]
+<./images/Server-Client-Logs.png, id=561, 916.92563pt x 469.755pt>
 File: ./images/Server-Client-Logs.png Graphic file (type png)
 <use ./images/Server-Client-Logs.png>
-Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 309.
+Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 319.
 (pdftex.def)             Requested size: 169.01036pt x 86.58075pt.
 
 
-[15
+[17
 
  <./images/Server-Client-Logs.png>]
 \openout4 = `Präsentation.vrb'.
@@ -994,42 +1014,28 @@ LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 1
 File: ts1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 ))
 
-[16
-
-{c:/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
-
-[17
-
-]
-<./images/Nuke-Pipeline.png, id=585, 748.7975pt x 639.38875pt>
-File: ./images/Nuke-Pipeline.png Graphic file (type png)
-<use ./images/Nuke-Pipeline.png>
-Package pdftex.def Info: ./images/Nuke-Pipeline.png  used on input line 384.
-(pdftex.def)             Requested size: 122.91406pt x 104.94823pt.
-<./images/CD-in-GH.png, id=586, 300.12125pt x 210.7875pt>
-File: ./images/CD-in-GH.png Graphic file (type png)
-<use ./images/CD-in-GH.png>
-Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 384.
-(pdftex.def)             Requested size: 122.91406pt x 86.32693pt.
-
-
 [18
 
- <./images/Nuke-Pipeline.png> <./images/CD-in-GH.png>]
-\openout4 = `Präsentation.vrb'.
-
- (./Präsentation.vrb)
+{c:/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
 
 [19
 
 ]
-\openout4 = `Präsentation.vrb'.
+<./images/Nuke-Pipeline.png, id=641, 748.7975pt x 639.38875pt>
+File: ./images/Nuke-Pipeline.png Graphic file (type png)
+<use ./images/Nuke-Pipeline.png>
+Package pdftex.def Info: ./images/Nuke-Pipeline.png  used on input line 394.
+(pdftex.def)             Requested size: 122.91406pt x 104.94823pt.
+<./images/CD-in-GH.png, id=642, 300.12125pt x 210.7875pt>
+File: ./images/CD-in-GH.png Graphic file (type png)
+<use ./images/CD-in-GH.png>
+Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 394.
+(pdftex.def)             Requested size: 122.91406pt x 86.32693pt.
 
- (./Präsentation.vrb)
 
 [20
 
-]
+ <./images/Nuke-Pipeline.png> <./images/CD-in-GH.png>]
 \openout4 = `Präsentation.vrb'.
 
  (./Präsentation.vrb)
@@ -1037,6 +1043,9 @@ Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 384.
 [21
 
 ]
+\openout4 = `Präsentation.vrb'.
+
+ (./Präsentation.vrb)
 
 [22
 
@@ -1048,13 +1057,13 @@ Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 384.
 [23
 
 ]
-\openout4 = `Präsentation.vrb'.
-
- (./Präsentation.vrb)
 
 [24
 
 ]
+\openout4 = `Präsentation.vrb'.
+
+ (./Präsentation.vrb)
 
 [25
 
@@ -1066,31 +1075,20 @@ Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 384.
 [26
 
 ]
-\openout4 = `Präsentation.vrb'.
-
- (./Präsentation.vrb)
 
 [27
 
 ]
+\openout4 = `Präsentation.vrb'.
+
+ (./Präsentation.vrb)
 
 [28
 
 ]
-File: ./images/Kanban.png Graphic file (type png)
-<use ./images/Kanban.png>
-Package pdftex.def Info: ./images/Kanban.png  used on input line 636.
-(pdftex.def)             Requested size: 1694.32588pt x 862.21915pt.
+\openout4 = `Präsentation.vrb'.
 
-Overfull \hbox (1387.03601pt too wide) in paragraph at lines 636--636
-[][]  
- []
-
-
-Overfull \vbox (616.94603pt too high) detected at line 636
- []
-
-
+ (./Präsentation.vrb)
 
 [29
 
@@ -1099,8 +1097,30 @@ Overfull \vbox (616.94603pt too high) detected at line 636
 [30
 
 ]
+File: ./images/Kanban.png Graphic file (type png)
+<use ./images/Kanban.png>
+Package pdftex.def Info: ./images/Kanban.png  used on input line 646.
+(pdftex.def)             Requested size: 1694.32588pt x 862.21915pt.
+
+Overfull \hbox (1387.03601pt too wide) in paragraph at lines 646--646
+[][]  
+ []
+
+
+Overfull \vbox (616.94603pt too high) detected at line 646
+ []
+
+
 
 [31
+
+]
+
+[32
+
+]
+
+[33
 
 ]
 \tf@nav=\write6
@@ -1118,21 +1138,21 @@ LaTeX2e <2024-06-01> patch level 2
 L3 programming layer <2024-10-09>
  ***********
 Package rerunfilecheck Info: File `Präsentation.out' has not changed.
-(rerunfilecheck)             Checksum: 88D184012AF388C685F1915970072349;3644.
+(rerunfilecheck)             Checksum: 8EB991174C5D1752ADF7B3930F2C145B;3644.
  ) 
 Here is how much of TeX's memory you used:
- 29658 strings out of 473577
- 582280 string characters out of 5732204
- 1255750 words of memory out of 5000000
- 51906 multiletter control sequences out of 15000+600000
+ 29684 strings out of 473577
+ 582861 string characters out of 5732204
+ 1255840 words of memory out of 5000000
+ 51928 multiletter control sequences out of 15000+600000
  570358 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,14n,123p,458b,1429s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb>
-Output written on Präsentation.pdf (31 pages, 958269 bytes).
+Output written on Präsentation.pdf (33 pages, 3046420 bytes).
 PDF statistics:
- 1003 PDF objects out of 1200 (max. 8388607)
- 924 compressed objects within 10 object streams
- 90 named destinations out of 1000 (max. 500000)
- 289 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1058 PDF objects out of 1200 (max. 8388607)
+ 973 compressed objects within 10 object streams
+ 94 named destinations out of 1000 (max. 500000)
+ 299 words of extra memory for PDF output out of 10000 (max. 10000000)
 

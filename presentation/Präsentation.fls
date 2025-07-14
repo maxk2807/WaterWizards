@@ -453,6 +453,14 @@ INPUT ./Präsentation.vrb
 INPUT Präsentation.vrb
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
+INPUT ./images/GameScreen.png
+INPUT ./images/GameScreen.png
+INPUT ./images/GameScreen.png
+INPUT ./images/GameScreen.png
+INPUT ./images/UI-Struktur.png
+INPUT ./images/UI-Struktur.png
+INPUT ./images/UI-Struktur.png
+INPUT ./images/UI-Struktur.png
 INPUT ./images/Server-Client-Logs.png
 INPUT ./images/Server-Client-Logs.png
 INPUT ./images/Server-Client-Logs.png
