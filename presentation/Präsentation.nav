@@ -34,13 +34,13 @@
 \headcommand {\sectionentry {4}{Technologie + Architektur}{9}{Technologie + Architektur}{0}}
 \headcommand {\slideentry {4}{0}{1}{9/9}{}{0}}
 \headcommand {\beamer@framepages {9}{9}}
-\headcommand {\slideentry {4}{0}{2}{10/10}{}{0}}
+\headcommand {\beamer@subsectionpages {9}{9}}
+\headcommand {\beamer@subsectionentry {0}{4}{1}{10}{UI}}
+\headcommand {\slideentry {4}{1}{1}{10/10}{UI}{0}}
 \headcommand {\beamer@framepages {10}{10}}
-\headcommand {\beamer@subsectionpages {9}{10}}
-\headcommand {\beamer@subsectionentry {0}{4}{1}{11}{UI}}
-\headcommand {\slideentry {4}{1}{1}{11/11}{UI}{0}}
+\headcommand {\slideentry {4}{1}{2}{11/11}{UI}{0}}
 \headcommand {\beamer@framepages {11}{11}}
-\headcommand {\beamer@subsectionpages {11}{11}}
+\headcommand {\beamer@subsectionpages {10}{11}}
 \headcommand {\beamer@subsectionentry {0}{4}{2}{12}{UI-Example}}
 \headcommand {\slideentry {4}{2}{1}{12/12}{UI-Example}{0}}
 \headcommand {\beamer@framepages {12}{12}}

@@ -5,7 +5,7 @@
 \beamer@sectionintoc {3}{Rollen des Projektes}{7}{0}{3}
 \beamer@subsectionintoc {3}{1}{Ansprechpartner}{8}{0}{3}
 \beamer@sectionintoc {4}{Technologie + Architektur}{9}{0}{4}
-\beamer@subsectionintoc {4}{1}{UI}{11}{0}{4}
+\beamer@subsectionintoc {4}{1}{UI}{10}{0}{4}
 \beamer@subsectionintoc {4}{2}{UI-Example}{12}{0}{4}
 \beamer@subsectionintoc {4}{3}{TextureManager}{14}{0}{4}
 \beamer@subsectionintoc {4}{4}{Server/Backend}{15}{0}{4}

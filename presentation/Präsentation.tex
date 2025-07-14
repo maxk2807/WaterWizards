@@ -1,5 +1,4 @@
 \documentclass{beamer}
-\input{listings-csharp.tex}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{multicol}
@@ -139,7 +138,7 @@
     vgrid,
     hgrid,
     bar/.append style={fill=blue!40},
-    group/.append style={fill=orange!60},
+    group/.append style={fill=orange!60}, 
     milestone/.append style={fill=red!80},
     group label font=\bfseries\scriptsize,
     bar label font=\scriptsize,
@@ -220,11 +219,6 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Spiel-Bildschirm / GameScreen}
-  \includegraphics[width=\textwidth]{GameScreen.png}
-\end{frame}
-
 \subsection{UI}
 \begin{frame}
   \frametitle{UI}
@@ -241,6 +235,11 @@
     \item Alle Elemente werden durch eine Methode Draw angezeigt, welche in der GameLoop ausgeführt wird.
     \item Die wenige Logik, die auf dem Client ausgeführt wird, wird in diesen Draw Methoden ausgeführt
   \end{itemize} 
+\end{frame}
+
+\begin{frame}
+  \frametitle{Spiel-Bildschirm / GameScreen}
+  \includegraphics[width=\textwidth]{GameScreen.png}
 \end{frame}
 
 \subsection{UI-Example}
@@ -326,7 +325,7 @@ public class TextureManager
     \item Spiel wird in der GameState-Klasse beschrieben
   \end{itemize}
   \textbf{Ausschnitt: }
-  \begin{lstlisting}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
     public class GameState
     {
       public NetPeer[] players = new NetPeer[2];
