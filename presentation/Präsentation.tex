@@ -151,26 +151,26 @@
     \ganttgroup{Prototyp}{1}{3} \\
     \ganttbar{Anforderungsanalyse}{1}{1} \\
     \ganttbar{Architektur \& Server Logic}{1}{2} \\
-    \ganttbar{UI}{2}{2} \\
+    \ganttbar{UI}{2}{3} \\
 
     \ganttgroup{Design \& Erste Karten + MVP}{3}{6} \\
     \ganttbar{UI Design}{3}{3} \\
-    \ganttbar{3 Attack Karten}{4}{4} \\
     \ganttbar{Showcase MVP vorbereiten}{4}{6} \\
+    \ganttbar{3 Attack Karten}{5}{6} \\
 
     \ganttgroup{Testen}{5}{12} \\
     \ganttbar{Unit Tests}{5}{11} \\
-    \ganttbar{1 Integrationstests}{12}{12} \\
+    \ganttbar{1 Integrationstest}{12}{12} \\
 
-    \ganttgroup{Zielgenaue Implementierung}{6}{10} \\
+    \ganttgroup{Zielgenaue Implementierung}{5}{10} \\
     \ganttbar{Backend - Frontend Kommunikation verbessern}{5}{8} \\
     \ganttbar{Frontend Feinschliff}{6}{10} \\
     \ganttbar{Refactoring für bessere Lesbarkeit}{7}{9} \\
 
-    \ganttgroup{Abschluss}{13}{14} \\
+    \ganttgroup{Abschluss}{10}{14} \\
+    \ganttbar{Projekt Feinschliff}{10}{14} \\
     \ganttbar{Dokumentation}{13}{13} \\
     \ganttbar{Präsentation}{14}{14} \\
-    \ganttbar{Projekt Feinschliff}{13}{14} \\
     \ganttmilestone{Projekt Abgabe}{14}
   \end{ganttchart}
 }
@@ -210,7 +210,7 @@
     \item Raylib für die grafische Darstellung
     \item LiteNetLib für die Client-Server-Verbindung
     \item Nuke für das Build-System
-    \item CodeQl für die statische Code-Analyse
+    \item CodeQL für die statische Code-Analyse
     \item GitHub Actions für die CD-Pipeline
     \item GitHub Pages für die Dokumentation
     \item Event-Driven Architektur
@@ -219,9 +219,9 @@
   \end{itemize}
 \end{frame}
 
-\subsection{UI}
+\subsection{UI/Client}
 \begin{frame}
-  \frametitle{UI}
+  \frametitle{UI/Client}
   \begin{itemize}
     \item Raylib für die grafische Darstellung
     \item Grafische Darstellung getrennt von Spielfunktionalität:
@@ -235,6 +235,45 @@
     \item Alle Elemente werden durch eine Methode Draw angezeigt, welche in der GameLoop ausgeführt wird.
     \item Die wenige Logik, die auf dem Client ausgeführt wird, wird in diesen Draw Methoden ausgeführt
   \end{itemize} 
+\end{frame}
+
+\subsection{Nachrichtenempfang + Parsing im Client}
+\begin{frame}[fragile]
+\frametitle{Nachrichtenempfang + Parsing im Client}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+     private void HandleClientReceiveEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        byte channelNumber,
+        DeliveryMethod deliveryMethod
+    )
+    {
+        try
+        {
+            string messageType = reader.GetString();
+            Console.WriteLine($"[Client] Nachricht vom Server empfangen: {messageType}");
+
+            switch (messageType)
+            {
+                case "UpdatePauseState":
+                    bool isPaused = reader.GetBool();
+                    if (isPaused)
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().PauseGame();
+                    }
+                    else
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().ResumeGame();
+                    }
+                    break;
+                case "StartGame":
+                    GameStateManager.Instance.SetStateToInGame();
+                    break;
+                ...
+          }
+          ...
+    }
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}
@@ -317,6 +356,23 @@ public class TextureManager
   \end{itemize}
 \end{frame}
 
+\subsection{Backend - Client Kommunikation}
+\begin{frame}
+\frametitle{Backend - Client Kommunikation}
+\begin{columns}
+  \begin{column}{0.45\textwidth}
+    Event-Driven Architektur
+    \begin{itemize}
+      \item UDP für die Echtzeit-Kommunikation
+      \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.55\textwidth}
+    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
+  \end{column}
+\end{columns}
+\end{frame}
+
 \subsection{GameState}
 \begin{frame}[fragile]
   \frametitle{Spielzustand / GameState}
@@ -385,62 +441,6 @@ public class TextureManager
     \item Enthält die Definitionen der Karten und der Kartentypen
     \item Enthält die Definitionen der Schiffe und der Schiffs-Typen
   \end{itemize}
-\end{frame}
-
-\subsection{Backend - Client Kommunikation}
-\begin{frame}
-\frametitle{Backend - Client Kommunikation}
-\begin{columns}
-  \begin{column}{0.45\textwidth}
-    Event-Driven Architektur
-    \begin{itemize}
-      \item UDP für die Echtzeit-Kommunikation
-      \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
-    \end{itemize}
-  \end{column}
-  \begin{column}{0.55\textwidth}
-    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
-  \end{column}
-\end{columns}
-\end{frame}
-
-\subsection{Nachrichtenempfang + Parsing im Client}
-\begin{frame}[fragile]
-\frametitle{Nachrichtenempfang + Parsing im Client}
-  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
-     private void HandleClientReceiveEvent(
-        NetPeer peer,
-        NetPacketReader reader,
-        byte channelNumber,
-        DeliveryMethod deliveryMethod
-    )
-    {
-        try
-        {
-            string messageType = reader.GetString();
-            Console.WriteLine($"[Client] Nachricht vom Server empfangen: {messageType}");
-
-            switch (messageType)
-            {
-                case "UpdatePauseState":
-                    bool isPaused = reader.GetBool();
-                    if (isPaused)
-                    {
-                        GameStateManager.Instance.GetGamePauseManager().PauseGame();
-                    }
-                    else
-                    {
-                        GameStateManager.Instance.GetGamePauseManager().ResumeGame();
-                    }
-                    break;
-                case "StartGame":
-                    GameStateManager.Instance.SetStateToInGame();
-                    break;
-                ...
-          }
-          ...
-    }
-  \end{lstlisting}
 \end{frame}
 
 \section{DevOps}

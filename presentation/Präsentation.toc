@@ -5,15 +5,15 @@
 \beamer@sectionintoc {3}{Rollen des Projektes}{7}{0}{3}
 \beamer@subsectionintoc {3}{1}{Ansprechpartner}{8}{0}{3}
 \beamer@sectionintoc {4}{Technologie + Architektur}{9}{0}{4}
-\beamer@subsectionintoc {4}{1}{UI}{10}{0}{4}
-\beamer@subsectionintoc {4}{2}{UI-Example}{12}{0}{4}
-\beamer@subsectionintoc {4}{3}{TextureManager}{14}{0}{4}
-\beamer@subsectionintoc {4}{4}{Server/Backend}{15}{0}{4}
-\beamer@subsectionintoc {4}{5}{GameState}{16}{0}{4}
-\beamer@subsectionintoc {4}{6}{Factory Pattern}{17}{0}{4}
-\beamer@subsectionintoc {4}{7}{Shared}{18}{0}{4}
-\beamer@subsectionintoc {4}{8}{Backend - Client Kommunikation}{19}{0}{4}
-\beamer@subsectionintoc {4}{9}{Nachrichtenempfang + Parsing im Client}{20}{0}{4}
+\beamer@subsectionintoc {4}{1}{UI/Client}{10}{0}{4}
+\beamer@subsectionintoc {4}{2}{Nachrichtenempfang + Parsing im Client}{11}{0}{4}
+\beamer@subsectionintoc {4}{3}{UI-Example}{13}{0}{4}
+\beamer@subsectionintoc {4}{4}{TextureManager}{15}{0}{4}
+\beamer@subsectionintoc {4}{5}{Server/Backend}{16}{0}{4}
+\beamer@subsectionintoc {4}{6}{Backend - Client Kommunikation}{17}{0}{4}
+\beamer@subsectionintoc {4}{7}{GameState}{18}{0}{4}
+\beamer@subsectionintoc {4}{8}{Factory Pattern}{19}{0}{4}
+\beamer@subsectionintoc {4}{9}{Shared}{20}{0}{4}
 \beamer@sectionintoc {5}{DevOps}{21}{0}{5}
 \beamer@subsectionintoc {5}{1}{CI/CD Pipeline}{22}{0}{5}
 \beamer@subsectionintoc {5}{2}{CI-Pipeline Konfiguration}{23}{0}{5}
