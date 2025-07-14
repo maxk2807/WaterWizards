@@ -473,6 +473,11 @@ OUTPUT Präsentation.vrb
 INPUT ./Präsentation.vrb
 INPUT ./Präsentation.vrb
 INPUT Präsentation.vrb
+INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
+OUTPUT Präsentation.vrb
+INPUT ./Präsentation.vrb
+INPUT ./Präsentation.vrb
+INPUT Präsentation.vrb
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/ts1cmtt.fd
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/ts1cmtt.fd
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/ts1cmtt.fd
@@ -537,6 +542,7 @@ INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb
+INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb

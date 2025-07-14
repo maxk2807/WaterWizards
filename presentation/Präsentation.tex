@@ -317,6 +317,33 @@ public class TextureManager
   \end{itemize}
 \end{frame}
 
+\subsection{GameState}
+\begin{frame}[fragile]
+  \frametitle{Spielzustand / GameState}
+  \begin{itemize}
+    \item Programm wird in Zustands-Klassen (States) beschrieben
+    \item Spiel wird in der GameState-Klasse beschrieben
+  \end{itemize}
+  \textbf{Ausschnitt: }
+  \begin{lstlisting}
+    public class GameState
+    {
+      public NetPeer[] players = new NetPeer[2];
+      public static readonly int boardWidth = 12;
+      public static readonly int boardHeight = 10;
+      public readonly Cell[][,] boards = new Cell[2][,];
+      public Cell[,] Player1 => boards[0];
+      public Cell[,] Player2 => boards[1];
+      public readonly List<Cards>[] hands;
+      private readonly NetManager server;
+      public readonly ServerGameStateManager manager;
+      public List<Cards> Player1Hand => hands[0];
+      public List<Cards> Player2Hand => hands[1];
+      public static List<Cards>? ActiveCards //[...]
+      public static List<Cards>? UtilityStack //[...]
+  \end{lstlisting}
+\end{frame}
+
 \subsection{Factory Pattern}
 \begin{frame}[fragile]
 \frametitle{Factory Pattern}
