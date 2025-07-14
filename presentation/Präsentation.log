@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.13)  14 JUL 2025 02:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.13)  14 JUL 2025 02:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -777,7 +777,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 <./images/Server-Client-Logs.png, id=376, 916.92563pt x 469.755pt>
 File: ./images/Server-Client-Logs.png Graphic file (type png)
 <use ./images/Server-Client-Logs.png>
-Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 159.
+Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 163.
 (pdftex.def)             Requested size: 169.01036pt x 86.58075pt.
 
 
@@ -791,7 +791,7 @@ Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 159
 <./images/GitHub-Insights.png, id=427, 673.76718pt x 517.18219pt>
 File: ./images/GitHub-Insights.png Graphic file (type png)
 <use ./images/GitHub-Insights.png>
-Package pdftex.def Info: ./images/GitHub-Insights.png  used on input line 174.
+Package pdftex.def Info: ./images/GitHub-Insights.png  used on input line 178.
 (pdftex.def)             Requested size: 307.28987pt x 235.87856pt.
 
 
@@ -832,7 +832,7 @@ Here is how much of TeX's memory you used:
  36 hyphenation exceptions out of 8191
  101i,14n,107p,456b,627s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on Präsentation.pdf (16 pages, 181451 bytes).
+Output written on Präsentation.pdf (16 pages, 181617 bytes).
 PDF statistics:
  530 PDF objects out of 1000 (max. 8388607)
  487 compressed objects within 5 object streams
