@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.7)  14 JUL 2025 18:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.7)  14 JUL 2025 18:15
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -952,13 +952,10 @@ LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <6> not available
 ]
 \openout4 = `Präsentation.vrb'.
 
- (./Präsentation.vrb
-LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 3.
-) [12
+ (./Präsentation.vrb) [12
 
 ]
-<./images/GameScreen.png, id=466, 899.61093pt x 683.55376pt>
+<./images/GameScreen.png, id=465, 899.61093pt x 683.55376pt>
 File: ./images/GameScreen.png Graphic file (type png)
 <use ./images/GameScreen.png>
 Package pdftex.def Info: ./images/GameScreen.png  used on input line 302.
@@ -966,7 +963,7 @@ Package pdftex.def Info: ./images/GameScreen.png  used on input line 302.
  [13
 
  <./images/GameScreen.png>]
-<./images/UI-Struktur.png, id=493, 725.71124pt x 475.7775pt>
+<./images/UI-Struktur.png, id=492, 725.71124pt x 475.7775pt>
 File: ./images/UI-Struktur.png Graphic file (type png)
 <use ./images/UI-Struktur.png>
 Package pdftex.def Info: ./images/UI-Struktur.png  used on input line 307.
@@ -989,7 +986,7 @@ File: ts1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 {/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] [18
 
 ]
-<./images/Server-Client-Logs.png, id=622, 916.92563pt x 469.755pt>
+<./images/Server-Client-Logs.png, id=621, 916.92563pt x 469.755pt>
 File: ./images/Server-Client-Logs.png Graphic file (type png)
 <use ./images/Server-Client-Logs.png>
 Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 393.
@@ -1004,12 +1001,12 @@ Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 393
 ] [21
 
 ]
-<./images/Nuke-Pipeline.png, id=699, 748.7975pt x 639.38875pt>
+<./images/Nuke-Pipeline.png, id=698, 748.7975pt x 639.38875pt>
 File: ./images/Nuke-Pipeline.png Graphic file (type png)
 <use ./images/Nuke-Pipeline.png>
 Package pdftex.def Info: ./images/Nuke-Pipeline.png  used on input line 468.
 (pdftex.def)             Requested size: 122.91406pt x 104.94823pt.
-<./images/CD-in-GH.png, id=700, 300.12125pt x 210.7875pt>
+<./images/CD-in-GH.png, id=699, 300.12125pt x 210.7875pt>
 File: ./images/CD-in-GH.png Graphic file (type png)
 <use ./images/CD-in-GH.png>
 Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 468.
@@ -1096,18 +1093,18 @@ Package rerunfilecheck Info: File `Präsentation.out' has not changed.
 (rerunfilecheck)             Checksum: BAE8FF46573466CDF626217479463CE2;3910.
  ) 
 Here is how much of TeX's memory you used:
- 29720 strings out of 474116
- 587078 string characters out of 5743683
+ 29718 strings out of 474116
+ 587047 string characters out of 5743683
  2255187 words of memory out of 5000000
- 51408 multiletter control sequences out of 15000+600000
- 570358 words of font info for 81 fonts, out of 8000000 for 9000
+ 51406 multiletter control sequences out of 15000+600000
+ 570190 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,14n,123p,470b,1453s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb>
-Output written on Präsentation.pdf (35 pages, 3052796 bytes).
+</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb>
+Output written on Präsentation.pdf (35 pages, 3036734 bytes).
 PDF statistics:
- 1118 PDF objects out of 1200 (max. 8388607)
- 1030 compressed objects within 11 object streams
+ 1113 PDF objects out of 1200 (max. 8388607)
+ 1027 compressed objects within 11 object streams
  100 named destinations out of 1000 (max. 500000)
  315 words of extra memory for PDF output out of 10000 (max. 10000000)
 
