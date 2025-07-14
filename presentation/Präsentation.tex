@@ -219,6 +219,11 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Spiel-Bildschirm / GameScreen}
+  \includegraphics[width=\textwidth]{GameScreen.png}
+\end{frame}
+
 \subsection{UI}
 \begin{frame}
   \frametitle{UI}
@@ -235,6 +240,33 @@
     \item Alle Elemente werden durch eine Methode Draw angezeigt, welche in der GameLoop ausgeführt wird.
     \item Die wenige Logik, die auf dem Client ausgeführt wird, wird in diesen Draw Methoden ausgeführt
   \end{itemize} 
+\end{frame}
+
+\subsection{UI-Example}
+\begin{frame}[fragile]
+  \frametitle{UI-Beispiel aus der GameHand Klasse}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public virtual void Draw(bool front)
+    { 
+        int availableHandWidth = (int)(ScreenWidth * 0.2f);
+        int totalCardWidth = Cards.Count * CardWidth;
+        int excess = totalCardWidth - availableHandWidth;
+        int offset = excess > 0 ? excess / Cards.Count : 0;
+        for (int i = 0; i < Cards.Count; i++)
+        {
+            //[...]
+
+            Cards[i].Draw(centralX + cardX, cardY, front);
+
+            DrawCardPreview(front, i, cardX, effectiveCardWidth);
+        }
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{UI Struktur GameScreen}
+  \includegraphics[width=\textwidth]{UI-Struktur.png}
 \end{frame}
 
 \subsection{TextureManager}
@@ -272,53 +304,6 @@ public class TextureManager
     }
 }
 \end{lstlisting}
-\end{frame}
-
-\subsection{UI-Example}
-\begin{frame}[fragile]
-  \frametitle{UI-Beispiel aus der GameHand Klasse}
-  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
-    public virtual void Draw(bool front)
-    {
-        int availableHandWidth = (int)(ScreenWidth * 0.2f);
-        int totalCardWidth = Cards.Count * CardWidth;
-        int excess = totalCardWidth - availableHandWidth;
-        int offset = excess > 0 ? excess / Cards.Count : 0;
-        for (int i = 0; i < Cards.Count; i++)
-        {
-            //omitted [...]
-
-            Cards[i].Draw(centralX + cardX, cardY, front);
-
-            DrawCardPreview(front, i, cardX, effectiveCardWidth);
-        }
-    }
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Spiel-Bildschirm}
-  \includegraphics[width=\textwidth]{GameScreen.png}
-\end{frame}
-
-\begin{frame}
-  \frametitle{UI Struktur GameScreen}
-  \includegraphics[width=\textwidth]{UI-Struktur.png}
-\end{frame}
-
-\subsection{GameScreen}
-\begin{frame}
-\frametitle{GameScreen}
-  \begin{itemize}
-    \item GameScreen enthält alles, was auf dem Bildschirm gezeigt wird
-      \begin{enumerate}
-        \item Die beiden Spielbretter (GameBoard) mit Schiffen (GameShip) und Steinen
-        \item Die Karten (GameCard) auf der Hand (GameHand) der Spieler
-        \item Die Kartenstapel (CardStack) der einzelnen Kartentypen (CardType)
-        \item ActiveCardsField für Karten, die einen Effekt über längere Zeit auslösen
-      \end{enumerate}
-  \end{itemize}
-  
 \end{frame}
 
 \subsection{Server/Backend}
