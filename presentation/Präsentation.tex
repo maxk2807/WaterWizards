@@ -1,4 +1,5 @@
 \documentclass{beamer}
+\input{listings-csharp.tex}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{multicol}
@@ -219,12 +220,39 @@
   \frametitle{UI}
   \begin{itemize}
     \item Raylib für die grafische Darstellung
-    \item GameScreen als Hauptkomponente
-    \item GameBoard für die Spielbretter
-    \item GameShip für die Schiffe
-    \item GameCard für die Karten
-    \item GameHand für die Hand der Spieler
+    \item Grafische Darstellung getrennt von Spielfunktionalität:
+      \begin{itemize}
+        \item Client übernimmt das Anzeigen und Handhabung des User Interfaces 
+      \end{itemize}
+    \item Gemeint sind Interaktive dargestellte Elemente, z.B:
+    \begin{itemize}
+      \item Die Kartenstapel, die Schiffe oder die Kartenhand
+    \end{itemize}
+    \item Alle Elemente werden durch eine Methode Draw angezeigt, welche in der GameLoop ausgeführt wird.
+    \item Die wenige Logik, die auf dem Client ausgeführt wird, wird in diesen Draw Methoden ausgeführt
   \end{itemize} 
+\end{frame}
+
+\subsection{UI-Example}
+\begin{frame}[fragile]
+  \frametitle{UI-Beispiel}
+  \begin{lstlisting}[language=CSharp]
+    public virtual void Draw(bool front)
+    {
+        int availableHandWidth = (int)(ScreenWidth * 0.2f);
+        int totalCardWidth = Cards.Count * CardWidth;
+        int excess = totalCardWidth - availableHandWidth;
+        int offset = excess > 0 ? excess / Cards.Count : 0;
+        for (int i = 0; i < Cards.Count; i++)
+        {
+            //omitted [...]
+
+            Cards[i].Draw(centralX + cardX, cardY, front);
+
+            DrawCardPreview(front, i, cardX, effectiveCardWidth);
+        }
+    }
+  \end{lstlisting}
 \end{frame}
 
 \subsection{GameScreen}
@@ -236,6 +264,7 @@
         \item Die beiden Spielbretter (GameBoard) mit Schiffen (GameShip) und Steinen
         \item Die Karten (GameCard) auf der Hand (GameHand) der Spieler
         \item Die Kartenstapel (CardStack) der einzelnen Kartentypen (CardType)
+        \item ActiveCardsField für Karten, die einen Effekt über längere Zeit auslösen
       \end{enumerate}
   \end{itemize}
   
