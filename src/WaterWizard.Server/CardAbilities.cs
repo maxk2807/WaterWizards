@@ -301,8 +301,31 @@ public static class CardAbilities
         var card = new Cards(variant);
         if (card.Type == CardType.Utility)
         {
-            // Verwende die übergebenen Handler
-            // utilityCardHandler.HandleUtilityCard(variant, targetCoords, caster, defender);
+            switch (variant)
+            {
+                case CardVariant.HoveringEye:
+                    var hoveringEyeCard = new HoveringEyeCard();
+                    if (hoveringEyeCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                    {
+                        bool executed = hoveringEyeCard.ExecuteUtility(gameState, targetCoords, caster, defender);
+                        Console.WriteLine($"[Server] {variant} utility result: {(executed ? "executed successfully" : "execution failed")}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})");
+                    }
+                    break;
+                case CardVariant.Paralize:
+                    var paralizeCard = new ParalizeCard();
+                    if (paralizeCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                    {
+                        paralizeCard.ExecuteUtility(gameState, targetCoords, caster, defender);
+                    }
+                    break;
+                default:
+                    utilityCardHandler.HandleUtilityCard(variant, targetCoords, caster, defender);
+                    break;
+            }
             return;
         }
 

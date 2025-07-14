@@ -190,8 +190,7 @@ public class CardHandler(GameState gameState)
                     Console.WriteLine($"[CardHandler] Player {peer} has no hand tracked on server - this might be normal for testing");
                 }
 
-
-                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
+                CardAbilities.HandleAbilityWithHandlers(variant, gameState, new Vector2(cardX, cardY), peer, defender, paralizeHandler, utilityCardHandler);
 
                 var cardToRemove = new Cards(variant);
                 bool cardRemoved = gameState.RemoveCardFromPlayerHand(peer, cardToRemove);
