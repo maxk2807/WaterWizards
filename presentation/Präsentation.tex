@@ -39,6 +39,23 @@
   frame=single,
 }
 
+\lstdefinelanguage{CSharp}{
+  morekeywords={
+    abstract, as, base, bool, break, byte, case, catch, char, checked, class, const, continue,
+    decimal, default, delegate, do, double, else, enum, event, explicit, extern, false, finally,
+    fixed, float, for, foreach, goto, if, implicit, in, int, interface, internal, is, lock, long,
+    namespace, new, null, object, operator, out, override, params, private, protected, public,
+    readonly, ref, return, sbyte, sealed, short, sizeof, stackalloc, static, string, struct, switch,
+    this, throw, true, try, typeof, uint, ulong, unchecked, unsafe, ushort, using, virtual, void,
+    volatile, while, var, dynamic, get, set, value, await, async, partial, yield
+  },
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
 \title{WaterWizards}
 \author{Justin Dewitz, Erick Zeiler, Max Kondratov, Julian <Nachname>}
 \date{17. Juli 2025}
@@ -166,7 +183,9 @@
 \begin{frame}
   \begin{itemize}
     \item Architektur: Justin Dewitz
+    \item Dokumentation: Erick Zeiler
     \item Code-Qualität: Paul Schneider (abgesprungen)
+    \item Git Repository: Max Kondratov
   \end{itemize}
 \frametitle{Rollen des Projektes}
 
@@ -258,6 +277,45 @@
     \includegraphics[width=\textwidth]{Server-Client-Logs.png}
   \end{column}
 \end{columns}
+\end{frame}
+
+\subsection{Nachrichtenempfang + Parsing im Client}
+\begin{frame}[fragile]
+\frametitle{Nachrichtenempfang + Parsing im Client}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+     private void HandleClientReceiveEvent(
+        NetPeer peer,
+        NetPacketReader reader,
+        byte channelNumber,
+        DeliveryMethod deliveryMethod
+    )
+    {
+        try
+        {
+            string messageType = reader.GetString();
+            Console.WriteLine($"[Client] Nachricht vom Server empfangen: {messageType}");
+
+            switch (messageType)
+            {
+                case "UpdatePauseState":
+                    bool isPaused = reader.GetBool();
+                    if (isPaused)
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().PauseGame();
+                    }
+                    else
+                    {
+                        GameStateManager.Instance.GetGamePauseManager().ResumeGame();
+                    }
+                    break;
+                case "StartGame":
+                    GameStateManager.Instance.SetStateToInGame();
+                    break;
+                ...
+          }
+          ...
+    }
+  \end{lstlisting}
 \end{frame}
 
 \section{DevOps}

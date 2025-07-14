@@ -10,16 +10,17 @@
 \beamer@subsectionintoc {4}{3}{Server/Backend}{12}{0}{4}
 \beamer@subsectionintoc {4}{4}{Shared}{13}{0}{4}
 \beamer@subsectionintoc {4}{5}{Backend - Client Kommunikation}{14}{0}{4}
-\beamer@sectionintoc {5}{DevOps}{15}{0}{5}
-\beamer@subsectionintoc {5}{1}{CI/CD Pipeline}{16}{0}{5}
-\beamer@subsectionintoc {5}{2}{CI-Pipeline Konfiguration}{17}{0}{5}
-\beamer@subsectionintoc {5}{3}{CD-Pipeline Konfiguration}{18}{0}{5}
-\beamer@subsectionintoc {5}{4}{Statische Code-Analyse}{20}{0}{5}
-\beamer@subsectionintoc {5}{5}{CodeQL Konfiguration}{21}{0}{5}
-\beamer@subsectionintoc {5}{6}{Containerisierung}{23}{0}{5}
-\beamer@subsectionintoc {5}{7}{Dockerfile Code}{24}{0}{5}
-\beamer@subsectionintoc {5}{8}{Docker-Compose Code}{25}{0}{5}
-\beamer@sectionintoc {6}{Technische Erfahrungen}{26}{0}{6}
-\beamer@sectionintoc {7}{Analyse}{27}{0}{7}
-\beamer@sectionintoc {8}{Wiki}{28}{0}{8}
-\beamer@sectionintoc {9}{Erfahrungen und Fazit}{29}{0}{9}
+\beamer@subsectionintoc {4}{6}{Nachrichtenempfang + Parsing im Client}{15}{0}{4}
+\beamer@sectionintoc {5}{DevOps}{16}{0}{5}
+\beamer@subsectionintoc {5}{1}{CI/CD Pipeline}{17}{0}{5}
+\beamer@subsectionintoc {5}{2}{CI-Pipeline Konfiguration}{18}{0}{5}
+\beamer@subsectionintoc {5}{3}{CD-Pipeline Konfiguration}{19}{0}{5}
+\beamer@subsectionintoc {5}{4}{Statische Code-Analyse}{21}{0}{5}
+\beamer@subsectionintoc {5}{5}{CodeQL Konfiguration}{22}{0}{5}
+\beamer@subsectionintoc {5}{6}{Containerisierung}{24}{0}{5}
+\beamer@subsectionintoc {5}{7}{Dockerfile Code}{25}{0}{5}
+\beamer@subsectionintoc {5}{8}{Docker-Compose Code}{26}{0}{5}
+\beamer@sectionintoc {6}{Technische Erfahrungen}{27}{0}{6}
+\beamer@sectionintoc {7}{Analyse}{28}{0}{7}
+\beamer@sectionintoc {8}{Wiki}{29}{0}{8}
+\beamer@sectionintoc {9}{Erfahrungen und Fazit}{30}{0}{9}
