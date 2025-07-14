@@ -1,5 +1,6 @@
 \documentclass{beamer}
 \usepackage{graphicx}
+\usepackage{tikz}
 \graphicspath{ {./images/} }
 
 \title{WaterWizards}
@@ -8,7 +9,13 @@
 
 \begin{document}
 
-\frame{\titlepage}
+\begin{frame}[plain]
+  \titlepage
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south west, xshift=0.2cm, yshift=0.2cm] at (current page.south west) {\includegraphics[height=2.5cm]{wizblu.png}};
+    \node[anchor=south east, xshift=-0.2cm, yshift=0.2cm] at (current page.south east) {\includegraphics[height=2.5cm]{wizred.png}};
+  \end{tikzpicture}
+\end{frame}
 
 \begin{frame}
 \frametitle{Inhaltsverzeichnis}
