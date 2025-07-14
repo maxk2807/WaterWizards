@@ -11,7 +11,7 @@ namespace WaterWizard.Client.gamescreen.ships;
 
 public class ShipField(GameScreen gameScreen)
 {
-    public Dictionary<DraggingShip, int> Ships = [];
+    public Dictionary<DraggableShip, int> Ships = [];
 
     private int X;
     private int Y;
@@ -31,7 +31,7 @@ public class ShipField(GameScreen gameScreen)
         int shipY = Y + ZonePadding / 4;
         int width = CellSize;
         int height = CellSize * 5;
-        DraggingShip ship = new(gameScreen, shipX, shipY, width, height, 1);
+        DraggableShip ship = new(gameScreen, shipX, shipY, width, height, 1);
         Ships.Add(ship, 1);
 
         shipX = X + ZonePadding / 2 + CellSize;

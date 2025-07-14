@@ -20,7 +20,7 @@ using WaterWizard.Client.Gamescreen;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
-public class DraggingShip
+public class DraggableShip
 {
     private readonly GameScreen gameScreen;
     private readonly int X;
@@ -97,7 +97,7 @@ public class DraggingShip
 
     /// <summary>
     /// This class represents a type of Ship on the <see cref="ShipField"/> that can be dragged
-    /// onto the Board to place. Once placed, the dragged <see cref="DraggingShip"/> spawns
+    /// onto the Board to place. Once placed, the dragged <see cref="DraggableShip"/> spawns
     /// a normal Ship on that location.
     /// In the beginning, there are 1 Ship of length 5, 2 Ships of length 4, 2 Ships of length 3,
     /// 4 ships of length 2 and 5 ships of length 1. Further Ships can be summoned with the cards.
@@ -109,7 +109,7 @@ public class DraggingShip
     /// <param name="length"></param>
     /// <param name="currentNumber"></param>
     /// <param name="orientation"></param>
-    public DraggingShip(
+    public DraggableShip(
         GameScreen gameScreen,
         int x,
         int y,
