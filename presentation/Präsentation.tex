@@ -5,6 +5,7 @@
 \usepackage{listings}
 \usepackage{pgfgantt}
 \usepackage{xcolor}
+\usepackage[utf8]{inputenc}
 \graphicspath{ {./images/} }
 
 \lstdefinelanguage{yaml}{
@@ -20,7 +21,10 @@
   columns=fullflexible,
   language=yaml,
   breaklines=true,
-  frame=single
+  frame=single,
+  literate={ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+           {Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+           {ß}{{\ss}}1
 }
 
 \lstdefinelanguage{Dockerfile}{
@@ -227,6 +231,43 @@
   \end{itemize} 
 \end{frame}
 
+\subsection{TextureManager}
+\begin{frame}[fragile]
+\frametitle{TextureManager}
+\begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+/// <summary>
+/// Verwaltet das Laden und Entladen von Texturen für das Spiel.
+/// </summary>
+public class TextureManager
+{
+    private static List<Texture2D> textures = [];
+
+    /// <summary>
+    /// Lädt eine Textur aus einer Datei und speichert sie für späteres Entladen.
+    /// </summary>
+    /// <param name="file">Pfad zur Texturdatei</param>
+    /// <returns>Die geladene Textur als <see cref="Texture2D"/></returns>
+    public static Texture2D LoadTexture(string file)
+    {
+        var texture = Raylib.LoadTexture(file);
+        textures.Add(texture);
+        return texture;
+    }
+
+    /// <summary>
+    /// Entlädt alle zuvor geladenen Texturen aus dem Speicher.
+    /// </summary>
+    public static void UnloadAllTextures()
+    {
+        foreach (var texture in textures)
+        {
+            Raylib.UnloadTexture(texture);
+        }
+    }
+}
+\end{lstlisting}
+\end{frame}
+
 \subsection{GameScreen}
 \begin{frame}
 \frametitle{GameScreen}
@@ -241,7 +282,6 @@
   
 \end{frame}
 
-
 \subsection{Server/Backend}
 \begin{frame}
 \frametitle{Server/Backend}
@@ -249,6 +289,40 @@
     \item Das Backend ist in C\# mit der Library LiteNetLib geschrieben
     \item Ein globaler Server der eine Lobby auf Hetzner bereitstellt
     \item Server wird in Docker-Containern ausgeführt
+    \item Der Server wird auf dem Port 7777/UDP bereitgestellt
+  \end{itemize}
+\end{frame}
+
+\subsection{Factory Pattern}
+\begin{frame}[fragile]
+\frametitle{Factory Pattern}
+  \begin{itemize}
+    \item Das Factory-Pattern wird für die Erstellung von Kartenobjekten verwendet
+    \item Für jede Kartenart gibt es eine eigene Factory
+  \end{itemize}
+  
+  \textbf{Beispiel: DamageCardFactory}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public static class DamageCardFactory 
+    {
+        public static IDamageCard Create(CardVariant variant) 
+        {
+            return variant switch 
+            {
+                CardVariant.Firebolt => new FireboltCard(),
+                CardVariant.FrostBolt => new FrostBoltCard(),
+                CardVariant.Lightning => new LightningCard(),
+                _ => throw new ArgumentException($"Unknown variant: {variant}")
+            };
+        }
+    }
+  \end{lstlisting}
+  
+  \textbf{Vorteile:}
+  \begin{itemize}
+    \item Neue Karten können einfach ergänzt werden
+    \item Spiellogik bleibt unverändert
+    \item Klare Trennung von Erstellung und Verwendung
   \end{itemize}
 \end{frame}
 
