@@ -7,22 +7,23 @@
 \beamer@sectionintoc {4}{Technologie + Architektur}{9}{0}{4}
 \beamer@subsectionintoc {4}{1}{UI}{10}{0}{4}
 \beamer@subsectionintoc {4}{2}{TextureManager}{11}{0}{4}
-\beamer@subsectionintoc {4}{3}{GameScreen}{12}{0}{4}
-\beamer@subsectionintoc {4}{4}{Server/Backend}{13}{0}{4}
-\beamer@subsectionintoc {4}{5}{Factory Pattern}{14}{0}{4}
-\beamer@subsectionintoc {4}{6}{Shared}{15}{0}{4}
-\beamer@subsectionintoc {4}{7}{Backend - Client Kommunikation}{16}{0}{4}
-\beamer@subsectionintoc {4}{8}{Nachrichtenempfang + Parsing im Client}{17}{0}{4}
-\beamer@sectionintoc {5}{DevOps}{18}{0}{5}
-\beamer@subsectionintoc {5}{1}{CI/CD Pipeline}{19}{0}{5}
-\beamer@subsectionintoc {5}{2}{CI-Pipeline Konfiguration}{20}{0}{5}
-\beamer@subsectionintoc {5}{3}{CD-Pipeline Konfiguration}{21}{0}{5}
-\beamer@subsectionintoc {5}{4}{Statische Code-Analyse}{23}{0}{5}
-\beamer@subsectionintoc {5}{5}{CodeQL Konfiguration}{24}{0}{5}
-\beamer@subsectionintoc {5}{6}{Containerisierung}{26}{0}{5}
-\beamer@subsectionintoc {5}{7}{Dockerfile Code}{27}{0}{5}
-\beamer@subsectionintoc {5}{8}{Docker-Compose Code}{28}{0}{5}
-\beamer@sectionintoc {6}{Technische Erfahrungen}{29}{0}{6}
-\beamer@sectionintoc {7}{Analyse}{30}{0}{7}
-\beamer@sectionintoc {8}{Wiki}{31}{0}{8}
-\beamer@sectionintoc {9}{Erfahrungen und Fazit}{32}{0}{9}
+\beamer@subsectionintoc {4}{3}{UI-Example}{12}{0}{4}
+\beamer@subsectionintoc {4}{4}{GameScreen}{15}{0}{4}
+\beamer@subsectionintoc {4}{5}{Server/Backend}{16}{0}{4}
+\beamer@subsectionintoc {4}{6}{Factory Pattern}{17}{0}{4}
+\beamer@subsectionintoc {4}{7}{Shared}{18}{0}{4}
+\beamer@subsectionintoc {4}{8}{Backend - Client Kommunikation}{19}{0}{4}
+\beamer@subsectionintoc {4}{9}{Nachrichtenempfang + Parsing im Client}{20}{0}{4}
+\beamer@sectionintoc {5}{DevOps}{21}{0}{5}
+\beamer@subsectionintoc {5}{1}{CI/CD Pipeline}{22}{0}{5}
+\beamer@subsectionintoc {5}{2}{CI-Pipeline Konfiguration}{23}{0}{5}
+\beamer@subsectionintoc {5}{3}{CD-Pipeline Konfiguration}{24}{0}{5}
+\beamer@subsectionintoc {5}{4}{Statische Code-Analyse}{26}{0}{5}
+\beamer@subsectionintoc {5}{5}{CodeQL Konfiguration}{27}{0}{5}
+\beamer@subsectionintoc {5}{6}{Containerisierung}{29}{0}{5}
+\beamer@subsectionintoc {5}{7}{Dockerfile Code}{30}{0}{5}
+\beamer@subsectionintoc {5}{8}{Docker-Compose Code}{31}{0}{5}
+\beamer@sectionintoc {6}{Technische Erfahrungen}{32}{0}{6}
+\beamer@sectionintoc {7}{Analyse}{33}{0}{7}
+\beamer@sectionintoc {8}{Wiki}{34}{0}{8}
+\beamer@sectionintoc {9}{Erfahrungen und Fazit}{35}{0}{9}
