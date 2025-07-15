@@ -261,7 +261,45 @@
     \item Alle Elemente werden durch eine Methode Draw angezeigt, welche in der GameLoop ausgeführt wird.
     \item Die wenige Logik, die auf dem Client ausgeführt wird, wird in diesen Draw Methoden ausgeführt
   \end{itemize} 
+  \centering
   \includegraphics[width=0.5\textwidth]{MainMenu.png}
+\end{frame}
+
+\subsection{UI-Example}
+\begin{frame}[fragile]
+  \frametitle{UI-Beispiel aus der MainMenu Klasse}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    private static void HandleJoinButton(GameStateManager manager)
+    {
+        Rectangle joinButton = new(
+                    (float)manager.screenWidth / 2 - 140,
+                    (float)manager.screenHeight / 2,
+                    246,
+                    72
+                );
+        bool hoverJoin = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), joinButton);
+        if (hoverJoin && Raylib.IsMouseButtonReleased(MouseButton.Left))
+        {
+            Raylib.PlaySound(SoundManager.ButtonSound);
+            manager.SetStateToLobbyList();
+        }
+        Rectangle textureRec = new(0, 0, joinButtonAsset.Width, joinButtonAsset.Height);
+        Raylib.DrawTexturePro(
+            joinButtonAsset,
+            textureRec,
+            joinButton,
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+        Raylib.DrawRectangleRec(joinButton, hoverJoin ? new(255, 255, 255, 31) : Color.Blank);
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Spiel-Bildschirm / GameScreen}
+  \includegraphics[width=\textwidth]{GameScreen.png}
 \end{frame}
 
 \subsection{Nachrichtenempfang + Parsing im Client}
@@ -303,32 +341,7 @@
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Spiel-Bildschirm / GameScreen}
-  \includegraphics[width=\textwidth]{GameScreen.png}
-\end{frame}
 
-\subsection{UI-Example}
-\begin{frame}[fragile]
-  \frametitle{UI-Beispiel aus der GameHand Klasse}
-  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
-    public virtual void Draw(bool front)
-    { 
-        int availableHandWidth = (int)(ScreenWidth * 0.2f);
-        int totalCardWidth = Cards.Count * CardWidth;
-        int excess = totalCardWidth - availableHandWidth;
-        int offset = excess > 0 ? excess / Cards.Count : 0;
-        for (int i = 0; i < Cards.Count; i++)
-        {
-            //[...]
-
-            Cards[i].Draw(centralX + cardX, cardY, front);
-
-            DrawCardPreview(front, i, cardX, effectiveCardWidth);
-        }
-    }
-  \end{lstlisting}
-\end{frame}
 
 \begin{frame}
   \frametitle{UI Struktur GameScreen}
