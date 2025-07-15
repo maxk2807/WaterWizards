@@ -167,8 +167,8 @@
     \ganttgroup{Zielgenaue Implementierung}{5}{10} \\
     \ganttbar{Backend - Frontend Kommunikation verbessern}{5}{8} \\
     \ganttbar{Frontend Feinschliff}{6}{10} \\
-    \ganttbar{Refactoring für bessere Lesbarkeit}{7}{9} \\
-
+    \ganttbar[name=refactoring1]{Refactoring für bessere Lesbarkeit}{7}{9} 
+    \ganttbar[inline, bar/.append style={fill=blue!40}]{ }{12}{13} \\
     \ganttgroup{Abschluss}{10}{14} \\
     \ganttbar{Projekt Feinschliff}{10}{14} \\
     \ganttbar{Dokumentation}{13}{13} \\
@@ -239,7 +239,7 @@
   \begin{multicols}{2}
     \begin{itemize}
       \item Einfaches Setup
-      \item Einfache Client-Server-Kommunication über Nachrichten
+      \item Einfache Client-Server-Kommunitation über Nachrichten
       \item Einfache Datenübertragung der Spieldaten
     \end{itemize}
     \columnbreak
@@ -523,6 +523,27 @@
   \end{lstlisting}
 \end{frame}
 
+\subsection{Wiki}
+\begin{frame}
+\frametitle{Wiki}
+  \begin{itemize}
+    \item GitHub Wiki für Regeln
+      \begin{itemize}
+        \item Dokumentation der Projektstruktur
+        \item Regeln für Beiträge und Pull Requests
+      \end{itemize}
+    \item Github Pages für Code-Dokumentation
+      \begin{itemize}
+        \item Dokumentation erstellt durch Doxygen
+      \end{itemize}
+    \item ReadME für Projektbeschreibung \& User Dokumentation
+      \begin{itemize}
+        \item Kurze Einführung ins Projekt
+        \item Installation und Nutzung des Spiels
+      \end{itemize}
+  \end{itemize}  
+\end{frame}
+
 \section{Architektur}
 \begin{frame}
   \frametitle{Architektur}
@@ -778,7 +799,7 @@
 
 \subsection{Factory Pattern}
 \begin{frame}[fragile]
-\frametitle{Factory Pattern}
+\frametitle{Factory Pattern im Backend}
   \begin{itemize}
     \item Das Factory-Pattern wird für die Erstellung von Kartenobjekten verwendet
     \item Für jede Kartenart gibt es eine eigene Factory
@@ -807,6 +828,39 @@
     \item Spiellogik bleibt unverändert
     \item Klare Trennung von Erstellung und Verwendung
   \end{itemize}
+\end{frame}
+
+\subsection{Handler}
+\begin{frame}[fragile]
+\frametitle{Handler}
+  \begin{itemize}
+    \item Entkoppelt die Logik von der Netzwerkkommunikation
+  \end{itemize}
+  \textbf{Beispiel: CardHandler}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public void HandleCastCard(Cards card, GameBoard.Point hoveredCoords)
+    {
+        if (clientService.client != null && clientService.client.FirstPeer != null)
+        {
+            NetDataWriter writer = new();
+            writer.Put("CastCard");
+            writer.Put(card.Variant.ToString());
+            writer.Put(hoveredCoords.X);
+            writer.Put(hoveredCoords.Y);
+            clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+            Console.WriteLine($"[Client] Karte wirken: {card.Variant} an Position ({hoveredCoords.X}, {hoveredCoords.Y})");
+        }
+        else
+        {
+            Console.WriteLine("[Client] Kein Server verbunden, Karte konnte nicht gewirkt werden.");
+        }
+    }
+  \end{lstlisting}
+  \textbf{Vorteile:}
+  \begin{itemize}
+    \item Einfachere Wartbarkeit und Erweiterbarkeit
+    \item Einheitliche Handhabung von Aktionen
+  \end{itemize} 
 \end{frame}
 
 \subsection{Shared}
@@ -854,23 +908,21 @@
   \end{lstlisting}
 \end{frame}
 
-
-
-
 \section{Technische Erfahrungen}
 \begin{frame}
 \frametitle{Technische Erfahrungen}
   \begin{multicols}{2}
     \begin{itemize}
+      \item \textbf{Positiv:}
       \item Raylib hat einfachen Einstieg erlaubt
       \item CI/CD Pipeline hat gut Funktioniert
       \item Automatische Validierung CodeQL gut Funktioniert
-      \item 
     \end{itemize}
     \columnbreak
     \begin{itemize}
-      \item Server Hosten richtig scheiße
-      \item 
+      \item \textbf{Negativ:}
+      \item Server deployment war komplex
+      \item Keine CD für den globalen Server
     \end{itemize}
   \end{multicols}
 \end{frame}
@@ -883,12 +935,6 @@
     \includegraphics{Kanban.png} % Placeholder for the actual images
   \end{column}
 \end{columns}
-\end{frame}
-
-\section{Wiki}
-\begin{frame}
-\frametitle{Wiki}
-
 \end{frame}
 
 \section{Erfahrungen und Fazit}
