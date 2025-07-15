@@ -205,11 +205,37 @@
 
 \section{Technologie und Architektur}
 \begin{frame}
-\frametitle{Technologie und Architektur}
+  \textbf{Technologie und Architektur}
+  \linebreak
+  Programiersprache: C\#
+\end{frame}
+
+\subsection{Raylib}
+\begin{frame}
+  \frametitle{Raylib}
   \begin{itemize}
-    \item Programiersprache: C\#
     \item Raylib für die grafische Darstellung
-    \item LiteNetLib für die Client-Server-Verbindung
+    \begin{enumerate}
+      \item Leichtgewichtige Library
+      \item Einfacher Einstieg
+      \item Kein Eigenenes Key- und Maus-Event Handling
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\subsection{LiteNetLib}
+\begin{frame}
+  LiteNetLib für die Client-Server-Verbindung
+    \begin{enumerate}
+      \item Einfacher Setup?
+      \item Einfache Client-Server-Communication über Messages
+      \item Einfache Datenübertragung der Spieldaten
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Weiteres}
+  \begin{itemize}
     \item Nuke für das Build-System
     \item CodeQL für die statische Code-Analyse
     \item GitHub Actions für die CD-Pipeline
@@ -224,23 +250,23 @@
 \begin{frame}
   \frametitle{UI/Client}
   \begin{itemize}
-    \item Raylib für die grafische Darstellung
     \item Grafische Darstellung getrennt von Spielfunktionalität:
       \begin{itemize}
         \item Client übernimmt das Anzeigen und Handhabung des User Interfaces 
       \end{itemize}
     \item Gemeint sind Interaktive dargestellte Elemente, z.B:
-    \begin{itemize}
-      \item Die Kartenstapel, die Schiffe oder die Kartenhand
+    \begin{itemize} 
+      \item Das Main Menu, Die Kartenstapel, die Schiffe oder die Kartenhand
     \end{itemize}
     \item Alle Elemente werden durch eine Methode Draw angezeigt, welche in der GameLoop ausgeführt wird.
     \item Die wenige Logik, die auf dem Client ausgeführt wird, wird in diesen Draw Methoden ausgeführt
   \end{itemize} 
+  \includegraphics[width=0.5\textwidth]{MainMenu.png}
 \end{frame}
 
 \subsection{Nachrichtenempfang + Parsing im Client}
 \begin{frame}[fragile]
-\frametitle{Nachrichtenempfang + Parsing im Client}
+\frametitle{Nachrichtenempfang und Parsing im Client}
   \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
      private void HandleClientReceiveEvent(
         NetPeer peer,

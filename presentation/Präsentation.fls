@@ -448,6 +448,10 @@ INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/sansmathaccent/mathkerncmssi10.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/sansmathaccent/mathkerncmssi8.tfm
+INPUT ./images/MainMenu.png
+INPUT ./images/MainMenu.png
+INPUT ./images/MainMenu.png
+INPUT ./images/MainMenu.png
 OUTPUT Präsentation.vrb
 INPUT ./Präsentation.vrb
 INPUT ./Präsentation.vrb
