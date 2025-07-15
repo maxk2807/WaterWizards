@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  15 JUL 2025 12:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.25)  15 JUL 2025 12:18
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1070,10 +1070,6 @@ Package pdftex.def Info: ./images/Server-Client-Logs.png  used on input line 431
 \openout4 = `Präsentation.vrb'.
 
  (./Präsentation.vrb)
-Overfull \vbox (14.32686pt too high) detected at line 541
- []
-
-
 
 [24
 
@@ -1085,12 +1081,12 @@ Overfull \vbox (14.32686pt too high) detected at line 541
 <./images/Nuke-Pipeline.png, id=815, 748.7975pt x 639.38875pt>
 File: ./images/Nuke-Pipeline.png Graphic file (type png)
 <use ./images/Nuke-Pipeline.png>
-Package pdftex.def Info: ./images/Nuke-Pipeline.png  used on input line 578.
+Package pdftex.def Info: ./images/Nuke-Pipeline.png  used on input line 571.
 (pdftex.def)             Requested size: 122.91406pt x 104.94823pt.
 <./images/CD-in-GH.png, id=816, 300.12125pt x 210.7875pt>
 File: ./images/CD-in-GH.png Graphic file (type png)
 <use ./images/CD-in-GH.png>
-Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 578.
+Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 571.
 (pdftex.def)             Requested size: 122.91406pt x 86.32693pt.
 
 
@@ -1100,7 +1096,7 @@ Package pdftex.def Info: ./images/CD-in-GH.png  used on input line 578.
 \openout4 = `Präsentation.vrb'.
 
  (./Präsentation.vrb)
-Overfull \vbox (1.92686pt too high) detected at line 617
+Overfull \vbox (1.92686pt too high) detected at line 610
  []
 
 
@@ -1147,7 +1143,7 @@ Overfull \vbox (1.92686pt too high) detected at line 617
 \openout4 = `Präsentation.vrb'.
 
  (./Präsentation.vrb)
-Overfull \vbox (1.52687pt too high) detected at line 796
+Overfull \vbox (1.52687pt too high) detected at line 789
  []
 
 
@@ -1168,15 +1164,15 @@ Overfull \vbox (1.52687pt too high) detected at line 796
 ]
 File: ./images/Kanban.png Graphic file (type png)
 <use ./images/Kanban.png>
-Package pdftex.def Info: ./images/Kanban.png  used on input line 830.
+Package pdftex.def Info: ./images/Kanban.png  used on input line 823.
 (pdftex.def)             Requested size: 1694.32588pt x 862.21915pt.
 
-Overfull \hbox (1387.03601pt too wide) in paragraph at lines 830--830
+Overfull \hbox (1387.03601pt too wide) in paragraph at lines 823--823
 [][]  
  []
 
 
-Overfull \vbox (625.34602pt too high) detected at line 830
+Overfull \vbox (625.34602pt too high) detected at line 823
  []
 
 
@@ -1210,15 +1206,15 @@ Package rerunfilecheck Info: File `Präsentation.out' has not changed.
 (rerunfilecheck)             Checksum: A8995BBDE0B5EF54A646F5D4C6D75373;4396.
  ) 
 Here is how much of TeX's memory you used:
- 29700 strings out of 473577
- 584895 string characters out of 5732204
+ 29702 strings out of 473577
+ 584923 string characters out of 5732204
  1257034 words of memory out of 5000000
- 51913 multiletter control sequences out of 15000+600000
+ 51915 multiletter control sequences out of 15000+600000
  570190 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,14n,123p,452b,1435s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb>
-Output written on Präsentation.pdf (39 pages, 3380527 bytes).
+Output written on Präsentation.pdf (39 pages, 3380698 bytes).
 PDF statistics:
  1235 PDF objects out of 1440 (max. 8388607)
  1141 compressed objects within 12 object streams
