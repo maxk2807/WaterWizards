@@ -708,6 +708,21 @@
   \end{column}
 \end{columns}
 \end{frame}
+\begin{frame}[fragile]
+  \begin{column}{0.85\textwidth}
+    Basiert auf dem Austausch von Ereignissen (Events)
+    \begin{itemize}
+      \item Ein Spieler hat eine Karte ausgespielt („CastCard“)
+      \item Das Spiel wird pausiert („UpdatePauseState“)
+      \item Ein Schiff wurde zerstört („ShipDestroyed“)
+      \item Jede Aktion im Spiel löst ein Event aus, das dann an die jeweils betroffenen Clients geschickt wird.
+    \end{itemize}
+      Der Vorteil: 
+      \item
+      Das Spiel bleibt reaktionsschnell und alle Spieler sind immer auf dem aktuellen Stand, ohne unnötigen Netzwerkverkehr.
+
+\end{column}
+\end{frame}
 
 \subsection{Nachrichtenempfang + Parsing im Client}
 \begin{frame}[fragile]
@@ -768,6 +783,10 @@
           }
       }
   \end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]
+
+\includegraphics[width=\textwidth]{EDA.png}
 \end{frame}
 
 \subsection{GameState}
@@ -930,11 +949,192 @@
 \section{Analyse}
 \begin{frame}
 \frametitle{Analyse}
-\begin{columns}
-  \begin{column}{1\textwidth}
-    \includegraphics{Kanban.png} % Placeholder for the actual images
-  \end{column}
-\end{columns}
+
+\begin{itemize}
+  \item Eigenes Analytics-System zur Auswertung des Repositories
+  \item Automatische Ausführung bei jedem Commit, Merge oder Push (Git-Hooks)
+  \item Ziel: Transparenz, Codequalität und Team-Insights
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Was wird analysiert?}
+\begin{itemize}
+  \item \textbf{Git-Statistiken:} Commits, Branches, letzter Commit, Autor, etc.
+  \item \textbf{Code-Statistiken:} Anzahl Dateien, Gesamtzeilen, Codezeilen, Kommentarzeilen, leere Zeilen, Dateitypen, Klassen, Methoden, Interfaces, Properties
+  \item \textbf{Entwickler-Statistiken:} Beiträge pro Entwickler, Feature-/Bugfix-/Refactor-/Doku-Commits, Aktivitätsverläufe, Alias-Erkennung
+  \item \textbf{Qualitätsmetriken:} Verhältnis Code/Kommentar, Komplexität, Dokumentationsabdeckung, Velocity, aktivster Entwickler, Repository-Alter
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Beispielhafte Metriken}
+\begin{itemize}
+  \item \textbf{Code-Komplexität:} z.B. durchschnittliche Methodenlänge
+  \item \textbf{Dokumentationsabdeckung:} Anteil dokumentierter Klassen
+  \item \textbf{Velocity:} Commits pro Tag im Durchschnitt
+  \item \textbf{Aktivster Entwickler:} Name und Beitrag
+  \item \textbf{Feature/Bugfix/Refactor-Anteile:} Prozentuale Verteilung der Commits
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Beispiel: Entwickler-Statistiken (JSON-Auszug)}
+\begin{lstlisting}[language=json, basicstyle=\ttfamily\tiny, breaklines=true]
+{
+  "developerStatistics": [
+    {
+      "name": "Max Mustermann",
+      "firstCommit": "2023-01-01T00:00:00Z",
+      "lastCommit": "2024-01-15T10:30:00Z",
+      "totalCommits": 450,
+      "featureCommits": 120,
+      "bugFixCommits": 80,
+      "refactorCommits": 60,
+      "documentationCommits": 40
+    }
+  ]
+}
+\end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]
+
+\frametitle{Beispiel: Entwickler-Statistiken}
+\begin{lstlisting}[language=markdown,basicstyle=\ttfamily\tiny,breaklines=true]
+
+##  Developer Statistics
+### Erick Zeiler
+- **Aliases**: erick, Erick Zeiler, Erickk0
+- **Total Commits**: 270
+- **First Commit**: 2025-04-23
+- **Last Commit**: 2025-07-15
+- **Days Active**: 83 days
+- **Commit Frequency**: 3.25 commits/day
+
+####  Commit Breakdown
+- **Feature Commits**: 100 (37.0%)
+- **Bug Fix Commits**: 48 (17.8%)
+- **Refactor Commits**: 1 (0.4%)
+- **Documentation Commits**: 0 (0.0%)
+
+####  Activity Patterns
+- **Average Commits/Week**: 20.8
+- **Average Commits/Month**: 67.5
+- **Most Active Week**: 2025-W21 (37 commits)
+- **Most Active Month**: 2025-05 (101 commits)
+
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Das Skript: Wie funktioniert unsere Analyse?}
+\begin{itemize}
+  \item Zentrale Methode \texttt{GenerateRepositoryAnalytics} sammelt alle relevanten Daten:
+  \begin{itemize}
+    \item Git-Statistiken (Commits, Branches, letzter Commit, Autor, etc.)
+    \item Code-Statistiken (Dateien, Zeilen, Klassen, Methoden, Kommentare, etc.)
+    \item Entwickler-Statistiken (Beiträge, Aktivität, Aliase)
+    \item Qualitätsmetriken (Code-Komplexität, Dokumentationsabdeckung, Velocity)
+  \end{itemize}
+  \item Die Daten werden automatisch aus dem Repository und dem Quellcode extrahiert – keine manuelle Pflege nötig!
+  \item Ergebnisse werden als JSON und Markdown gespeichert und können für Reports oder Visualisierungen genutzt werden.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Code-Ausschnitt: Analyse-Logik}
+\begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+// Git-Statistiken sammeln
+var gitCollector = new GitStatisticsCollector(repositoryPath);
+analytics.GitStatistics = await gitCollector.CollectAsync();
+
+// Code-Statistiken sammeln
+var codeCollector = new CodeStatisticsCollector(repositoryPath);
+analytics.CodeStatistics = codeCollector.Collect();
+
+// Entwickler-Statistiken sammeln
+var devCollector = new DeveloperStatisticsCollector(repositoryPath);
+analytics.DeveloperStatistics = await devCollector.CollectAsync();
+
+// Qualitäts-Metriken berechnen
+var metricsCalculator = new QualityMetricsCalculator(analytics);
+analytics.QualityMetrics = metricsCalculator.Calculate();
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Entwickler-Statistiken (Models/DeveloperStatistics.cs)}
+\begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+public class DeveloperStatistics
+{
+    public string Name { get; set; } = "";
+    public DateTime FirstCommit { get; set; }
+    public DateTime LastCommit { get; set; }
+    public int TotalCommits { get; set; }
+    public int FeatureCommits { get; set; }
+    public int BugFixCommits { get; set; }
+    public int RefactorCommits { get; set; }
+    public int DocumentationCommits { get; set; }
+    public List<string> CommitMessages { get; set; } = new();
+    public List<string> OriginalNames { get; set; } = new();
+    public Dictionary<string, int> WeeklyActivity { get; set; } = new();
+    public Dictionary<string, int> MonthlyActivity { get; set; } = new();
+    // ...
+}
+\end{lstlisting}
+
+\textbf{Erklärung:}
+\begin{itemize}
+  \item Für jeden Entwickler werden Commits, Zeiträume, Commit-Arten und Aktivitätsverläufe gespeichert.
+  \item So können z.B. die aktivsten Entwickler, Feature-Anteile und Aktivitätsmuster ausgewertet werden.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Code-Analyse: Zeilenzählung}
+\begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+private static FileAnalysis AnalyzeFile(string filePath)
+{
+    var lines = File.ReadAllLines(filePath);
+    var analysis = new FileAnalysis
+    {
+        FileSize = new FileInfo(filePath).Length,
+        TotalLines = lines.Length
+    };
+
+    bool inMultiLineComment = false;
+    foreach (var line in lines)
+    {
+        var trimmedLine = line.Trim();
+        if (string.IsNullOrEmpty(trimmedLine)) analysis.EmptyLines++;
+        else if (trimmedLine.StartsWith("//") || trimmedLine.StartsWith("///")) analysis.CommentLines++;
+        else if (trimmedLine.StartsWith("/*")) { analysis.CommentLines++; inMultiLineComment = true; }
+        else if (trimmedLine.Contains("*/")) { analysis.CommentLines++; inMultiLineComment = false; }
+        else if (inMultiLineComment) analysis.CommentLines++;
+        else analysis.CodeLines++;
+    }
+    return analysis;
+}
+\end{lstlisting}
+
+\textbf{Erklärung:}
+{\footnotesize
+\begin{itemize}
+  \item Jede Datei wird zeilenweise analysiert.
+  \item Es wird unterschieden zwischen Codezeilen, Kommentarzeilen und leeren Zeilen.
+  \item Auch mehrzeilige Kommentare werden korrekt erkannt.
+\end{itemize}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nutzen für das Team}
+\begin{itemize}
+  \item Transparenz über Beiträge und Teamaktivität
+  \item Motivation durch sichtbare Fortschritte und Statistiken
+  \item Grundlage für gezielte Verbesserungen im Entwicklungsprozess
+\end{itemize}
 \end{frame}
 
 \section{Erfahrungen und Fazit}
