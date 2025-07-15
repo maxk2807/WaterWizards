@@ -660,6 +660,34 @@
 \end{multicols}
 \end{frame}
 
+\subsection{Server/Backend}
+\begin{frame}
+\frametitle{Server/Backend}
+  \begin{itemize}
+    \item Das Backend ist in C\# mit der Library LiteNetLib geschrieben
+    \item Ein globaler Server der eine Lobby auf Hetzner bereitstellt
+    \item Server wird in Docker-Containern ausgeführt
+    \item Der Server wird auf dem Port 7777/UDP bereitgestellt
+  \end{itemize}
+\end{frame}
+
+\subsection{Backend - Client Kommunikation}
+\begin{frame}
+\frametitle{Backend - Client Kommunikation}
+\begin{columns}
+  \begin{column}{0.45\textwidth}
+    Event-Driven Architektur
+    \begin{itemize}
+      \item UDP für die Echtzeit-Kommunikation
+      \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.55\textwidth}
+    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
+  \end{column}
+\end{columns}
+\end{frame}
+
 \subsection{Nachrichtenempfang + Parsing im Client}
 \begin{frame}[fragile]
 \frametitle{Nachrichtenempfang und Parsing im Client}
@@ -719,34 +747,6 @@
           }
       }
   \end{lstlisting}
-\end{frame}
-
-\subsection{Server/Backend}
-\begin{frame}
-\frametitle{Server/Backend}
-  \begin{itemize}
-    \item Das Backend ist in C\# mit der Library LiteNetLib geschrieben
-    \item Ein globaler Server der eine Lobby auf Hetzner bereitstellt
-    \item Server wird in Docker-Containern ausgeführt
-    \item Der Server wird auf dem Port 7777/UDP bereitgestellt
-  \end{itemize}
-\end{frame}
-
-\subsection{Backend - Client Kommunikation}
-\begin{frame}
-\frametitle{Backend - Client Kommunikation}
-\begin{columns}
-  \begin{column}{0.45\textwidth}
-    Event-Driven Architektur
-    \begin{itemize}
-      \item UDP für die Echtzeit-Kommunikation
-      \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
-    \end{itemize}
-  \end{column}
-  \begin{column}{0.55\textwidth}
-    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
-  \end{column}
-\end{columns}
 \end{frame}
 
 \subsection{GameState}
