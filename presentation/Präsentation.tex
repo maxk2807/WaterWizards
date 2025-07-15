@@ -198,9 +198,9 @@
 \frametitle{Rollen des Projektes}
 \end{frame}
 
-\section{Technologie und Architektur}
+\section{Technologie und DevOps}
 \begin{frame}
-\frametitle{Technologie und Architektur}
+\frametitle{Technologie und DevOps}
   \begin{itemize}
     \item Programiersprache: C\#
     \item Raylib
@@ -248,6 +248,291 @@
     \end{itemize}
   \end{multicols}
 \end{frame}
+
+
+\subsection{DevOps}
+\begin{frame}
+\frametitle{DevOps}
+  \begin{itemize}
+    \item CI-Pipeline
+    \item CD-Pipeline
+    \item Statische Code-Analyse
+    \item Pull Requests mit 4-Augen Prinzip
+    \item Dokumentation auf Github Pages
+  \end{itemize}
+\end{frame}
+
+\subsection{CI/CD Pipeline}
+\begin{frame}
+\frametitle{CI/CD Pipeline}
+  \begin{multicols}{2}
+    \begin{itemize}
+      \item \textbf{CI}
+        \begin{itemize}
+          \item Nuke build für die Continous-Integration
+          \item dotnet \textit{restore, build, test}, werden bei jedem PR ausgeführt
+        \end{itemize}
+      \includegraphics[width=0.4\textwidth]{Nuke-Pipeline.png}
+    \end{itemize}
+  \columnbreak
+    \begin{itemize}
+      \item \textbf{CD}
+        \begin{itemize}
+          \item Github Actions für das Continous-Deployment
+          \item Baut eine exe Datei für Windows und eine MacOS App 
+        \end{itemize}
+        \includegraphics[width=0.4\textwidth]{CD-in-GH.png}
+    \end{itemize}
+  \end{multicols}
+\end{frame}
+
+\subsection{CI-Pipeline Konfiguration}
+\begin{frame}[fragile]
+\frametitle{CI-Pipeline Konfiguration}
+  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
+    name: NUKE Build CI
+
+    on:
+      push:
+        branches: [ "main", "dev" ] 
+      pull_request:
+        branches: [ "**" ] 
+
+      workflow_dispatch:
+
+    jobs:
+      build:
+        runs-on: ubuntu-latest 
+
+        permissions:
+          actions: read 
+          contents: read 
+          security-events: write 
+
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+            with:
+              fetch-depth: 0 
+
+          - name: Setup .NET SDK
+            uses: actions/setup-dotnet@v4
+            with:
+              dotnet-version: '8.0.x'
+
+          - name: Run NUKE Build and Test
+            run: ./build.sh Compile Test
+  \end{lstlisting}
+\end{frame}
+
+\subsection{CD-Pipeline Konfiguration}
+\begin{frame}[fragile]
+\frametitle{CD-Pipeline Konfiguration (Teil 1)}
+  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
+- name: Publish Client (Windows)
+  run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win --verbosity normal
+
+- name: Publish Server (Windows)
+  run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-server
+
+- name: Publish Client (MacOS)
+  run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx --verbosity normal
+
+- name: Publish Server (MacOS)
+  run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx-server
+
+- name: Prepare release assets
+  run: |
+    mkdir release-assets
+
+    # Find the actual executable names
+    WIN_EXE=$(find ./publish/win -name "*.exe" -type f | head -1)
+    OSX_EXE=$(find ./publish/osx -type f -executable | grep -v "\.dll$" | grep -v "\.so$" | head -1)
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{CD-Pipeline Konfiguration (Teil 2)}
+  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
+    if [ -n "$WIN_EXE" ]; then
+      cp "$WIN_EXE" release-assets/WaterWizard.Client.exe
+    else
+      echo "Warning: No Windows executable found"
+    fi
+
+    if [ -n "$OSX_EXE" ]; then
+      cp "$OSX_EXE" release-assets/WaterWizard.Client.MacOS
+    else
+      echo "Warning: No MacOS executable found"
+    fi
+
+    echo "Release assets:"
+    ls -la release-assets/
+ 
+- name: Create GitHub Release & Upload Assets
+  uses: softprops/action-gh-release@v2
+  with:
+    tag_name: ${{ steps.get_version.outputs.tag }}
+    name: Release ${{ steps.get_version.outputs.version }}
+    body: ${{ steps.changelog.outputs.changelog }}
+    draft: false
+    prerelease: false
+    files: release-assets/*
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Statische Code-Analyse}
+\begin{frame}
+\frametitle{Statische Code-Analyse}
+  \begin{itemize}
+    \item CodeQL für die statische Code-Analyse
+    \item CodeQL eigene Konfigurationsdatei
+      \begin{itemize} 
+        \item Möglich auch in der CI Kofigurationsdatei
+        \item Best Practice getrennt
+        \item Simplere Konfiguration durch seperate Datei
+      \end{itemize} 
+    \item Ergebnisse in GitHub-Security
+  \end{itemize}
+\end{frame}
+
+\subsection{CodeQL Konfiguration}
+\begin{frame}[fragile]
+\frametitle{CodeQL Konfiguration (Teil 1)}
+  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
+    name: CodeQL
+
+    on:
+      push:
+        branches: [ main, dev ]
+      pull_request:
+        branches: [ '**' ]
+      workflow_dispatch:
+
+    jobs:
+      analyze:
+        name: Analyze
+        runs-on: ubuntu-latest
+        permissions:
+          security-events: write
+          actions: read
+          contents: read
+
+        strategy:
+          fail-fast: false
+          matrix:
+            language: ['csharp']
+
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{CodeQL Konfiguration (Teil 2)}
+  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
+      - name: Setup .NET SDK
+            uses: actions/setup-dotnet@v4
+            with:
+              dotnet-version: '8.0.x'
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          config-file: .github/codeql/codeql.yml
+
+      - name: Build with NUKE (required by CodeQL)
+        run: ./build.sh Compile
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{ matrix.language }}'
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Containerisierung}
+\begin{frame}
+\frametitle{Containerisierung}
+  \begin{itemize}
+    \item Docker für die Containerisierung des Servers
+    \item Dockerfile im Server-Verzeichnis
+    \item Docker Compose im root-Verzeichnis
+  \end{itemize}
+\end{frame}
+
+\subsection{Dockerfile Code}
+\begin{frame}[fragile]
+\frametitle{Dockerfile Code}
+  \textbf{Dockerfile}
+  \begin{lstlisting}[language=Dockerfile,basicstyle=\ttfamily\tiny]
+    FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+    WORKDIR /source
+
+    COPY WaterWizards.sln .
+
+    COPY src/WaterWizard.Server/WaterWizard.Server.csproj ./src/WaterWizard.Server/
+    COPY src/WaterWizard.Shared/WaterWizard.Shared.csproj ./src/WaterWizard.Shared/
+    COPY src/WaterWizard.Client/WaterWizard.Client.csproj ./src/WaterWizard.Client/
+    COPY src/WaterWizardTests/WaterWizardTests.csproj ./src/WaterWizardTests/
+
+    RUN dotnet restore WaterWizards.sln
+
+    COPY src/WaterWizard.Server/ ./src/WaterWizard.Server/
+    COPY src/WaterWizard.Shared/ ./src/WaterWizard.Shared/
+    COPY src/WaterWizard.Client/ ./src/WaterWizard.Client/
+    COPY src/WaterWizardTests/ ./src/WaterWizardTests/
+
+    RUN dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -o /app/publish
+
+    FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
+    WORKDIR /app
+
+    COPY --from=build /app/publish .
+
+
+    EXPOSE 7777/udp
+
+
+    ENTRYPOINT ["dotnet", "WaterWizard.Server.dll"]
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Docker-Compose Code}
+\begin{frame}[fragile]
+\frametitle{Docker-Compose Code}
+  \textbf{docker-compose}
+  \begin{lstlisting}[language=yaml,basicstyle=\ttfamily\tiny]
+    version: '3.8'
+
+    services:
+      waterwizard-server:
+        build:
+          context: .
+          dockerfile: ./src/WaterWizard.Server/Dockerfile
+        ports:
+          - "7777:7777/udp"
+        environment:
+          - PUBLIC_ADDRESS=${SERVER_IP}
+  \end{lstlisting}
+\end{frame}
+
+\section{Architektur}
+\begin{frame}
+  \frametitle{Architektur}
+  \begin{itemize}
+    \item UI/Client
+    \item Server/Backend
+    \item Shared/Geteilte Klassen
+  \end{itemize}
+\end{frame}
+
 
 \subsection{UI/Client}
 \begin{frame}
@@ -541,278 +826,7 @@ public class TextureManager
 \end{frame}
 
 
-\section{DevOps}
-\begin{frame}
-\frametitle{DevOps}
-  \begin{itemize}
-    \item CI-Pipeline
-    \item CD-Pipeline
-    \item Statische Code-Analyse
-    \item Pull Requests mit 4-Augen Prinzip
-    \item Dokumentation auf Github Pages
-  \end{itemize}
-\end{frame}
 
-\subsection{CI/CD Pipeline}
-\begin{frame}
-\frametitle{CI/CD Pipeline}
-  \begin{multicols}{2}
-    \begin{itemize}
-      \item \textbf{CI}
-        \begin{itemize}
-          \item Nuke build für die Continous-Integration
-          \item dotnet \textit{restore, build, test}, werden bei jedem PR ausgeführt
-        \end{itemize}
-      \includegraphics[width=0.4\textwidth]{Nuke-Pipeline.png}
-    \end{itemize}
-  \columnbreak
-    \begin{itemize}
-      \item \textbf{CD}
-        \begin{itemize}
-          \item Github Actions für das Continous-Deployment
-          \item Baut eine exe Datei für Windows und eine MacOS App 
-        \end{itemize}
-        \includegraphics[width=0.4\textwidth]{CD-in-GH.png}
-    \end{itemize}
-  \end{multicols}
-\end{frame}
-
-\subsection{CI-Pipeline Konfiguration}
-\begin{frame}[fragile]
-\frametitle{CI-Pipeline Konfiguration}
-  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
-    name: NUKE Build CI
-
-    on:
-      push:
-        branches: [ "main", "dev" ] 
-      pull_request:
-        branches: [ "**" ] 
-
-      workflow_dispatch:
-
-    jobs:
-      build:
-        runs-on: ubuntu-latest 
-
-        permissions:
-          actions: read 
-          contents: read 
-          security-events: write 
-
-        steps:
-          - name: Checkout repository
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0 
-
-          - name: Setup .NET SDK
-            uses: actions/setup-dotnet@v4
-            with:
-              dotnet-version: '8.0.x'
-
-          - name: Run NUKE Build and Test
-            run: ./build.sh Compile Test
-  \end{lstlisting}
-\end{frame}
-
-\subsection{CD-Pipeline Konfiguration}
-\begin{frame}[fragile]
-\frametitle{CD-Pipeline Konfiguration (Teil 1)}
-  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
-- name: Publish Client (Windows)
-  run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win --verbosity normal
-
-- name: Publish Server (Windows)
-  run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-server
-
-- name: Publish Client (MacOS)
-  run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx --verbosity normal
-
-- name: Publish Server (MacOS)
-  run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx-server
-
-- name: Prepare release assets
-  run: |
-    mkdir release-assets
-
-    # Find the actual executable names
-    WIN_EXE=$(find ./publish/win -name "*.exe" -type f | head -1)
-    OSX_EXE=$(find ./publish/osx -type f -executable | grep -v "\.dll$" | grep -v "\.so$" | head -1)
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{CD-Pipeline Konfiguration (Teil 2)}
-  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
-    if [ -n "$WIN_EXE" ]; then
-      cp "$WIN_EXE" release-assets/WaterWizard.Client.exe
-    else
-      echo "Warning: No Windows executable found"
-    fi
-
-    if [ -n "$OSX_EXE" ]; then
-      cp "$OSX_EXE" release-assets/WaterWizard.Client.MacOS
-    else
-      echo "Warning: No MacOS executable found"
-    fi
-
-    echo "Release assets:"
-    ls -la release-assets/
- 
-- name: Create GitHub Release & Upload Assets
-  uses: softprops/action-gh-release@v2
-  with:
-    tag_name: ${{ steps.get_version.outputs.tag }}
-    name: Release ${{ steps.get_version.outputs.version }}
-    body: ${{ steps.changelog.outputs.changelog }}
-    draft: false
-    prerelease: false
-    files: release-assets/*
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-  \end{lstlisting}
-\end{frame}
-
-\subsection{Statische Code-Analyse}
-\begin{frame}
-\frametitle{Statische Code-Analyse}
-  \begin{itemize}
-    \item CodeQL für die statische Code-Analyse
-    \item CodeQL eigene Konfigurationsdatei
-      \begin{itemize} 
-        \item Möglich auch in der CI Kofigurationsdatei
-        \item Best Practice getrennt
-        \item Simplere Konfiguration durch seperate Datei
-      \end{itemize} 
-    \item Ergebnisse in GitHub-Security
-  \end{itemize}
-\end{frame}
-
-\subsection{CodeQL Konfiguration}
-\begin{frame}[fragile]
-\frametitle{CodeQL Konfiguration (Teil 1)}
-  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
-    name: CodeQL
-
-    on:
-      push:
-        branches: [ main, dev ]
-      pull_request:
-        branches: [ '**' ]
-      workflow_dispatch:
-
-    jobs:
-      analyze:
-        name: Analyze
-        runs-on: ubuntu-latest
-        permissions:
-          security-events: write
-          actions: read
-          contents: read
-
-        strategy:
-          fail-fast: false
-          matrix:
-            language: ['csharp']
-
-        steps:
-          - name: Checkout repository
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{CodeQL Konfiguration (Teil 2)}
-  \begin{lstlisting}[language=yaml, basicstyle=\ttfamily\tiny, breaklines=true]
-      - name: Setup .NET SDK
-            uses: actions/setup-dotnet@v4
-            with:
-              dotnet-version: '8.0.x'
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-          config-file: .github/codeql/codeql.yml
-
-      - name: Build with NUKE (required by CodeQL)
-        run: ./build.sh Compile
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: '/language:${{ matrix.language }}'
-  \end{lstlisting}
-\end{frame}
-
-\subsection{Containerisierung}
-\begin{frame}
-\frametitle{Containerisierung}
-  \begin{itemize}
-    \item Docker für die Containerisierung des Servers
-    \item Dockerfile im Server-Verzeichnis
-    \item Docker Compose im root-Verzeichnis
-  \end{itemize}
-\end{frame}
-
-\subsection{Dockerfile Code}
-\begin{frame}[fragile]
-\frametitle{Dockerfile Code}
-  \textbf{Dockerfile}
-  \begin{lstlisting}[language=Dockerfile,basicstyle=\ttfamily\tiny]
-    FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-    WORKDIR /source
-
-    COPY WaterWizards.sln .
-
-    COPY src/WaterWizard.Server/WaterWizard.Server.csproj ./src/WaterWizard.Server/
-    COPY src/WaterWizard.Shared/WaterWizard.Shared.csproj ./src/WaterWizard.Shared/
-    COPY src/WaterWizard.Client/WaterWizard.Client.csproj ./src/WaterWizard.Client/
-    COPY src/WaterWizardTests/WaterWizardTests.csproj ./src/WaterWizardTests/
-
-    RUN dotnet restore WaterWizards.sln
-
-    COPY src/WaterWizard.Server/ ./src/WaterWizard.Server/
-    COPY src/WaterWizard.Shared/ ./src/WaterWizard.Shared/
-    COPY src/WaterWizard.Client/ ./src/WaterWizard.Client/
-    COPY src/WaterWizardTests/ ./src/WaterWizardTests/
-
-    RUN dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -o /app/publish
-
-    FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
-    WORKDIR /app
-
-    COPY --from=build /app/publish .
-
-
-    EXPOSE 7777/udp
-
-
-    ENTRYPOINT ["dotnet", "WaterWizard.Server.dll"]
-  \end{lstlisting}
-\end{frame}
-
-\subsection{Docker-Compose Code}
-\begin{frame}[fragile]
-\frametitle{Docker-Compose Code}
-  \textbf{docker-compose}
-  \begin{lstlisting}[language=yaml,basicstyle=\ttfamily\tiny]
-    version: '3.8'
-
-    services:
-      waterwizard-server:
-        build:
-          context: .
-          dockerfile: ./src/WaterWizard.Server/Dockerfile
-        ports:
-          - "7777:7777/udp"
-        environment:
-          - PUBLIC_ADDRESS=${SERVER_IP}
-  \end{lstlisting}
-\end{frame}
 
 \section{Technische Erfahrungen}
 \begin{frame}
