@@ -15,5 +15,6 @@ analytics/analytics_*.md
 *.trx
 TestResults/
 # Präsentation
-presentation/
+presentation/*
+!presentation/images/
 !presentation/Präsentation.tex
