@@ -440,6 +440,10 @@ INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/sansmathaccent/mathkerncmssi8.tfm
+INPUT ./images/GameScreen.png
+INPUT ./images/GameScreen.png
+INPUT ./images/GameScreen.png
+INPUT ./images/GameScreen.png
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmss8.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
@@ -458,10 +462,6 @@ INPUT ./Präsentation.vrb
 INPUT Präsentation.vrb
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
-INPUT ./images/GameScreen.png
-INPUT ./images/GameScreen.png
-INPUT ./images/GameScreen.png
-INPUT ./images/GameScreen.png
 OUTPUT Präsentation.vrb
 INPUT ./Präsentation.vrb
 INPUT ./Präsentation.vrb
