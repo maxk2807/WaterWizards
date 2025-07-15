@@ -4,7 +4,7 @@
 \beamer@subsectionintoc {2}{2}{Projektplan}{6}{0}{2}
 \beamer@subsectionintoc {2}{3}{Rollen des Projektes}{7}{0}{2}
 \beamer@subsectionintoc {2}{4}{Ansprechpartner}{8}{0}{2}
-\beamer@sectionintoc {3}{Technologie + Architektur}{9}{0}{3}
+\beamer@sectionintoc {3}{Technologie und Architektur}{9}{0}{3}
 \beamer@subsectionintoc {3}{1}{UI/Client}{10}{0}{3}
 \beamer@subsectionintoc {3}{2}{Nachrichtenempfang + Parsing im Client}{11}{0}{3}
 \beamer@subsectionintoc {3}{3}{UI-Example}{13}{0}{3}
