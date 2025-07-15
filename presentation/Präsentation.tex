@@ -78,7 +78,8 @@
 
 \begin{frame}
 \frametitle{Inhaltsverzeichnis}
-\tableofcontents[hideallsubsections] \small
+\tableofcontents[hideallsubsections] 
+\small
 \end{frame}
 
 \section{Einleitung}
@@ -237,15 +238,10 @@
 \begin{frame}
   LiteNetLib für die Client-Server-Verbindung
     \begin{enumerate}
-      \item Einfacher Setup?
-      \item Einfache Client-Server-Communication über Messages
+      \item Einfaches Setup?
+      \item Einfache Client-Server-Kommunication über Nachrichten
       \item Einfache Datenübertragung der Spieldaten
     \end{enumerate}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Weiteres}
-  
 \end{frame}
 
 \subsection{UI/Client}
@@ -257,7 +253,7 @@
 \begin{frame}
   \frametitle{UI/Client}
   \begin{itemize}
-    \item Grafische Darstellung getrennt von Spielfunktionalität:
+    \item Grafische Darstellung getrennt von Spielfunktionalität
       \begin{itemize}
         \item Client übernimmt das Anzeigen und Handhabung des User Interfaces 
       \end{itemize}
@@ -303,8 +299,6 @@
   \end{lstlisting}
 \end{frame}
 
-
-
 \subsection{Nachrichtenempfang + Parsing im Client}
 \begin{frame}[fragile]
 \frametitle{Nachrichtenempfang und Parsing im Client}
@@ -344,7 +338,27 @@
   \end{lstlisting}
 \end{frame}
 
-
+\subsection{Nachrichten senden an den Server}
+\begin{frame}[fragile]
+\frametitle{Nachrichten senden an den Server}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public void RequestCardBuy(string cardType)
+      {
+          if (clientService.client != null && clientService.client.FirstPeer != null)
+          {
+              var writer = new NetDataWriter();
+              writer.Put("BuyCard");
+              writer.Put(cardType);
+              clientService.client.FirstPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+              Console.WriteLine("[Client] Kaufe Karte");
+          }
+          else
+          {
+              Console.WriteLine("[Client] Kein Server verbunden, PlaceShip konnte nicht gesendet werden.");
+          }
+      }
+  \end{lstlisting}
+\end{frame}
 
 \begin{frame}
   \frametitle{UI Struktur GameScreen}

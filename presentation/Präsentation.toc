@@ -7,15 +7,16 @@
 \beamer@sectionintoc {3}{Technologie und Architektur}{9}{0}{3}
 \beamer@subsectionintoc {3}{1}{Raylib}{10}{0}{3}
 \beamer@subsectionintoc {3}{2}{LiteNetLib}{11}{0}{3}
-\beamer@subsectionintoc {3}{3}{UI/Client}{13}{0}{3}
-\beamer@subsectionintoc {3}{4}{UI-Example}{15}{0}{3}
-\beamer@subsectionintoc {3}{5}{Nachrichtenempfang + Parsing im Client}{16}{0}{3}
-\beamer@subsectionintoc {3}{6}{TextureManager}{18}{0}{3}
-\beamer@subsectionintoc {3}{7}{Server/Backend}{19}{0}{3}
-\beamer@subsectionintoc {3}{8}{Backend - Client Kommunikation}{20}{0}{3}
-\beamer@subsectionintoc {3}{9}{GameState}{21}{0}{3}
-\beamer@subsectionintoc {3}{10}{Factory Pattern}{22}{0}{3}
-\beamer@subsectionintoc {3}{11}{Shared}{23}{0}{3}
+\beamer@subsectionintoc {3}{3}{UI/Client}{12}{0}{3}
+\beamer@subsectionintoc {3}{4}{UI-Example}{14}{0}{3}
+\beamer@subsectionintoc {3}{5}{Nachrichtenempfang + Parsing im Client}{15}{0}{3}
+\beamer@subsectionintoc {3}{6}{Nachrichten senden an den Server}{16}{0}{3}
+\beamer@subsectionintoc {3}{7}{TextureManager}{18}{0}{3}
+\beamer@subsectionintoc {3}{8}{Server/Backend}{19}{0}{3}
+\beamer@subsectionintoc {3}{9}{Backend - Client Kommunikation}{20}{0}{3}
+\beamer@subsectionintoc {3}{10}{GameState}{21}{0}{3}
+\beamer@subsectionintoc {3}{11}{Factory Pattern}{22}{0}{3}
+\beamer@subsectionintoc {3}{12}{Shared}{23}{0}{3}
 \beamer@sectionintoc {4}{DevOps}{24}{0}{4}
 \beamer@subsectionintoc {4}{1}{CI/CD Pipeline}{25}{0}{4}
 \beamer@subsectionintoc {4}{2}{CI-Pipeline Konfiguration}{26}{0}{4}

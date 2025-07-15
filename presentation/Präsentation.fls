@@ -450,6 +450,10 @@ INPUT ./Präsentation.vrb
 INPUT ./Präsentation.vrb
 INPUT Präsentation.vrb
 INPUT c:/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/tctt0800.tfm
+OUTPUT Präsentation.vrb
+INPUT ./Präsentation.vrb
+INPUT ./Präsentation.vrb
+INPUT Präsentation.vrb
 INPUT ./images/UI-Struktur.png
 INPUT ./images/UI-Struktur.png
 INPUT ./images/UI-Struktur.png
