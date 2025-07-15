@@ -63,8 +63,8 @@
 }
 
 \title{WaterWizards}
-\author{Justin Dewitz, Erick Zeiler, Max Kondratov, Julian <Nachname>}
-\date{17. Juli 2025}
+\author{Justin Dewitz, Erick Zeiler, Max Kondratov, Julian Ramscheid}
+\date{17. Juli 2025}  
 
 \begin{document}
 
@@ -191,17 +191,11 @@
   \begin{itemize}
     \item Architektur: Justin Dewitz
     \item Dokumentation: Erick Zeiler
-    \item Code-Qualität: Paul Schneider (abgesprungen)
     \item Git Repository: Max Kondratov
+    \item Koordinator: Julian Ramscheid
+    \item Qualitätsmanagement: Paul Schneider (verlassen)
   \end{itemize}
 \frametitle{Rollen des Projektes}
-
-\end{frame}
-
-\subsection{Ansprechpartner}
-\begin{frame}
-\frametitle{Ansprechpartner}
-
 \end{frame}
 
 \section{Technologie und Architektur}
@@ -226,22 +220,33 @@
   \frametitle{Raylib}
   \begin{itemize}
     \item Raylib für die grafische Darstellung
-    \begin{enumerate}
-      \item Leichtgewichtige Library
-      \item Einfacher Einstieg
-      \item Kein Eigenenes Key- und Maus-Event Handling
-    \end{enumerate}
-  \end{itemize}
+    \begin{multicols}{2}
+      \begin{itemize}
+        \item Leichtgewichtige Library
+        \item Einfacher Einstieg
+      \end{itemize}
+      \columnbreak
+      \begin{itemize}
+        \item Kein Eigenenes Key- und Maus-Event Handling
+      \end{itemize}
+    \end{multicols}
+    \end{itemize}
 \end{frame}
 
 \subsection{LiteNetLib}
 \begin{frame}
   LiteNetLib für die Client-Server-Verbindung
-    \begin{enumerate}
-      \item Einfaches Setup?
+  \begin{multicols}{2}
+    \begin{itemize}
+      \item Einfaches Setup
       \item Einfache Client-Server-Kommunication über Nachrichten
       \item Einfache Datenübertragung der Spieldaten
-    \end{enumerate}
+    \end{itemize}
+    \columnbreak
+    \begin{itemize}
+      \item Unterstützt nur UDP
+    \end{itemize}
+  \end{multicols}
 \end{frame}
 
 \subsection{UI/Client}
@@ -257,9 +262,9 @@
       \begin{itemize}
         \item Client übernimmt das Anzeigen und Handhabung des User Interfaces 
       \end{itemize}
-    \item Gemeint sind Interaktive dargestellte Elemente, z.B:
+    \item Interaktive dargestellte Elemente:
     \begin{itemize} 
-      \item Das Main Menu, Die Kartenstapel, die Schiffe oder die Kartenhand
+      \item Das Main Menu, die Kartenstapel, die Schiffe oder die Kartenhand
     \end{itemize}
     \item Rendering und Client-Side Logik werden über Draw-Methoden direkt in der GameLoop ausgeführt wird.
   \end{itemize} 
@@ -812,7 +817,19 @@ public class TextureManager
 \section{Technische Erfahrungen}
 \begin{frame}
 \frametitle{Technische Erfahrungen}
-  
+  \begin{multicols}{2}
+    \begin{itemize}
+      \item Raylib hat einfachen Einstieg erlaubt
+      \item CI/CD Pipeline hat gut Funktioniert
+      \item Automatische Validierung CodeQL gut Funktioniert
+      \item 
+    \end{itemize}
+    \columnbreak
+    \begin{itemize}
+      \item Server Hosten richtig scheiße
+      \item 
+    \end{itemize}
+  \end{multicols}
 \end{frame}
 
 \section{Analyse}
