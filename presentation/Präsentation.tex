@@ -5,19 +5,49 @@
 \usepackage{listings}
 \usepackage{pgfgantt}
 \usepackage{xcolor}
-\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{csquotes}
+\usepackage{textcomp}
 \setbeamertemplate{footline}[frame number]
 \graphicspath{ {./images/} }
 \setbeamertemplate{section in toc}[ball unnumbered]
 
-\lstdefinelanguage{yaml}{
-  keywords={true,false,null,y,n},
-  sensitive=false,
-  comment=[l]{\#},
+\lstdefinelanguage{json}{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  showstringspaces=false,
+  commentstyle=\color{gray},
+  stringstyle=\color{orange},
+  keywordstyle=\color{blue}\bfseries,
+  keywords={true,false,null},
+  string=[s]{"}{"},
+  comment=[l]{//},
   morecomment=[s]{/*}{*/},
-  morestring=[b]',
-  morestring=[b]"
+  breaklines=true,
+  frame=single,
 }
+
+\lstdefinelanguage{markdown}{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+}
+
+\lstdefinelanguage{yaml}{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  keywords={true,false,null,yes,no},
+  keywordstyle=\color{blue}\bfseries,
+  stringstyle=\color{orange},
+  commentstyle=\color{gray},
+  comment=[l]{\#},
+}
+
 \lstset{
   basicstyle=\ttfamily\small,
   columns=fullflexible,
@@ -64,7 +94,7 @@
 
 \title{WaterWizards}
 \author{Justin Dewitz, Erick Zeiler, Max Kondratov, Julian Ramscheid}
-\date{17. Juli 2025}  
+\date{16. Juli 2025}  
 
 \begin{document}
 
@@ -117,7 +147,7 @@
 \begin{frame}
   \frametitle{Organisation}
   \begin{itemize}
-    \item git über GitHub für die Versionsverwaltung 
+    \item Github
     \item Scrum mit 2-Wochen-Sprints
     \item Kanban/Issue-Board über GitHub
     \item Kommunikation über Discord-Server
@@ -546,7 +576,7 @@
 
 \section{Architektur}
 \begin{frame}
-  \frametitle{Architektur}
+\frametitle{Architektur}
   \begin{itemize}
     \item UI/Client
     \item Server/Backend
@@ -696,32 +726,41 @@
 \begin{frame}
 \frametitle{Backend - Client Kommunikation}
 \begin{columns}
-  \begin{column}{0.45\textwidth}
-    Event-Driven Architektur
-    \begin{itemize}
-      \item UDP für die Echtzeit-Kommunikation
-      \item Nachrichten basiertes Protokoll für beidseitige Kommunikation
-    \end{itemize}
-  \end{column}
-  \begin{column}{0.55\textwidth}
-    \includegraphics[width=\textwidth]{Server-Client-Logs.png}
-  \end{column}
-\end{columns}
-\end{frame}
-\begin{frame}[fragile]
   \begin{column}{0.85\textwidth}
     Basiert auf dem Austausch von Ereignissen (Events)
     \begin{itemize}
-      \item Ein Spieler hat eine Karte ausgespielt („CastCard“)
-      \item Das Spiel wird pausiert („UpdatePauseState“)
-      \item Ein Schiff wurde zerstört („ShipDestroyed“)
+      \item Ein Spieler hat eine Karte ausgespielt (``CastCard'')
+      \item Das Spiel wird pausiert (``UpdatePauseState'')
+      \item Ein Schiff wurde zerstört (``ShipDestroyed'')
       \item Jede Aktion im Spiel löst ein Event aus, das dann an die jeweils betroffenen Clients geschickt wird.
     \end{itemize}
-      Der Vorteil: 
-      \item
-      Das Spiel bleibt reaktionsschnell und alle Spieler sind immer auf dem aktuellen Stand, ohne unnötigen Netzwerkverkehr.
+    
+    Der Vorteil:
+    \begin{itemize}
+      \item Das Spiel bleibt reaktionsschnell und alle Spieler sind immer auf dem aktuellen Stand, ohne unnötigen Netzwerkverkehr.
+    \end{itemize}
+  \end{column}
+\end{columns}
+\end{frame}
 
-\end{column}
+\begin{frame}[fragile]
+\frametitle{Backend - Client Kommunikation}
+  \begin{columns}
+  \begin{column}{0.85\textwidth}
+    Basiert auf dem Austausch von Ereignissen (Events)
+    \begin{itemize}
+      \item Ein Spieler hat eine Karte ausgespielt (``CastCard'')
+      \item Das Spiel wird pausiert (``UpdatePauseState'')
+      \item Ein Schiff wurde zerstört (``ShipDestroyed'')
+      \item Jede Aktion im Spiel löst ein Event aus, das dann an die jeweils betroffenen Clients geschickt wird.
+    \end{itemize}
+    
+    Der Vorteil:
+    \begin{itemize}
+      \item Das Spiel bleibt reaktionsschnell und alle Spieler sind immer auf dem aktuellen Stand, ohne unnötigen Netzwerkverkehr.
+    \end{itemize}
+  \end{column}
+  \end{columns}
 \end{frame}
 
 \subsection{Nachrichtenempfang + Parsing im Client}
@@ -880,6 +919,57 @@
     \item Einfachere Wartbarkeit und Erweiterbarkeit
     \item Einheitliche Handhabung von Aktionen
   \end{itemize} 
+\end{frame}
+
+\subsection{Ressources}
+\begin{frame}[fragile]
+\frametitle{Gold}
+\begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public void UpdateGold()
+    {
+        gameState.UpdateGoldFreezeTimers(2000f);
+
+        if (!gameState.IsPlayerGoldFrozen(0))
+        {
+            int merchantShipCount = GetMerchantShipCount(0);
+            int goldToAdd = 1 + merchantShipCount; 
+            
+            gameState.SetGold(0, gameState.Player1Gold + goldToAdd);
+            Console.WriteLine($"[GoldHandler] Player 1 Gold +{goldToAdd} (Neuer Stand: {gameState.Player1Gold})");
+        }
+        else
+        {
+            Console.WriteLine("[GoldHandler] Player 1 gold generation frozen - no gold gained");
+            Console.WriteLine($"[GoldHandler] Player 1 Gold bleibt bei {gameState.Player1Gold} (Gold-Freeze-Effekt aktiv)");
+        }
+
+        SendGoldUpdates();
+    }
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Ressources}
+\begin{frame}[fragile]
+\frametitle{Mana}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public void UpdateMana()
+      {
+          paralizeHandler.UpdateParalizeTimers(4000f); // 4 Sekunden = 4000ms
+
+          if (!paralizeHandler.IsPlayerParalized(0))
+          {
+              gameState.Player1Mana.Add(1);
+              Console.WriteLine($"[ManaHandler] Player 1 Mana +1 (Neuer Stand: {gameState.Player1Mana.CurrentMana})");
+          }
+          else
+          {
+              Console.WriteLine("[ManaHandler] Player 1 paralyzed - no mana gained");
+              Console.WriteLine($"[ManaHandler] Player 1 Mana bleibt bei {gameState.Player1Mana.CurrentMana} (Paralize-Effekt aktiv)");
+          }
+
+          SendManaUpdates();
+      }
+    \end{lstlisting}
 \end{frame}
 
 \subsection{Shared}
