@@ -500,6 +500,47 @@ public class TextureManager
   \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Beispiel: Cards}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+        // Damage Variants
+        { CardVariant.MagicAttack, CardType.Damage },
+        { CardVariant.ArcaneMissile, CardType.Damage },
+        { CardVariant.Firebolt, CardType.Damage },
+        { CardVariant.Fireball, CardType.Damage },
+        { CardVariant.GreedHit, CardType.Damage },
+        { CardVariant.FrostBolt, CardType.Damage },
+        { CardVariant.LifeSteal, CardType.Damage },
+        //[...]
+  \end{lstlisting}
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    // Damage
+        {
+            CardVariant.MagicAttack,
+            new CardStats
+            {
+                Mana = 1,
+                Gold = 2,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new("1x1"),
+            }
+        },
+        {
+            CardVariant.ArcaneMissile,
+            new CardStats
+            {
+                Mana = 2,
+                Gold = 2,
+                CastTime = "instant",
+                Duration = "instant",
+                Target = new("random 1x1"),
+            }
+        },
+  \end{lstlisting}
+\end{frame}
+
+
 \section{DevOps}
 \begin{frame}
 \frametitle{DevOps}
