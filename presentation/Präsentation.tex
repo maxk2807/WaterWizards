@@ -8,6 +8,7 @@
 \usepackage[utf8]{inputenc}
 \setbeamertemplate{footline}[frame number]
 \graphicspath{ {./images/} }
+\setbeamertemplate{section in toc}[ball unnumbered]
 
 \lstdefinelanguage{yaml}{
   keywords={true,false,null,y,n},
@@ -184,7 +185,7 @@
 \end{center}
 \end{frame}
 
-\section{Rollen des Projektes}
+\subsection{Rollen des Projektes}
 \begin{frame}
   \begin{itemize}
     \item Architektur: Justin Dewitz
@@ -561,7 +562,7 @@ public class TextureManager
 
     echo "Release assets:"
     ls -la release-assets/
-
+ 
 - name: Create GitHub Release & Upload Assets
   uses: softprops/action-gh-release@v2
   with:

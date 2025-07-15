@@ -2,28 +2,28 @@
 \beamer@sectionintoc {2}{Organisation}{4}{0}{2}
 \beamer@subsectionintoc {2}{1}{Backlog}{5}{0}{2}
 \beamer@subsectionintoc {2}{2}{Projektplan}{6}{0}{2}
-\beamer@sectionintoc {3}{Rollen des Projektes}{7}{0}{3}
-\beamer@subsectionintoc {3}{1}{Ansprechpartner}{8}{0}{3}
-\beamer@sectionintoc {4}{Technologie + Architektur}{9}{0}{4}
-\beamer@subsectionintoc {4}{1}{UI/Client}{10}{0}{4}
-\beamer@subsectionintoc {4}{2}{Nachrichtenempfang + Parsing im Client}{11}{0}{4}
-\beamer@subsectionintoc {4}{3}{UI-Example}{13}{0}{4}
-\beamer@subsectionintoc {4}{4}{TextureManager}{15}{0}{4}
-\beamer@subsectionintoc {4}{5}{Server/Backend}{16}{0}{4}
-\beamer@subsectionintoc {4}{6}{Backend - Client Kommunikation}{17}{0}{4}
-\beamer@subsectionintoc {4}{7}{GameState}{18}{0}{4}
-\beamer@subsectionintoc {4}{8}{Factory Pattern}{19}{0}{4}
-\beamer@subsectionintoc {4}{9}{Shared}{20}{0}{4}
-\beamer@sectionintoc {5}{DevOps}{21}{0}{5}
-\beamer@subsectionintoc {5}{1}{CI/CD Pipeline}{22}{0}{5}
-\beamer@subsectionintoc {5}{2}{CI-Pipeline Konfiguration}{23}{0}{5}
-\beamer@subsectionintoc {5}{3}{CD-Pipeline Konfiguration}{24}{0}{5}
-\beamer@subsectionintoc {5}{4}{Statische Code-Analyse}{26}{0}{5}
-\beamer@subsectionintoc {5}{5}{CodeQL Konfiguration}{27}{0}{5}
-\beamer@subsectionintoc {5}{6}{Containerisierung}{29}{0}{5}
-\beamer@subsectionintoc {5}{7}{Dockerfile Code}{30}{0}{5}
-\beamer@subsectionintoc {5}{8}{Docker-Compose Code}{31}{0}{5}
-\beamer@sectionintoc {6}{Technische Erfahrungen}{32}{0}{6}
-\beamer@sectionintoc {7}{Analyse}{33}{0}{7}
-\beamer@sectionintoc {8}{Wiki}{34}{0}{8}
-\beamer@sectionintoc {9}{Erfahrungen und Fazit}{35}{0}{9}
+\beamer@subsectionintoc {2}{3}{Rollen des Projektes}{7}{0}{2}
+\beamer@subsectionintoc {2}{4}{Ansprechpartner}{8}{0}{2}
+\beamer@sectionintoc {3}{Technologie + Architektur}{9}{0}{3}
+\beamer@subsectionintoc {3}{1}{UI/Client}{10}{0}{3}
+\beamer@subsectionintoc {3}{2}{Nachrichtenempfang + Parsing im Client}{11}{0}{3}
+\beamer@subsectionintoc {3}{3}{UI-Example}{13}{0}{3}
+\beamer@subsectionintoc {3}{4}{TextureManager}{15}{0}{3}
+\beamer@subsectionintoc {3}{5}{Server/Backend}{16}{0}{3}
+\beamer@subsectionintoc {3}{6}{Backend - Client Kommunikation}{17}{0}{3}
+\beamer@subsectionintoc {3}{7}{GameState}{18}{0}{3}
+\beamer@subsectionintoc {3}{8}{Factory Pattern}{19}{0}{3}
+\beamer@subsectionintoc {3}{9}{Shared}{20}{0}{3}
+\beamer@sectionintoc {4}{DevOps}{21}{0}{4}
+\beamer@subsectionintoc {4}{1}{CI/CD Pipeline}{22}{0}{4}
+\beamer@subsectionintoc {4}{2}{CI-Pipeline Konfiguration}{23}{0}{4}
+\beamer@subsectionintoc {4}{3}{CD-Pipeline Konfiguration}{24}{0}{4}
+\beamer@subsectionintoc {4}{4}{Statische Code-Analyse}{26}{0}{4}
+\beamer@subsectionintoc {4}{5}{CodeQL Konfiguration}{27}{0}{4}
+\beamer@subsectionintoc {4}{6}{Containerisierung}{29}{0}{4}
+\beamer@subsectionintoc {4}{7}{Dockerfile Code}{30}{0}{4}
+\beamer@subsectionintoc {4}{8}{Docker-Compose Code}{31}{0}{4}
+\beamer@sectionintoc {5}{Technische Erfahrungen}{32}{0}{5}
+\beamer@sectionintoc {6}{Analyse}{33}{0}{6}
+\beamer@sectionintoc {7}{Wiki}{34}{0}{7}
+\beamer@sectionintoc {8}{Erfahrungen und Fazit}{35}{0}{8}
