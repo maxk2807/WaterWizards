@@ -437,23 +437,22 @@ public class TextureManager
     \item Programm wird in Zustands-Klassen (States) beschrieben
     \item Spiel wird in der GameState-Klasse beschrieben
   \end{itemize}
-  \textbf{Ausschnitt: }
+  \textbf{Beispiel: }
   \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
-    public class GameState
+    public void CheckGameOver()
     {
-      public NetPeer[] players = new NetPeer[2];
-      public static readonly int boardWidth = 12;
-      public static readonly int boardHeight = 10;
-      public readonly Cell[][,] boards = new Cell[2][,];
-      public Cell[,] Player1 => boards[0];
-      public Cell[,] Player2 => boards[1];
-      public readonly List<Cards>[] hands;
-      private readonly NetManager server;
-      public readonly ServerGameStateManager manager;
-      public List<Cards> Player1Hand => hands[0];
-      public List<Cards> Player2Hand => hands[1];
-      public static List<Cards>? ActiveCards //[...]
-      public static List<Cards>? UtilityStack //[...]
+        foreach (var player in players)
+        {
+            if (player != null && ShipHandler.AreAllShipsDestroyed(player))
+            {
+                var winner = players.FirstOrDefault(p => p != player);
+                if (winner != null)
+                {
+                    BroadcastGameOver(winner, player);
+                }
+            }
+        }
+    }
   \end{lstlisting}
 \end{frame}
 
