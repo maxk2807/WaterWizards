@@ -436,6 +436,7 @@ public class TextureManager
   \begin{itemize}
     \item Programm wird in Zustands-Klassen (States) beschrieben
     \item Spiel wird in der GameState-Klasse beschrieben
+    \item Spielinstanzen können getrennt werden
   \end{itemize}
   \textbf{Beispiel: }
   \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
@@ -502,17 +503,19 @@ public class TextureManager
 
 \begin{frame}[fragile]
   \frametitle{Beispiel: Cards}
+  \textbf{Definition: }
   \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
-        // Damage Variants
-        { CardVariant.MagicAttack, CardType.Damage },
-        { CardVariant.ArcaneMissile, CardType.Damage },
-        { CardVariant.Firebolt, CardType.Damage },
-        { CardVariant.Fireball, CardType.Damage },
-        { CardVariant.GreedHit, CardType.Damage },
-        { CardVariant.FrostBolt, CardType.Damage },
-        { CardVariant.LifeSteal, CardType.Damage },
-        //[...]
+    // Damage Variants
+    { CardVariant.MagicAttack, CardType.Damage },
+    { CardVariant.ArcaneMissile, CardType.Damage },
+    { CardVariant.Firebolt, CardType.Damage },
+    { CardVariant.Fireball, CardType.Damage },
+    { CardVariant.GreedHit, CardType.Damage },
+    { CardVariant.FrostBolt, CardType.Damage },
+    { CardVariant.LifeSteal, CardType.Damage },
+    //[...]
   \end{lstlisting}
+  \textbf{Nutzung: }
   \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
     public void HandleCast(Cards card, GameBoard.Point hoveredCoords)
     {
@@ -809,7 +812,7 @@ public class TextureManager
 \section{Technische Erfahrungen}
 \begin{frame}
 \frametitle{Technische Erfahrungen}
-
+  
 \end{frame}
 
 \section{Analyse}
