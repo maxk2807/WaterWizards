@@ -534,10 +534,25 @@
 \end{frame}
 
 
-\subsection{UI/Client}
+\subsection{UI/Client - Deckblatt}
 \begin{frame}
-  \frametitle{UI/Client}
-  \includegraphics[width=\textwidth]{GameScreen.png}
+  \frametitle{UI/Client - Main Menu}
+  \includegraphics[width=0.95\textwidth]{MainMenuScreen.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{UI/Client - Lobby List}
+  \includegraphics[width=0.95\textwidth]{LobbyListScreen.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{UI/Client - Lobby List}
+  \includegraphics[width=0.95\textwidth]{LobbyScreen.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{UI/Client - GameScreen}
+  \includegraphics[width=0.95\textwidth]{GameScreen.png}
 \end{frame}
 
 \begin{frame}
@@ -554,7 +569,7 @@
     \item Rendering und Client-Side Logik werden über Draw-Methoden direkt in der GameLoop ausgeführt wird.
   \end{itemize} 
   \centering
-  \includegraphics[width=0.55\textwidth]{MainMenu.png}
+  \includegraphics[width=0.55\textwidth]{MainMenuZoomIn.png}
 \end{frame}
 
 \subsection{UI-Example}
@@ -587,6 +602,62 @@
         Raylib.DrawRectangleRec(joinButton, hoverJoin ? new(255, 255, 255, 31) : Color.Blank);
     }
   \end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{UI Struktur GameScreen}
+  \includegraphics[width=\textwidth]{UI-Struktur.png}
+\end{frame}
+
+\subsection{TextureManager}
+\begin{frame}[fragile]
+\frametitle{TextureManager}
+\begin{multicols}{2}
+  
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public class TextureManager
+    {
+      private static List<Texture2D> textures = [];
+      
+      public static Texture2D LoadTexture(string file)
+      {
+        var texture = Raylib.LoadTexture(file);
+        textures.Add(texture);
+        return texture;
+      }
+        
+      public static void UnloadAllTextures()
+      {
+        foreach (var texture in textures)
+        {
+          Raylib.UnloadTexture(texture);
+        }
+      }
+    }
+  \end{lstlisting}
+  \columnbreak
+  \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
+    public static class SoundManager
+    {
+    //sounds definition [...]
+
+    public static void LoadSounds()
+    {
+        CardSound = Raylib.LoadSound("...Sounds/DrawCard.wav");
+        ButtonSound = Raylib.LoadSound("...Sounds/ButtonClick.wav");
+        //[...]
+    }
+
+    public static void UnloadSounds()
+    {
+        Raylib.UnloadSound(CardSound);
+        Raylib.UnloadSound(ButtonSound);
+        //[...]
+    }
+    
+    //[...]
+  \end{lstlisting}
+\end{multicols}
 \end{frame}
 
 \subsection{Nachrichtenempfang + Parsing im Client}
@@ -648,48 +719,6 @@
           }
       }
   \end{lstlisting}
-\end{frame}
-
-\begin{frame}
-  \frametitle{UI Struktur GameScreen}
-  \includegraphics[width=\textwidth]{UI-Struktur.png}
-\end{frame}
-
-\subsection{TextureManager}
-\begin{frame}[fragile]
-\frametitle{TextureManager}
-\begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
-/// <summary>
-/// Verwaltet das Laden und Entladen von Texturen für das Spiel.
-/// </summary>
-public class TextureManager
-{
-    private static List<Texture2D> textures = [];
-
-    /// <summary>
-    /// Lädt eine Textur aus einer Datei und speichert sie für späteres Entladen.
-    /// </summary>
-    /// <param name="file">Pfad zur Texturdatei</param>
-    /// <returns>Die geladene Textur als <see cref="Texture2D"/></returns>
-    public static Texture2D LoadTexture(string file)
-    {
-        var texture = Raylib.LoadTexture(file);
-        textures.Add(texture);
-        return texture;
-    }
-
-    /// <summary>
-    /// Entlädt alle zuvor geladenen Texturen aus dem Speicher.
-    /// </summary>
-    public static void UnloadAllTextures()
-    {
-        foreach (var texture in textures)
-        {
-            Raylib.UnloadTexture(texture);
-        }
-    }
-}
-\end{lstlisting}
 \end{frame}
 
 \subsection{Server/Backend}
