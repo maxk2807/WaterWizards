@@ -14,14 +14,6 @@ analytics/analytics_*.md
 # Test-Output
 *.trx
 TestResults/
-presentation/Präsentation.aux
-presentation/Präsentation.fdb_latexmk
-presentation/Präsentation.fls
-presentation/Präsentation.log
-presentation/Präsentation.nav
-presentation/Präsentation.out
-presentation/Präsentation.snm
-presentation/Präsentation.pdf
-presentation/Präsentation.syntex.gz
-presentation/Präsentation.toc
-presentation/Präsentation.vrb
+# Präsentation
+presentation/
+!presentation/Präsentation.tex
