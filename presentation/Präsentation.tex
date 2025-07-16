@@ -265,16 +265,20 @@
 
 \subsection{LiteNetLib}
 \begin{frame}
+\frametitle{LiteNetLib}
   LiteNetLib für die Client-Server-Verbindung
   \begin{multicols}{2}
     \begin{itemize}
+      \item \textbf{Vorteile:}
       \item Einfaches Setup
       \item Einfache Client-Server-Kommunitation über Nachrichten
       \item Einfache Datenübertragung der Spieldaten
     \end{itemize}
     \columnbreak
     \begin{itemize}
+      \item \textbf{Nachteile:}
       \item Unterstützt nur UDP
+      \item Wenig Doku
     \end{itemize}
   \end{multicols}
 \end{frame}
@@ -428,6 +432,13 @@
   \end{itemize}
 \end{frame}
 
+\subsection{Statische Code-Analyse}
+\begin{frame}
+\frametitle{Statische Code-Analyse}
+  \center
+  \includegraphics[width=0.8\textwidth]{github-sec.png}
+\end{frame}
+
 \subsection{CodeQL Konfiguration}
 \begin{frame}[fragile]
 \frametitle{CodeQL Konfiguration (Teil 1)}
@@ -487,6 +498,13 @@
   \end{lstlisting}
 \end{frame}
 
+\subsection{DevOps Metric}
+\begin{frame}
+\frametitle{Dev Ops Metrik}
+  \center
+  \includegraphics[width=0.8\textwidth]{ActionsUsageMetric.png}
+\end{frame}
+
 \subsection{Containerisierung}
 \begin{frame}
 \frametitle{Containerisierung}
@@ -509,15 +527,11 @@
 
     COPY src/WaterWizard.Server/WaterWizard.Server.csproj ./src/WaterWizard.Server/
     COPY src/WaterWizard.Shared/WaterWizard.Shared.csproj ./src/WaterWizard.Shared/
-    COPY src/WaterWizard.Client/WaterWizard.Client.csproj ./src/WaterWizard.Client/
-    COPY src/WaterWizardTests/WaterWizardTests.csproj ./src/WaterWizardTests/
 
     RUN dotnet restore WaterWizards.sln
 
     COPY src/WaterWizard.Server/ ./src/WaterWizard.Server/
     COPY src/WaterWizard.Shared/ ./src/WaterWizard.Shared/
-    COPY src/WaterWizard.Client/ ./src/WaterWizard.Client/
-    COPY src/WaterWizardTests/ ./src/WaterWizardTests/
 
     RUN dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -o /app/publish
 
@@ -660,9 +674,9 @@
   \includegraphics[width=\textwidth]{UI-Struktur.png}
 \end{frame}
 
-\subsection{TextureManager}
+\subsection{AssetManager}
 \begin{frame}[fragile]
-\frametitle{TextureManager}
+\frametitle{AssetManager}
 \begin{multicols}{2}
   
   \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
@@ -830,9 +844,9 @@
 
 \subsection{GameState}
 \begin{frame}[fragile]
-  \frametitle{Spielzustand / GameState}
+  \frametitle{Spielzustand/GameState}
   \begin{itemize}
-    \item Programm wird in Zustands-Klassen (States) beschrieben
+    \item Programm wird in States beschrieben
     \item Spiel wird in der GameState-Klasse beschrieben
     \item Spielinstanzen können getrennt werden
   \end{itemize}
@@ -1032,6 +1046,7 @@
       \item \textbf{Negativ:}
       \item Server deployment war komplex
       \item Keine CD für den globalen Server
+      \item Best Practices nicht bei Projektstart
     \end{itemize}
   \end{multicols}
 \end{frame}
@@ -1047,29 +1062,9 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Was wird analysiert?}
-\begin{itemize}
-  \item \textbf{Git-Statistiken:} Commits, Branches, letzter Commit, Autor, etc.
-  \item \textbf{Code-Statistiken:} Anzahl Dateien, Gesamtzeilen, Codezeilen, Kommentarzeilen, leere Zeilen, Dateitypen, Klassen, Methoden, Interfaces, Properties
-  \item \textbf{Entwickler-Statistiken:} Beiträge pro Entwickler, Feature-/Bugfix-/Refactor-/Doku-Commits, Aktivitätsverläufe, Alias-Erkennung
-  \item \textbf{Qualitätsmetriken:} Verhältnis Code/Kommentar, Komplexität, Dokumentationsabdeckung, Velocity, aktivster Entwickler, Repository-Alter
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Beispielhafte Metriken}
-\begin{itemize}
-  \item \textbf{Code-Komplexität:} z.B. durchschnittliche Methodenlänge
-  \item \textbf{Dokumentationsabdeckung:} Anteil dokumentierter Klassen
-  \item \textbf{Velocity:} Commits pro Tag im Durchschnitt
-  \item \textbf{Aktivster Entwickler:} Name und Beitrag
-  \item \textbf{Feature/Bugfix/Refactor-Anteile:} Prozentuale Verteilung der Commits
-\end{itemize}
-\end{frame}
-
+\subsection{Analyse}
 \begin{frame}[fragile]
-\frametitle{Beispiel: Entwickler-Statistiken (JSON-Auszug)}
+\frametitle{Beispielstruktur der Statistik}
 \begin{lstlisting}[language=json, basicstyle=\ttfamily\tiny, breaklines=true]
 {
   "developerStatistics": [
@@ -1087,8 +1082,9 @@
 }
 \end{lstlisting}
 \end{frame}
-\begin{frame}[fragile]
 
+\subsection{Analyse}
+\begin{frame}[fragile]
 \frametitle{Beispiel: Entwickler-Statistiken}
 \begin{lstlisting}[language=markdown,basicstyle=\ttfamily\tiny,breaklines=true]
 
@@ -1114,24 +1110,25 @@
 - **Most Active Month**: 2025-05 (101 commits)
 
 \end{lstlisting}
-
 \end{frame}
 
+\subsection{Analyse}
 \begin{frame}
 \frametitle{Das Skript: Wie funktioniert unsere Analyse?}
 \begin{itemize}
   \item Zentrale Methode \texttt{GenerateRepositoryAnalytics} sammelt alle relevanten Daten:
   \begin{itemize}
-    \item Git-Statistiken (Commits, Branches, letzter Commit, Autor, etc.)
-    \item Code-Statistiken (Dateien, Zeilen, Klassen, Methoden, Kommentare, etc.)
-    \item Entwickler-Statistiken (Beiträge, Aktivität, Aliase)
-    \item Qualitätsmetriken (Code-Komplexität, Dokumentationsabdeckung, Velocity)
+    \item Git-Statistiken 
+    \item Code-Statistiken
+    \item Entwickler-Statistiken
+    \item Qualitätsmetriken
   \end{itemize}
   \item Die Daten werden automatisch aus dem Repository und dem Quellcode extrahiert – keine manuelle Pflege nötig!
   \item Ergebnisse werden als JSON und Markdown gespeichert und können für Reports oder Visualisierungen genutzt werden.
 \end{itemize}
 \end{frame}
 
+\subsection{Analyse}
 \begin{frame}[fragile]
 \frametitle{Code-Ausschnitt: Analyse-Logik}
 \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
@@ -1153,6 +1150,7 @@ analytics.QualityMetrics = metricsCalculator.Calculate();
 \end{lstlisting}
 \end{frame}
 
+\subsection{Analyse}
 \begin{frame}[fragile]
 \frametitle{Entwickler-Statistiken (Models/DeveloperStatistics.cs)}
 \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
@@ -1181,6 +1179,7 @@ public class DeveloperStatistics
 \end{itemize}
 \end{frame}
 
+\subsection{Analyse}
 \begin{frame}[fragile]
 \frametitle{Code-Analyse: Zeilenzählung}
 \begin{lstlisting}[language=CSharp, basicstyle=\ttfamily\tiny, breaklines=true]
@@ -1211,13 +1210,11 @@ private static FileAnalysis AnalyzeFile(string filePath)
 \textbf{Erklärung:}
 {\footnotesize
 \begin{itemize}
-  \item Jede Datei wird zeilenweise analysiert.
-  \item Es wird unterschieden zwischen Codezeilen, Kommentarzeilen und leeren Zeilen.
-  \item Auch mehrzeilige Kommentare werden korrekt erkannt.
-\end{itemize}
-}
+  \item Unterscheidung zwischen Code-, Kommentar- und leeren Zeilen
+\end{itemize}}
 \end{frame}
 
+\subsection{Analyse}
 \begin{frame}
 \frametitle{Nutzen für das Team}
 \begin{itemize}
@@ -1225,6 +1222,13 @@ private static FileAnalysis AnalyzeFile(string filePath)
   \item Motivation durch sichtbare Fortschritte und Statistiken
   \item Grundlage für gezielte Verbesserungen im Entwicklungsprozess
 \end{itemize}
+\end{frame}
+
+\subsection{Analyse}
+\begin{frame}
+\frametitle{Github Insights}
+  \center
+  \includegraphics[width=0.7\textwidth]{GitCommits.png}
 \end{frame}
 
 \section{Erfahrungen und Fazit}
