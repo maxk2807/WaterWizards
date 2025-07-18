@@ -14,7 +14,7 @@ The solution ([WaterWizards.sln](WaterWizards.sln)) contains the following proje
 
 *   .NET 8 SDK
 
-## Setup and Running
+# Setup and Running
 
 1.  **Clone the repository (if you haven't already):**
     ```sh
@@ -43,4 +43,101 @@ The solution ([WaterWizards.sln](WaterWizards.sln)) contains the following proje
 ## Dependencies
 
 *   [Raylib-cs](https://github.com/ChrisDill/Raylib-cs) (Client)
-*   [LiteNetLib](https://github.com/RevenantX/LiteNetLib) (Client, Server, Shared)
+*   [LiteNetLib](https://github.com/RevenantX/LiteNetLib) (Client, Server, Shared)  
+
+
+## Game Launcher 
+
+### **Unix/MacOS/Linux**
+- **`./start-game`** - Universal Script
+- **`./start-game.sh`** - Bash Skript for a quick start with 2 clients and with a server
+
+### **Windows**
+- **`start-game.bat`** - Batch-Script for CMD
+- **`start-game.ps1`** - Powershell-Script
+
+
+## Usage
+
+### Easiest Method (all Platformen)
+```bash
+./start-game
+```
+
+### Windows Powershell
+```powershell
+.\start-game.ps1
+```
+
+### Windows CMD
+```cmd
+./start-game.bat
+```
+
+### Unix/MacOS/Linux
+```bash
+./start-game.sh
+```
+
+
+## Ending the Game
+
+### On all platforms
+```bash
+CTRL + C
+```
+
+
+## Logging
+Scripts are creating log files:
+- **`server.log`** - Server-Logs
+- **`client1.log`** - Client 1 Logs
+- **`client2.log`** - Client 2 Logs
+
+## Troubleshooting
+### Build-Error
+```bash
+❌ Build failed! Please fix the errors and try again.
+```
+**Solution:** Fix the build errors
+
+### Server-Start-Error
+```bash
+❌ Server failed to start. Check server.log for details.
+```
+**Solution:** Check the `server.log` for detailed logs.
+
+### Port-Conflicts
+**Symptom:** Server or Client can't connect to each other
+**Solution:** 
+- Check if port 7777 is available
+- End other dotnet-process
+- Use `netstat -an | grep 7777` (Unix) or `netstat -an | findstr 7777` (Windows)
+
+
+## Start single Services
+
+### Start only Server (dotnet)
+```bash
+dotnet run --project src/WaterWizard.Server/WaterWizard.Server.csproj
+```
+
+### Start only Server (docker)
+- In the server directory run:
+```bash
+docker compose up --build
+```
+
+### Start only a Client
+```bash
+dotnet run --project src/WaterWizard.Client/WaterWizard.Client.csproj
+```
+
+
+## Plattform-Support
+
+| Plattform | Recommended Script | Alternative |
+|-----------|-------------------|-------------|
+| macOS | `./start-game` | `./start-game.sh` |
+| Linux | `./start-game` | `./start-game.sh` |
+| Windows | `start-game.ps1` | `start-game.bat` |
