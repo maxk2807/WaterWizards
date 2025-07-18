@@ -1,20 +1,3 @@
-.git
-.idea
-bin
-obj
-.DS_Store
-.env
-.vs
-.nuke/temp/
-.vscode
-# Analytics Reports
-analytics/analytics_*.json
-analytics/analytics_*.md
-!analytics/analytics_latest.*
-# Test-Output
-*.trx
-TestResults/
-# Präsentation
 presentation/*
-!presentation/images/
 !presentation/Präsentation.tex
+!presentation/Präsentation.pdf
