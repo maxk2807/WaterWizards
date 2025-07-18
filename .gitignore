@@ -1,3 +1,4 @@
 presentation/*
 !presentation/Präsentation.tex
 !presentation/Präsentation.pdf
+.DS_Store
