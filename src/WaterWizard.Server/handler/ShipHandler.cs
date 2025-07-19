@@ -12,6 +12,7 @@ using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Shared;
+using WaterWizard.Shared.ShipType;
 
 namespace WaterWizard.Server.handler;
 
@@ -87,6 +88,8 @@ public class ShipHandler
         int height = reader.GetInt();
 
         int size = Math.Max(width, height);
+        
+        ShipType shipType = size == 5 ? ShipType.Merchant : ShipType.DEFAULT;
 
         if (gameState.IsPlacementPhase())
         {
@@ -159,6 +162,7 @@ public class ShipHandler
                 gameState.boards[playerIndex][x + i, y + j].CellState = CellState.Ship;
             }
         }
+        
         AddShip(
             peer,
             new PlacedShip
@@ -167,6 +171,7 @@ public class ShipHandler
                 Y = y,
                 Width = width,
                 Height = height,
+                ShipType = shipType
             }
         );
 

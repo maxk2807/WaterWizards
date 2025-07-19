@@ -11,6 +11,7 @@
 
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Shared.ShipType;
 using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client.gamescreen.ships;
