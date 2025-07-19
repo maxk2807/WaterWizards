@@ -8,6 +8,8 @@
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
+using WaterWizard.Shared.ShipType;
+
 namespace WaterWizard.Server;
 
 /// <summary>
@@ -44,6 +46,11 @@ public class PlacedShip
     /// Gibt an, ob das Schiff zerstört ist (alle Zellen beschädigt).
     /// </summary>
     public bool IsDestroyed => DamagedCells.Count >= MaxHealth;
+
+    /// <summary>
+    /// Repräsentiert ein platziertes Schiff auf dem Spielfeld.
+    /// </summary>
+    public ShipType ShipType { get; set; } = ShipType.DEFAULT;
 
     /// <summary>
     /// Prüft, ob eine bestimmte Zelle beschädigt ist.
