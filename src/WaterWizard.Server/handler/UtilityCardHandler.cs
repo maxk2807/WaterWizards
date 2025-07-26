@@ -42,10 +42,14 @@ public class UtilityCardHandler
         {
             case CardVariant.Paralize:
                 Console.WriteLine($"[UtilityCardHandler] Paralize-Karte aktiviert!");
-                Console.WriteLine($"[UtilityCardHandler] Caster (Angreifer): {caster.ToString()} (Port: {caster.Port})");
-                Console.WriteLine($"[UtilityCardHandler] Defender (Ziel): {defender.ToString()} (Port: {defender.Port})");
+                Console.WriteLine($"[UtilityCardHandler] Caster (Angreifer): {caster} (Port: {caster.Port})");
+                Console.WriteLine($"[UtilityCardHandler] Defender (Ziel): {defender} (Port: {defender.Port})");
                 Console.WriteLine($"[UtilityCardHandler] Zielkoordinaten: ({targetCoords.X}, {targetCoords.Y})");
                 // paralizeHandler.HandleParalizeCard(caster, defender); //TODO:not needed if factory goes right
+                break;
+            case CardVariant.Shield:
+                Console.WriteLine($"[UtilityCardHandler] Shield-Karte aktiviert!");
+                HandleShield(targetCoords, caster, defender);
                 break;
             case CardVariant.HoveringEye:
                 Console.WriteLine($"[UtilityCardHandler] HoveringEye-Karte aktiviert!");
@@ -82,7 +86,7 @@ public class UtilityCardHandler
         int shipId = (int)(targetCoords.X) >> 16;
         int destinationX = (int)targetCoords.X & 0xFFFF;
         int destinationY = (int)targetCoords.Y;
-        
+
         Console.WriteLine($"[UtilityCardHandler] Teleport ship {shipId} to ({destinationX}, {destinationY})");
     }
 
@@ -111,5 +115,21 @@ public class UtilityCardHandler
     {
         // TODO: Implementiere Verwandlungseffekt
         Console.WriteLine($"[UtilityCardHandler] Polymorph at ({targetCoords.X}, {targetCoords.Y})");
+    }
+    
+    /// <summary>
+    /// Handelt die Shield-Karte (Schutzschild)
+    /// </summary>
+    private void HandleShield(Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        var shieldCard = new Card.utility.ShieldCard();
+        if (shieldCard.IsValidTarget(gameState, targetCoords, caster, defender))
+        {
+            shieldCard.ExecuteUtility(gameState, targetCoords, caster, defender);
+        }
+        else
+        {
+            Console.WriteLine($"[UtilityCardHandler] Invalid target for Shield at ({targetCoords.X}, {targetCoords.Y})");
+        }
     }
 }
