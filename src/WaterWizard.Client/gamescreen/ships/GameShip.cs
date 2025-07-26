@@ -11,6 +11,7 @@
 
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Shared.ShipType;
 using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client.gamescreen.ships;
@@ -45,13 +46,18 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     /// </summary>
     public void Draw()
     {
-        Texture2D texture = HandleShips.TextureFromLength(
-            Rotated,
-            Math.Max(Width / CellSize, Height / CellSize)
-        );
+        Texture2D shipTexture = HandleShips.TextureFromLength(Rotated, Math.Max(Width / CellSize, Height / CellSize));
         Rectangle rec = new(X, Y, Width, Height);
-        Rectangle textureRec = new(0, 0, texture.Width, texture.Height);
-        Raylib.DrawTexturePro(texture, textureRec, rec, Vector2.Zero, 0f, Color.White);
+        Rectangle textureRec = new(0, 0, shipTexture.Width, shipTexture.Height);
+        Raylib.DrawTexturePro(
+            shipTexture,
+            textureRec,
+            rec,
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+
 
         Color shipColor =
             DamagedCells.Count > 0 ? new(190, 33, 55, 0.3f) : new Color(112, 31, 126, 0.3f);

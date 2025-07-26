@@ -12,9 +12,11 @@ using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Raylib_cs;
-using WaterWizard.Client.Gamescreen;
-using WaterWizard.Client.gamescreen.ships;
 using WaterWizard.Client.network;
+using WaterWizard.Shared.ShipType;
+using CellState = WaterWizard.Client.Gamescreen.CellState;
+using WaterWizard.Client.gamescreen.ships;
+
 
 namespace WaterWizard.Client.gamescreen.handler;
 
@@ -94,12 +96,17 @@ public class HandleShips
         int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
         int pixelWidth = width * playerBoard.CellSize;
         int pixelHeight = height * playerBoard.CellSize;
+
+        // Determine ship type - largest ship is merchant
+        int size = Math.Max(width, height);
+        ShipType shipType = size == 5 ? ShipType.Merchant : ShipType.DEFAULT;
+        
         playerBoard.putShip(
             new GameShip(
                 GameStateManager.Instance.GameScreen,
                 pixelX,
                 pixelY,
-                ShipType.DEFAULT,
+                shipType,
                 pixelWidth,
                 pixelHeight
             )

@@ -16,7 +16,7 @@ namespace WaterWizard.Server.Card.utility;
 
 /// <summary>
 /// Implementation of the HoveringEye utility card
-/// Reveals a 2x2 area without damaging ships
+/// Reveals a 2x1 area without damaging ships
 /// </summary>
 public class HoveringEyeCard : IUtilityCard
 {
@@ -37,6 +37,8 @@ public class HoveringEyeCard : IUtilityCard
         int startY = (int)targetCoords.Y;
 
         Console.WriteLine($"[Server] HoveringEye revealing 2x2 area at ({startX}, {startY})");
+
+        SendHoveringEyeAreaHighlight(caster, opponent, startX, startY, (int)AreaOfEffect.X, (int)AreaOfEffect.Y);
 
         for (int dx = 0; dx < (int)AreaOfEffect.X; dx++)
         {
@@ -104,7 +106,7 @@ public class HoveringEyeCard : IUtilityCard
         casterWriter.Put(x);
         casterWriter.Put(y);
         casterWriter.Put(hasShip);
-        casterWriter.Put(false);
+        casterWriter.Put(true); 
         caster.Send(casterWriter, DeliveryMethod.ReliableOrdered);
 
         var opponentWriter = new LiteNetLib.Utils.NetDataWriter();
@@ -112,11 +114,32 @@ public class HoveringEyeCard : IUtilityCard
         opponentWriter.Put(x);
         opponentWriter.Put(y);
         opponentWriter.Put(hasShip);
-        opponentWriter.Put(true);
+        opponentWriter.Put(false); 
         opponent.Send(opponentWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
             $"[Server] HoveringEye reveal sent to both players: ({x},{y}) = {(hasShip ? "ship present" : "empty")}"
         );
+    }
+
+    private static void SendHoveringEyeAreaHighlight(NetPeer caster, NetPeer opponent, int startX, int startY, int width, int height)
+    {
+        var casterWriter = new LiteNetLib.Utils.NetDataWriter();
+        casterWriter.Put("HoveringEyeAreaHighlight");
+        casterWriter.Put(startX);
+        casterWriter.Put(startY);
+        casterWriter.Put(width);
+        casterWriter.Put(height);
+        casterWriter.Put(false); 
+        caster.Send(casterWriter, DeliveryMethod.ReliableOrdered);
+
+        var opponentWriter = new LiteNetLib.Utils.NetDataWriter();
+        opponentWriter.Put("HoveringEyeAreaHighlight");
+        opponentWriter.Put(startX);
+        opponentWriter.Put(startY);
+        opponentWriter.Put(width);
+        opponentWriter.Put(height);
+        opponentWriter.Put(true);
+        opponent.Send(opponentWriter, DeliveryMethod.ReliableOrdered);
     }
 }

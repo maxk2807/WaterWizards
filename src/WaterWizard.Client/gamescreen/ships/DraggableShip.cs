@@ -17,10 +17,12 @@ using Raylib_cs;
 using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
+using WaterWizard.Client.Gamescreen;
+using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
-public class DraggingShip
+public class DraggableShip
 {
     private readonly GameScreen gameScreen;
     private readonly int X;
@@ -28,7 +30,7 @@ public class DraggingShip
     private readonly int Width;
     private readonly int Height;
     private readonly int currentNumber;
-
+    public Texture2D shipTexture;
     public Texture2D rotateIcon;
     public Texture2D confirmIcon;
 
@@ -36,6 +38,7 @@ public class DraggingShip
     /// <see cref="Raylib_cs.Rectangle"/> of the Original Ship on the <see cref="ShipField"/>.
     /// </summary>
     private Rectangle Rectangle => new(X, Y, Width, Height);
+    private bool DraggedShipRotated => Math.Max((int)DraggedShipRectangle.Width / CellSize, (int)DraggedShipRectangle.Height / CellSize) == (int)DraggedShipRectangle.Width / CellSize;
 
     /// <summary>
     /// <see cref="Raylib_cs.Rectangle"/> of the Ship that is being dragged onto the Screen to place
@@ -107,7 +110,7 @@ public class DraggingShip
 
     /// <summary>
     /// This class represents a type of Ship on the <see cref="ShipField"/> that can be dragged
-    /// onto the Board to place. Once placed, the dragged <see cref="DraggingShip"/> spawns
+    /// onto the Board to place. Once placed, the dragged <see cref="DraggableShip"/> spawns
     /// a normal Ship on that location.
     /// In the beginning, there are 1 Ship of length 5, 2 Ships of length 4, 2 Ships of length 3,
     /// 4 ships of length 2 and 5 ships of length 1. Further Ships can be summoned with the cards.
@@ -119,7 +122,7 @@ public class DraggingShip
     /// <param name="length"></param>
     /// <param name="currentNumber"></param>
     /// <param name="orientation"></param>
-    public DraggingShip(
+    public DraggableShip(
         GameScreen gameScreen,
         int x,
         int y,
@@ -141,6 +144,8 @@ public class DraggingShip
         confirmIcon = TextureManager.LoadTexture(
             "src/WaterWizard.Client/Assets/icons8-tick-60.png"
         );
+        shipTexture = HandleShips.TextureFromLength(
+            false, Math.Max(Width / CellSize, Height / CellSize));
     }
 
     /// <summary>
@@ -148,15 +153,22 @@ public class DraggingShip
     /// </summary>
     public void Draw()
     {
-        Console.WriteLine($"Draw() aufgerufen, dragging: {dragging}");
-        Rectangle rec = new(X, Y, Width, Height);
+        shipTexture = HandleShips.TextureFromLength(
+            false, Math.Max(Width / CellSize, Height / CellSize));
+        Rectangle textureRec = new(0, 0, shipTexture.Width, shipTexture.Height);
+        Raylib.DrawTexturePro(
+            shipTexture,
+            textureRec,
+            Rectangle,
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
 
         // Wenn das Limit erreicht ist, Schiff ausgegraut zeichnen
         int size = Math.Max(Width / CellSize, Height / CellSize);
         bool limitReached = IsShipSizeLimitReached(size);
-        Color shipColor = limitReached ? Color.Gray : Color.DarkPurple;
-
-        Raylib.DrawRectangleRec(rec, shipColor);
+        
         Raylib.DrawText(currentNumber.ToString(), X + Width / 2, Y + Height / 2, 10, Color.White);
 
         // Nur Dragging erlauben, wenn das Limit nicht erreicht ist und Platzierung erlaubt ist
@@ -182,7 +194,7 @@ public class DraggingShip
         );
 
         // Zeichne das Originalschiff immer
-        Raylib.DrawRectangleRec(Rectangle, Color.DarkPurple);
+        DrawShipTexture();
         Raylib.DrawText(currentNumber.ToString(), X + Width / 2, Y + Height / 2, 10, Color.White);
 
         if (confirming)
@@ -245,6 +257,19 @@ public class DraggingShip
         }
     }
 
+    private void DrawShipTexture()
+    {
+        Rectangle textureRec = new(0, 0, shipTexture.Width, shipTexture.Height);
+        Raylib.DrawTexturePro(
+            shipTexture,
+            textureRec,
+            Rectangle,
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+    }
+
     /// <summary>
     /// Handles the Confirm Mechanic of Ship Placement.
     /// Renders the Ship Outline and offers
@@ -253,9 +278,10 @@ public class DraggingShip
     /// </summary>
     private void HandleConfirm()
     {
+        DrawDraggedShipTexture();
         Raylib.DrawRectangleRec(
             DraggedShipRectangle,
-            validPlacement ? new(30, 200, 200) : new(255, 0, 0)
+            validPlacement ? new(30, 200, 200, 0.3f) : new(255, 0, 0, 0.5f)
         );
 
         float screenHeight = gameScreen._gameStateManager.screenHeight;
@@ -332,15 +358,8 @@ public class DraggingShip
             // Nach Platzierung im InGameState das Flag zurücksetzen
             if (GameStateManager.Instance.GetCurrentState() is InGameState)
             {
-                var prop = gameScreen
-                    .GetType()
-                    .GetProperty(
-                        "allowSingleShipPlacement",
-                        System.Reflection.BindingFlags.NonPublic
-                            | System.Reflection.BindingFlags.Instance
-                    );
-                if (prop != null)
-                    prop.SetValue(gameScreen, false);
+                var prop = gameScreen.GetType().GetProperty("allowSingleShipPlacement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                prop?.SetValue(gameScreen, false);
             }
         }
     }
@@ -398,10 +417,11 @@ public class DraggingShip
                 DraggedShipRectangle.Width,
                 DraggedShipRectangle.Height
             );
+            DrawDraggedShipTexture();
             bool valid = IsValid(DraggedShipRectangle);
             Raylib.DrawRectangleRec(
                 DraggedShipRectangle,
-                valid ? new(30, 200, 200) : new(255, 0, 0)
+                valid ? new(30, 200, 200, 0.3f) : new(255, 0, 0, 0.5f)
             );
             return valid;
         }
@@ -416,6 +436,20 @@ public class DraggingShip
             Raylib.DrawRectangleRec(DraggedShipRectangle, new(200, 0, 0, 0.5f));
             return false;
         }
+    }
+
+    private void DrawDraggedShipTexture()
+    {
+        shipTexture = HandleShips.TextureFromLength(DraggedShipRotated, Math.Max((int)DraggedShipRectangle.Width / CellSize, (int)DraggedShipRectangle.Height / CellSize));
+        Rectangle textureRec = new(0, 0, shipTexture.Width, shipTexture.Height);
+        Raylib.DrawTexturePro(
+            shipTexture,
+            textureRec,
+            DraggedShipRectangle,
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
     }
 
     /// <summary>

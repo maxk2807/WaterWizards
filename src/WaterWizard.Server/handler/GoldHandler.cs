@@ -8,8 +8,7 @@
 
 using LiteNetLib;
 using LiteNetLib.Utils;
-using WaterWizard.Server;
-using WaterWizard.Shared;
+using WaterWizard.Shared.ShipType;
 
 namespace WaterWizard.Server.handler;
 
@@ -118,13 +117,19 @@ public class GoldHandler
 
     /// <summary>
     /// Ermittelt die Anzahl der Handelsschiffe für einen Spieler
-    /// TODO: Implementiere die Logik basierend auf deinem Schiffssystem
     /// </summary>
     /// <param name="playerIndex">Index des Spielers</param>
     /// <returns>Anzahl der Handelsschiffe</returns>
     private int GetMerchantShipCount(int playerIndex)
     {
-        // TODO: Implementiere die Logik, um Handelsschiffe zu zählen
-        return 0; // Placeholder - return actual merchant ship count
+        if (playerIndex < 0 || playerIndex >= gameState.players.Length)
+            return 0;
+            
+        var player = gameState.players[playerIndex];
+        if (player == null)
+            return 0;
+            
+        var ships = ShipHandler.GetShips(player);
+        return ships.Count(ship => ship.ShipType == ShipType.Merchant && !ship.IsDestroyed);
     }
 }

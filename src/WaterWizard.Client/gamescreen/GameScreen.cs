@@ -55,6 +55,8 @@ public class GameScreen(
     private Texture2D gameBackground;
     private Texture2D gridBackground;
     private Texture2D enemyGridBackground;
+    private Texture2D blueWizardTexture;
+    private Texture2D redWizardTexture;
 
     private bool allowSingleShipPlacement = false;
 
@@ -66,6 +68,11 @@ public class GameScreen(
             "src/WaterWizard.Client/Assets/Background/BasicBackground.png"
         );
         //Hintergrund für das Spielbrett
+        
+        if (blueWizardTexture.Id == 0)
+            blueWizardTexture = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/InGame/wizblu.png");
+        if (redWizardTexture.Id == 0)
+            redWizardTexture = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/InGame/wizred.png");
     }
 
     public void LoadBoardBackground() //Hintergrund für das Grid
@@ -381,6 +388,8 @@ public class GameScreen(
             );
         }
 
+        DrawWizards(currentScreenWidth, currentScreenHeight, boardPixelWidth, boardPixelHeight);
+
         // Draw Back Button
         int backButtonWidth = 100;
         int backButtonHeight = 30;
@@ -616,5 +625,47 @@ public class GameScreen(
             Console.WriteLine("Starte Dragging für Schiff!");
             randomShip.StartDragging();
         }
+    }
+
+    /// <summary>
+    /// Draws the wizard textures - red wizard at opponent's side (top) and blue wizard at player's side (bottom)
+    /// </summary>
+    /// <param name="screenWidth">Current screen width</param>
+    /// <param name="screenHeight">Current screen height</param>
+    /// <param name="boardPixelWidth">Width of the game board in pixels</param>
+    /// <param name="boardPixelHeight">Height of the game board in pixels</param>
+    private void DrawWizards(int screenWidth, int screenHeight, int boardPixelWidth, int boardPixelHeight)
+    {
+        int wizardWidth = (int)(screenWidth * 0.04f); 
+        int wizardHeight = (int)(screenHeight * 0.07f); 
+        
+        float outerBufferWidth = cardWidth * 0.1f;
+        float graveyardWidth = cardWidth + outerBufferWidth * 2;
+        float graveyardX = playerBoard!.Position.X - graveyardWidth - ZonePadding;
+        float graveyardY = (screenHeight - (cardHeight + outerBufferWidth * 2)) / 2f;
+        
+        float wizardX = graveyardX - wizardWidth - (ZonePadding * 0.5f);
+        
+        float redWizardY = graveyardY - (wizardHeight * 1.2f);
+        
+        Raylib.DrawTexturePro(
+            redWizardTexture,
+            new Rectangle(0, 0, redWizardTexture.Width, redWizardTexture.Height),
+            new Rectangle(wizardX, redWizardY, wizardWidth, wizardHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+        
+        float blueWizardY = graveyardY + (wizardHeight * 1.2f);
+        
+        Raylib.DrawTexturePro(
+            blueWizardTexture,
+            new Rectangle(0, 0, blueWizardTexture.Width, blueWizardTexture.Height),
+            new Rectangle(wizardX, blueWizardY, wizardWidth, wizardHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
     }
 }

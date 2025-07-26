@@ -124,29 +124,30 @@ public class HandleUtility
         bool hasShip = reader.GetBool();
         bool isOpponent = reader.GetBool();
 
+        Console.WriteLine($"[CLIENT] HoveringEye message received: ({revealX},{revealY}) hasShip={hasShip} isOpponent={isOpponent}");
+
         var gameScreen = GameStateManager.Instance.GameScreen;
         if (gameScreen != null)
         {
             if (isOpponent)
             {
-                var playerBoard = gameScreen.playerBoard;
-                if (playerBoard != null)
-                {
-                    playerBoard.MarkCellAsHoveringEyeRevealed(revealX, revealY, hasShip);
-                    Console.WriteLine(
-                        $"[Client] Opponent - HoveringEye revealed on own board: ({revealX},{revealY}) = {(hasShip ? "ship present" : "empty")}"
-                    );
-                }
-            }
-            else
-            {
                 var opponentBoard = gameScreen.opponentBoard;
                 if (opponentBoard != null)
                 {
                     opponentBoard.MarkCellAsHoveringEyeRevealed(revealX, revealY, hasShip);
-                    Console.WriteLine(
-                        $"[Client] Caster - HoveringEye revealed on opponent board: ({revealX},{revealY}) = {(hasShip ? "ship present" : "empty")}"
-                    );
+                    Console.WriteLine($"[CLIENT] Updated opponent board cell ({revealX},{revealY}) with hasShip={hasShip}");
+                }
+            }
+            else
+            {
+                var playerBoard = gameScreen.playerBoard;
+                if (playerBoard != null)
+                {
+                    if (!hasShip)
+                    {
+                        playerBoard.MarkCellAsHoveringEyeRevealed(revealX, revealY, hasShip);
+                    }
+                    Console.WriteLine($"[CLIENT] Updated player board cell ({revealX},{revealY}) with hasShip={hasShip}");
                 }
             }
         }

@@ -14,3 +14,7 @@ analytics/analytics_*.md
 # Test-Output
 *.trx
 TestResults/
+presentation/*
+!presentation/Präsentation.tex
+!presentation/Präsentation.pdf
+.DS_Store

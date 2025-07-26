@@ -319,18 +319,12 @@ public class GameBoard
     /// </summary>
     public void Draw()
     {
-        // Zeichne das Grundbrett
+        // Use DrawCell instead of the inline drawing
         for (int x = 0; x < GridWidth; x++)
         {
             for (int y = 0; y < GridHeight; y++)
             {
-                int posX = (int)Position.X + x * CellSize;
-                int posY = (int)Position.Y + y * CellSize;
-
-                // Zeichne die Grundfarbe der Zelle
-                Color cellColor = GetColorForState(_gridStates[x, y]);
-                Raylib.DrawRectangle(posX, posY, CellSize, CellSize, cellColor);
-                Raylib.DrawRectangleLines(posX, posY, CellSize, CellSize, Color.DarkGray);
+                DrawCell(x, y);
             }
         }
 
@@ -407,14 +401,14 @@ public class GameBoard
         return state switch
         {
             CellState.Empty => Color.LightGray,
-            // CellState.Ship => Color.Gray, //because of texture now blank
             CellState.Ship => Color.Blank,
             CellState.Rock => Color.DarkGray,
             CellState.Hit => Color.Blank,
             CellState.Miss => Color.Blue,
-            CellState.Unknown => new Color(135, 206, 235, 0), //transparenz hinzugefügt um den background sichtbar zu machen
-            CellState.Thunder => new Color(30, 30, 150, 255), // Dunkelblau für Thunder
-            CellState.Shield => new Color(0, 255, 255, 100), // Cyan für Shield mit Transparenz
+            CellState.Unknown => new Color(135, 206, 235, 0),
+            CellState.Thunder => new Color(30, 30, 150, 255),
+            CellState.Shield => new Color(0, 255, 255, 100),
+            CellState.HoveringEyeRevealed => new Color(25, 25, 112, 255), // Dark blue for empty revealed cells
             _ => Color.Black,
         };
     }
@@ -564,12 +558,13 @@ public class GameBoard
         {
             if (hasShip)
             {
-                _gridStates[x, y] = CellState.Ship;
+                _gridStates[x, y] = CellState.Ship; 
             }
             else
             {
-                _gridStates[x, y] = CellState.HoveringEyeRevealed;
+                _gridStates[x, y] = CellState.HoveringEyeRevealed; 
             }
+            Console.WriteLine($"[GameBoard] HoveringEye revealed cell ({x},{y}) = {(hasShip ? "ship" : "empty")}");
         }
     }
 
@@ -758,60 +753,32 @@ public class GameBoard
         int cellX = (int)Position.X + x * CellSize;
         int cellY = (int)Position.Y + y * CellSize;
 
-        switch (_gridStates[x, y])
+        Color cellColor = _gridStates[x, y] switch
         {
-            case CellState.Empty:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.LightGray);
-                break;
-            case CellState.Ship:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Gray);
-                break;
-            case CellState.Rock:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.DarkGray);
-                break;
-            case CellState.Hit:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Orange);
-                break;
-            case CellState.Miss:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.DarkBlue);
-                break;
-            case CellState.Shield:
-                Raylib.DrawRectangle(
-                    cellX,
-                    cellY,
-                    CellSize,
-                    CellSize,
-                    GetColorForState(CellState.Shield)
-                );
-                break;
-            case CellState.Unknown:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(135, 206, 235, 0));
-                break;
-            case CellState.Thunder:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, new Color(30, 30, 150, 255));
-                break;
-            case CellState.HoveringEyeRevealed:
-                Raylib.DrawRectangle(
-                    cellX,
-                    cellY,
-                    CellSize,
-                    CellSize,
-                    new Color(100, 150, 255, 100)
-                );
-                Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, Color.Blue);
-                break;
-            default:
-                Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, Color.Black);
-                break;
+            CellState.Empty => Color.LightGray,
+            CellState.Ship => this == GameStateManager.Instance.GameScreen?.playerBoard ? Color.Blank : Color.Orange, // Blank for player's board, Orange for opponent's board
+            CellState.Rock => Color.DarkGray,
+            CellState.Hit => Color.Orange,
+            CellState.Miss => Color.DarkBlue,
+            CellState.Unknown => new Color(135, 206, 235, 0),
+            CellState.Thunder => new Color(30, 30, 150, 255),
+            CellState.Shield => new Color(0, 255, 255, 100),
+            CellState.HoveringEyeRevealed => new Color(25, 25, 112, 255),
+            _ => Color.Black,
+        };
+
+        Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, cellColor);
+
+        if (_gridStates[x, y] == CellState.HoveringEyeRevealed)
+        {
+            Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, new Color(255, 255, 0, 200)); 
         }
 
-        // Draw shield effect overlay if cell is shielded
         if (IsCellShielded(x, y))
         {
             float duration = _shieldedCells[(x, y)];
-            float alpha = Math.Min(1.0f, duration / 6.0f); // Fade out as duration decreases
-            Color shieldColor = new Color(0, 255, 255, (int)(150 * alpha)); // Cyan with transparency
-
+            float alpha = Math.Min(1.0f, duration / 6.0f);
+            Color shieldColor = new Color(0, 255, 255, (int)(150 * alpha));
             Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, shieldColor);
             Raylib.DrawRectangleLines(
                 cellX,
@@ -873,5 +840,16 @@ public class GameBoard
     {
         _shieldedCells.Clear();
         Console.WriteLine("[GameBoard] All shield effects cleared");
+    }
+
+    public void AddHoveringEyeHighlight(int startX, int startY, int width, int height)
+    {
+        int cellX = (int)Position.X + startX * CellSize;
+        int cellY = (int)Position.Y + startY * CellSize;
+        int rectWidth = width * CellSize;
+        int rectHeight = height * CellSize;
+        
+        Raylib.DrawRectangleLines(cellX - 2, cellY - 2, rectWidth + 4, rectHeight + 4, new Color(255, 255, 0, 255));
+        Raylib.DrawRectangleLines(cellX - 1, cellY - 1, rectWidth + 2, rectHeight + 2, new Color(255, 255, 0, 200));
     }
 }
