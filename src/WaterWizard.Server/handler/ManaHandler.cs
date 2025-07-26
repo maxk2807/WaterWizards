@@ -32,7 +32,7 @@ public class ManaHandler
     public void UpdateMana()
     {
         // Aktualisiere Paralize-Timer
-        paralizeHandler.UpdateParalizeTimers(4000f); // 4 Sekunden = 4000ms
+        paralizeHandler.UpdateParalizeTimers(2000f); // 2 Sekunden = 2000ms
 
         // Gebe Mana nur hinzu, wenn der Spieler nicht paralysiert ist
         if (!paralizeHandler.IsPlayerParalized(0))

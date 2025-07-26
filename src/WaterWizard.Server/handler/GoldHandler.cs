@@ -29,7 +29,7 @@ public class GoldHandler
     /// </summary>
     public void UpdateGold()
     {
-        gameState.UpdateGoldFreezeTimers(2000f);
+        gameState.UpdateGoldFreezeTimers(4000f);
 
         if (!gameState.IsPlayerGoldFrozen(0))
         {
