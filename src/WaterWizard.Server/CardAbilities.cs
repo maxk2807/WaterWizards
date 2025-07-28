@@ -32,184 +32,34 @@ public static class CardAbilities
         NetPeer defender
     )
     {
-        if (DamageCardFactory.IsDamageCard(variant))
-        {
-            var damageCard = DamageCardFactory.CreateDamageCard(variant);
-            if (damageCard != null)
-            {
-                Console.WriteLine($"[Server] Executing damage card {variant}");
-
-                if (damageCard.IsValidTarget(gameState, targetCoords, defender))
-                {
-                    var attacker = gameState.players.FirstOrDefault(p => p != defender);
-                    if (attacker != null)
-                    {
-                        bool damageDealt = damageCard.ExecuteDamage(
-                            gameState,
-                            targetCoords,
-                            attacker,
-                            defender
-                        );
-                        Console.WriteLine(
-                            $"[Server] {variant} damage result: {(damageDealt ? "damage dealt" : "no damage")}"
-                        );
-
-                        if (damageDealt)
-                        {
-                            gameState.CheckGameOver();
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(
-                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
-                    );
-                }
-                return;
-            }
-        }
-        else if (HealingCardFactory.IsHealingCard(variant))
-        {
-            var healingCard = HealingCardFactory.CreateHealingCard(variant);
-            if (healingCard != null)
-            {
-                Console.WriteLine($"[Server] Executing healing card {variant}");
-
-                if (healingCard.IsValidTarget(gameState, targetCoords, caster, defender))
-                {
-                    if (caster != null)
-                    {
-                        bool healingDone = healingCard.ExecuteHealing(
-                            gameState,
-                            targetCoords,
-                            caster,
-                            defender
-                        );
-                        Console.WriteLine(
-                            $"[Server] {variant} healing result: {(healingDone ? "healing done" : "no healing")}"
-                        );
-
-                        if (healingDone)
-                        {
-                            gameState.CheckGameOver();
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(
-                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
-                    );
-                }
-            }
-        }
-        else if (UtilityCardFactory.IsUtilityCard(variant))
-        {
-            var utilityCard = UtilityCardFactory.CreateUtilityCard(variant);
-            if (utilityCard != null)
-            {
-                Console.WriteLine($"[Server] Executing utility card {variant}");
-
-                if (utilityCard.IsValidTarget(gameState, targetCoords, caster, defender))
-                {
-                    if (caster != null)
-                    {
-                        bool utilityDone = utilityCard.ExecuteUtility(
-                            gameState,
-                            targetCoords,
-                            caster,
-                            defender
-                        );
-                        Console.WriteLine(
-                            $"[Server] {variant} execution result: {(utilityDone ? "utility executed" : "not executed")}"
-                        );
-
-                        if (utilityDone)
-                        {
-                            gameState.CheckGameOver();
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(
-                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
-                    );
-                }
-            }
-        }
-        else if (EnvironmentCardFactory.IsEnvironmentCard(variant))
-        {
-            var environmentCard = EnvironmentCardFactory.CreateEnvironmentCard(variant);
-            if (environmentCard != null)
-            {
-                Console.WriteLine($"[Server] Executing environment card {variant}");
-
-                if (environmentCard.IsValidTarget(gameState, targetCoords, caster, defender))
-                {
-                    if (caster != null)
-                    {
-                        bool environmentExecuted = environmentCard.ExecuteEnvironment(
-                            gameState,
-                            targetCoords,
-                            caster,
-                            defender
-                        );
-                        Console.WriteLine(
-                            $"[Server] {variant} execution result: {(environmentExecuted ? "environment executed" : "not executed")}"
-                        );
-
-                        if (environmentExecuted)
-                        {
-                            gameState.CheckGameOver();
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(
-                        $"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})"
-                    );
-                }
-            }
-        }
-
-        switch (variant)
-        {
-            case CardVariant.Thunder:
-                Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
-                break;
-            default:
-                Console.WriteLine(
-                    $"[Server] Cast Card Variant {variant} on coords ({targetCoords.X},{targetCoords.Y})"
-                );
-                PrintCardArea(variant, targetCoords, gameState, defender);
-                break;
-        }
+        Console.WriteLine($"[CardAbilities] HandleAbility called for {variant}");
+        
         var durationString = new Cards(variant).Duration!;
+        Console.WriteLine($"[CardAbilities] Card {variant} has duration: {durationString}");
+        
         switch (durationString)
         {
             case "instant":
+                Console.WriteLine($"[CardAbilities] Processing instant card {variant}");
+                CardHandler.CardActivation(gameState, variant, 0); 
                 break;
             case "permanent":
-                Console.WriteLine($"[Server] Activated Card: {variant}");
+                Console.WriteLine($"[CardAbilities] Processing permanent card {variant}");
+                CardHandler.CardActivation(gameState, variant, 0);
                 break;
-            default: //Duration is a number
+            default: 
                 try
                 {
-                    //Now covered by individual cards: see Thunder
-                    // int duration = int.Parse(durationString);
-                    // CardHandler.CardActivation(gameState, variant, duration);
-                    // Console.WriteLine(
-                    //     $"[Server] Activated Card: {variant} for {duration} seconds"
-                    // );
+                    int duration = int.Parse(durationString);
+                    Console.WriteLine($"[CardAbilities] Processing timed card {variant} with duration {duration} seconds");
+                    CardHandler.CardActivation(gameState, variant, duration);
                     break;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
-                    throw;
+                    Console.WriteLine($"[CardAbilities] Error parsing duration for {variant}: {ex.Message}");
+                    CardHandler.CardActivation(gameState, variant, 0);
+                    break;
                 }
         }
     }
@@ -221,8 +71,13 @@ public static class CardAbilities
         NetPeer caster,
         NetPeer defender,
         ParalizeHandler paralizeHandler,
-        UtilityCardHandler utilityCardHandler)
+        UtilityCardHandler utilityCardHandler
+    )
     {
+        Console.WriteLine($"[CardAbilities] HandleAbilityWithHandlers called for {variant}");
+        
+        HandleAbility(variant, gameState, targetCoords, caster, defender);
+        
         if (DamageCardFactory.IsDamageCard(variant))
         {
             var damageCard = DamageCardFactory.CreateDamageCard(variant);
