@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 185 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(1, 1);   (Erickk0: 162 Zeilen)
 // ===============================================
@@ -80,13 +80,14 @@ public class FrostBoltCard : IDamageCard
 
         foreach (var ship in ships)
         {
-            if (x >= ship.X && x < ship.X + ship.Width &&
-                y >= ship.Y && y < ship.Y + ship.Height)
+            if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
             {
                 hit = true;
                 bool newDamage = ship.DamageCell(x, y);
 
-                Console.WriteLine($"[Server] FrostBolt hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}");
+                Console.WriteLine(
+                    $"[Server] FrostBolt hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}"
+                );
 
                 HandleGoldFreeze(gameState, defender);
 
@@ -94,7 +95,9 @@ public class FrostBoltCard : IDamageCard
                 {
                     if (ship.IsDestroyed)
                     {
-                        Console.WriteLine($"[Server] FrostBolt destroyed ship at ({ship.X}, {ship.Y})!");
+                        Console.WriteLine(
+                            $"[Server] FrostBolt destroyed ship at ({ship.X}, {ship.Y})!"
+                        );
                         ShipHandler.SendShipReveal(attacker, ship, gameState);
                         gameState.CheckGameOver();
                     }
@@ -137,7 +140,9 @@ public class FrostBoltCard : IDamageCard
 
         gameState.FreezeGoldGeneration(defenderIndex, GoldFreezeDuration);
 
-        Console.WriteLine($"[Server] FrostBolt froze gold generation for Player {defenderIndex} for {GoldFreezeDuration} seconds");
+        Console.WriteLine(
+            $"[Server] FrostBolt froze gold generation for Player {defenderIndex} for {GoldFreezeDuration} seconds"
+        );
 
         SendGoldFreezeNotifications(gameState, defenderIndex, GoldFreezeDuration);
     }
@@ -148,26 +153,30 @@ public class FrostBoltCard : IDamageCard
     /// <param name="gameState">The current game state</param>
     /// <param name="frozenPlayerIndex">The index of the player whose gold is frozen</param>
     /// <param name="duration">The duration of the freeze in seconds</param>
-    private static void SendGoldFreezeNotifications(GameState gameState, int frozenPlayerIndex, int duration)
+    private static void SendGoldFreezeNotifications(
+        GameState gameState,
+        int frozenPlayerIndex,
+        int duration
+    )
     {
         for (int i = 0; i < gameState.Server.ConnectedPeersCount; i++)
         {
             var peer = gameState.Server.ConnectedPeerList[i];
             var writer = new NetDataWriter();
-            
+
             if (i == frozenPlayerIndex)
             {
                 writer.Put("GoldFrozen");
                 writer.Put(duration);
-                writer.Put(true); 
+                writer.Put(true);
             }
             else
             {
                 writer.Put("EnemyGoldFrozen");
                 writer.Put(duration);
-                writer.Put(false); 
+                writer.Put(false);
             }
-            
+
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
             Console.WriteLine($"[Server] Sent gold freeze notification to Player {i}");
         }

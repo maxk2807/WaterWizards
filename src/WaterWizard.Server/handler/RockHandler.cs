@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 141 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -25,19 +25,21 @@ public static class RockHandler
     public static void GenerateAndSyncRocks(GameState gameState)
     {
         Console.WriteLine("[RockHandler] Starte Stein-Generierung für alle Spieler...");
-        
+
         for (int playerIndex = 0; playerIndex < gameState.boards.Length; playerIndex++)
         {
             if (gameState.players[playerIndex] != null)
             {
                 var rockPositions = RockFactory.GenerateRocks(gameState.boards[playerIndex]);
                 SyncRocksToClient(gameState.players[playerIndex], rockPositions);
-                
-                Console.WriteLine($"[RockHandler] {rockPositions.Count} Steine für Spieler {playerIndex + 1} generiert und synchronisiert");
+
+                Console.WriteLine(
+                    $"[RockHandler] {rockPositions.Count} Steine für Spieler {playerIndex + 1} generiert und synchronisiert"
+                );
             }
         }
     }
-    
+
     /// <summary>
     /// Synchronisiert die Stein-Positionen mit einem Client.
     /// </summary>
@@ -48,17 +50,19 @@ public static class RockHandler
         var writer = new NetDataWriter();
         writer.Put("RockSync");
         writer.Put(rockPositions.Count);
-        
+
         foreach (var (x, y) in rockPositions)
         {
             writer.Put(x);
             writer.Put(y);
         }
-        
+
         peer.Send(writer, DeliveryMethod.ReliableOrdered);
-        Console.WriteLine($"[RockHandler] Stein-Synchronisation an {peer} gesendet: {rockPositions.Count} Steine");
+        Console.WriteLine(
+            $"[RockHandler] Stein-Synchronisation an {peer} gesendet: {rockPositions.Count} Steine"
+        );
     }
-    
+
     /// <summary>
     /// Überprüft, ob eine Position von einem Stein blockiert ist.
     /// </summary>
@@ -72,10 +76,10 @@ public static class RockHandler
         {
             return true; // Außerhalb des Spielfelds ist blockiert
         }
-        
+
         return board[x, y].CellState == CellState.Rock;
     }
-    
+
     /// <summary>
     /// Überprüft, ob ein Bereich von einem Stein blockiert ist.
     /// </summary>
@@ -85,7 +89,13 @@ public static class RockHandler
     /// <param name="width">Breite des Bereichs</param>
     /// <param name="height">Höhe des Bereichs</param>
     /// <returns>True, wenn der Bereich von einem Stein blockiert ist</returns>
-    public static bool IsAreaBlockedByRocks(Cell[,] board, int startX, int startY, int width, int height)
+    public static bool IsAreaBlockedByRocks(
+        Cell[,] board,
+        int startX,
+        int startY,
+        int width,
+        int height
+    )
     {
         for (int x = startX; x < startX + width; x++)
         {
@@ -97,10 +107,10 @@ public static class RockHandler
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /// <summary>
     /// Entfernt alle Steine von einem Spielfeld (für Reset-Zwecke).
     /// </summary>
@@ -108,7 +118,7 @@ public static class RockHandler
     public static void ClearRocks(Cell[,] board)
     {
         int clearedCount = 0;
-        
+
         for (int x = 0; x < board.GetLength(0); x++)
         {
             for (int y = 0; y < board.GetLength(1); y++)
@@ -120,10 +130,10 @@ public static class RockHandler
                 }
             }
         }
-        
+
         Console.WriteLine($"[RockHandler] {clearedCount} Steine vom Spielfeld entfernt");
     }
-    
+
     /// <summary>
     /// Gibt alle Stein-Positionen auf einem Spielfeld zurück.
     /// </summary>
@@ -132,7 +142,7 @@ public static class RockHandler
     public static List<(int X, int Y)> GetRockPositions(Cell[,] board)
     {
         var rockPositions = new List<(int X, int Y)>();
-        
+
         for (int x = 0; x < board.GetLength(0); x++)
         {
             for (int y = 0; y < board.GetLength(1); y++)
@@ -143,7 +153,7 @@ public static class RockHandler
                 }
             }
         }
-        
+
         return rockPositions;
     }
-} 
+}
