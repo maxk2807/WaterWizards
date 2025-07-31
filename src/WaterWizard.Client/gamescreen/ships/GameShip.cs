@@ -4,7 +4,7 @@
 // - Erickk0: 20 Zeilen
 // - erick: 15 Zeilen
 // - jdewi001: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -31,9 +31,7 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     private int CellSize => gameScreen.playerBoard!.CellSize;
 
     public HashSet<(int X, int Y)> DamagedCells { get; private set; } = new();
-    public bool IsDestroyed =>
-        DamagedCells.Count
-        >= (Width * Height / (CellSize * CellSize));
+    public bool IsDestroyed => DamagedCells.Count >= (Width * Height / (CellSize * CellSize));
 
     public bool IsRevealed { get; set; } = false;
     public float Transparency { get; set; } = 1.0f;
@@ -61,7 +59,8 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
         );
 
 
-        Color shipColor = DamagedCells.Count > 0 ? new(190, 33, 55, 0.3f) : new Color(112, 31, 126, 0.3f);
+        Color shipColor =
+            DamagedCells.Count > 0 ? new(190, 33, 55, 0.3f) : new Color(112, 31, 126, 0.3f);
         if (IsDestroyed)
             shipColor = new(255, 255, 255, 0.3f);
 
@@ -71,7 +70,6 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
         }
 
         // Raylib.DrawRectangleRec(rec, shipColor);
-
 
         if (!IsRevealed || Transparency >= 1.0f)
         {

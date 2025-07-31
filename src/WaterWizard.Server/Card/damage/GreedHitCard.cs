@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 194 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(1, 1);   (Erickk0: 171 Zeilen)
 // ===============================================
@@ -80,13 +80,14 @@ public class GreedHitCard : IDamageCard
 
         foreach (var ship in ships)
         {
-            if (x >= ship.X && x < ship.X + ship.Width &&
-                y >= ship.Y && y < ship.Y + ship.Height)
+            if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
             {
                 hit = true;
                 bool newDamage = ship.DamageCell(x, y);
 
-                Console.WriteLine($"[Server] GreedHit hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}");
+                Console.WriteLine(
+                    $"[Server] GreedHit hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}"
+                );
 
                 HandleGoldSteal(gameState, attacker, defender);
 
@@ -94,7 +95,9 @@ public class GreedHitCard : IDamageCard
                 {
                     if (ship.IsDestroyed)
                     {
-                        Console.WriteLine($"[Server] GreedHit destroyed ship at ({ship.X}, {ship.Y})!");
+                        Console.WriteLine(
+                            $"[Server] GreedHit destroyed ship at ({ship.X}, {ship.Y})!"
+                        );
                         ShipHandler.SendShipReveal(attacker, ship, gameState);
                     }
                     else
@@ -146,7 +149,9 @@ public class GreedHitCard : IDamageCard
             gameState.SetGold(defenderIndex, defenderGold - actualStolen);
             gameState.SetGold(attackerIndex, attackerGold + actualStolen);
 
-            Console.WriteLine($"[Server] GreedHit stole {actualStolen} gold from Player {defenderIndex} to Player {attackerIndex}");
+            Console.WriteLine(
+                $"[Server] GreedHit stole {actualStolen} gold from Player {defenderIndex} to Player {attackerIndex}"
+            );
 
             gameState.SyncGoldToClient(attackerIndex);
             gameState.SyncGoldToClient(defenderIndex);
@@ -165,12 +170,16 @@ public class GreedHitCard : IDamageCard
     /// <param name="attacker">The attacking player</param>
     /// <param name="defender">The defending player</param>
     /// <param name="stolenAmount">The amount of gold stolen</param>
-    private static void SendGoldTheftNotification(NetPeer attacker, NetPeer defender, int stolenAmount)
+    private static void SendGoldTheftNotification(
+        NetPeer attacker,
+        NetPeer defender,
+        int stolenAmount
+    )
     {
         var attackerWriter = new NetDataWriter();
         attackerWriter.Put("GoldStolen");
         attackerWriter.Put(stolenAmount);
-        attackerWriter.Put(true); 
+        attackerWriter.Put(true);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
         var defenderWriter = new NetDataWriter();

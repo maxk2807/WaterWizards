@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 92 Zeilen
 // - erick: 9 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -21,11 +21,11 @@ namespace WaterWizardTests
         {
             // Arrange
             var gameBoard = CreateTestGameBoard();
-            var screenPos = new Vector2(150, 150); 
-            
+            var screenPos = new Vector2(150, 150);
+
             // Act
             var result = gameBoard.GetCellFromScreenCoords(screenPos);
-            
+
             // Assert
             Assert.NotNull(result);
             if (result != null)
@@ -39,11 +39,11 @@ namespace WaterWizardTests
         {
             // Arrange
             var gameBoard = CreateTestGameBoard();
-            var screenPos = new Vector2(50, 50); 
-            
+            var screenPos = new Vector2(50, 50);
+
             // Act
             var result = gameBoard.GetCellFromScreenCoords(screenPos);
-            
+
             // Assert
             Assert.Null(result);
         }
@@ -54,10 +54,10 @@ namespace WaterWizardTests
             // Arrange
             var gameBoard = CreateTestGameBoard();
             var screenPos = new Vector2(150, 150);
-            
+
             // Act
             var result = gameBoard.IsPointOutside(screenPos);
-            
+
             // Assert
             Assert.False(result);
         }
@@ -68,10 +68,10 @@ namespace WaterWizardTests
             // Arrange
             var gameBoard = CreateTestGameBoard();
             var screenPos = new Vector2(50, 50);
-            
+
             // Act
             var result = gameBoard.IsPointOutside(screenPos);
-            
+
             // Assert
             Assert.True(result);
         }
@@ -84,9 +84,9 @@ namespace WaterWizardTests
             // Act
             gameBoard.SetCellState(0, 0, ClientCellState.Hit);
             gameBoard.SetCellState(0, 0, (ClientCellState)CellState.Hit);
-            
-            // Assert 
-            Assert.True(true); 
+
+            // Assert
+            Assert.True(true);
         }
 
         [Fact]
@@ -94,10 +94,10 @@ namespace WaterWizardTests
         {
             // Arrange
             var gameBoard = CreateTestGameBoard();
-            
+
             // Act
             var result = gameBoard.IsCellShielded(0, 0);
-            
+
             // Assert
             Assert.False(result);
         }

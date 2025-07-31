@@ -1,17 +1,18 @@
+using LiteNetLib;
 using WaterWizard.Server;
 using WaterWizard.Server.ServerGameStates;
-using LiteNetLib;
 
 namespace WaterWizardTests;
+
 public class GameStateTests
 {
     private GameState CreateTestGameState()
     {
         var listener = new EventBasedNetListener();
         var netManager = new NetManager(listener);
-        
+
         var stateManager = new ServerGameStateManager(netManager);
-        
+
         try
         {
             return new GameState(netManager, stateManager);
@@ -100,7 +101,7 @@ public class GameStateTests
         }
 
         gameState.FreezeGoldGeneration(0, 2);
-        
+
         Assert.True(gameState.IsPlayerGoldFrozen(0));
 
         // Act
@@ -112,7 +113,7 @@ public class GameStateTests
         // Act
         gameState.UpdateGoldFreezeTimers(1500f);
 
-        // Assert 
+        // Assert
         Assert.False(gameState.IsPlayerGoldFrozen(0));
     }
 
@@ -130,18 +131,18 @@ public class GameStateTests
         gameState.FreezeGoldGeneration(0, 2);
         gameState.FreezeGoldGeneration(1, 3);
 
-        // Assert 
+        // Assert
         Assert.True(gameState.IsPlayerGoldFrozen(0));
         Assert.True(gameState.IsPlayerGoldFrozen(1));
 
         // Act
         gameState.UpdateGoldFreezeTimers(2500f);
 
-        // Assert 
+        // Assert
         Assert.False(gameState.IsPlayerGoldFrozen(0));
         Assert.True(gameState.IsPlayerGoldFrozen(1));
 
-        // Act 
+        // Act
         gameState.UpdateGoldFreezeTimers(1000f);
 
         // Assert
@@ -189,7 +190,7 @@ public class GameStateTests
             return;
         }
 
-        // Act & Assert 
+        // Act & Assert
         Assert.Equal(0, gameState.Player1Gold);
         Assert.Equal(0, gameState.Player2Gold);
     }

@@ -4,7 +4,7 @@
 // - maxk2807: 11 Zeilen
 // - erick: 2 Zeilen
 // - Erickk0: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -18,7 +18,6 @@ namespace WaterWizard.Client.gamestates;
 
 public class PlacementPhaseState : IGameState
 {
-
     private bool IsReady = false;
 
     public void UpdateAndDraw(GameStateManager manager)
@@ -35,11 +34,14 @@ public class PlacementPhaseState : IGameState
         int buttonY = textY + (int)(manager.screenHeight * 0.15f);
         Rectangle readyButton = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
         bool hoverReady = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), readyButton);
-        Raylib.DrawRectangleRec(readyButton,
-            IsReady ?
-                Color.LightGray
-                    : hoverReady ? Color.DarkGreen : Color.Green);
-        if(IsReady) Raylib.DrawRectangleLinesEx(readyButton, 3, Color.Black);
+        Raylib.DrawRectangleRec(
+            readyButton,
+            IsReady ? Color.LightGray
+                : hoverReady ? Color.DarkGreen
+                : Color.Green
+        );
+        if (IsReady)
+            Raylib.DrawRectangleLinesEx(readyButton, 3, Color.Black);
         string readyText = "Fertig" + (!IsReady ? "?" : "!");
         int readyTextWidth = Raylib.MeasureText(readyText, 24);
         Raylib.DrawText(

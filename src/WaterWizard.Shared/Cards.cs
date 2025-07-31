@@ -6,7 +6,7 @@
 // - jlnhsrm: 28 Zeilen
 // - Erickk0: 11 Zeilen
 // - erick: 5 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -164,7 +164,6 @@ public class Cards
                 Target = new("1x1"),
             }
         },
-
         {
             CardVariant.LifeSteal,
             new CardStats
