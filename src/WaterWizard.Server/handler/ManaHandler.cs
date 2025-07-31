@@ -19,6 +19,7 @@ public class ManaHandler
 {
     private readonly GameState gameState;
     private readonly ParalizeHandler paralizeHandler;
+    private DateTime lastManaUpdate = DateTime.UtcNow; // Track last update time
 
     public ManaHandler(GameState gameState, ParalizeHandler paralizeHandler)
     {
@@ -31,8 +32,13 @@ public class ManaHandler
     /// </summary>
     public void UpdateMana()
     {
-        // Aktualisiere Paralize-Timer
-        paralizeHandler.UpdateParalizeTimers(4000f); // 4 Sekunden = 4000ms
+        // Berechne echte Delta-Zeit seit letztem Update
+        DateTime currentTime = DateTime.UtcNow;
+        float deltaTimeSeconds = (float)(currentTime - lastManaUpdate).TotalSeconds;
+        lastManaUpdate = currentTime;
+
+        // Aktualisiere Paralize-Timer mit korrekter Delta-Zeit
+        paralizeHandler.UpdateParalizeTimers(deltaTimeSeconds); // Verwende echte Delta-Zeit statt fixer 4000ms
 
         // Gebe Mana nur hinzu, wenn der Spieler nicht paralysiert ist
         if (!paralizeHandler.IsPlayerParalized(0))
