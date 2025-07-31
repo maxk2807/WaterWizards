@@ -136,7 +136,7 @@ public class UtilityCardHandler
             $"[UtilityCardHandler] Polymorph at ({targetCoords.X}, {targetCoords.Y})"
         );
     }
-    
+
     /// <summary>
     /// Handles the SummonShip card (summons a ship at the target coordinates)
     /// </summary>
@@ -149,5 +149,4 @@ public class UtilityCardHandler
         summonShipCard.ExecuteUtility(gameState, targetCoords, caster, defender);
         Console.WriteLine($"[UtilityCardHandler] SummonShip executed at ({targetCoords.X}, {targetCoords.Y})");
     }
-}
 }
