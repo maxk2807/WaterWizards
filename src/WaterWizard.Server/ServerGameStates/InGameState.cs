@@ -6,7 +6,7 @@
 // - maxk2807: 26 Zeilen
 // - erick: 18 Zeilen
 // - jlnhsrm: 11 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -71,19 +71,22 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
 
     private void UpdateMana()
     {
-        if (gameState.IsPaused) return;
+        if (gameState.IsPaused)
+            return;
         manaHandler?.UpdateMana();
     }
 
     private void UpdateGold()
     {
-        if (gameState.IsPaused) return;
+        if (gameState.IsPaused)
+            return;
         goldHandler?.UpdateGold();
     }
 
     private void UpdateShields()
     {
-        if (gameState.IsPaused) return;
+        if (gameState.IsPaused)
+            return;
         // Update shields with delta time of 0.1 seconds (100ms timer interval)
         gameState.UpdateShields(0.1f);
     }
@@ -120,7 +123,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "PlaceShip":
                 // Prüfe, ob der Spieler Schiffe in der Spielphase platzieren darf
                 int playerIndex = gameState.GetPlayerIndex(peer);
-                if (gameState.AllowShipPlacementInGame != null && gameState.AllowShipPlacementInGame[playerIndex])
+                if (
+                    gameState.AllowShipPlacementInGame != null
+                    && gameState.AllowShipPlacementInGame[playerIndex]
+                )
                 {
                     ShipHandler.HandleShipPlacement(peer, reader, gameState);
                     gameState.AllowShipPlacementInGame[playerIndex] = false; // Nach Platzierung wieder sperren
@@ -129,7 +135,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 {
                     var errorWriter = new NetDataWriter();
                     errorWriter.Put("ShipPlacementError");
-                    errorWriter.Put("Schiffsplatzierung ist in der Spielphase nur mit der Karte 'Summon Ship' erlaubt!");
+                    errorWriter.Put(
+                        "Schiffsplatzierung ist in der Spielphase nur mit der Karte 'Summon Ship' erlaubt!"
+                    );
                     peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
                 }
                 break;
@@ -137,7 +145,14 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 CardHandler.HandleCardBuying(serverInstance, peer, reader, gameState);
                 break;
             case "CastCard":
-                cardHandler.HandleCardCasting(serverInstance, peer, reader, gameState, paralizeHandler!, utilityCardHandler!);
+                cardHandler.HandleCardCasting(
+                    serverInstance,
+                    peer,
+                    reader,
+                    gameState,
+                    paralizeHandler!,
+                    utilityCardHandler!
+                );
                 break;
             case "Attack":
                 int x = reader.GetInt();

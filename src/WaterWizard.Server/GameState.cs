@@ -7,7 +7,7 @@
 // - jlnhsrm: 24 Zeilen
 // - justinjd00: 21 Zeilen
 // - Max Kondratov: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private readonly List<ShieldEffect> _activeShields = new();   (Erickk0: 206 Zeilen)
 // ===============================================
@@ -103,13 +103,13 @@ public class GameState
     /// Öffentlicher Zugriff auf den Server für Handler-Klassen
     /// </summary>
     public NetManager Server => server;
+
     /// <summary>
     /// Dictionary that tracks the cards each player currently has in their hand.
     /// Key: NetPeer representing the player
     /// Value: List of Cards representing the player's current hand
     /// </summary>
     public Dictionary<NetPeer, List<Cards>> PlayerHands { get; set; } = [];
-
 
     public bool IsPlacementPhase()
     {
@@ -312,17 +312,23 @@ public class GameState
     /// <param name="durationSeconds">Duration in seconds to freeze gold generation</param>
     public void FreezeGoldGeneration(int playerIndex, int durationSeconds)
     {
-        Console.WriteLine($"[GameState] Freezing gold generation for Player {playerIndex} for {durationSeconds} seconds");
+        Console.WriteLine(
+            $"[GameState] Freezing gold generation for Player {playerIndex} for {durationSeconds} seconds"
+        );
 
         if (playerIndex == 0)
         {
             _player1GoldFreezeTimer = durationSeconds * 1000f;
-            Console.WriteLine($"[GameState] Player 1 gold generation frozen for {durationSeconds} seconds");
+            Console.WriteLine(
+                $"[GameState] Player 1 gold generation frozen for {durationSeconds} seconds"
+            );
         }
         else if (playerIndex == 1)
         {
             _player2GoldFreezeTimer = durationSeconds * 1000f;
-            Console.WriteLine($"[GameState] Player 2 gold generation frozen for {durationSeconds} seconds");
+            Console.WriteLine(
+                $"[GameState] Player 2 gold generation frozen for {durationSeconds} seconds"
+            );
         }
 
         SendGoldFreezeStatusToClients();
@@ -379,7 +385,9 @@ public class GameState
     /// </summary>
     private void SendGoldFreezeStatusToClients()
     {
-        Console.WriteLine($"[GameState] Sending gold freeze status to {server.ConnectedPeersCount} clients");
+        Console.WriteLine(
+            $"[GameState] Sending gold freeze status to {server.ConnectedPeersCount} clients"
+        );
 
         for (int i = 0; i < server.ConnectedPeersCount; i++)
         {
@@ -392,7 +400,9 @@ public class GameState
             writer.Put(isFrozen);
 
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine($"[GameState] GoldFreezeStatus sent to {peer} - PlayerIndex: {i}, IsFrozen: {isFrozen}");
+            Console.WriteLine(
+                $"[GameState] GoldFreezeStatus sent to {peer} - PlayerIndex: {i}, IsFrozen: {isFrozen}"
+            );
         }
     }
 
@@ -420,7 +430,9 @@ public class GameState
     /// <param name="surrenderingPlayer">The player who surrendered</param>
     public void HandleSurrender(NetPeer winner, NetPeer surrenderingPlayer)
     {
-        Console.WriteLine($"[Server] Processing surrender - Winner: {winner}, Surrendering: {surrenderingPlayer}");
+        Console.WriteLine(
+            $"[Server] Processing surrender - Winner: {winner}, Surrendering: {surrenderingPlayer}"
+        );
         BroadcastGameOver(winner, surrenderingPlayer);
     }
 
@@ -431,7 +443,9 @@ public class GameState
     public void AddShieldEffect(ShieldEffect shieldEffect)
     {
         _activeShields.Add(shieldEffect);
-        Console.WriteLine($"[GameState] Shield added at ({shieldEffect.Position.X}, {shieldEffect.Position.Y}) for player {shieldEffect.PlayerIndex + 1}");
+        Console.WriteLine(
+            $"[GameState] Shield added at ({shieldEffect.Position.X}, {shieldEffect.Position.Y}) for player {shieldEffect.PlayerIndex + 1}"
+        );
     }
 
     /// <summary>
@@ -447,9 +461,16 @@ public class GameState
 
             if (!shield.IsActive)
             {
-                Card.utility.ShieldCard.SendShieldExpired(players, shield.PlayerIndex, (int)shield.Position.X, (int)shield.Position.Y);
+                Card.utility.ShieldCard.SendShieldExpired(
+                    players,
+                    shield.PlayerIndex,
+                    (int)shield.Position.X,
+                    (int)shield.Position.Y
+                );
                 _activeShields.RemoveAt(i);
-                Console.WriteLine($"[GameState] Shield expired and removed at ({shield.Position.X}, {shield.Position.Y}) for player {shield.PlayerIndex + 1}");
+                Console.WriteLine(
+                    $"[GameState] Shield expired and removed at ({shield.Position.X}, {shield.Position.Y}) for player {shield.PlayerIndex + 1}"
+                );
             }
         }
     }
@@ -464,11 +485,11 @@ public class GameState
     public bool IsCoordinateProtectedByShield(int x, int y, int playerIndex)
     {
         return _activeShields.Any(shield =>
-            shield.IsActive &&
-            shield.PlayerIndex == playerIndex &&
-            shield.IsCoordinateProtected(x, y));
+            shield.IsActive
+            && shield.PlayerIndex == playerIndex
+            && shield.IsCoordinateProtected(x, y)
+        );
     }
-
 
     /// <summary>
     /// Removes a specific card from a player's hand on the server side.
@@ -485,7 +506,9 @@ public class GameState
             if (cardToRemove != null)
             {
                 hand.Remove(cardToRemove);
-                Console.WriteLine($"[GameState] Removed card {card.Variant} from player {player}'s hand");
+                Console.WriteLine(
+                    $"[GameState] Removed card {card.Variant} from player {player}'s hand"
+                );
                 return true;
             }
         }

@@ -4,12 +4,12 @@
 // - jdewi001: 10 Zeilen
 // - maxk2807: 3 Zeilen
 // - Erickk0: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-﻿using System;
+using System;
 using Raylib_cs;
 using WaterWizard.Client;
 using WaterWizard.Client.Assets.Sounds.Manager;
@@ -80,7 +80,8 @@ class Program
             Console.WriteLine("Drücke eine beliebige Taste zum Beenden...");
             Console.ReadKey();
         }
-        finally{
+        finally
+        {
             SoundManager.UnloadSounds();
             Raylib.CloseAudioDevice();
         }
