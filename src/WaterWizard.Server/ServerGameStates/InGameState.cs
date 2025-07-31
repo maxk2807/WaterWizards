@@ -52,12 +52,12 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         goldHandler = new GoldHandler(gameState);
         utilityCardHandler = new UtilityCardHandler(gameState, paralizeHandler);
 
-        manaTimer = new System.Timers.Timer(4000);
+        manaTimer = new System.Timers.Timer(2000);
         manaTimer.Elapsed += (sender, e) => UpdateMana();
         manaTimer.AutoReset = true;
         manaTimer.Start();
 
-        goldTimer = new System.Timers.Timer(2000);
+        goldTimer = new System.Timers.Timer(4000);
         goldTimer.Elapsed += (sender, e) => UpdateGold();
         goldTimer.AutoReset = true;
         goldTimer.Start();

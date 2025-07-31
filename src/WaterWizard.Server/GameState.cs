@@ -79,10 +79,10 @@ public class GameState
 
     private Timer activationTimer;
 
-    public Mana Player1Mana { get; private set; } = new();
-    public Mana Player2Mana { get; private set; } = new();
-    public int Player1Gold { get; private set; } = 0;
-    public int Player2Gold { get; private set; } = 0;
+    public Mana Player1Mana { get; private set; } = new(initialAmount: 6);
+    public Mana Player2Mana { get; private set; } = new(initialAmount: 6);
+    public int Player1Gold { get; private set; } = 6;
+    public int Player2Gold { get; private set; } = 6;
 
     public bool IsPaused { get; set; } = false;
 

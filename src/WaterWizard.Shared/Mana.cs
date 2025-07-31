@@ -15,7 +15,7 @@ namespace WaterWizard.Shared
         /// </summary>
         public int CurrentMana { get; private set; }
 
-        public Mana(int initialAmount = 0)
+        public Mana(int initialAmount = 6)
         {
             CurrentMana = initialAmount;
         }
