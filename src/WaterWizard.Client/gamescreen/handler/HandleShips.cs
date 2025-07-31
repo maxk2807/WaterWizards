@@ -203,7 +203,11 @@ public class HandleShips
                             && cellY < targetBoard.GridHeight
                         )
                         {
-                            if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
+                            if (damagedCells.Contains((cellX, cellY)))
+                            {
+                                targetBoard.SetCellState(cellX, cellY, CellState.Hit);
+                            }
+                            else if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
                             {
                                 targetBoard.SetCellState(cellX, cellY, CellState.Ship);
                             }
