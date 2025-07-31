@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 97 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -38,23 +38,31 @@ public class ManaHandler
         if (!paralizeHandler.IsPlayerParalized(0))
         {
             gameState.Player1Mana.Add(1);
-            Console.WriteLine($"[ManaHandler] Player 1 Mana +1 (Neuer Stand: {gameState.Player1Mana.CurrentMana})");
+            Console.WriteLine(
+                $"[ManaHandler] Player 1 Mana +1 (Neuer Stand: {gameState.Player1Mana.CurrentMana})"
+            );
         }
         else
         {
             Console.WriteLine("[ManaHandler] Player 1 paralyzed - no mana gained");
-            Console.WriteLine($"[ManaHandler] Player 1 Mana bleibt bei {gameState.Player1Mana.CurrentMana} (Paralize-Effekt aktiv)");
+            Console.WriteLine(
+                $"[ManaHandler] Player 1 Mana bleibt bei {gameState.Player1Mana.CurrentMana} (Paralize-Effekt aktiv)"
+            );
         }
 
         if (!paralizeHandler.IsPlayerParalized(1))
         {
             gameState.Player2Mana.Add(1);
-            Console.WriteLine($"[ManaHandler] Player 2 Mana +1 (Neuer Stand: {gameState.Player2Mana.CurrentMana})");
+            Console.WriteLine(
+                $"[ManaHandler] Player 2 Mana +1 (Neuer Stand: {gameState.Player2Mana.CurrentMana})"
+            );
         }
         else
         {
             Console.WriteLine("[ManaHandler] Player 2 paralyzed - no mana gained");
-            Console.WriteLine($"[ManaHandler] Player 2 Mana bleibt bei {gameState.Player2Mana.CurrentMana} (Paralize-Effekt aktiv)");
+            Console.WriteLine(
+                $"[ManaHandler] Player 2 Mana bleibt bei {gameState.Player2Mana.CurrentMana} (Paralize-Effekt aktiv)"
+            );
         }
 
         // Sende Mana-Updates an alle Clients
@@ -101,7 +109,8 @@ public class ManaHandler
     {
         var mana = playerIndex == 0 ? gameState.Player1Mana : gameState.Player2Mana;
         bool spent = mana.Spend(manaCost);
-        if (spent) SendManaUpdates();
+        if (spent)
+            SendManaUpdates();
         return spent;
     }
 }

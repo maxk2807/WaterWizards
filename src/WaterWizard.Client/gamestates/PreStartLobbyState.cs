@@ -4,13 +4,13 @@
 // - maxk2807: 19 Zeilen
 // - Paul: 13 Zeilen
 // - erick: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
-using WaterWizard.Client.Assets.Sounds.Manager;
-using Raylib_cs;
 using System.Numerics;
+using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.gamescreen;
 using WaterWizard.Client.network;
 
@@ -23,9 +23,12 @@ public class PreStartLobbyState : IGameState
         DrawPreStartLobby(manager);
     }
 
-    private static Texture2D menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
-    private static Texture2D textBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/TitleMenuBackground.png");
-
+    private static Texture2D menuBackground = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png"
+    );
+    private static Texture2D textBackground = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Background/TitleMenuBackground.png"
+    );
 
     private void DrawPreStartLobby(GameStateManager manager)
     {
@@ -44,11 +47,7 @@ public class PreStartLobbyState : IGameState
         Raylib.DrawTexturePro(
             textBackground,
             new(0, 0, textBackground.Width, textBackground.Height),
-            new(
-                (availableWidth - 470) / 2f,
-                (float)manager.screenHeight / 10 - 40,
-                470,
-                315),
+            new((availableWidth - 470) / 2f, (float)manager.screenHeight / 10 - 40, 470, 315),
             Vector2.Zero,
             0f,
             Color.White
@@ -63,7 +62,7 @@ public class PreStartLobbyState : IGameState
             30,
             Color.DarkBlue
         );
-        
+
         string playerCountText = $"Connected Players: {players.Count}";
         int playerCountWidth = Raylib.MeasureText(playerCountText, 20);
         Raylib.DrawText(

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 19 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -24,4 +24,4 @@ public class CodeStatistics
     public int Methods { get; set; }
     public int Interfaces { get; set; }
     public int Properties { get; set; }
-} 
+}

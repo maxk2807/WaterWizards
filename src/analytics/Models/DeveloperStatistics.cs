@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 35 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -40,4 +40,4 @@ public class DeveloperStatistics
     public int DaysSinceFirstCommit { get; set; }
     public int DaysSinceLastCommit { get; set; }
     public double CommitFrequency { get; set; } // Commits pro Tag
-} 
+}

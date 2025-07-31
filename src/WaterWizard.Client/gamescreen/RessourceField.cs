@@ -6,7 +6,7 @@
 // - erick: 17 Zeilen
 // - jlnhsrm: 11 Zeilen
 // - jdewi001: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -132,23 +132,19 @@ public class RessourceField(GameScreen gameScreen)
     public void Draw()
     {
         Raylib.DrawText(goldString, (int)GoldRec.X, (int)GoldRec.Y, 30, Color.Black);
-        
+
         if (isGoldFrozen)
         {
-            Console.WriteLine($"[RessourceField] Zeichne blauen Gold-Freeze-Punkt - isGoldFrozen: {isGoldFrozen}");
+            Console.WriteLine(
+                $"[RessourceField] Zeichne blauen Gold-Freeze-Punkt - isGoldFrozen: {isGoldFrozen}"
+            );
             int statusY = (int)GoldRec.Y - 25;
             int statusX = (int)GoldRec.X;
 
             Raylib.DrawCircle(statusX + 8, statusY + 8, 6, Color.SkyBlue);
             Raylib.DrawCircleLines(statusX + 8, statusY + 8, 6, Color.Black);
 
-            Raylib.DrawText(
-                goldFrozenString,
-                statusX + 15,
-                statusY,
-                15,
-                Color.SkyBlue
-            );
+            Raylib.DrawText(goldFrozenString, statusX + 15, statusY, 15, Color.SkyBlue);
         }
 
         Raylib.DrawText(manaString, (int)ManaRec.X, (int)ManaRec.Y, 30, Color.Black);
@@ -156,7 +152,9 @@ public class RessourceField(GameScreen gameScreen)
         // Draw paralysis indicator if paralyzed
         if (isParalized)
         {
-            Console.WriteLine($"[RessourceField] Zeichne gelben Paralize-Punkt - isParalized: {isParalized}");
+            Console.WriteLine(
+                $"[RessourceField] Zeichne gelben Paralize-Punkt - isParalized: {isParalized}"
+            );
 
             int statusY = (int)ManaRec.Y - 25;
             int statusX = (int)ManaRec.X;

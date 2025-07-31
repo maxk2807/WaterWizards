@@ -3,7 +3,7 @@
 // - erick: 187 Zeilen
 // - maxk2807: 35 Zeilen
 // - Erickk0: 16 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -231,10 +231,11 @@ public class ShipHandler
         else
         {
             writer.Put(false); // failed
-            Console.WriteLine($"[Server] Sent Failed ShipHeal, Possible Mismatch between Client and Server");
+            Console.WriteLine(
+                $"[Server] Sent Failed ShipHeal, Possible Mismatch between Client and Server"
+            );
         }
         caster.Send(writer, DeliveryMethod.ReliableOrdered);
-
     }
 
     public static void HandlePositionUpdate(Vector2 oldCoords, Vector2 newCoords, NetPeer client)

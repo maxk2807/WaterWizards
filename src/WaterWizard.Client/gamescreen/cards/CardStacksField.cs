@@ -4,7 +4,7 @@
 // - justinjd00: 40 Zeilen
 // - jdewi001: 14 Zeilen
 // - erick: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
