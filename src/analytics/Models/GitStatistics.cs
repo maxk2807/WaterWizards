@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 13 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -18,4 +18,4 @@ public class GitStatistics
     public string LastCommitMessage { get; set; } = "";
     public string LastCommitAuthor { get; set; } = "";
     public DateTime LastCommitDate { get; set; }
-} 
+}

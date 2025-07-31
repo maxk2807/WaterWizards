@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 349 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -192,7 +192,12 @@ public class HostService(NetworkManager manager)
                     break;
                 case "PlayerJoin":
                     string playerName = reader.GetString();
-                    LobbyHandler.HandlePlayerJoin(peer, playerName, ConnectedPlayers, UpdatePlayerList);
+                    LobbyHandler.HandlePlayerJoin(
+                        peer,
+                        playerName,
+                        ConnectedPlayers,
+                        UpdatePlayerList
+                    );
                     break;
                 default:
                     Console.WriteLine(

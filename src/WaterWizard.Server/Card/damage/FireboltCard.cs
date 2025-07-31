@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 104 Zeilen
 // - Erickk0: 33 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(1, 1);   (erick: 84 Zeilen)
 // ===============================================
@@ -73,7 +73,10 @@ public class FireboltCard : IDamageCard
                 bool cellHit = false;
 
                 // Check if this coordinate is protected by a shield
-                if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+                if (
+                    defenderIndex != -1
+                    && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex)
+                )
                 {
                     Console.WriteLine($"[Server] Firebolt attack at ({x}, {y}) blocked by shield!");
                     CellHandler.SendCellReveal(attacker, defender, x, y, false, "FireBolt");
@@ -100,7 +103,14 @@ public class FireboltCard : IDamageCard
                             }
                             else
                             {
-                                CellHandler.SendCellReveal(attacker, defender, x, y, true, "FireBolt");
+                                CellHandler.SendCellReveal(
+                                    attacker,
+                                    defender,
+                                    x,
+                                    y,
+                                    true,
+                                    "FireBolt"
+                                );
                             }
                         }
                         else

@@ -6,21 +6,21 @@
 // - justinjd00: 32 Zeilen
 // - erick: 32 Zeilen
 // - Erickk0: 15 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private HashSet<int> shipSizeLimitReached = new();   (maxk2807: 241 Zeilen)
 // ===============================================
 
 using System.Numerics;
+using System.Security.Cryptography;
 using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
-using WaterWizard.Client.gamestates;
-using System.Security.Cryptography;
-using WaterWizard.Client.Assets.Sounds.Manager;
 
 namespace WaterWizard.Client.gamescreen;
 
@@ -62,8 +62,11 @@ public class GameScreen(
 
     public void LoadBackgroundAssets()
     {
-        if (gameBackground.Id != 0) return;
-        gameBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/BasicBackground.png");
+        if (gameBackground.Id != 0)
+            return;
+        gameBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/BasicBackground.png"
+        );
         //Hintergrund für das Spielbrett
         
         if (blueWizardTexture.Id == 0)
@@ -74,22 +77,32 @@ public class GameScreen(
 
     public void LoadBoardBackground() //Hintergrund für das Grid
     {
-        if (gridBackground.Id != 0) return;
-        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+        if (gridBackground.Id != 0)
+            return;
+        gridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackground.png"
+        );
 
-
-        if (enemyGridBackground.Id != 0) return;
-        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+        if (enemyGridBackground.Id != 0)
+            return;
+        enemyGridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png"
+        );
     }
 
     public void LoadUiBackground() //Ui hintergrund
     {
-        if (gridBackground.Id != 0) return;
-        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+        if (gridBackground.Id != 0)
+            return;
+        gridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackground.png"
+        );
 
-
-        if (enemyGridBackground.Id != 0) return;
-        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+        if (enemyGridBackground.Id != 0)
+            return;
+        enemyGridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png"
+        );
     }
 
     /// <summary>
@@ -246,7 +259,6 @@ public class GameScreen(
             Color.White
         );
 
-
         LoadBoardBackground();
 
         //Raylib.DrawTexture(gridBackground, (int)playerBoard.Position.X, (int)playerBoard.Position.Y, Color.White);
@@ -265,7 +277,6 @@ public class GameScreen(
             Color.White
         );
 
-
         //Raylib.DrawTexture(enemyGridBackground, (int)opponentBoard.Position.X, (int)opponentBoard.Position.Y, Color.White);
 
         Raylib.DrawTexturePro(
@@ -282,9 +293,7 @@ public class GameScreen(
             Color.White
         );
 
-
         LoadBoardBackground();
-
 
         // Calculate dynamic layout values inside Draw
         cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));
@@ -326,12 +335,13 @@ public class GameScreen(
         DrawRessourceField();
 
         // ShipField zeichnen: Immer in der Platzierungsphase, oder im InGameState wenn allowSingleShipPlacement aktiv ist
-        if (GameStateManager.Instance.GetCurrentState() is PlacementPhaseState || allowSingleShipPlacement)
+        if (
+            GameStateManager.Instance.GetCurrentState() is PlacementPhaseState
+            || allowSingleShipPlacement
+        )
         {
             DrawShipField();
         }
-
-        
 
         // Draw board titles (rest of the code is mostly the same as previous fix)
         opponentBoard.Draw();
@@ -600,7 +610,6 @@ public class GameScreen(
         {
             CastingUI.Instance.CancelCasting();
         }
-
     }
 
     public void EnableSingleShipPlacement()

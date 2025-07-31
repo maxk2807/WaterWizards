@@ -6,7 +6,7 @@
 // - erick: 13 Zeilen
 // - Erickk0: 8 Zeilen
 // - Erick Zeiler: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private Rectangle Rectangle => new(X, Y, Width, Height);   (maxk2807: 7 Zeilen)
 // - private Vector2 offset = new();   (maxk2807: 231 Zeilen)
@@ -14,6 +14,7 @@
 
 using System.Numerics;
 using Raylib_cs;
+using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
 using WaterWizard.Client.Gamescreen;
@@ -90,8 +91,18 @@ public class DraggableShip
         if (GameStateManager.Instance.GetCurrentState() is PlacementPhaseState)
             allowed = true;
         // Im InGameState nur, wenn das Flag gesetzt ist
-        var field = gameScreen.GetType().GetField("allowSingleShipPlacement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        if (GameStateManager.Instance.GetCurrentState() is InGameState && field != null && field.GetValue(gameScreen) is bool allowedFlag && allowedFlag)
+        var field = gameScreen
+            .GetType()
+            .GetField(
+                "allowSingleShipPlacement",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
+            );
+        if (
+            GameStateManager.Instance.GetCurrentState() is InGameState
+            && field != null
+            && field.GetValue(gameScreen) is bool allowedFlag
+            && allowedFlag
+        )
             allowed = true;
         Console.WriteLine($"IsShipPlacementAllowed: {allowed}");
         return allowed;
@@ -527,9 +538,6 @@ public class DraggableShip
         var mousePos = Raylib.GetMousePosition();
         DraggedShipRectangle.X = mousePos.X - DraggedShipRectangle.Width / 2f;
         DraggedShipRectangle.Y = mousePos.Y - DraggedShipRectangle.Height / 2f;
-        offset = new(
-            mousePos.X - DraggedShipRectangle.X,
-            mousePos.Y - DraggedShipRectangle.Y
-        );
+        offset = new(mousePos.X - DraggedShipRectangle.X, mousePos.Y - DraggedShipRectangle.Y);
     }
 }

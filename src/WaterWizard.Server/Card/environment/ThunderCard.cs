@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 158 Zeilen
 // - Erickk0: 11 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new();   (maxk2807: 145 Zeilen)
 // ===============================================
@@ -24,18 +24,22 @@ public class ThunderCard : IEnvironmentCard
 
     public bool HasSpecialTargeting => true;
 
-    private static readonly float THUNDER_INTERVAL = 1.75f;// Intervall zwischen Blitzeinschlägen in Sekunden
+    private static readonly float THUNDER_INTERVAL = 1.75f; // Intervall zwischen Blitzeinschlägen in Sekunden
     private static float thunderTimer = 0;
 
-
-    public bool ExecuteEnvironment(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteEnvironment(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         try
         {
-           var durationString = new Cards(Variant).Duration!;
-           int duration = int.Parse(durationString);
-           CardHandler.CardActivation(gameState, Variant, duration);
-           return true;
+            var durationString = new Cards(Variant).Duration!;
+            int duration = int.Parse(durationString);
+            CardHandler.CardActivation(gameState, Variant, duration);
+            return true;
         }
         catch (Exception)
         {
@@ -44,7 +48,12 @@ public class ThunderCard : IEnvironmentCard
         }
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer defender
+    )
     {
         return true; //true because target is battlefield
     }
@@ -78,7 +87,9 @@ public class ThunderCard : IEnvironmentCard
                 var targetPlayer = gameState.players[boardIndex];
                 var attacker = gameState.players[boardIndex == 0 ? 1 : 0];
 
-                Console.WriteLine($"Generating 2 thunder strikes for Board[{boardIndex}] (Player: {targetPlayer})");
+                Console.WriteLine(
+                    $"Generating 2 thunder strikes for Board[{boardIndex}] (Player: {targetPlayer})"
+                );
 
                 for (int strikeNum = 0; strikeNum < 3; strikeNum++)
                 {
@@ -97,13 +108,22 @@ public class ThunderCard : IEnvironmentCard
     /// <summary>
     /// Handles a single thunder strike and returns if it was a hit
     /// </summary>
-    private static bool HandleThunderStrike(GameState gameState, NetPeer attacker, NetPeer targetPlayer, int x, int y)
+    private static bool HandleThunderStrike(
+        GameState gameState,
+        NetPeer attacker,
+        NetPeer targetPlayer,
+        int x,
+        int y
+    )
     {
         // Get target player's index for shield check
         int targetPlayerIndex = gameState.GetPlayerIndex(targetPlayer);
 
         // Check if this coordinate is protected by a shield
-        if (targetPlayerIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, targetPlayerIndex))
+        if (
+            targetPlayerIndex != -1
+            && gameState.IsCoordinateProtectedByShield(x, y, targetPlayerIndex)
+        )
         {
             Console.WriteLine($"    Thunder strike at ({x}, {y}) blocked by shield!");
             CellHandler.SendCellReveal(attacker, targetPlayer, x, y, false, "Thunder");
@@ -115,13 +135,14 @@ public class ThunderCard : IEnvironmentCard
 
         foreach (var ship in ships)
         {
-            if (x >= ship.X && x < ship.X + ship.Width &&
-                y >= ship.Y && y < ship.Y + ship.Height)
+            if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
             {
                 hit = true;
                 bool newDamage = ship.DamageCell(x, y);
 
-                Console.WriteLine($"    Thunder hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}");
+                Console.WriteLine(
+                    $"    Thunder hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}"
+                );
 
                 if (newDamage)
                 {
@@ -160,7 +181,13 @@ public class ThunderCard : IEnvironmentCard
     /// <param name="players">The connected player</param>
     /// <param name="x">x-Coordinate</param>
     /// <param name="y">y-Coordinate</param>
-    private static void SendThunderVisualEffect(NetPeer[] players, int boardIndex, int x, int y, bool hit)
+    private static void SendThunderVisualEffect(
+        NetPeer[] players,
+        int boardIndex,
+        int x,
+        int y,
+        bool hit
+    )
     {
         foreach (var client in players)
         {
@@ -172,7 +199,9 @@ public class ThunderCard : IEnvironmentCard
             thunderWriter.Put(hit);
 
             client.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine($"    Sent ThunderStrike visual to {client} for Board[{boardIndex}] at ({x},{y}) hit={hit}");
+            Console.WriteLine(
+                $"    Sent ThunderStrike visual to {client} for Board[{boardIndex}] at ({x},{y}) hit={hit}"
+            );
         }
     }
 }

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 36 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -25,7 +25,9 @@ public class HandleParalize
         bool isParalized = reader.GetBool();
         int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
 
-        Console.WriteLine($"[Client] ParalizeStatus empfangen - PlayerIndex: {playerIndex}, IsParalized: {isParalized}");
+        Console.WriteLine(
+            $"[Client] ParalizeStatus empfangen - PlayerIndex: {playerIndex}, IsParalized: {isParalized}"
+        );
         Console.WriteLine($"[Client] Mein PlayerIndex: {myPlayerIndex}");
         Console.WriteLine($"[Client] Betrifft mich: {playerIndex == myPlayerIndex}");
 

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - erick: 94 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(2, 1);   (erick: 78 Zeilen)
 // ===============================================
@@ -26,7 +26,12 @@ public class HoveringEyeCard : IUtilityCard
 
     public bool HasSpecialTargeting => false;
 
-    public bool ExecuteUtility(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteUtility(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         int startX = (int)targetCoords.X;
         int startY = (int)targetCoords.Y;
@@ -49,8 +54,12 @@ public class HoveringEyeCard : IUtilityCard
 
                     foreach (var ship in ships)
                     {
-                        if (x >= ship.X && x < ship.X + ship.Width &&
-                            y >= ship.Y && y < ship.Y + ship.Height)
+                        if (
+                            x >= ship.X
+                            && x < ship.X + ship.Width
+                            && y >= ship.Y
+                            && y < ship.Y + ship.Height
+                        )
                         {
                             hasShip = true;
                             break;
@@ -65,7 +74,12 @@ public class HoveringEyeCard : IUtilityCard
         return true;
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         int boardWidth = GameState.boardWidth;
         int boardHeight = GameState.boardHeight;
@@ -79,7 +93,13 @@ public class HoveringEyeCard : IUtilityCard
     /// <summary>
     /// Sends hovering eye reveal information to both players
     /// </summary>
-    private static void SendHoveringEyeReveal(NetPeer caster, NetPeer opponent, int x, int y, bool hasShip)
+    private static void SendHoveringEyeReveal(
+        NetPeer caster,
+        NetPeer opponent,
+        int x,
+        int y,
+        bool hasShip
+    )
     {
         var casterWriter = new LiteNetLib.Utils.NetDataWriter();
         casterWriter.Put("HoveringEyeReveal");

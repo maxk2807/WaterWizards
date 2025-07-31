@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 126 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -38,7 +38,9 @@ public class ParalizeHandler
     /// <param name="durationSeconds">Dauer des Paralize-Effekts in Sekunden</param>
     public void ActivateParalize(int playerIndex, float durationSeconds)
     {
-        Console.WriteLine($"[ParalizeHandler] Aktiviere Paralize-Effekt für Player {playerIndex + 1}");
+        Console.WriteLine(
+            $"[ParalizeHandler] Aktiviere Paralize-Effekt für Player {playerIndex + 1}"
+        );
         Console.WriteLine($"[ParalizeHandler] Dauer: {durationSeconds} Sekunden");
 
         if (playerIndex == 0)
@@ -95,7 +97,9 @@ public class ParalizeHandler
         if (statusChanged)
         {
             SendParalizeStatusToClients();
-            Console.WriteLine("[ParalizeHandler] Paralize-Status-Update an Clients gesendet (Effekt beendet)");
+            Console.WriteLine(
+                "[ParalizeHandler] Paralize-Status-Update an Clients gesendet (Effekt beendet)"
+            );
         }
     }
 
@@ -114,7 +118,9 @@ public class ParalizeHandler
     /// </summary>
     private void SendParalizeStatusToClients()
     {
-        Console.WriteLine($"[ParalizeHandler] Sende Paralize-Status an {gameState.Server.ConnectedPeersCount} Clients");
+        Console.WriteLine(
+            $"[ParalizeHandler] Sende Paralize-Status an {gameState.Server.ConnectedPeersCount} Clients"
+        );
 
         for (int i = 0; i < gameState.Server.ConnectedPeersCount; i++)
         {
@@ -128,7 +134,9 @@ public class ParalizeHandler
 
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
-            Console.WriteLine($"[ParalizeHandler] ParalizeStatus gesendet an {peer.ToString()} (Port: {peer.Port}) - PlayerIndex: {i}, IsParalized: {isParalized}");
+            Console.WriteLine(
+                $"[ParalizeHandler] ParalizeStatus gesendet an {peer.ToString()} (Port: {peer.Port}) - PlayerIndex: {i}, IsParalized: {isParalized}"
+            );
         }
     }
 }

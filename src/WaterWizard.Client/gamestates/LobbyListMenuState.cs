@@ -5,24 +5,27 @@
 // - Paul: 13 Zeilen
 // - Erickk0: 8 Zeilen
 // - erick: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Raylib_cs;
 using System.Numerics;
+using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.network;
-using WaterWizard.Client.Assets.Sounds.Manager;
 
 namespace WaterWizard.Client.gamestates;
 
 public class LobbyListMenuState : IGameState
 {
-
-    private static Texture2D menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
-    private static Texture2D textBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/TitleMenuBackground.png");
+    private static Texture2D menuBackground = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png"
+    );
+    private static Texture2D textBackground = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Background/TitleMenuBackground.png"
+    );
 
     public void UpdateAndDraw(GameStateManager manager)
     {
@@ -49,12 +52,12 @@ public class LobbyListMenuState : IGameState
                 (manager.screenWidth - 640) / 2f,
                 (float)manager.screenHeight / 10 - 40,
                 640,
-                270 + lobbies.Count * 30f),
+                270 + lobbies.Count * 30f
+            ),
             Vector2.Zero,
             0f,
             Color.White
         );
-
 
         int titleWidth = Raylib.MeasureText("Verfügbare Lobbies", 30);
         Raylib.DrawText(

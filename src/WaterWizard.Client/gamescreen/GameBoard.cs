@@ -6,7 +6,7 @@
 // - maxk2807: 125 Zeilen
 // - justinjd00: 50 Zeilen
 // - Paul: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private readonly Random _random = new();   (jdewi001: 1 Zeilen)
 // - private Dictionary<(int x, int y), float> _shieldedCells = new();   (Erickk0: 22 Zeilen)
@@ -45,6 +45,7 @@ public class GameBoard
 
     // Shield effect tracking
     private Dictionary<(int x, int y), float> _shieldedCells = new();
+
     private class ShieldEffect
     {
         public int X { get; set; }
@@ -107,13 +108,13 @@ public class GameBoard
             if (alpha <= 0)
                 return;
 
-            Color baseColor = Hit ?
-                new Color(255, 100, 100, (int)(255 * alpha)) :
-                new Color(255, 255, 0, (int)(255 * alpha));
+            Color baseColor = Hit
+                ? new Color(255, 100, 100, (int)(255 * alpha))
+                : new Color(255, 255, 0, (int)(255 * alpha));
 
-            Color glowColor = Hit ?
-                new Color(255, 150, 150, (int)(100 * alpha)) :
-                new Color(255, 255, 100, (int)(100 * alpha));
+            Color glowColor = Hit
+                ? new Color(255, 150, 150, (int)(100 * alpha))
+                : new Color(255, 255, 100, (int)(100 * alpha));
 
             float glowSize = cellSize * (0.75f + 0.5f * alpha);
             Raylib.DrawCircle((int)Position.X, (int)Position.Y, glowSize, glowColor);
@@ -189,7 +190,7 @@ public class GameBoard
     }
 
     /// <summary>
-    /// Handles Changing the Cell States of moving a Ship (e.g. due to CallWind Card Casting). 
+    /// Handles Changing the Cell States of moving a Ship (e.g. due to CallWind Card Casting).
     /// </summary>
     /// <param name="ship">the ship to be moved</param>
     /// <param name="oldCoords">the old Coordinates of the ship (in board coords so the small numbers)</param>
@@ -215,14 +216,14 @@ public class GameBoard
                     }
                     else
                     {
-                        Console.WriteLine($"Set to Unknown you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}");
+                        Console.WriteLine(
+                            $"Set to Unknown you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}"
+                        );
                         _gridStates[x, y] = CellState.Unknown;
                     }
                 }
             }
         }
-
-
 
         startX = (int)newCoords.X;
         startY = (int)newCoords.Y;
@@ -236,11 +237,12 @@ public class GameBoard
                     if (hit.Any(cell => cell.X == x && cell.Y == y))
                     {
                         _gridStates[x, y] = CellState.Hit;
-
                     }
                     else
                     {
-                        Console.WriteLine($"Set to Ship you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}");
+                        Console.WriteLine(
+                            $"Set to Ship you know for moving and stuff: {(x, y)}, {_gridStates[x, y]}"
+                        );
                         _gridStates[x, y] = CellState.Ship;
                     }
                 }
@@ -509,10 +511,15 @@ public class GameBoard
                 return;
             }
 
-            if ((_gridStates[x, y] == CellState.Hit || _gridStates[x, y] == CellState.Miss) &&
-                state != CellState.Hit && state != CellState.Miss)
+            if (
+                (_gridStates[x, y] == CellState.Hit || _gridStates[x, y] == CellState.Miss)
+                && state != CellState.Hit
+                && state != CellState.Miss
+            )
             {
-                Console.WriteLine($"[GameBoard] SetCellState: ({x},{y}) already has final state {_gridStates[x, y]}, ignoring {state}");
+                Console.WriteLine(
+                    $"[GameBoard] SetCellState: ({x},{y}) already has final state {_gridStates[x, y]}, ignoring {state}"
+                );
                 return;
             }
 
@@ -635,35 +642,46 @@ public class GameBoard
     /// <param name="duration">Duration of the shield effect</param>
     public void AddShieldEffect(int x, int y, float duration)
     {
-        Console.WriteLine($"[GameBoard] Adding shield effect at CENTER ({x}, {y}) with duration {duration}");
-        
-        for (int dx = -1; dx <= 1; dx++)  
+        Console.WriteLine(
+            $"[GameBoard] Adding shield effect at CENTER ({x}, {y}) with duration {duration}"
+        );
+
+        for (int dx = -1; dx <= 1; dx++)
         {
-            for (int dy = -1; dy <= 1; dy++)  
+            for (int dy = -1; dy <= 1; dy++)
             {
                 int shieldX = x + dx;
                 int shieldY = y + dy;
-                
+
                 if (shieldX >= 0 && shieldX < GridWidth && shieldY >= 0 && shieldY < GridHeight)
                 {
                     if (_shieldedCells.ContainsKey((shieldX, shieldY)))
                     {
-                        _shieldedCells[(shieldX, shieldY)] = Math.Max(_shieldedCells[(shieldX, shieldY)], duration);
+                        _shieldedCells[(shieldX, shieldY)] = Math.Max(
+                            _shieldedCells[(shieldX, shieldY)],
+                            duration
+                        );
                     }
                     else
                     {
                         _shieldedCells[(shieldX, shieldY)] = duration;
                     }
-                    Console.WriteLine($"[GameBoard] Shield cell added at ({shieldX}, {shieldY}) for {duration} seconds [offset: dx={dx}, dy={dy}]");
+                    Console.WriteLine(
+                        $"[GameBoard] Shield cell added at ({shieldX}, {shieldY}) for {duration} seconds [offset: dx={dx}, dy={dy}]"
+                    );
                 }
                 else
                 {
-                    Console.WriteLine($"[GameBoard] Shield cell ({shieldX}, {shieldY}) is OUT OF BOUNDS [offset: dx={dx}, dy={dy}]");
+                    Console.WriteLine(
+                        $"[GameBoard] Shield cell ({shieldX}, {shieldY}) is OUT OF BOUNDS [offset: dx={dx}, dy={dy}]"
+                    );
                 }
             }
         }
-        
-        Console.WriteLine($"[GameBoard] Shield placement complete. Total shielded cells: {_shieldedCells.Count}");
+
+        Console.WriteLine(
+            $"[GameBoard] Shield placement complete. Total shielded cells: {_shieldedCells.Count}"
+        );
     }
 
     /// <summary>
@@ -762,7 +780,13 @@ public class GameBoard
             float alpha = Math.Min(1.0f, duration / 6.0f);
             Color shieldColor = new Color(0, 255, 255, (int)(150 * alpha));
             Raylib.DrawRectangle(cellX, cellY, CellSize, CellSize, shieldColor);
-            Raylib.DrawRectangleLines(cellX, cellY, CellSize, CellSize, new Color(0, 200, 200, (int)(255 * alpha)));
+            Raylib.DrawRectangleLines(
+                cellX,
+                cellY,
+                CellSize,
+                CellSize,
+                new Color(0, 200, 200, (int)(255 * alpha))
+            );
         }
     }
 
@@ -797,7 +821,7 @@ public class GameBoard
                 new(centerX, centerY - symbolSize),
                 new(centerX + symbolSize, centerY),
                 new(centerX, centerY + symbolSize),
-                new(centerX - symbolSize, centerY)
+                new(centerX - symbolSize, centerY),
             };
 
             Color symbolColor = new(255, 255, 255, Math.Min(255, alphaValue + 100));
@@ -808,7 +832,7 @@ public class GameBoard
             }
         }
     }
-    
+
     /// <summary>
     /// Clears all shield effects from the game board
     /// </summary>
