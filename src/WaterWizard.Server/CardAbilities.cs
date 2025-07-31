@@ -5,7 +5,7 @@
 // - jdewi001: 65 Zeilen
 // - erick: 35 Zeilen
 // - Erickk0: 11 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private static readonly Random random = new();   (maxk2807: 169 Zeilen)
 // ===============================================
@@ -24,6 +24,7 @@ namespace WaterWizard.Server;
 public static class CardAbilities
 {
     private static readonly Random random = new();
+
     public static void HandleAbility(
         CardVariant variant,
         GameState gameState,

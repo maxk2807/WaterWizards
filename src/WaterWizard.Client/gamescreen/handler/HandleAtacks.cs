@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 156 Zeilen
 // - Erickk0: 34 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -124,7 +124,6 @@ public class HandleAttacks
         }
     }
 
-
     /// <summary>
     /// Sends an attack to the server with the specified coordinates.
     /// </summary>
@@ -136,7 +135,7 @@ public class HandleAttacks
         bool isHit = reader.GetBool();
         bool isDefender = reader.GetBool();
         string cardVariant = reader.GetString();
-        
+
         if (isHit)
         {
             switch (cardVariant)
@@ -245,16 +244,22 @@ public class HandleAttacks
             int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
 
             GameBoard? targetBoard = null;
-            Console.WriteLine($"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}");
+            Console.WriteLine(
+                $"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}"
+            );
             if (targetBoardIndex == myPlayerIndex)
             {
                 targetBoard = gameScreen.playerBoard;
-                Console.WriteLine($"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
+                Console.WriteLine(
+                    $"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY}) hit={thunderHit}"
+                );
             }
             else
             {
                 targetBoard = gameScreen.opponentBoard;
-                Console.WriteLine($"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
+                Console.WriteLine(
+                    $"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}"
+                );
             }
 
             targetBoard?.AddThunderStrike(strikeX, strikeY, thunderHit);

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 97 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -19,6 +19,7 @@ public class ManaHandler
 {
     private readonly GameState gameState;
     private readonly ParalizeHandler paralizeHandler;
+    private DateTime lastManaUpdate = DateTime.UtcNow; // Track last update time
 
     public ManaHandler(GameState gameState, ParalizeHandler paralizeHandler)
     {
@@ -31,30 +32,43 @@ public class ManaHandler
     /// </summary>
     public void UpdateMana()
     {
-        // Aktualisiere Paralize-Timer
-        paralizeHandler.UpdateParalizeTimers(4000f); // 4 Sekunden = 4000ms
+        // Berechne echte Delta-Zeit seit letztem Update
+        DateTime currentTime = DateTime.UtcNow;
+        float deltaTimeSeconds = (float)(currentTime - lastManaUpdate).TotalSeconds;
+        lastManaUpdate = currentTime;
+
+        // Aktualisiere Paralize-Timer mit korrekter Delta-Zeit
+        paralizeHandler.UpdateParalizeTimers(deltaTimeSeconds); // Verwende echte Delta-Zeit statt fixer 4000ms
 
         // Gebe Mana nur hinzu, wenn der Spieler nicht paralysiert ist
         if (!paralizeHandler.IsPlayerParalized(0))
         {
             gameState.Player1Mana.Add(1);
-            Console.WriteLine($"[ManaHandler] Player 1 Mana +1 (Neuer Stand: {gameState.Player1Mana.CurrentMana})");
+            Console.WriteLine(
+                $"[ManaHandler] Player 1 Mana +1 (Neuer Stand: {gameState.Player1Mana.CurrentMana})"
+            );
         }
         else
         {
             Console.WriteLine("[ManaHandler] Player 1 paralyzed - no mana gained");
-            Console.WriteLine($"[ManaHandler] Player 1 Mana bleibt bei {gameState.Player1Mana.CurrentMana} (Paralize-Effekt aktiv)");
+            Console.WriteLine(
+                $"[ManaHandler] Player 1 Mana bleibt bei {gameState.Player1Mana.CurrentMana} (Paralize-Effekt aktiv)"
+            );
         }
 
         if (!paralizeHandler.IsPlayerParalized(1))
         {
             gameState.Player2Mana.Add(1);
-            Console.WriteLine($"[ManaHandler] Player 2 Mana +1 (Neuer Stand: {gameState.Player2Mana.CurrentMana})");
+            Console.WriteLine(
+                $"[ManaHandler] Player 2 Mana +1 (Neuer Stand: {gameState.Player2Mana.CurrentMana})"
+            );
         }
         else
         {
             Console.WriteLine("[ManaHandler] Player 2 paralyzed - no mana gained");
-            Console.WriteLine($"[ManaHandler] Player 2 Mana bleibt bei {gameState.Player2Mana.CurrentMana} (Paralize-Effekt aktiv)");
+            Console.WriteLine(
+                $"[ManaHandler] Player 2 Mana bleibt bei {gameState.Player2Mana.CurrentMana} (Paralize-Effekt aktiv)"
+            );
         }
 
         // Sende Mana-Updates an alle Clients
@@ -101,7 +115,8 @@ public class ManaHandler
     {
         var mana = playerIndex == 0 ? gameState.Player1Mana : gameState.Player2Mana;
         bool spent = mana.Spend(manaCost);
-        if (spent) SendManaUpdates();
+        if (spent)
+            SendManaUpdates();
         return spent;
     }
 }
