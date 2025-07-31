@@ -11,6 +11,7 @@
 using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server;
+using WaterWizard.Server.Card.utility;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server.handler;
@@ -70,6 +71,10 @@ public class UtilityCardHandler
                 Console.WriteLine($"[UtilityCardHandler] ConeOfCold-Karte aktiviert!");
                 HandleConeOfCold(targetCoords, caster, defender);
                 break;
+            case CardVariant.SummonShip:
+                Console.WriteLine($"[UtilityCardHandler] SummonShip-Karte aktiviert!");
+                HandleSummonShip(targetCoords, caster, defender);
+                break;
             default:
                 Console.WriteLine($"[UtilityCardHandler] Unbekannte Utility-Karte: {variant}");
                 break;
@@ -96,9 +101,7 @@ public class UtilityCardHandler
         int destinationX = (int)targetCoords.X & 0xFFFF;
         int destinationY = (int)targetCoords.Y;
 
-        Console.WriteLine(
-            $"[UtilityCardHandler] Teleport ship {shipId} to ({destinationX}, {destinationY})"
-        );
+        Console.WriteLine($"[UtilityCardHandler] Teleport ship {shipId} to ({destinationX}, {destinationY})");
     }
 
     /// <summary>
@@ -133,4 +136,18 @@ public class UtilityCardHandler
             $"[UtilityCardHandler] Polymorph at ({targetCoords.X}, {targetCoords.Y})"
         );
     }
+    
+    /// <summary>
+    /// Handles the SummonShip card (summons a ship at the target coordinates)
+    /// </summary>
+    /// <param name="targetCoords">Target Coordinates where the ship will be summoned</param>
+    /// <param name="caster">The Player that uses the card</param>
+    /// <param name="defender">The Player that is affected by the card</param>
+    private void HandleSummonShip(Vector2 targetCoords, NetPeer caster, NetPeer defender)
+    {
+        var summonShipCard = new SummonShipCard();
+        summonShipCard.ExecuteUtility(gameState, targetCoords, caster, defender);
+        Console.WriteLine($"[UtilityCardHandler] SummonShip executed at ({targetCoords.X}, {targetCoords.Y})");
+    }
+}
 }
