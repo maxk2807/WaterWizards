@@ -70,7 +70,7 @@ public class GameState
     public readonly ServerGameStateManager manager;
     public List<Cards> Player1Hand => hands[0];
     public List<Cards> Player2Hand => hands[1];
-    public static List<Cards>? ActiveCards { get; private set; }
+    public static List<Cards>? ActiveCards { get; set; }
     public static List<Cards>? UtilityStack { get; private set; }
     public static List<Cards>? DamageStack { get; private set; }
     public static List<Cards>? EnvironmentStack { get; private set; }
@@ -79,10 +79,10 @@ public class GameState
 
     private Timer activationTimer;
 
-    public Mana Player1Mana { get; private set; } = new();
-    public Mana Player2Mana { get; private set; } = new();
-    public int Player1Gold { get; private set; } = 0;
-    public int Player2Gold { get; private set; } = 0;
+    public Mana Player1Mana { get; private set; } = new(initialAmount: 6);
+    public Mana Player2Mana { get; private set; } = new(initialAmount: 6);
+    public int Player1Gold { get; private set; } = 6;
+    public int Player2Gold { get; private set; } = 6;
 
     public bool IsPaused { get; set; } = false;
 

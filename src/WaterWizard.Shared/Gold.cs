@@ -27,7 +27,7 @@ namespace WaterWizard.Shared
 
         public Gold()
         {
-            Amount = 0;
+            Amount = 6;
         }
 
         /// <summary>
