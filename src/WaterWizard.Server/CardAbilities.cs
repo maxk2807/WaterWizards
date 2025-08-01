@@ -61,6 +61,11 @@ public static class CardAbilities
                         {
                             gameState.CheckGameOver();
                         }
+                        
+                        // Add damage card to active cards list
+                        var card = new Cards(variant);
+                        int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                        CardHandler.CardActivation(gameState, variant, duration);
                     }
                 }
                 else
@@ -97,6 +102,11 @@ public static class CardAbilities
                         {
                             gameState.CheckGameOver();
                         }
+                        
+                        // Add healing card to active cards list
+                        var card = new Cards(variant);
+                        int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                        CardHandler.CardActivation(gameState, variant, duration);
                     }
                 }
                 else
@@ -132,6 +142,11 @@ public static class CardAbilities
                         {
                             gameState.CheckGameOver();
                         }
+                        
+                        // Add utility card to active cards list
+                        var card = new Cards(variant);
+                        int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                        CardHandler.CardActivation(gameState, variant, duration);
                     }
                 }
                 else
@@ -166,6 +181,14 @@ public static class CardAbilities
                         if (environmentExecuted)
                         {
                             gameState.CheckGameOver();
+                        }
+                        
+                        // Add environment card to active cards list (but Thunder already handles this itself)
+                        if (variant != CardVariant.Thunder)
+                        {
+                            var card = new Cards(variant);
+                            int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                            CardHandler.CardActivation(gameState, variant, duration);
                         }
                     }
                 }
