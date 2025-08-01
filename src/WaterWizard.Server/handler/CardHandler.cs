@@ -220,8 +220,8 @@ public class CardHandler(GameState gameState)
                     );
                 }
 
-                CardAbilities.HandleAbilityWithHandlers(variant, gameState, new Vector2(cardX, cardY), peer, defender, paralizeHandler, utilityCardHandler);
-
+                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
+                
                 var cardToRemove = new Cards(variant);
                 bool cardRemoved = gameState.RemoveCardFromPlayerHand(peer, cardToRemove);
 
@@ -277,26 +277,26 @@ public class CardHandler(GameState gameState)
     internal static void CardActivation(GameState gameState, CardVariant variant, int duration)
     {
         Console.WriteLine($"[CardHandler.CardActivation] Called with variant: {variant}, duration: {duration}");
-        
+
         if (gameState == null)
         {
             Console.WriteLine("[Server] GameState is null, cannot activate card.");
             return;
         }
-        
+
         if (GameState.ActiveCards == null)
         {
             Console.WriteLine("[Server] GameState.ActiveCards is null, initializing...");
             GameState.ActiveCards = new List<Cards>();
         }
-        
+
         int displayDuration = duration == 0 ? 1500 : Math.Max(duration * 1000, 1500);
-        
+
         Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds (display duration: {displayDuration}ms)");
-        
+
         var newCard = new Cards(variant) { remainingDuration = displayDuration };
         GameState.ActiveCards.Add(newCard);
-        
+
         Console.WriteLine($"[Server] Active cards count after adding: {GameState.ActiveCards.Count}");
         foreach (var card in GameState.ActiveCards)
         {
