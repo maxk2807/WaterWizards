@@ -29,7 +29,10 @@ public class HandleCards
     /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleActiveCards(NetPacketReader reader)
     {
+        Console.WriteLine("[Client] HandleActiveCards called");
         var activeCardsNum = reader.GetInt();
+        Console.WriteLine($"[Client] Expecting {activeCardsNum} active cards");
+        
         List<Cards> activeCards = [];
         for (int i = 0; i < activeCardsNum; i++)
         {
@@ -40,10 +43,12 @@ public class HandleCards
                 remainingDuration = remainingDuration,
             };
             activeCards.Add(card);
-            Console.WriteLine($"[Client] ActivateCard received: {variant}");
+            Console.WriteLine($"[Client] Added active card: {variant} with {remainingDuration}ms remaining");
         }
 
+        Console.WriteLine($"[Client] Total active cards received: {activeCards.Count}");
         GameStateManager.Instance.GameScreen.activeCards!.UpdateActiveCards(activeCards);
+        Console.WriteLine("[Client] UpdateActiveCards completed");
     }
 
     /// <summary>

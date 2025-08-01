@@ -70,7 +70,7 @@ public class GameState
     public readonly ServerGameStateManager manager;
     public List<Cards> Player1Hand => hands[0];
     public List<Cards> Player2Hand => hands[1];
-    public static List<Cards>? ActiveCards { get; private set; }
+    public static List<Cards>? ActiveCards { get; set; }
     public static List<Cards>? UtilityStack { get; private set; }
     public static List<Cards>? DamageStack { get; private set; }
     public static List<Cards>? EnvironmentStack { get; private set; }

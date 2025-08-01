@@ -150,4 +150,3 @@ public class UtilityCardHandler
         Console.WriteLine($"[UtilityCardHandler] SummonShip executed at ({targetCoords.X}, {targetCoords.Y})");
     }
 }
-}

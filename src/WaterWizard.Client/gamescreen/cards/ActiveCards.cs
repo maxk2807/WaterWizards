@@ -98,32 +98,40 @@ public class ActiveCards(GameScreen gameScreen)
                 // Berechne den Fortschritt für die Karte
                 if (int.TryParse(card.Duration, out int totalDuration) && totalDuration > 0)
                 {
-                    // Konvertiere die verbleibende Zeit von Millisekunden in Sekunden
                     float remainingSeconds = card.remainingDuration / 1000f;
                     float progress = remainingSeconds / totalDuration;
 
-                    // Begrenze den Fortschritt auf 0-1
-                    progress = Math.Max(0, Math.Min(1, progress));
-
-                    // Berechne die Grad für den gefüllten Sektor (von 0 bis 360)
-                    int degrees = (int)(progress * 360);
-
-                    // Zeichne den gefüllten Sektor
-                    if (degrees > 0)
+                    if (card.remainingDuration <= 0)
                     {
                         Raylib.DrawCircleSector(
                             new(centralX + cardX + radius, cardY + radius),
                             radius,
                             0,
-                            degrees,
+                            360,
                             100,
-                            Color.Black
+                            Color.Gray
                         );
+                    }
+                    else
+                    {
+                        progress = Math.Max(0, Math.Min(1, progress));
+                        int degrees = (int)(progress * 360);
+
+                        if (degrees > 0)
+                        {
+                            Raylib.DrawCircleSector(
+                                new(centralX + cardX + radius, cardY + radius),
+                                radius,
+                                0,
+                                degrees,
+                                100,
+                                Color.Black
+                            );
+                        }
                     }
                 }
                 else if (card.Duration == "permanent")
                 {
-                    // Für permanente Karten zeichne einen vollständig gefüllten Kreis
                     Raylib.DrawCircleSector(
                         new(centralX + cardX + radius, cardY + radius),
                         radius,
@@ -133,10 +141,25 @@ public class ActiveCards(GameScreen gameScreen)
                         Color.Black
                     );
                 }
+                else if (card.Duration == "instant")
+                {
+                    Raylib.DrawCircleSector(
+                        new(centralX + cardX + radius, cardY + radius),
+                        radius,
+                        0,
+                        360,
+                        100,
+                        Color.Yellow
+                    );
+                }
             }
         }
     }
 
+    /// <summary>
+    /// Updates the active cards, reducing their remaining duration.
+    /// </summary>
+    /// <param name="deltaTime">Time elapsed since last update in seconds</param>
     public void Update(float deltaTime)
     {
         if (_cards == null || _cards.Cards.Count == 0)
@@ -150,17 +173,14 @@ public class ActiveCards(GameScreen gameScreen)
             {
                 if (gameCard.card.remainingDuration > 0)
                 {
-                    gameCard.card.remainingDuration -= deltaTime * 1000;
-
-                    Console.WriteLine(
-                        $"[Client] Card {gameCard.card.Variant} remaining: {gameCard.card.remainingDuration}ms"
-                    );
-
+                    // Update for visual countdown only
+                    gameCard.card.remainingDuration -= deltaTime * 1000; 
+                    
+                    Console.WriteLine($"[Client] Card {gameCard.card.Variant} remaining: {gameCard.card.remainingDuration}ms");
+                    
                     if (gameCard.card.remainingDuration <= 0)
                     {
-                        Console.WriteLine(
-                            $"[Client] Card {gameCard.card.Variant} duration expired on client"
-                        );
+                        Console.WriteLine($"[Client] Card {gameCard.card.Variant} display countdown finished");
                         gameCard.card.remainingDuration = 0;
                     }
                 }

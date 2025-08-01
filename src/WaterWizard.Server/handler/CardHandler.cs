@@ -276,18 +276,45 @@ public class CardHandler(GameState gameState)
 
     internal static void CardActivation(GameState gameState, CardVariant variant, int duration)
     {
+        Console.WriteLine($"[CardHandler.CardActivation] Called with variant: {variant}, duration: {duration}");
+        
         if (gameState == null)
         {
             Console.WriteLine("[Server] GameState is null, cannot activate card.");
             return;
         }
-        Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
-        GameState.ActiveCards?.Add(new Cards(variant) { remainingDuration = duration * 1000f });
-
-        // Sofort die aktive Karte an alle Clients senden
-        foreach (var player in gameState.players)
+        
+        if (GameState.ActiveCards == null)
         {
-            SendActiveCardsUpdate(player);
+            Console.WriteLine("[Server] GameState.ActiveCards is null, initializing...");
+            GameState.ActiveCards = new List<Cards>();
+        }
+        
+        int displayDuration = duration == 0 ? 1500 : Math.Max(duration * 1000, 1500);
+        
+        Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds (display duration: {displayDuration}ms)");
+        
+        var newCard = new Cards(variant) { remainingDuration = displayDuration };
+        GameState.ActiveCards.Add(newCard);
+        
+        Console.WriteLine($"[Server] Active cards count after adding: {GameState.ActiveCards.Count}");
+        foreach (var card in GameState.ActiveCards)
+        {
+            Console.WriteLine($"[Server] - Active card: {card.Variant} with {card.remainingDuration}ms remaining");
+        }
+
+        if (gameState.players != null)
+        {
+            Console.WriteLine($"[Server] Sending active cards update to {gameState.players.Length} players");
+            foreach (var player in gameState.players)
+            {
+                Console.WriteLine($"[Server] Sending to player: {player}");
+                SendActiveCardsUpdate(player);
+            }
+        }
+        else
+        {
+            Console.WriteLine("[Server] No players found to send active cards update");
         }
     }
 
