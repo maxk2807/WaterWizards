@@ -482,6 +482,12 @@ public class GameScreen(
         var oldBoardPosition = playerBoard.Position;
         Initialize();
         UpdateShipPosition(oldBoardPosition, oldCellSize);
+        
+        // Reinitialize ShipField to fix draggable ship positions
+        if (shipField != null)
+        {
+            shipField.Initialize();
+        }
     }
 
     private static void UpdateShipPosition(Vector2 oldBoardPosition, int oldCellSize)

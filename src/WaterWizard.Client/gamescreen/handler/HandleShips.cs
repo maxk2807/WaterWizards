@@ -364,10 +364,19 @@ public class HandleShips
         GameStateManager.Instance.GameScreen.playerBoard!.Ships.ForEach(ship =>
         {
             var board = GameStateManager.Instance.GameScreen.playerBoard!;
-            var prevX = (ship.X - oldBoardPosition.X) / oldCellSize;
-            var prevY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
-            ship.X = (int)(board.Position.X + prevX) * board.CellSize;
-            ship.Y = (int)(board.Position.Y + prevY) * board.CellSize;
+
+            var gridX = (ship.X - oldBoardPosition.X) / oldCellSize;
+            var gridY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
+            
+
+            ship.X = (int)(board.Position.X + gridX * board.CellSize);
+            ship.Y = (int)(board.Position.Y + gridY * board.CellSize);
+            
+
+            var gridWidth = ship.Width / (int)oldCellSize;
+            var gridHeight = ship.Height / (int)oldCellSize;
+            ship.Width = gridWidth * board.CellSize;
+            ship.Height = gridHeight * board.CellSize;
         });
     }
 }
