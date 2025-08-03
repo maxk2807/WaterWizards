@@ -26,7 +26,8 @@ class Program
             const int defaultHeight = 900;
 
             Raylib.InitWindow(defaultWidth, defaultHeight, "Water Wizard");
-            Raylib.SetExitKey(KeyboardKey.Escape); // Escape-Taste zum Beenden
+            Raylib.SetWindowState(ConfigFlags.ResizableWindow); 
+            Raylib.SetExitKey(KeyboardKey.Escape);
 
             bool isFullscreen = false;
             int screenWidth = defaultWidth;
@@ -37,6 +38,13 @@ class Program
             // Hauptspiel-Loop
             while (!Raylib.WindowShouldClose())
             {
+                if (Raylib.IsWindowResized())
+                {
+                    screenWidth = Raylib.GetScreenWidth();
+                    screenHeight = Raylib.GetScreenHeight();
+                    GameStateManager.Instance.UpdateScreenSize(screenWidth, screenHeight);
+                }
+
                 if (Raylib.IsKeyPressed(KeyboardKey.F11) || Raylib.IsKeyPressed(KeyboardKey.F))
                 {
                     isFullscreen = !isFullscreen;
