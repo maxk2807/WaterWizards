@@ -10,6 +10,7 @@ using System.Numerics;
 using LiteNetLib;
 using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
+using WaterWizard.Server.utils;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server.Card.utility;
@@ -101,12 +102,15 @@ public class HoveringEyeCard : IUtilityCard
         bool hasShip
     )
     {
+        var (casterDisplayX, casterDisplayY) = CoordinateTransform.UnrotateOpponentCoordinates(
+            x, y, GameState.boardWidth, GameState.boardHeight);
+            
         var casterWriter = new LiteNetLib.Utils.NetDataWriter();
         casterWriter.Put("HoveringEyeReveal");
-        casterWriter.Put(x);
-        casterWriter.Put(y);
+        casterWriter.Put(casterDisplayX);
+        casterWriter.Put(casterDisplayY);
         casterWriter.Put(hasShip);
-        casterWriter.Put(true); 
+        casterWriter.Put(true);
         caster.Send(casterWriter, DeliveryMethod.ReliableOrdered);
 
         var opponentWriter = new LiteNetLib.Utils.NetDataWriter();

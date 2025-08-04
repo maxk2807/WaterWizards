@@ -18,6 +18,7 @@ using WaterWizard.Server.Card.environment;
 using WaterWizard.Server.handler;
 using WaterWizard.Server.ServerGameStates;
 using WaterWizard.Shared;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.handler;
 
@@ -208,9 +209,9 @@ public class CardHandler(GameState gameState)
                     Console.WriteLine(
                         $"[CardHandler] Player {peer} has {hand.Count} cards in hand"
                     );
-                    foreach (var card in hand)
+                    foreach (var handCard in hand)
                     {
-                        Console.WriteLine($"[CardHandler] - {card.Variant}");
+                        Console.WriteLine($"[CardHandler] - {handCard.Variant}");
                     }
                 }
                 else
@@ -220,7 +221,21 @@ public class CardHandler(GameState gameState)
                     );
                 }
 
-                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
+                var card = new Cards(variant);
+                int finalX = cardX;
+                int finalY = cardY;
+                
+                if (card.Target != null && !card.Target.Ally)
+                {
+                    var (transformedX, transformedY) = CoordinateTransform.RotateOpponentCoordinates(
+                        cardX, cardY, GameState.boardWidth, GameState.boardHeight);
+                    finalX = transformedX;
+                    finalY = transformedY;
+                    
+                    Console.WriteLine($"[CardHandler] Transformed card coordinates: ({cardX}, {cardY}) -> ({finalX}, {finalY})");
+                }
+
+                CardAbilities.HandleAbility(variant, gameState, new Vector2(finalX, finalY), peer, defender);
                 
                 var cardToRemove = new Cards(variant);
                 bool cardRemoved = gameState.RemoveCardFromPlayerHand(peer, cardToRemove);

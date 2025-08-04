@@ -15,6 +15,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Server;
 using WaterWizard.Server.handler;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.ServerGameStates;
 
@@ -161,8 +162,13 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 var defender = FindOpponent(peer);
                 if (defender != null)
                 {
+                    var (transformedX, transformedY) = CoordinateTransform.RotateOpponentCoordinates(
+                        x, y, GameState.boardWidth, GameState.boardHeight);
+                        
+                    Console.WriteLine($"[Server] Transformed attack coordinates: ({x}, {y}) -> ({transformedX}, {transformedY})");
+                    
                     AttackHandler.Initialize(gameState);
-                    AttackHandler.HandleAttack(peer, defender, x, y);
+                    AttackHandler.HandleAttack(peer, defender, transformedX, transformedY);
                 }
                 else
                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");

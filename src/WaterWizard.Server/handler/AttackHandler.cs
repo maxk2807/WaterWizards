@@ -9,6 +9,7 @@
 
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.handler;
 
@@ -135,26 +136,30 @@ public class AttackHandler
         bool shipDestroyed
     )
     {
+        var (attackerDisplayX, attackerDisplayY) = CoordinateTransform.UnrotateOpponentCoordinates(
+            x, y, GameState.boardWidth, GameState.boardHeight);
+            
         var attackerWriter = new NetDataWriter();
         attackerWriter.Put("AttackResult");
-        attackerWriter.Put(x);
-        attackerWriter.Put(y);
+        attackerWriter.Put(attackerDisplayX);
+        attackerWriter.Put(attackerDisplayY);
         attackerWriter.Put(hit);
         attackerWriter.Put(shipDestroyed);
-        attackerWriter.Put(false);
+        attackerWriter.Put(false); // isDefender = false for attacker
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
+        // For the defender (viewing own board), use original coordinates
         var defenderWriter = new NetDataWriter();
         defenderWriter.Put("AttackResult");
         defenderWriter.Put(x);
         defenderWriter.Put(y);
         defenderWriter.Put(hit);
         defenderWriter.Put(shipDestroyed);
-        defenderWriter.Put(true);
+        defenderWriter.Put(true); // isDefender = true for defender
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Attack result sent: attacker sees result, defender sees damage"
+            $"[Server] Attack result sent: attacker sees ({attackerDisplayX},{attackerDisplayY}), defender sees ({x},{y})"
         );
     }
 }
