@@ -112,6 +112,14 @@ public class ArcaneMissileCard : IDamageCard
                             Console.WriteLine(
                                 $"[Server] Arcane Missile destroyed ship at ({ship.X}, {ship.Y})!"
                             );
+                            CellHandler.SendCellReveal(
+                                attacker,
+                                defender,
+                                x,
+                                y,
+                                true,
+                                "ArcaneMissile"
+                            );
                             ShipHandler.SendShipReveal(attacker, ship, gameState);
                         }
                         else

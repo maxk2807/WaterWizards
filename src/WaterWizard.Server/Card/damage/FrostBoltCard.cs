@@ -98,6 +98,7 @@ public class FrostBoltCard : IDamageCard
                         Console.WriteLine(
                             $"[Server] FrostBolt destroyed ship at ({ship.X}, {ship.Y})!"
                         );
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "FrostBolt");
                         ShipHandler.SendShipReveal(attacker, ship, gameState);
                         gameState.CheckGameOver();
                     }

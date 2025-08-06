@@ -150,6 +150,7 @@ public class ThunderCard : IEnvironmentCard
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"    Thunder destroyed ship at ({ship.X}, {ship.Y})!");
+                        CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true, "Thunder");
                         ShipHandler.SendShipReveal(attacker, ship, gameState!);
                     }
                     else

@@ -77,6 +77,7 @@ public class AttackHandler
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "Attack");
                         ShipHandler.SendShipReveal(attacker, ship, gameState!);
                     }
                     else
