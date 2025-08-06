@@ -87,8 +87,6 @@ public class ShipHandler
         int y = reader.GetInt();
         int width = reader.GetInt();
         int height = reader.GetInt();
-
-        bool isInGamePlacement = !gameState.IsPlacementPhase();
         
         int playerIndex = gameState.GetPlayerIndex(peer);
 
@@ -189,9 +187,7 @@ public class ShipHandler
     }
 
     public static void SendShipReveal(NetPeer attacker, PlacedShip ship, GameState gameState)
-    {
-        int attackerIndex = gameState.GetPlayerIndex(attacker);
-        
+    {        
         var (transformedX, transformedY) = CoordinateTransform.UnrotateOpponentCoordinates(
             ship.X, ship.Y, GameState.boardWidth, GameState.boardHeight);
         
