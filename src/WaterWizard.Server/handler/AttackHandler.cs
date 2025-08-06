@@ -72,9 +72,7 @@ public class AttackHandler
 
                 if (newDamage)
                 {
-                    Console.WriteLine(
-                        $"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})"
-                    );
+                    Console.WriteLine($"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})");
 
                     if (ship.IsDestroyed)
                     {

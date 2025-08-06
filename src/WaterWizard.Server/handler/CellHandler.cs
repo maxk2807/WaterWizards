@@ -67,21 +67,24 @@ public class CellHandler
         attackerWriter.Put(attackerDisplayX);
         attackerWriter.Put(attackerDisplayY);
         attackerWriter.Put(isHit);
-        attackerWriter.Put(false); // isDefender = false for attacker
+        attackerWriter.Put(false);
         attackerWriter.Put(cardVariant);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
+        var (defenderDisplayX, defenderDisplayY) = CoordinateTransform.UnrotateOpponentCoordinates(
+            x, y, GameState.boardWidth, GameState.boardHeight);
+            
         var defenderWriter = new NetDataWriter();
         defenderWriter.Put("CellReveal");
-        defenderWriter.Put(x);
-        defenderWriter.Put(y);
+        defenderWriter.Put(defenderDisplayX);
+        defenderWriter.Put(defenderDisplayY);
         defenderWriter.Put(isHit);
-        defenderWriter.Put(true); // isDefender = true for defender
+        defenderWriter.Put(true); // isDefender = true
         defenderWriter.Put(cardVariant);
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Cell reveal sent: attacker sees ({attackerDisplayX},{attackerDisplayY}), defender sees ({x},{y}) = {(isHit ? "hit" : "miss")}"
+            $"[Server] Cell reveal sent: attacker sees ({attackerDisplayX},{attackerDisplayY}), defender sees ({defenderDisplayX},{defenderDisplayY}) = {(isHit ? "hit" : "miss")}"
         );
     }
 }

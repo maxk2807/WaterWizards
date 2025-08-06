@@ -91,11 +91,6 @@ public class ShipHandler
         bool isInGamePlacement = !gameState.IsPlacementPhase();
         
         int playerIndex = gameState.GetPlayerIndex(peer);
-        
-        if (isInGamePlacement)
-        {
-
-        }
 
         int size = Math.Max(width, height);
         
@@ -195,31 +190,21 @@ public class ShipHandler
 
     public static void SendShipReveal(NetPeer attacker, PlacedShip ship, GameState gameState)
     {
-        // Determine if this ship belongs to the opponent from the attacker's perspective
         int attackerIndex = gameState.GetPlayerIndex(attacker);
-        int shipOwnerIndex = 1 - attackerIndex; // The other player
         
-        // Get ship coordinates - if revealing opponent's ship, inverse transform for client display
-        int displayX = ship.X;
-        int displayY = ship.Y;
-        
-        // Inverse transform coordinates for opponent's ship to show correctly on attacking client
         var (transformedX, transformedY) = CoordinateTransform.UnrotateOpponentCoordinates(
             ship.X, ship.Y, GameState.boardWidth, GameState.boardHeight);
-        displayX = transformedX;
-        displayY = transformedY;
         
         var writer = new NetDataWriter();
         writer.Put("ShipReveal");
-        writer.Put(displayX);
-        writer.Put(displayY);
+        writer.Put(transformedX);
+        writer.Put(transformedY);
         writer.Put(ship.Width);
         writer.Put(ship.Height);
 
         writer.Put(ship.DamagedCells.Count);
         foreach (var (damageX, damageY) in ship.DamagedCells)
         {
-            // Also inverse transform damage cell coordinates
             var (transformedDamageX, transformedDamageY) = CoordinateTransform.UnrotateOpponentCoordinates(
                 damageX, damageY, GameState.boardWidth, GameState.boardHeight);
             writer.Put(transformedDamageX);
@@ -229,7 +214,7 @@ public class ShipHandler
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Ship reveal sent to attacker: ({ship.X},{ship.Y}) -> ({displayX},{displayY}) size {ship.Width}x{ship.Height} with {ship.DamagedCells.Count} damage cells"
+            $"[Server] Ship reveal sent to attacker: ({ship.X},{ship.Y}) -> ({transformedX},{transformedY}) size {ship.Width}x{ship.Height} with {ship.DamagedCells.Count} damage cells"
         );
     }
 
