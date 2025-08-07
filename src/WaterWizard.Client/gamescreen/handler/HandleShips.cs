@@ -163,67 +163,47 @@ public class HandleShips
     /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleShipReveal(NetPacketReader reader)
     {
-        try
+        int x = reader.GetInt();
+        int y = reader.GetInt();
+        int width = reader.GetInt();
+        int height = reader.GetInt();
+        int damageCount = reader.GetInt();
+
+        var gameScreen = GameStateManager.Instance.GameScreen;
+        if (gameScreen?.opponentBoard == null)
         {
-            int x = reader.GetInt();
-            int y = reader.GetInt();
-            int width = reader.GetInt();
-            int height = reader.GetInt();
-
-            int damageCount = reader.GetInt();
-            var damagedCells = new HashSet<(int X, int Y)>();
-
-            Console.WriteLine(
-                $"[Client] HandleShipReveal: Ship at ({x},{y}) size {width}x{height}, damageCount={damageCount}"
-            );
-
-            for (int i = 0; i < damageCount; i++)
-            {
-                int damageX = reader.GetInt();
-                int damageY = reader.GetInt();
-                damagedCells.Add((damageX, damageY));
-                Console.WriteLine($"[Client] HandleShipReveal: Damage at ({damageX},{damageY})");
-            }
-
-            var targetBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-
-            if (targetBoard != null)
-            {
-                for (int dx = 0; dx < width; dx++)
-                {
-                    for (int dy = 0; dy < height; dy++)
-                    {
-                        int cellX = x + dx;
-                        int cellY = y + dy;
-
-                        if (
-                            cellX >= 0
-                            && cellX < targetBoard.GridWidth
-                            && cellY >= 0
-                            && cellY < targetBoard.GridHeight
-                        )
-                        {
-                            if (damagedCells.Contains((cellX, cellY)))
-                            {
-                                targetBoard.SetCellState(cellX, cellY, CellState.Hit);
-                            }
-                            else if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
-                            {
-                                targetBoard.SetCellState(cellX, cellY, CellState.Ship);
-                            }
-                        }
-                    }
-                }
-
-                Console.WriteLine(
-                    $"[Client] Ship revealed on opponent board: ({x},{y}) size {width}x{height} with {damageCount} damage cells - marked cells as Ship state"
-                );
-            }
+            Console.WriteLine("[Client] Error: opponentBoard is null in ShipReveal.");
+            return;
         }
-        catch (Exception ex)
+
+        Console.WriteLine($"[Client] Ship revealed at ({x},{y}) size {width}x{height} with {damageCount} damage cells");
+
+        var opponentBoard = gameScreen.opponentBoard;
+        var shipToRemove = opponentBoard.Ships.FirstOrDefault(ship => 
+            ship.X == (int)opponentBoard.Position.X + x * opponentBoard.CellSize &&
+            ship.Y == (int)opponentBoard.Position.Y + y * opponentBoard.CellSize);
+
+        if (shipToRemove != null)
         {
-            Console.WriteLine($"[Client] Error in HandleShipReveal: {ex.Message}");
-            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    int cellX = x + i;
+                    int cellY = y + j;
+                    opponentBoard.MarkCellAsHit(cellX, cellY, true);
+                }
+            }
+            
+            opponentBoard.Ships.Remove(shipToRemove);
+            Console.WriteLine($"[Client] Destroyed ship removed from opponent board");
+        }
+
+        for (int i = 0; i < damageCount; i++)
+        {
+            int damageX = reader.GetInt();
+            int damageY = reader.GetInt();
+            opponentBoard.MarkCellAsHit(damageX, damageY, true);
         }
     }
 

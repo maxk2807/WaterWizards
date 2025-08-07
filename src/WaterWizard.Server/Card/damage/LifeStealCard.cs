@@ -87,6 +87,7 @@ public class LifeStealCard : IDamageCard
                         Console.WriteLine(
                             $"[Server] Lifesteal destroyed ship at ({ship.X}, {ship.Y})!"
                         );
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "LifeSteal");
                         ShipHandler.SendShipReveal(attacker, ship, gameState);
                     }
                     else

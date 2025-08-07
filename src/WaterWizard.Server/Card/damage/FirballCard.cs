@@ -84,6 +84,14 @@ public class FireballCard : IDamageCard
                         {
                             if (ship.IsDestroyed)
                             {
+                                CellHandler.SendCellReveal(
+                                    attacker,
+                                    defender,
+                                    x,
+                                    y,
+                                    true,
+                                    "FireBall"
+                                );
                                 gameState.CheckGameOver();
                             }
                             else

@@ -13,6 +13,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Shared;
 using WaterWizard.Shared.ShipType;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.handler;
 
@@ -86,6 +87,8 @@ public class ShipHandler
         int y = reader.GetInt();
         int width = reader.GetInt();
         int height = reader.GetInt();
+        
+        int playerIndex = gameState.GetPlayerIndex(peer);
 
         int size = Math.Max(width, height);
         
@@ -137,7 +140,6 @@ public class ShipHandler
         }
 
         // 3. Felder auf dem Board prüfen
-        int playerIndex = Array.IndexOf(gameState.players, peer);
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -185,25 +187,30 @@ public class ShipHandler
     }
 
     public static void SendShipReveal(NetPeer attacker, PlacedShip ship, GameState gameState)
-    {
+    {        
+        var (transformedX, transformedY) = CoordinateTransform.UnrotateOpponentCoordinates(
+            ship.X, ship.Y, GameState.boardWidth, GameState.boardHeight);
+        
         var writer = new NetDataWriter();
         writer.Put("ShipReveal");
-        writer.Put(ship.X);
-        writer.Put(ship.Y);
+        writer.Put(transformedX);
+        writer.Put(transformedY);
         writer.Put(ship.Width);
         writer.Put(ship.Height);
 
         writer.Put(ship.DamagedCells.Count);
         foreach (var (damageX, damageY) in ship.DamagedCells)
         {
-            writer.Put(damageX);
-            writer.Put(damageY);
+            var (transformedDamageX, transformedDamageY) = CoordinateTransform.UnrotateOpponentCoordinates(
+                damageX, damageY, GameState.boardWidth, GameState.boardHeight);
+            writer.Put(transformedDamageX);
+            writer.Put(transformedDamageY);
         }
 
         attacker.Send(writer, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Ship reveal sent to attacker: ({ship.X},{ship.Y}) size {ship.Width}x{ship.Height} with {ship.DamagedCells.Count} damage cells"
+            $"[Server] Ship reveal sent to attacker: ({ship.X},{ship.Y}) -> ({transformedX},{transformedY}) size {ship.Width}x{ship.Height} with {ship.DamagedCells.Count} damage cells"
         );
     }
 

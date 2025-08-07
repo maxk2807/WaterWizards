@@ -99,6 +99,14 @@ public class FireboltCard : IDamageCard
                         {
                             if (ship.IsDestroyed)
                             {
+                                CellHandler.SendCellReveal(
+                                    attacker,
+                                    defender,
+                                    x,
+                                    y,
+                                    true,
+                                    "FireBolt"
+                                );
                                 gameState.CheckGameOver();
                             }
                             else

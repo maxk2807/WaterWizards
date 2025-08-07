@@ -67,6 +67,7 @@ public class MagicAttackCard : IDamageCard
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "MagicAttack");
                         ShipHandler.SendShipReveal(attacker, ship, gameState!);
                     }
                     else

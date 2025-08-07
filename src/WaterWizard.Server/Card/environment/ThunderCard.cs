@@ -12,6 +12,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
+using WaterWizard.Server.utils;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server.Card.environment;
@@ -149,6 +150,7 @@ public class ThunderCard : IEnvironmentCard
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"    Thunder destroyed ship at ({ship.X}, {ship.Y})!");
+                        CellHandler.SendCellReveal(attacker, targetPlayer, x, y, true, "Thunder");
                         ShipHandler.SendShipReveal(attacker, ship, gameState!);
                     }
                     else
@@ -189,19 +191,27 @@ public class ThunderCard : IEnvironmentCard
         bool hit
     )
     {
-        foreach (var client in players)
+        foreach (var player in players)
         {
-            NetDataWriter thunderWriter = new();
-            thunderWriter.Put("ThunderStrike");
-            thunderWriter.Put(boardIndex);
-            thunderWriter.Put(x);
-            thunderWriter.Put(y);
-            thunderWriter.Put(hit);
-
-            client.Send(thunderWriter, DeliveryMethod.ReliableOrdered);
-            Console.WriteLine(
-                $"    Sent ThunderStrike visual to {client} for Board[{boardIndex}] at ({x},{y}) hit={hit}"
-            );
+            int playerIndex = Array.IndexOf(players, player);
+            int displayX = x;
+            int displayY = y;
+            
+            if (boardIndex != playerIndex)
+            {
+                var (transformedX, transformedY) = CoordinateTransform.UnrotateOpponentCoordinates(
+                    x, y, GameState.boardWidth, GameState.boardHeight);
+                displayX = transformedX;
+                displayY = transformedY;
+            }
+            
+            var writer = new NetDataWriter();
+            writer.Put("ThunderVisualEffect");
+            writer.Put(boardIndex);
+            writer.Put(displayX);
+            writer.Put(displayY);
+            writer.Put(hit);
+            player.Send(writer, DeliveryMethod.ReliableOrdered);
         }
     }
 }

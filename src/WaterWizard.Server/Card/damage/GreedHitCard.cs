@@ -98,6 +98,7 @@ public class GreedHitCard : IDamageCard
                         Console.WriteLine(
                             $"[Server] GreedHit destroyed ship at ({ship.X}, {ship.Y})!"
                         );
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "GreedHit");
                         ShipHandler.SendShipReveal(attacker, ship, gameState);
                     }
                     else

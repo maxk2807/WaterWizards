@@ -240,6 +240,8 @@ public class GameScreen(
     /// <param name="currentScreenHeight"></param>
     public void Draw(int currentScreenWidth, int currentScreenHeight)
     {
+        Raylib.ClearBackground(Color.Black);
+        
         if (playerBoard == null || opponentBoard == null)
         {
             Raylib.DrawText("Initializing game boards...", 10, 50, 20, Color.Gray);
