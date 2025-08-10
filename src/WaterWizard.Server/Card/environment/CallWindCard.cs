@@ -56,12 +56,56 @@ public class CallWindCard : IEnvironmentCard
             {
                 return;
             }
+            if (HandleOnShips(gameState, client, ship, newCoords, randomDirection))
+            {
+                return;
+            }
             ship.X = (int)newCoords.X;
             ship.Y = (int)newCoords.Y;
             ShipHandler.HandlePositionUpdate(oldCoords, newCoords, client);
         });
     }
 
+    /// <summary>
+    /// Checks whether the given ship will end up on top of another ship after CallWind cast.
+    /// That is only possible if there is a ship next to the given ship in the direction that the wind
+    /// will be taking them, but the other ship cannot be moved due to a Board Boundary or a Rock
+    /// </summary>
+    /// <param name="gameState">The current GameState</param>
+    /// <param name="client">The Casting Player</param>
+    /// <param name="ship">The given ship to be checked</param>
+    /// <param name="newCoords">The potential coordinates after CallWind cast</param>
+    /// <returns>True if On another Ship after cast, False otherwise</returns>
+    private static bool HandleOnShips(GameState gameState, NetPeer client, PlacedShip ship, Vector2 newCoords, Vector2 randomDirection)
+    {
+        var ships = ShipHandler.GetShips(client);
+        var shipsOnNewCoords = ships.Where(ship1 =>
+            {
+                if (ship1.Equals(ship)) return false;
+                return Raylib.CheckCollisionRecs(
+                    new(ship1.X, ship1.Y, ship1.Width, ship1.Height),
+                    new(newCoords, ship.Width, ship.Height)
+                );
+            }
+        );
+
+        return shipsOnNewCoords.Any(ship1 =>
+        {
+            Vector2 coords = Vector2.Add(new(ship1.X, ship1.Y), randomDirection);
+            return HandleOutsideBoard(ship1, coords)
+                || HandleOnRocks(gameState, client, ship1, coords)
+                || HandleOnShips(gameState, client, ship1, coords, randomDirection);
+        });
+    }
+
+    /// <summary>
+    /// Checks whether the given Ship will end up on a Rock after CallWind cast
+    /// </summary>
+    /// <param name="gameState">The currest GameState</param>
+    /// <param name="client">The Casting Player</param>
+    /// <param name="ship">The Ship to be checked</param>
+    /// <param name="newCoords">The potenital coords of the ship after CallWind cast</param>
+    /// <returns>True if on Rocks after cast, False otherwise</returns>
     private static bool HandleOnRocks(
         GameState gameState,
         NetPeer client,
@@ -79,6 +123,12 @@ public class CallWindCard : IEnvironmentCard
         );
     }
 
+    /// <summary>
+    /// Checks whether the given Ship is going to end up outside the board after the CallWind cast
+    /// </summary>
+    /// <param name="ship">The Ship To Check</param>
+    /// <param name="newCoords">The potential coordinates of the CallWind cast</param>
+    /// <returns>True if Outside Board, false otherwise</returns>
     private static bool HandleOutsideBoard(PlacedShip ship, Vector2 newCoords)
     {
         return newCoords.X < 0
