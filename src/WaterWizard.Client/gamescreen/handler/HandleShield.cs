@@ -51,10 +51,7 @@ public static class HandleShield
                 );
             }
 
-            if (targetBoard != null)
-            {
-                targetBoard.AddShieldEffect(x, y, duration);
-            }
+            targetBoard?.AddShieldEffect(x, y, duration);
         }
 
         Console.WriteLine(
