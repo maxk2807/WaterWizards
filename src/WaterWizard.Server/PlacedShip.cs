@@ -84,8 +84,16 @@ public class PlacedShip
 
     public override bool Equals(object? obj)
     {
-        if (obj is PlacedShip ps && ps.GetType() == typeof(PlacedShip))
+        if (obj!.GetType() == typeof(PlacedShip))
+        {
+            PlacedShip ps = (PlacedShip)obj;
             return X == ps.X && Y == ps.Y && Width == ps.Width && Height == ps.Height; 
+        }
         return false;
+    }
+
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
     }
 }
