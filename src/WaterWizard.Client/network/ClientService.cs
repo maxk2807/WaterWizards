@@ -6,7 +6,7 @@
 // - erick: 53 Zeilen
 // - Erickk0: 51 Zeilen
 // - Erick Zeiler: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -22,6 +22,9 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
 
+/// <summary>
+/// Verwaltet die Client-spezifische Netzwerklogik, Verbindungen und Events.
+/// </summary>
 public class ClientService(NetworkManager manager)
 {
     public NetManager? client;
@@ -33,6 +36,9 @@ public class ClientService(NetworkManager manager)
     public GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
 
+    /// <summary>
+    /// Initialisiert den Client für die Lobby-Suche (Discovery).
+    /// </summary>
     public void InitializeClientForDiscovery()
     {
         CleanupIfRunning();
@@ -51,6 +57,9 @@ public class ClientService(NetworkManager manager)
             LobbyHandler.HandleLobbyInfoResponse(manager, remoteEndPoint, reader);
     }
 
+    /// <summary>
+    /// Beendet laufende Client-Verbindungen.
+    /// </summary>
     public void CleanupIfRunning()
     {
         if (client != null && client.IsRunning)
@@ -60,26 +69,41 @@ public class ClientService(NetworkManager manager)
         }
     }
 
+    /// <summary>
+    /// Prüft, ob der Client mit einem Server verbunden ist.
+    /// </summary>
     public bool IsServerConnected() =>
         client != null
         && client.FirstPeer != null
         && client.FirstPeer.ConnectionState == ConnectionState.Connected;
 
+    /// <summary>
+    /// Verarbeitet Netzwerkereignisse (Empfang/Senden von Nachrichten).
+    /// </summary>
     public void PollEvents()
     {
         client?.PollEvents();
     }
 
+    /// <summary>
+    /// Beendet die Client-Verbindung.
+    /// </summary>
     public void Shutdown()
     {
         client?.Stop();
     }
 
+    /// <summary>
+    /// Prüft, ob der Client bereit ist.
+    /// </summary>
     public bool IsClientReady()
     {
         return clientReady;
     }
 
+    /// <summary>
+    /// Setzt Event-Handler für Netzwerkereignisse.
+    /// </summary>
     public void SetupClientEventHandlers()
     {
         if (clientListener == null)
@@ -361,30 +385,13 @@ public class ClientService(NetworkManager manager)
                     }
                     break;
                 case "ThunderStrike":
-                    int targetBoardIndex = reader.GetInt();
-                    int strikeX = reader.GetInt();
-                    int strikeY = reader.GetInt();
-                    bool thunderHit = reader.GetBool();
-
-                    var gameScreen = GameStateManager.Instance.GameScreen;
-                    if (gameScreen != null)
+                    try
                     {
-                        int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
-
-                        GameBoard? targetBoard = null;
-                        Console.WriteLine($"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}");
-                        if (targetBoardIndex == myPlayerIndex)
-                        {
-                            targetBoard = gameScreen.playerBoard;
-                            Console.WriteLine($"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
-                        }
-                        else
-                        {
-                            targetBoard = gameScreen.opponentBoard;
-                            Console.WriteLine($"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}");
-                        }
-
-                        targetBoard?.AddThunderStrike(strikeX, strikeY, thunderHit);
+                        HandleAttacks.HandleThunderStrike(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Client] Error processing ThunderStrike: {ex.Message}");
                     }
                     break;
                 case "ThunderReset":
@@ -400,25 +407,30 @@ public class ClientService(NetworkManager manager)
                     Console.WriteLine($"[Client] Received player index: {playerIndex}");
                     break;
                 case "UpdateMana":
-                    {
-                        HandleRessources.HandleUpdateMana(reader);
-                        break;
-                    }
+                {
+                    HandleRessources.HandleUpdateMana(reader);
+                    break;
+                }
+                case "CardManaSpent":
+                {
+                    HandleCards.HandleCardManaSpent(reader);
+                    break;
+                }
                 case "UpdateGold":
-                    {
-                        HandleRessources.HandleUpdateGold(reader);
-                        break;
-                    }
+                {
+                    HandleRessources.HandleUpdateGold(reader);
+                    break;
+                }
                 case "GoldFreezeStatus":
-                    {
-                        HandleRessources.HandleGoldFreeze(reader);
-                        break;
-                    }
+                {
+                    HandleRessources.HandleGoldFreeze(reader);
+                    break;
+                }
                 case "ParalizeStatus":
-                    {
-                        HandleParalize.HandleParalizeStatus(reader);
-                        break;
-                    }
+                {
+                    HandleParalize.HandleParalizeStatus(reader);
+                    break;
+                }
                 case "HoveringEyeReveal":
                     HandleUtility.HandleHoveringEyeReveal(reader);
                     break;

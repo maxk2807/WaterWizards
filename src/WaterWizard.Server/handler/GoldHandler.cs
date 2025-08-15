@@ -1,15 +1,14 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 114 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
 using LiteNetLib;
 using LiteNetLib.Utils;
-using WaterWizard.Server;
-using WaterWizard.Shared;
+using WaterWizard.Shared.ShipType;
 
 namespace WaterWizard.Server.handler;
 
@@ -30,34 +29,42 @@ public class GoldHandler
     /// </summary>
     public void UpdateGold()
     {
-        gameState.UpdateGoldFreezeTimers(2000f);
+        gameState.UpdateGoldFreezeTimers(4000f);
 
         if (!gameState.IsPlayerGoldFrozen(0))
         {
             int merchantShipCount = GetMerchantShipCount(0);
-            int goldToAdd = 1 + merchantShipCount; 
-            
+            int goldToAdd = 1 + merchantShipCount;
+
             gameState.SetGold(0, gameState.Player1Gold + goldToAdd);
-            Console.WriteLine($"[GoldHandler] Player 1 Gold +{goldToAdd} (Neuer Stand: {gameState.Player1Gold})");
+            Console.WriteLine(
+                $"[GoldHandler] Player 1 Gold +{goldToAdd} (Neuer Stand: {gameState.Player1Gold})"
+            );
         }
         else
         {
             Console.WriteLine("[GoldHandler] Player 1 gold generation frozen - no gold gained");
-            Console.WriteLine($"[GoldHandler] Player 1 Gold bleibt bei {gameState.Player1Gold} (Gold-Freeze-Effekt aktiv)");
+            Console.WriteLine(
+                $"[GoldHandler] Player 1 Gold bleibt bei {gameState.Player1Gold} (Gold-Freeze-Effekt aktiv)"
+            );
         }
 
         if (!gameState.IsPlayerGoldFrozen(1))
         {
             int merchantShipCount = GetMerchantShipCount(1);
-            int goldToAdd = 1 + merchantShipCount; 
-            
+            int goldToAdd = 1 + merchantShipCount;
+
             gameState.SetGold(1, gameState.Player2Gold + goldToAdd);
-            Console.WriteLine($"[GoldHandler] Player 2 Gold +{goldToAdd} (Neuer Stand: {gameState.Player2Gold})");
+            Console.WriteLine(
+                $"[GoldHandler] Player 2 Gold +{goldToAdd} (Neuer Stand: {gameState.Player2Gold})"
+            );
         }
         else
         {
             Console.WriteLine("[GoldHandler] Player 2 gold generation frozen - no gold gained");
-            Console.WriteLine($"[GoldHandler] Player 2 Gold bleibt bei {gameState.Player2Gold} (Gold-Freeze-Effekt aktiv)");
+            Console.WriteLine(
+                $"[GoldHandler] Player 2 Gold bleibt bei {gameState.Player2Gold} (Gold-Freeze-Effekt aktiv)"
+            );
         }
 
         SendGoldUpdates();
@@ -110,13 +117,19 @@ public class GoldHandler
 
     /// <summary>
     /// Ermittelt die Anzahl der Handelsschiffe für einen Spieler
-    /// TODO: Implementiere die Logik basierend auf deinem Schiffssystem
     /// </summary>
     /// <param name="playerIndex">Index des Spielers</param>
     /// <returns>Anzahl der Handelsschiffe</returns>
     private int GetMerchantShipCount(int playerIndex)
     {
-        // TODO: Implementiere die Logik, um Handelsschiffe zu zählen
-        return 0; // Placeholder - return actual merchant ship count
+        if (playerIndex < 0 || playerIndex >= gameState.players.Length)
+            return 0;
+            
+        var player = gameState.players[playerIndex];
+        if (player == null)
+            return 0;
+            
+        var ships = ShipHandler.GetShips(player);
+        return ships.Count(ship => ship.ShipType == ShipType.Merchant && !ship.IsDestroyed);
     }
 }

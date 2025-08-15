@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 126 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -19,7 +19,7 @@ public class ParalizeHandler
 {
     private readonly GameState gameState;
 
-    // Paralize-Timer für jeden Spieler (in Millisekunden)
+    // Paralize-Timer für jeden Spieler (in Sekunden für Konsistenz)
     private float player1ParalizeTimer = 0f;
     private float player2ParalizeTimer = 0f;
 
@@ -38,18 +38,20 @@ public class ParalizeHandler
     /// <param name="durationSeconds">Dauer des Paralize-Effekts in Sekunden</param>
     public void ActivateParalize(int playerIndex, float durationSeconds)
     {
-        Console.WriteLine($"[ParalizeHandler] Aktiviere Paralize-Effekt für Player {playerIndex + 1}");
+        Console.WriteLine(
+            $"[ParalizeHandler] Aktiviere Paralize-Effekt für Player {playerIndex + 1}"
+        );
         Console.WriteLine($"[ParalizeHandler] Dauer: {durationSeconds} Sekunden");
 
         if (playerIndex == 0)
         {
-            player1ParalizeTimer = durationSeconds * 1000f; // Konvertiere zu Millisekunden
+            player1ParalizeTimer = durationSeconds; // Direkt in Sekunden speichern
             Console.WriteLine($"[ParalizeHandler] Player 1 paralyzed for {durationSeconds} seconds");
             Console.WriteLine($"[ParalizeHandler] Player 1 Mana-Timer gestoppt - keine Mana-Generierung während Paralize");
         }
         else if (playerIndex == 1)
         {
-            player2ParalizeTimer = durationSeconds * 1000f; // Konvertiere zu Millisekunden
+            player2ParalizeTimer = durationSeconds; // Direkt in Sekunden speichern
             Console.WriteLine($"[ParalizeHandler] Player 2 paralyzed for {durationSeconds} seconds");
             Console.WriteLine($"[ParalizeHandler] Player 2 Mana-Timer gestoppt - keine Mana-Generierung während Paralize");
         }
@@ -62,14 +64,14 @@ public class ParalizeHandler
     /// <summary>
     /// Aktualisiert die Paralize-Timer basierend auf der verstrichenen Zeit
     /// </summary>
-    /// <param name="deltaTimeMs">Verstrichene Zeit in Millisekunden</param>
-    public void UpdateParalizeTimers(float deltaTimeMs)
+    /// <param name="deltaTimeSeconds">Verstrichene Zeit in Sekunden</param>
+    public void UpdateParalizeTimers(float deltaTimeSeconds)
     {
         bool statusChanged = false;
 
         if (player1ParalizeTimer > 0f)
         {
-            player1ParalizeTimer -= deltaTimeMs;
+            player1ParalizeTimer -= deltaTimeSeconds;
             if (player1ParalizeTimer <= 0f)
             {
                 player1ParalizeTimer = 0f;
@@ -81,7 +83,7 @@ public class ParalizeHandler
 
         if (player2ParalizeTimer > 0f)
         {
-            player2ParalizeTimer -= deltaTimeMs;
+            player2ParalizeTimer -= deltaTimeSeconds;
             if (player2ParalizeTimer <= 0f)
             {
                 player2ParalizeTimer = 0f;
@@ -95,7 +97,9 @@ public class ParalizeHandler
         if (statusChanged)
         {
             SendParalizeStatusToClients();
-            Console.WriteLine("[ParalizeHandler] Paralize-Status-Update an Clients gesendet (Effekt beendet)");
+            Console.WriteLine(
+                "[ParalizeHandler] Paralize-Status-Update an Clients gesendet (Effekt beendet)"
+            );
         }
     }
 
@@ -114,7 +118,9 @@ public class ParalizeHandler
     /// </summary>
     private void SendParalizeStatusToClients()
     {
-        Console.WriteLine($"[ParalizeHandler] Sende Paralize-Status an {gameState.Server.ConnectedPeersCount} Clients");
+        Console.WriteLine(
+            $"[ParalizeHandler] Sende Paralize-Status an {gameState.Server.ConnectedPeersCount} Clients"
+        );
 
         for (int i = 0; i < gameState.Server.ConnectedPeersCount; i++)
         {
@@ -128,7 +134,9 @@ public class ParalizeHandler
 
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
 
-            Console.WriteLine($"[ParalizeHandler] ParalizeStatus gesendet an {peer.ToString()} (Port: {peer.Port}) - PlayerIndex: {i}, IsParalized: {isParalized}");
+            Console.WriteLine(
+                $"[ParalizeHandler] ParalizeStatus gesendet an {peer.ToString()} (Port: {peer.Port}) - PlayerIndex: {i}, IsParalized: {isParalized}"
+            );
         }
     }
 }

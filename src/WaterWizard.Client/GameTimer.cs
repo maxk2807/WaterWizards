@@ -4,7 +4,7 @@
 // - justinjd00: 24 Zeilen
 // - maxk2807: 17 Zeilen
 // - jdewi001: 6 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -14,22 +14,28 @@ using Raylib_cs;
 namespace WaterWizard.Client;
 
 /// <summary>
-/// GameTimer class handles the game timer functionality.
+/// Verwaltet die Spielzeit, das Pausieren und das Anzeigen des Timers.
 /// </summary>
-/// <param name="gameStateManager">to set the gamestate of the game</param>
 public class GameTimer(GameStateManager gameStateManager)
 {
     private float _timerSeconds;
     private const int _timeLimitMinutes = 3;
     private const int _timeLimitSeconds = 400;
     private GameStateManager _gameStateManager = gameStateManager;
+
+    /// <summary>
+    /// Gibt an, ob die Zeit abgelaufen ist.
+    /// </summary>
     public bool IsTimeUp { get; private set; } = false;
 
     private bool _isPaused = false;
+    /// <summary>
+    /// Gibt an, ob der Timer aktuell pausiert ist.
+    /// </summary>
     public bool IsPaused => _isPaused;
 
     /// <summary>
-    /// Updates the game timer. If the time limit is reached, it sets IsTimeUp to true and changes the game state.
+    /// Aktualisiert den Timer. Setzt IsTimeUp und wechselt ins Hauptmenü, wenn die Zeit abgelaufen ist.
     /// </summary>
     public void Update()
     {
@@ -45,12 +51,18 @@ public class GameTimer(GameStateManager gameStateManager)
         }
     }
 
+    /// <summary>
+    /// Pausiert den Timer.
+    /// </summary>
     public void Pause()
     {
         _isPaused = true;
         Console.WriteLine("[GameTimer] Game paused.");
     }
 
+    /// <summary>
+    /// Setzt den Timer fort.
+    /// </summary>
     public void Resume()
     {
         _isPaused = false;
@@ -58,28 +70,28 @@ public class GameTimer(GameStateManager gameStateManager)
     }
 
     /// <summary>
-    /// Draws the timer on the screen at the specified position with the specified font size and color.
+    /// Zeichnet den Timer an die angegebene Position.
     /// </summary>
-    /// <param name="x">X-Coordinate of the timer</param>
-    /// <param name="y">Y-Coordinate of the timer</param>
-    /// <param name="fontSize">size of the font of the timer</param>
-    /// <param name="color">color of the timer</param>
+    /// <param name="x">X-Koordinate</param>
+    /// <param name="y">Y-Koordinate</param>
+    /// <param name="fontSize">Schriftgröße</param>
+    /// <param name="color">Farbe</param>
     public void Draw(int x, int y, int fontSize, Color color)
     {
         Raylib.DrawText(TimerString(), x, y, fontSize, color);
     }
 
     /// <summary>
-    /// Calculates the number of minutes from the timer seconds.
+    /// Berechnet die Anzahl der Minuten aus den Timer-Sekunden.
     /// </summary>
-    /// <returns>Minutes calculated by the seconds</returns>
+    /// <returns>Minuten, die aus den Sekunden berechnet wurden</returns>
     private int GetMinutes()
     {
         return (int)_timerSeconds / 60;
     }
 
     /// <summary>
-    /// Resets the timer to 0 seconds.
+    /// Setzt den Timer zurück.
     /// </summary>
     public void Reset()
     {
@@ -88,6 +100,10 @@ public class GameTimer(GameStateManager gameStateManager)
         _isPaused = false;
     }
 
+    /// <summary>
+    /// Gibt die aktuelle Zeit als formatierten String zurück.
+    /// </summary>
+    /// <returns>String im Format "Time: mm:ss"</returns>
     public string TimerString()
     {
         int totalSeconds = (int)_timerSeconds;
@@ -97,11 +113,21 @@ public class GameTimer(GameStateManager gameStateManager)
         return timerText;
     }
 
+    /// <summary>
+    /// Gibt die Textbreite des Timers für die angegebene Schriftgröße zurück.
+    /// </summary>
+    /// <param name="fontsize">Schriftgröße</param>
+    /// <returns>Textbreite in Pixel</returns>
     public int TextWidth(int fontsize)
     {
         return Raylib.MeasureText(TimerString(), fontsize);
     }
 
+    /// <summary>
+    /// Gibt die maximale Textbreite für den Timer zurück.
+    /// </summary>
+    /// <param name="fontsize">Schriftgröße</param>
+    /// <returns>Maximale Textbreite in Pixel</returns>
     internal static float MaxTextWidth(int fontsize)
     {
         return Raylib.MeasureText("Time: 99:99", fontsize);

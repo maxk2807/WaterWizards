@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 72 Zeilen
 // - Erickk0: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private readonly Random _random = new();   (jdewi001: 60 Zeilen)
 // ===============================================
@@ -13,6 +13,9 @@ using System.Numerics;
 
 namespace WaterWizard.Shared;
 
+/// <summary>
+/// Repräsentiert einen aktiven Blitzeffekt auf dem Spielfeld.
+/// </summary>
 public class ThunderEffect
 {
     private readonly float _totalDuration = 5f; // Gesamtdauer des Effekts in Sekunden

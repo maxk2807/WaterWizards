@@ -5,7 +5,7 @@
 // - jdewi001: 65 Zeilen
 // - erick: 35 Zeilen
 // - Erickk0: 11 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private static readonly Random random = new();   (maxk2807: 169 Zeilen)
 // ===============================================
@@ -24,6 +24,7 @@ namespace WaterWizard.Server;
 public static class CardAbilities
 {
     private static readonly Random random = new();
+
     public static void HandleAbility(
         CardVariant variant,
         GameState gameState,
@@ -32,6 +33,8 @@ public static class CardAbilities
         NetPeer defender
     )
     {
+        Console.WriteLine($"[CardAbilities] HandleAbility called for {variant}");
+
         if (DamageCardFactory.IsDamageCard(variant))
         {
             var damageCard = DamageCardFactory.CreateDamageCard(variant);
@@ -58,6 +61,11 @@ public static class CardAbilities
                         {
                             gameState.CheckGameOver();
                         }
+                        
+                        // Add damage card to active cards list
+                        var card = new Cards(variant);
+                        int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                        CardHandler.CardActivation(gameState, variant, duration);
                     }
                 }
                 else
@@ -94,6 +102,11 @@ public static class CardAbilities
                         {
                             gameState.CheckGameOver();
                         }
+                        
+                        // Add healing card to active cards list
+                        var card = new Cards(variant);
+                        int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                        CardHandler.CardActivation(gameState, variant, duration);
                     }
                 }
                 else
@@ -129,6 +142,11 @@ public static class CardAbilities
                         {
                             gameState.CheckGameOver();
                         }
+                        
+                        // Add utility card to active cards list
+                        var card = new Cards(variant);
+                        int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                        CardHandler.CardActivation(gameState, variant, duration);
                     }
                 }
                 else
@@ -164,6 +182,14 @@ public static class CardAbilities
                         {
                             gameState.CheckGameOver();
                         }
+                        
+                        // Add environment card to active cards list (but Thunder already handles this itself)
+                        if (variant != CardVariant.Thunder)
+                        {
+                            var card = new Cards(variant);
+                            int duration = card.Duration == "instant" ? 0 : (int.TryParse(card.Duration, out int d) ? d : 0);
+                            CardHandler.CardActivation(gameState, variant, duration);
+                        }
                     }
                 }
                 else
@@ -175,43 +201,7 @@ public static class CardAbilities
             }
         }
 
-        switch (variant)
-        {
-            case CardVariant.Thunder:
-                Console.WriteLine($"[Server] Thunder-Karte aktiviert!");
-                break;
-            default:
-                Console.WriteLine(
-                    $"[Server] Cast Card Variant {variant} on coords ({targetCoords.X},{targetCoords.Y})"
-                );
-                PrintCardArea(variant, targetCoords, gameState, defender);
-                break;
-        }
-        var durationString = new Cards(variant).Duration!;
-        switch (durationString)
-        {
-            case "instant":
-                break;
-            case "permanent":
-                Console.WriteLine($"[Server] Activated Card: {variant}");
-                break;
-            default: //Duration is a number
-                try
-                {
-                    //Now covered by individual cards: see Thunder
-                    // int duration = int.Parse(durationString);
-                    // CardHandler.CardActivation(gameState, variant, duration);
-                    // Console.WriteLine(
-                    //     $"[Server] Activated Card: {variant} for {duration} seconds"
-                    // );
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    throw;
-                }
-        }
+        PrintCardArea(variant, targetCoords, gameState, defender);
     }
 
     public static void HandleAbilityWithHandlers(
@@ -221,8 +211,13 @@ public static class CardAbilities
         NetPeer caster,
         NetPeer defender,
         ParalizeHandler paralizeHandler,
-        UtilityCardHandler utilityCardHandler)
+        UtilityCardHandler utilityCardHandler
+    )
     {
+        Console.WriteLine($"[CardAbilities] HandleAbilityWithHandlers called for {variant}");
+
+        HandleAbility(variant, gameState, targetCoords, caster, defender);
+
         if (DamageCardFactory.IsDamageCard(variant))
         {
             var damageCard = DamageCardFactory.CreateDamageCard(variant);
@@ -301,8 +296,31 @@ public static class CardAbilities
         var card = new Cards(variant);
         if (card.Type == CardType.Utility)
         {
-            // Verwende die übergebenen Handler
-            // utilityCardHandler.HandleUtilityCard(variant, targetCoords, caster, defender);
+            switch (variant)
+            {
+                case CardVariant.HoveringEye:
+                    var hoveringEyeCard = new HoveringEyeCard();
+                    if (hoveringEyeCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                    {
+                        bool executed = hoveringEyeCard.ExecuteUtility(gameState, targetCoords, caster, defender);
+                        Console.WriteLine($"[Server] {variant} utility result: {(executed ? "executed successfully" : "execution failed")}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[Server] Invalid target for {variant} at ({targetCoords.X}, {targetCoords.Y})");
+                    }
+                    break;
+                case CardVariant.Paralize:
+                    var paralizeCard = new ParalizeCard();
+                    if (paralizeCard.IsValidTarget(gameState, targetCoords, caster, defender))
+                    {
+                        paralizeCard.ExecuteUtility(gameState, targetCoords, caster, defender);
+                    }
+                    break;
+                default:
+                    utilityCardHandler.HandleUtilityCard(variant, targetCoords, caster, defender);
+                    break;
+            }
             return;
         }
 

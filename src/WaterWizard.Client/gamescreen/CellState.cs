@@ -4,7 +4,7 @@
 // - Erickk0: 3 Zeilen
 // - jdewi001: 1 Zeilen
 // - justinjd00: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -24,5 +24,5 @@ public enum CellState
     Unknown,
     Thunder,
     HoveringEyeRevealed,
-    Shield
+    Shield,
 }

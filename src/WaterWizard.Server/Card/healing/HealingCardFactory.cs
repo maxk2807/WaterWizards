@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 32 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -23,6 +23,7 @@ public class HealingCardFactory
         return variant switch
         {
             CardVariant.Heal => new HealCard(),
+            CardVariant.PerfectMending => new PerfectMendingCard(),
             _ => null,
         };
     }

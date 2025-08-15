@@ -3,7 +3,7 @@
 // - erick: 167 Zeilen
 // - maxk2807: 76 Zeilen
 // - Erickk0: 65 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -12,9 +12,11 @@ using System.Numerics;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Raylib_cs;
-using WaterWizard.Client.gamescreen.ships;
-using WaterWizard.Client.Gamescreen;
 using WaterWizard.Client.network;
+using WaterWizard.Shared.ShipType;
+using CellState = WaterWizard.Client.Gamescreen.CellState;
+using WaterWizard.Client.gamescreen.ships;
+
 
 namespace WaterWizard.Client.gamescreen.handler;
 
@@ -23,17 +25,36 @@ namespace WaterWizard.Client.gamescreen.handler;
 /// </summary>
 public class HandleShips
 {
-
-    public readonly static Texture2D Ship1 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship1.png");
-    public readonly static Texture2D Ship1Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship1-Rotated.png");
-    public readonly static Texture2D Ship2 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship2.png");
-    public readonly static Texture2D Ship2Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship2-Rotated.png");
-    public readonly static Texture2D Ship3 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship3.png");
-    public readonly static Texture2D Ship3Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship3-Rotated.png");
-    public readonly static Texture2D Ship4 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship4.png");
-    public readonly static Texture2D Ship4Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship4-Rotated.png");
-    public readonly static Texture2D Ship5 = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship5.png");
-    public readonly static Texture2D Ship5Rotated = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ships/Ship5-Rotated.png");
+    public static readonly Texture2D Ship1 = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship1.png"
+    );
+    public static readonly Texture2D Ship1Rotated = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship1-Rotated.png"
+    );
+    public static readonly Texture2D Ship2 = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship2.png"
+    );
+    public static readonly Texture2D Ship2Rotated = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship2-Rotated.png"
+    );
+    public static readonly Texture2D Ship3 = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship3.png"
+    );
+    public static readonly Texture2D Ship3Rotated = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship3-Rotated.png"
+    );
+    public static readonly Texture2D Ship4 = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship4.png"
+    );
+    public static readonly Texture2D Ship4Rotated = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship4-Rotated.png"
+    );
+    public static readonly Texture2D Ship5 = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship5.png"
+    );
+    public static readonly Texture2D Ship5Rotated = TextureManager.LoadTexture(
+        "src/WaterWizard.Client/Assets/Ships/Ship5-Rotated.png"
+    );
 
     public static Texture2D TextureFromLength(bool rotated, int length)
     {
@@ -75,12 +96,17 @@ public class HandleShips
         int pixelY = (int)playerBoard.Position.Y + y * playerBoard.CellSize;
         int pixelWidth = width * playerBoard.CellSize;
         int pixelHeight = height * playerBoard.CellSize;
+
+        // Determine ship type - largest ship is merchant
+        int size = Math.Max(width, height);
+        ShipType shipType = size == 5 ? ShipType.Merchant : ShipType.DEFAULT;
+        
         playerBoard.putShip(
             new GameShip(
                 GameStateManager.Instance.GameScreen,
                 pixelX,
                 pixelY,
-                ShipType.DEFAULT,
+                shipType,
                 pixelWidth,
                 pixelHeight
             )
@@ -137,56 +163,47 @@ public class HandleShips
     /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleShipReveal(NetPacketReader reader)
     {
-        try
+        int x = reader.GetInt();
+        int y = reader.GetInt();
+        int width = reader.GetInt();
+        int height = reader.GetInt();
+        int damageCount = reader.GetInt();
+
+        var gameScreen = GameStateManager.Instance.GameScreen;
+        if (gameScreen?.opponentBoard == null)
         {
-            int x = reader.GetInt();
-            int y = reader.GetInt();
-            int width = reader.GetInt();
-            int height = reader.GetInt();
-
-            int damageCount = reader.GetInt();
-            var damagedCells = new HashSet<(int X, int Y)>();
-
-            Console.WriteLine($"[Client] HandleShipReveal: Ship at ({x},{y}) size {width}x{height}, damageCount={damageCount}");
-
-            for (int i = 0; i < damageCount; i++)
-            {
-                int damageX = reader.GetInt();
-                int damageY = reader.GetInt();
-                damagedCells.Add((damageX, damageY));
-                Console.WriteLine($"[Client] HandleShipReveal: Damage at ({damageX},{damageY})");
-            }
-
-            var targetBoard = GameStateManager.Instance.GameScreen!.opponentBoard;
-
-            if (targetBoard != null)
-            {
-                for (int dx = 0; dx < width; dx++)
-                {
-                    for (int dy = 0; dy < height; dy++)
-                    {
-                        int cellX = x + dx;
-                        int cellY = y + dy;
-
-                        if (cellX >= 0 && cellX < targetBoard.GridWidth && cellY >= 0 && cellY < targetBoard.GridHeight)
-                        {
-                            if (targetBoard._gridStates[cellX, cellY] != CellState.Hit)
-                            {
-                                targetBoard.SetCellState(cellX, cellY, CellState.Ship);
-                            }
-                        }
-                    }
-                }
-
-                Console.WriteLine(
-                    $"[Client] Ship revealed on opponent board: ({x},{y}) size {width}x{height} with {damageCount} damage cells - marked cells as Ship state"
-                );
-            }
+            Console.WriteLine("[Client] Error: opponentBoard is null in ShipReveal.");
+            return;
         }
-        catch (Exception ex)
+
+        Console.WriteLine($"[Client] Ship revealed at ({x},{y}) size {width}x{height} with {damageCount} damage cells");
+
+        var opponentBoard = gameScreen.opponentBoard;
+        var shipToRemove = opponentBoard.Ships.FirstOrDefault(ship => 
+            ship.X == (int)opponentBoard.Position.X + x * opponentBoard.CellSize &&
+            ship.Y == (int)opponentBoard.Position.Y + y * opponentBoard.CellSize);
+
+        if (shipToRemove != null)
         {
-            Console.WriteLine($"[Client] Error in HandleShipReveal: {ex.Message}");
-            Console.WriteLine($"[Client] Stack trace: {ex.StackTrace}");
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    int cellX = x + i;
+                    int cellY = y + j;
+                    opponentBoard.MarkCellAsHit(cellX, cellY, true);
+                }
+            }
+            
+            opponentBoard.Ships.Remove(shipToRemove);
+            Console.WriteLine($"[Client] Destroyed ship removed from opponent board");
+        }
+
+        for (int i = 0; i < damageCount; i++)
+        {
+            int damageX = reader.GetInt();
+            int damageY = reader.GetInt();
+            opponentBoard.MarkCellAsHit(damageX, damageY, true);
         }
     }
 
@@ -278,7 +295,8 @@ public class HandleShips
             int newY = reader.GetInt();
             var ship = board.Ships.Find(ship =>
             {
-                return (ship.X - (int)board.Position.X) / board.CellSize == oldX && (ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
+                return (ship.X - (int)board.Position.X) / board.CellSize == oldX
+                    && (ship.Y - (int)board.Position.Y) / board.CellSize == oldY;
             });
             if (ship != null)
             {
@@ -310,11 +328,7 @@ public class HandleShips
         {
             int X = reader.GetInt();
             int Y = reader.GetInt();
-            GameStateManager.Instance.GameScreen.playerBoard!.SetCellState(
-                    X,
-                    Y,
-                    CellState.Ship
-                );
+            GameStateManager.Instance.GameScreen.playerBoard!.SetCellState(X, Y, CellState.Ship);
             Console.WriteLine($"[Client] Healed At ({X},{Y})");
         }
         Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
@@ -330,10 +344,19 @@ public class HandleShips
         GameStateManager.Instance.GameScreen.playerBoard!.Ships.ForEach(ship =>
         {
             var board = GameStateManager.Instance.GameScreen.playerBoard!;
-            var prevX = (ship.X - oldBoardPosition.X) / oldCellSize;
-            var prevY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
-            ship.X = (int)(board.Position.X + prevX) * board.CellSize;
-            ship.Y = (int)(board.Position.Y + prevY) * board.CellSize;
+
+            var gridX = (ship.X - oldBoardPosition.X) / oldCellSize;
+            var gridY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
+            
+
+            ship.X = (int)(board.Position.X + gridX * board.CellSize);
+            ship.Y = (int)(board.Position.Y + gridY * board.CellSize);
+            
+
+            var gridWidth = ship.Width / (int)oldCellSize;
+            var gridHeight = ship.Height / (int)oldCellSize;
+            ship.Width = gridWidth * board.CellSize;
+            ship.Height = gridHeight * board.CellSize;
         });
     }
 }

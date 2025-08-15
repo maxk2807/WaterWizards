@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 36 Zeilen
 // - Paul: 24 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new();   (maxk2807: 33 Zeilen)
 // ===============================================
@@ -25,15 +25,23 @@ public class ParalizeCard : IUtilityCard
 
     public bool HasSpecialTargeting => true; // whole Battlefield
 
-
-    public bool ExecuteUtility(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool ExecuteUtility(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         var state = gameState.manager.CurrentState;
         if (state is InGameState ingame)
         {
             Console.WriteLine($"[ParalizeHandler] Paralize-Karte wird ausgeführt...");
-            Console.WriteLine($"[ParalizeHandler] Caster (Angreifer): {caster.ToString()} (Port: {caster.Port})");
-            Console.WriteLine($"[ParalizeHandler] Defender (Ziel): {opponent.ToString()} (Port: {opponent.Port})");
+            Console.WriteLine(
+                $"[ParalizeHandler] Caster (Angreifer): {caster.ToString()} (Port: {caster.Port})"
+            );
+            Console.WriteLine(
+                $"[ParalizeHandler] Defender (Ziel): {opponent.ToString()} (Port: {opponent.Port})"
+            );
 
             // Finde den Spielerindex des Gegners
             int opponentIndex = -1;
@@ -50,8 +58,12 @@ public class ParalizeCard : IUtilityCard
             {
                 // Aktiviere Paralize für 6 Sekunden
                 ingame.paralizeHandler!.ActivateParalize(opponentIndex, 6.0f);
-                Console.WriteLine($"[ParalizeHandler] Player {opponentIndex + 1} paralyzed for 6 seconds");
-                Console.WriteLine($"[ParalizeHandler] Paralize-Effekt: Mana-Generierung für {opponentIndex + 1} Sekunden gestoppt");
+                Console.WriteLine(
+                    $"[ParalizeHandler] Player {opponentIndex + 1} paralyzed for 6 seconds"
+                );
+                Console.WriteLine(
+                    $"[ParalizeHandler] Paralize-Effekt: Mana-Generierung für {opponentIndex + 1} Sekunden gestoppt"
+                );
             }
             else
             {
@@ -62,7 +74,12 @@ public class ParalizeCard : IUtilityCard
         return true;
     }
 
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         return true;
     }

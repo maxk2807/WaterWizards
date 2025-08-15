@@ -1,12 +1,13 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jlnhsrm: 41 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
 using WaterWizard.Server.Card;
+using WaterWizard.Server.Card.damage;
 using WaterWizard.Server.Interface;
 using WaterWizard.Shared;
 
@@ -26,6 +27,7 @@ public static class DamageCardFactory
     {
         return variant switch
         {
+            CardVariant.MagicAttack => new MagicAttackCard(),
             CardVariant.Firebolt => new FireboltCard(),
             CardVariant.ArcaneMissile => new ArcaneMissileCard(),
             CardVariant.GreedHit => new GreedHitCard(),

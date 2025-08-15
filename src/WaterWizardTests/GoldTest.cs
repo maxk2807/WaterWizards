@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 59 Zeilen
 // - justinjd00: 14 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -21,7 +21,7 @@ namespace WaterWizardTests
             var gold = new Gold();
 
             // Assert
-            Assert.Equal(0, gold.Amount);
+            Assert.Equal(6, gold.Amount);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace WaterWizardTests
             gold.Update(2.0, 3); // 2 Sekunden vergangen, 3 Handelsschiffe
 
             // Assert
-            Assert.Equal(4, gold.Amount); // 1 Basis + 3 von Handelsschiffen
+            Assert.Equal(10, gold.Amount); // 1 Basis + 3 von Handelsschiffen
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace WaterWizardTests
             gold.Update(1.0, 2); // Nur 1 Sekunde vergangen, 2 Handelsschiffe
 
             // Assert
-            Assert.Equal(0, gold.Amount); // Noch kein Gold generiert
+            Assert.Equal(6, gold.Amount); // Should remain at initial 6
         }
 
         [Fact]
@@ -55,14 +55,14 @@ namespace WaterWizardTests
         {
             // Arrange
             var gold = new Gold();
-            gold.Update(2.0, 2); // 3 Gold generieren (1 Basis + 2 von Schiffen)
+            gold.Update(2.0, 2); // Generate 3 more gold (1 base + 2 merchant ships), total = 9
 
             // Act
             var result = gold.Spend(2);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(1, gold.Amount);
+            Assert.Equal(7, gold.Amount); // 9 - 2 = 7
         }
 
         [Fact]
@@ -72,11 +72,11 @@ namespace WaterWizardTests
             var gold = new Gold();
 
             // Act
-            var result = gold.Spend(5);
+            var result = gold.Spend(10); // Try to spend more than initial 6
 
             // Assert
             Assert.False(result);
-            Assert.Equal(0, gold.Amount);
+            Assert.Equal(6, gold.Amount); // Should remain unchanged at 6
         }
     }
 }

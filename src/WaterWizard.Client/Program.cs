@@ -4,15 +4,16 @@
 // - jdewi001: 10 Zeilen
 // - maxk2807: 3 Zeilen
 // - Erickk0: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-﻿using System;
+using System;
 using Raylib_cs;
 using WaterWizard.Client;
 using WaterWizard.Client.Assets.Sounds.Manager;
+
 class Program
 {
     static void Main()
@@ -25,7 +26,8 @@ class Program
             const int defaultHeight = 900;
 
             Raylib.InitWindow(defaultWidth, defaultHeight, "Water Wizard");
-            Raylib.SetExitKey(KeyboardKey.Escape); // Escape-Taste zum Beenden
+            Raylib.SetWindowState(ConfigFlags.ResizableWindow); 
+            Raylib.SetExitKey(KeyboardKey.Escape);
 
             bool isFullscreen = false;
             int screenWidth = defaultWidth;
@@ -36,6 +38,13 @@ class Program
             // Hauptspiel-Loop
             while (!Raylib.WindowShouldClose())
             {
+                if (Raylib.IsWindowResized())
+                {
+                    screenWidth = Raylib.GetScreenWidth();
+                    screenHeight = Raylib.GetScreenHeight();
+                    GameStateManager.Instance.UpdateScreenSize(screenWidth, screenHeight);
+                }
+
                 if (Raylib.IsKeyPressed(KeyboardKey.F11) || Raylib.IsKeyPressed(KeyboardKey.F))
                 {
                     isFullscreen = !isFullscreen;
@@ -79,7 +88,8 @@ class Program
             Console.WriteLine("Drücke eine beliebige Taste zum Beenden...");
             Console.ReadKey();
         }
-        finally{
+        finally
+        {
             SoundManager.UnloadSounds();
             Raylib.CloseAudioDevice();
         }

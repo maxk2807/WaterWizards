@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 65 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -11,6 +11,9 @@ using Raylib_cs;
 
 namespace WaterWizard.Client;
 
+/// <summary>
+/// Verwaltet das Pausieren und Fortsetzen des Spiels und des Timers.
+/// </summary>
 public class GamePauseManager
 {
     private readonly GameTimer _gameTimer;

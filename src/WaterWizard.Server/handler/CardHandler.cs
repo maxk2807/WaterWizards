@@ -5,7 +5,7 @@
 // - jlnhsrm: 28 Zeilen
 // - justinjd00: 17 Zeilen
 // - maxk2807: 13 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -15,28 +15,40 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Server.Card.environment;
-using WaterWizard.Shared;
 using WaterWizard.Server.handler;
 using WaterWizard.Server.ServerGameStates;
+using WaterWizard.Shared;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.handler;
 
+/// <summary>
+/// Verwaltet das Kaufen und Ausspielen von Karten sowie die Kommunikation mit den Clients bezüglich Kartenaktionen.
+/// </summary>
 public class CardHandler(GameState gameState)
 {
     private readonly GameState? gameState = gameState;
 
     /// <summary>
-    /// Handles the Buying of Cards from a CardStack. Takes a random Card from the corresponding CardStack
-    /// of the <see cref="CardType"/> given in <paramref name="reader"/>
+    /// Verarbeitet den Kauf einer Karte durch einen Client und sendet die Karte zurück.
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
-    public static void HandleCardBuying(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState)
+    public static void HandleCardBuying(
+        NetManager server,
+        NetPeer peer,
+        NetPacketReader reader,
+        GameState gameState
+    )
     {
-
         string cardType = reader.GetString();
         Console.WriteLine($"[Server] Trying to Buy {cardType} Card");
-        if (GameState.UtilityStack == null || GameState.DamageStack == null || GameState.EnvironmentStack == null || GameState.HealingStack == null)
+        if (
+            GameState.UtilityStack == null
+            || GameState.DamageStack == null
+            || GameState.EnvironmentStack == null
+            || GameState.HealingStack == null
+        )
         {
             Console.WriteLine("[Server] Card stacks are not initialized, cannot buy card.");
             return;
@@ -66,18 +78,24 @@ public class CardHandler(GameState gameState)
 
         if (!goldHandler.CanSpendGold(playerIndex, goldCost))
         {
-            Console.WriteLine($"[Server] Player {playerIndex} has insufficient gold: {(playerIndex == 0 ? gameState.Player1Gold : gameState.Player2Gold )} ({goldCost} required). Purchase cancelled.");
+            Console.WriteLine(
+                $"[Server] Player {playerIndex} has insufficient gold: {(playerIndex == 0 ? gameState.Player1Gold : gameState.Player2Gold)} ({goldCost} required). Purchase cancelled."
+            );
             return;
         }
 
         bool success = goldHandler?.SpendGold(playerIndex, goldCost) ?? false;
         if (!success)
         {
-            Console.WriteLine($"[Server] Player {playerIndex} could not spend gold despite CanSpendGold check. Purchase cancelled.");
+            Console.WriteLine(
+                $"[Server] Player {playerIndex} could not spend gold despite CanSpendGold check. Purchase cancelled."
+            );
             return;
         }
 
-        Console.WriteLine($"[Server] Player {playerIndex} bought {cardType} card ({card.Variant}) for {goldCost} gold.");
+        Console.WriteLine(
+            $"[Server] Player {playerIndex} bought {cardType} card ({card.Variant}) for {goldCost} gold."
+        );
 
         NetDataWriter writer = new();
         writer.Put("BoughtCard");
@@ -106,19 +124,26 @@ public class CardHandler(GameState gameState)
     }
 
     /// <summary>
-    /// Handles the Casting of Cards from the <see cref="NetPeer"/>s hand. //TODO: handle Mana Cost.
-    /// Calls the Ability in <see cref="CardAbilities"/>
+    /// Verarbeitet das Ausspielen einer Karte durch einen Client und führt die Kartenfähigkeit aus.
     /// </summary>
     /// <param name="peer">The <see cref="NetPeer"/> Client sending the Placement Request</param>
     /// <param name="reader"><see cref="NetPacketReader"/> with the Request Data</param>
-    public void HandleCardCasting(NetManager server, NetPeer peer, NetPacketReader reader, GameState gameState, ParalizeHandler paralizeHandler, UtilityCardHandler utilityCardHandler)
+    public void HandleCardCasting(
+        NetManager server,
+        NetPeer peer,
+        NetPacketReader reader,
+        GameState gameState,
+        ParalizeHandler paralizeHandler,
+        UtilityCardHandler utilityCardHandler
+    )
     {
-        
         string cardVariantString = reader.GetString();
         int cardX = reader.GetInt();
         int cardY = reader.GetInt();
 
-        Console.WriteLine($"[CardHandler] Kartenausspielung empfangen von {peer.ToString()} (Port: {peer.Port})");
+        Console.WriteLine(
+            $"[CardHandler] Kartenausspielung empfangen von {peer.ToString()} (Port: {peer.Port})"
+        );
         Console.WriteLine($"[CardHandler] Kartenvariante: {cardVariantString}");
         Console.WriteLine($"[CardHandler] Zielkoordinaten: ({cardX}, {cardY})");
 
@@ -133,7 +158,9 @@ public class CardHandler(GameState gameState)
 
             if (defender != null)
             {
-                Console.WriteLine($"[CardHandler] Gegner gefunden: {defender.ToString()} (Port: {defender.Port})");
+                Console.WriteLine(
+                    $"[CardHandler] Gegner gefunden: {defender.ToString()} (Port: {defender.Port})"
+                );
                 Console.WriteLine($"[CardHandler] Starte Kartenausführung für {variant}...");
                 // Mana-cost-handling
                 int playerIndex = gameState.Server.ConnectedPeerList.IndexOf(peer);
@@ -141,59 +168,91 @@ public class CardHandler(GameState gameState)
                 InGameState? inGame = gameState.manager.CurrentState as InGameState;
                 ManaHandler manaHandler = inGame!.manaHandler!;
 
-
                 if (!manaHandler.CanSpendMana(playerIndex, manaCost))
                 {
-                    Console.WriteLine($"[Server] Player {playerIndex} has insufficient mana: " +
-                        $"{(playerIndex == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana)} " +
-                        $"({manaCost} required). Cast cancelled.");
+                    Console.WriteLine(
+                        $"[Server] Player {playerIndex} has insufficient mana: "
+                            + $"{(playerIndex == 0 ? gameState.Player1Mana.CurrentMana : gameState.Player2Mana.CurrentMana)} "
+                            + $"({manaCost} required). Cast cancelled."
+                    );
                     return;
                 }
 
                 bool success = manaHandler.SpendMana(playerIndex, manaCost);
-                if (!success)
+                if (success)
                 {
-                    Console.WriteLine($"[Server] Player {playerIndex} could not spend mana despite CanSpendMana check. Cast cancelled.");
+                    SendCardManaSpent(peer, variant);
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"[Server] Player {playerIndex} could not spend mana despite CanSpendMana check. Cast cancelled."
+                    );
                     return;
                 }
 
-                Console.WriteLine($"[Server] Player {playerIndex} casted card {variant} for {manaCost} mana.");
+                Console.WriteLine(
+                    $"[Server] Player {playerIndex} casted card {variant} for {manaCost} mana."
+                );
                 // end of Mana-cost-handling
 
                 if (gameState.PlayerHands == null)
                 {
-                    Console.WriteLine("[CardHandler] WARNING: PlayerHands is null - initializing empty hands");
+                    Console.WriteLine(
+                        "[CardHandler] WARNING: PlayerHands is null - initializing empty hands"
+                    );
                     gameState.PlayerHands = [];
                 }
 
                 if (gameState.PlayerHands.TryGetValue(peer, out var hand))
                 {
-                    Console.WriteLine($"[CardHandler] Player {peer} has {hand.Count} cards in hand");
-                    foreach (var card in hand)
+                    Console.WriteLine(
+                        $"[CardHandler] Player {peer} has {hand.Count} cards in hand"
+                    );
+                    foreach (var handCard in hand)
                     {
-                        Console.WriteLine($"[CardHandler] - {card.Variant}");
+                        Console.WriteLine($"[CardHandler] - {handCard.Variant}");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"[CardHandler] Player {peer} has no hand tracked on server - this might be normal for testing");
+                    Console.WriteLine(
+                        $"[CardHandler] Player {peer} has no hand tracked on server - this might be normal for testing"
+                    );
                 }
 
+                var card = new Cards(variant);
+                int finalX = cardX;
+                int finalY = cardY;
                 
-                CardAbilities.HandleAbility(variant, gameState, new Vector2(cardX, cardY), peer, defender);
+                if (card.Target != null && !card.Target.Ally)
+                {
+                    var (transformedX, transformedY) = CoordinateTransform.RotateOpponentCoordinates(
+                        cardX, cardY, GameState.boardWidth, GameState.boardHeight);
+                    finalX = transformedX;
+                    finalY = transformedY;
+                    
+                    Console.WriteLine($"[CardHandler] Transformed card coordinates: ({cardX}, {cardY}) -> ({finalX}, {finalY})");
+                }
+
+                CardAbilities.HandleAbility(variant, gameState, new Vector2(finalX, finalY), peer, defender);
                 
                 var cardToRemove = new Cards(variant);
                 bool cardRemoved = gameState.RemoveCardFromPlayerHand(peer, cardToRemove);
-                
+
                 if (cardRemoved)
                 {
-                    Console.WriteLine($"[CardHandler] Successfully removed {variant} from player hand");
+                    Console.WriteLine(
+                        $"[CardHandler] Successfully removed {variant} from player hand"
+                    );
                 }
                 else
                 {
-                    Console.WriteLine($"[CardHandler] Could not remove {variant} from player hand (hand might not be tracked)");
+                    Console.WriteLine(
+                        $"[CardHandler] Could not remove {variant} from player hand (hand might not be tracked)"
+                    );
                 }
-                
+
                 NotifyOpponentCardUsed(defender, variant);
                 Console.WriteLine($"[CardHandler] Kartenausführung für {variant} abgeschlossen");
             }
@@ -206,6 +265,14 @@ public class CardHandler(GameState gameState)
         {
             Console.WriteLine($"[Server] Casting Failed. Variant {cardVariantString} unknown");
         }
+    }
+
+    private void SendCardManaSpent(NetPeer peer, CardVariant variant)
+    {
+        NetDataWriter writer = new();
+        writer.Put("CardManaSpent");
+        writer.Put(variant.ToString());
+        peer.Send(writer, DeliveryMethod.ReliableOrdered);
     }
 
     /// <summary>
@@ -224,18 +291,45 @@ public class CardHandler(GameState gameState)
 
     internal static void CardActivation(GameState gameState, CardVariant variant, int duration)
     {
+        Console.WriteLine($"[CardHandler.CardActivation] Called with variant: {variant}, duration: {duration}");
+
         if (gameState == null)
         {
             Console.WriteLine("[Server] GameState is null, cannot activate card.");
             return;
         }
-        Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds");
-        GameState.ActiveCards?.Add(new Cards(variant) { remainingDuration = duration * 1000f });
 
-        // Sofort die aktive Karte an alle Clients senden
-        foreach (var player in gameState.players)
+        if (GameState.ActiveCards == null)
         {
-            SendActiveCardsUpdate(player);
+            Console.WriteLine("[Server] GameState.ActiveCards is null, initializing...");
+            GameState.ActiveCards = new List<Cards>();
+        }
+
+        int displayDuration = duration == 0 ? 1500 : Math.Max(duration * 1000, 1500);
+
+        Console.WriteLine($"[Server] Activate Card {variant} for {duration} seconds (display duration: {displayDuration}ms)");
+
+        var newCard = new Cards(variant) { remainingDuration = displayDuration };
+        GameState.ActiveCards.Add(newCard);
+
+        Console.WriteLine($"[Server] Active cards count after adding: {GameState.ActiveCards.Count}");
+        foreach (var card in GameState.ActiveCards)
+        {
+            Console.WriteLine($"[Server] - Active card: {card.Variant} with {card.remainingDuration}ms remaining");
+        }
+
+        if (gameState.players != null)
+        {
+            Console.WriteLine($"[Server] Sending active cards update to {gameState.players.Length} players");
+            foreach (var player in gameState.players)
+            {
+                Console.WriteLine($"[Server] Sending to player: {player}");
+                SendActiveCardsUpdate(player);
+            }
+        }
+        else
+        {
+            Console.WriteLine("[Server] No players found to send active cards update");
         }
     }
 
@@ -257,7 +351,9 @@ public class CardHandler(GameState gameState)
 
             if (card.remainingDuration <= 0) // Ist Karte abgelaufen
             {
-                Console.WriteLine($"[Server] Card {card.Variant} expired, removing from active cards");
+                Console.WriteLine(
+                    $"[Server] Card {card.Variant} expired, removing from active cards"
+                );
                 GameState.ActiveCards.RemoveAt(i);
 
                 foreach (var player in gameState.players)

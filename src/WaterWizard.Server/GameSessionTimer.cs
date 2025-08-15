@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 110 Zeilen
 // - jdewi001: 10 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -14,17 +14,23 @@ using LiteNetLib.Utils;
 namespace WaterWizard.Server;
 
 /// <summary>
-/// Manages the game session timer on the server.
+/// Verwaltet den Spielzeit-Timer auf dem Server und sendet regelmäßige Updates an die Clients.
 /// </summary>
 public class GameSessionTimer : IDisposable
 {
+    /// <summary>
+    /// Gibt an, ob der Timer aktuell läuft.
+    /// </summary>
+    public bool IsRunning => _gameStopwatch?.IsRunning ?? false;
+    /// <summary>
+    /// Gibt die vergangenen Sekunden seit Start des Timers zurück.
+    /// </summary>
+    public float ElapsedSeconds => (float)(_gameStopwatch?.Elapsed.TotalSeconds ?? 0);
+
     private readonly NetManager _server;
     private Stopwatch? _gameStopwatch;
     private Timer? _timerUpdateTimer;
     private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(1);
-
-    public bool IsRunning => _gameStopwatch?.IsRunning ?? false;
-    public float ElapsedSeconds => (float)(_gameStopwatch?.Elapsed.TotalSeconds ?? 0);
 
     private static void Log(string message)
     {
@@ -32,16 +38,16 @@ public class GameSessionTimer : IDisposable
     }
 
     /// <summary>
-    /// Initializes a new instance of the GameSessionTimer.
+    /// Initialisiert eine neue Instanz des GameSessionTimer.
     /// </summary>
-    /// <param name="server">The NetManager instance used to send updates.</param>
+    /// <param name="server">NetManager-Instanz für Netzwerk-Updates</param>
     public GameSessionTimer(NetManager server)
     {
         _server = server ?? throw new ArgumentNullException(nameof(server));
     }
 
     /// <summary>
-    /// Starts the game timer and begins sending periodic updates to clients.
+    /// Startet den Timer und beginnt mit dem Senden von Updates an die Clients.
     /// </summary>
     public void Start()
     {
@@ -66,7 +72,7 @@ public class GameSessionTimer : IDisposable
     }
 
     /// <summary>
-    /// Stops the game timer and stops sending updates.
+    /// Stoppt den Timer und beendet das Senden von Updates.
     /// </summary>
     public void Stop()
     {
@@ -81,9 +87,9 @@ public class GameSessionTimer : IDisposable
     }
 
     /// <summary>
-    /// Sends the current timer value to a specific peer.
+    /// Sendet den aktuellen Timer-Wert an einen bestimmten Peer.
     /// </summary>
-    /// <param name="peer">The peer to send the update to.</param>
+    /// <param name="peer">Empfänger-Peer</param>
     public void SendCurrentTimeToPeer(NetPeer peer)
     {
         if (!IsRunning)
@@ -119,7 +125,7 @@ public class GameSessionTimer : IDisposable
     }
 
     /// <summary>
-    /// Disposes the internal timer resources.
+    /// Gibt die Ressourcen des Timers frei.
     /// </summary>
     public void Dispose()
     {

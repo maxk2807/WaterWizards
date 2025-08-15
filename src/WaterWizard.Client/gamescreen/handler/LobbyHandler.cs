@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 213 Zeilen
 // - Erickk0: 11 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -229,5 +229,39 @@ public static class LobbyHandler
             );
         }
         GameStateManager.Instance.SetStateToLobby();
+    }
+
+    /// <summary>
+    /// Handles a player joining the lobby.
+    /// </summary>
+    /// <param name="peer">The network peer representing the joining player.</param>
+    /// <param name="playerName">The name of the player joining the lobby.</param>
+    /// <param name="connectedPlayers">The list of currently connected players.</param>
+    /// <param name="updatePlayerListCallback">A callback to update the player list (e.g., UI refresh or broadcast).</param>
+    public static void HandlePlayerJoin(
+        NetPeer peer,
+        string playerName,
+        List<Player> connectedPlayers,
+        Action updatePlayerListCallback
+    )
+    {
+        var playerToUpdate = connectedPlayers.FirstOrDefault(p => p.Address == peer.ToString());
+
+        if (playerToUpdate != null)
+        {
+            playerToUpdate.Name = playerName;
+            updatePlayerListCallback(); // Broadcast the updated player list to all clients
+        }
+        else
+        {
+            // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
+            Console.WriteLine(
+                $"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}"
+            );
+            // Optionally, handle this by adding the player if it's a valid scenario,
+            // though players are typically added during PeerConnectedEvent.
+            // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
+            // updatePlayerListCallback();
+        }
     }
 }

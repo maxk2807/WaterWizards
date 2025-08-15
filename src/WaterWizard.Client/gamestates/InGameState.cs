@@ -3,7 +3,7 @@
 // - jdewi001: 36 Zeilen
 // - Erickk0: 32 Zeilen
 // - erick: 10 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -11,18 +11,23 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert den Spielzustand während eines laufenden Spiels (In-Game).
+/// </summary>
 public class InGameState : IGameState
 {
     /// <summary>
-    /// Updates the game state and draws the game screen or pause overlay based on the game pause status.
+    /// Aktualisiert den Spielzustand und zeichnet das Spielfeld oder das Pause-Overlay.
     /// </summary>
-    /// <param name="manager">The GameStateManager instance that provides access to game components, screen dimensions, pause state, and rendering systems.</param>
+    /// <param name="manager">GameStateManager mit Zugriff auf Komponenten und Status</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
+        Raylib.UpdateMusicStream(SoundManager.PauseSound);
         if (Raylib.IsKeyPressed(KeyboardKey.S))
         {
             HandleSurrender();
@@ -45,9 +50,19 @@ public class InGameState : IGameState
                 40,
                 Color.Yellow
             );
+            // PauseMusic als Loop abspielen
+            if (!Raylib.IsMusicStreamPlaying(SoundManager.PauseSound))
+            {
+                Raylib.PlayMusicStream(SoundManager.PauseSound);
+            }
         }
         else
         {
+            // Falls PauseMusic läuft, stoppen
+            if (Raylib.IsMusicStreamPlaying(SoundManager.PauseSound))
+            {
+                Raylib.StopMusicStream(SoundManager.PauseSound);
+            }
             DrawGameScreen(manager);
 
             string surrenderHint = "Press 'S' to Surrender";
@@ -57,7 +72,8 @@ public class InGameState : IGameState
                 manager.screenWidth - hintWidth - 10,
                 10,
                 12,
-                Color.Gray);
+                Color.Gray
+            );
         }
     }
 
@@ -78,9 +94,9 @@ public class InGameState : IGameState
     }
 
     /// <summary>
-    /// Draws the game screen, including the game state and any relevant UI elements.
+    /// Zeichnet das Spielfeld und relevante UI-Elemente.
     /// </summary>
-    /// <param name="manager">The GameStateManager instance that provides access to game components, screen dimensions, pause state, and rendering systems.</param>
+    /// <param name="manager">GameStateManager mit Zugriff auf Komponenten und Status</param>
     private static void DrawGameScreen(GameStateManager manager)
     {
         manager.GameScreen.Draw(manager.screenWidth, manager.screenHeight);

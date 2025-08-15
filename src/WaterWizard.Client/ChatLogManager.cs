@@ -3,7 +3,7 @@
 // - justinjd00: 113 Zeilen
 // - jdewi001: 40 Zeilen
 // - maxk2807: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private readonly List<string> _messages = new List<string>();   (justinjd00: 107 Zeilen)
 // ===============================================
@@ -13,6 +13,9 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client;
 
+/// <summary>
+/// Verwaltet den Chatverlauf und die Chat-Eingabe im Spiel.
+/// </summary>
 public class ChatLogManager
 {
     private readonly List<string> _messages = new List<string>();
@@ -24,6 +27,10 @@ public class ChatLogManager
     private float _scrollOffset = 0;
     private readonly int _lineHeight = 18;
 
+    /// <summary>
+    /// Fügt dem Chat eine neue Nachricht hinzu.
+    /// </summary>
+    /// <param name="message">Die Nachricht, die hinzugefügt werden soll.</param>
     public void AddMessage(string message)
     {
         _messages.Add(message);
@@ -35,6 +42,9 @@ public class ChatLogManager
         _scrollOffset = Math.Max(0, (_messages.Count * (float)_lineHeight) - _chatArea.Height);
     }
 
+    /// <summary>
+    /// Verarbeitet die Benutzereingabe für den Chat (Tippen, Senden, Scrollen).
+    /// </summary>
     public void HandleInput()
     {
         if (_isTyping)
@@ -96,6 +106,11 @@ public class ChatLogManager
         }
     }
 
+    /// <summary>
+    /// Zeichnet das Chatfenster und das Eingabefeld auf den Bildschirm.
+    /// </summary>
+    /// <param name="screenWidth">Bildschirmbreite</param>
+    /// <param name="screenHeight">Bildschirmhöhe</param>
     public void Draw(int screenWidth, int screenHeight)
     {
         float chatHeight = screenHeight * 0.4f;

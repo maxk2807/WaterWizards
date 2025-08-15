@@ -6,23 +6,27 @@
 // - justinjd00: 32 Zeilen
 // - erick: 32 Zeilen
 // - Erickk0: 15 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - private HashSet<int> shipSizeLimitReached = new();   (maxk2807: 241 Zeilen)
 // ===============================================
 
 using System.Numerics;
+using System.Security.Cryptography;
 using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.gamescreen.cards;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.gamescreen.ships;
+using WaterWizard.Client.gamestates;
 using WaterWizard.Client.network;
 using WaterWizard.Shared;
-using WaterWizard.Client.gamestates;
-using System.Security.Cryptography;
 
 namespace WaterWizard.Client.gamescreen;
 
+/// <summary>
+/// Stellt die zentrale Spielfläche dar und verwaltet Boards, Karten, Schiffe und Ressourcenanzeige.
+/// </summary>
 public class GameScreen(
     GameStateManager gameStateManager,
     int screenWidth,
@@ -51,39 +55,58 @@ public class GameScreen(
     private Texture2D gameBackground;
     private Texture2D gridBackground;
     private Texture2D enemyGridBackground;
+    private Texture2D blueWizardTexture;
+    private Texture2D redWizardTexture;
 
     private bool allowSingleShipPlacement = false;
 
     public void LoadBackgroundAssets()
     {
-        if (gameBackground.Id != 0) return;
-        gameBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/BasicBackground.png");
+        if (gameBackground.Id != 0)
+            return;
+        gameBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/BasicBackground.png"
+        );
         //Hintergrund für das Spielbrett
+        
+        if (blueWizardTexture.Id == 0)
+            blueWizardTexture = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/InGame/wizblu.png");
+        if (redWizardTexture.Id == 0)
+            redWizardTexture = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Ui/InGame/wizred.png");
     }
 
     public void LoadBoardBackground() //Hintergrund für das Grid
     {
-        if (gridBackground.Id != 0) return;
-        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+        if (gridBackground.Id != 0)
+            return;
+        gridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackground.png"
+        );
 
-
-        if (enemyGridBackground.Id != 0) return;
-        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+        if (enemyGridBackground.Id != 0)
+            return;
+        enemyGridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png"
+        );
     }
 
     public void LoadUiBackground() //Ui hintergrund
     {
-        if (gridBackground.Id != 0) return;
-        gridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackground.png");
+        if (gridBackground.Id != 0)
+            return;
+        gridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackground.png"
+        );
 
-
-        if (enemyGridBackground.Id != 0) return;
-        enemyGridBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png");
+        if (enemyGridBackground.Id != 0)
+            return;
+        enemyGridBackground = TextureManager.LoadTexture(
+            "src/WaterWizard.Client/Assets/Background/GridBackgroundEnemy.png"
+        );
     }
 
     /// <summary>
-    /// Initialize all elements rendered on the GameScreen:
-    ///  the two Boards, Cardhands and Cardstacks as well as the //TODO: Graveyard and GameTimer
+    /// Initialisiert alle UI-Elemente und Spielfelder auf dem GameScreen.
     /// </summary>
     public void Initialize()
     {
@@ -114,11 +137,20 @@ public class GameScreen(
 
     private HashSet<int> shipSizeLimitReached = new();
 
+    /// <summary>
+    /// Markiert, dass das Limit für eine bestimmte Schiffsgröße erreicht wurde.
+    /// </summary>
+    /// <param name="size">Schiffsgröße</param>
     public void MarkShipSizeLimitReached(int size)
     {
         shipSizeLimitReached.Add(size);
     }
 
+    /// <summary>
+    /// Prüft, ob das Limit für eine bestimmte Schiffsgröße erreicht wurde.
+    /// </summary>
+    /// <param name="size">Schiffsgröße</param>
+    /// <returns>True, wenn das Limit erreicht ist</returns>
     public bool IsShipSizeLimitReached(int size)
     {
         return shipSizeLimitReached.Contains(size);
@@ -191,6 +223,9 @@ public class GameScreen(
         }
     }
 
+    /// <summary>
+    /// Initialisiert die aktiven Karten.
+    /// </summary>
     public void InitializeActiveCards()
     {
         activeCards = new(this);
@@ -205,6 +240,8 @@ public class GameScreen(
     /// <param name="currentScreenHeight"></param>
     public void Draw(int currentScreenWidth, int currentScreenHeight)
     {
+        Raylib.ClearBackground(Color.Black);
+        
         if (playerBoard == null || opponentBoard == null)
         {
             Raylib.DrawText("Initializing game boards...", 10, 50, 20, Color.Gray);
@@ -224,7 +261,6 @@ public class GameScreen(
             Color.White
         );
 
-
         LoadBoardBackground();
 
         //Raylib.DrawTexture(gridBackground, (int)playerBoard.Position.X, (int)playerBoard.Position.Y, Color.White);
@@ -243,7 +279,6 @@ public class GameScreen(
             Color.White
         );
 
-
         //Raylib.DrawTexture(enemyGridBackground, (int)opponentBoard.Position.X, (int)opponentBoard.Position.Y, Color.White);
 
         Raylib.DrawTexturePro(
@@ -260,9 +295,7 @@ public class GameScreen(
             Color.White
         );
 
-
         LoadBoardBackground();
-
 
         // Calculate dynamic layout values inside Draw
         cardWidth = (int)Math.Round(currentScreenWidth * (1 / 12f));
@@ -304,20 +337,12 @@ public class GameScreen(
         DrawRessourceField();
 
         // ShipField zeichnen: Immer in der Platzierungsphase, oder im InGameState wenn allowSingleShipPlacement aktiv ist
-        if (GameStateManager.Instance.GetCurrentState() is PlacementPhaseState || allowSingleShipPlacement)
+        if (
+            GameStateManager.Instance.GetCurrentState() is PlacementPhaseState
+            || allowSingleShipPlacement
+        )
         {
             DrawShipField();
-        }
-
-        // Update and Draw Game Boards
-        GameBoard.Point? clickedCell = opponentBoard.Update();
-        if (clickedCell.HasValue)
-        {
-            NetworkManager.SendAttack(clickedCell.Value.X, clickedCell.Value.Y);
-            Console.WriteLine(
-                $"Attack initiated at ({clickedCell.Value.X}, {clickedCell.Value.Y})"
-            );
-            // TODO: Send attack command
         }
 
         // Draw board titles (rest of the code is mostly the same as previous fix)
@@ -364,6 +389,8 @@ public class GameScreen(
                 Color.Black
             );
         }
+
+        DrawWizards(currentScreenWidth, currentScreenHeight, boardPixelWidth, boardPixelHeight);
 
         // Draw Back Button
         int backButtonWidth = 100;
@@ -457,6 +484,12 @@ public class GameScreen(
         var oldBoardPosition = playerBoard.Position;
         Initialize();
         UpdateShipPosition(oldBoardPosition, oldCellSize);
+        
+        // Reinitialize ShipField to fix draggable ship positions
+        if (shipField != null)
+        {
+            shipField.Initialize();
+        }
     }
 
     private static void UpdateShipPosition(Vector2 oldBoardPosition, int oldCellSize)
@@ -504,6 +537,7 @@ public class GameScreen(
         {
             Cards card;
             playerHand!.AddCard(card = new(cardVariant));
+            Raylib.PlaySound(SoundManager.CardSound);
             int goldAmount = card.Gold;
             var ressourceField = GameStateManager.Instance.GameScreen.ressourceField!;
             ressourceField.SetGold((int)(ressourceField.Gold - goldAmount));
@@ -524,6 +558,7 @@ public class GameScreen(
         )
         {
             opponentHand!.AddCard(cards[0]);
+            Raylib.PlaySound(SoundManager.CardSound);
         }
         else
         {
@@ -583,7 +618,6 @@ public class GameScreen(
         {
             CastingUI.Instance.CancelCasting();
         }
-
     }
 
     public void EnableSingleShipPlacement()
@@ -599,5 +633,47 @@ public class GameScreen(
             Console.WriteLine("Starte Dragging für Schiff!");
             randomShip.StartDragging();
         }
+    }
+
+    /// <summary>
+    /// Draws the wizard textures - red wizard at opponent's side (top) and blue wizard at player's side (bottom)
+    /// </summary>
+    /// <param name="screenWidth">Current screen width</param>
+    /// <param name="screenHeight">Current screen height</param>
+    /// <param name="boardPixelWidth">Width of the game board in pixels</param>
+    /// <param name="boardPixelHeight">Height of the game board in pixels</param>
+    private void DrawWizards(int screenWidth, int screenHeight, int boardPixelWidth, int boardPixelHeight)
+    {
+        int wizardWidth = (int)(screenWidth * 0.04f); 
+        int wizardHeight = (int)(screenHeight * 0.07f); 
+        
+        float outerBufferWidth = cardWidth * 0.1f;
+        float graveyardWidth = cardWidth + outerBufferWidth * 2;
+        float graveyardX = playerBoard!.Position.X - graveyardWidth - ZonePadding;
+        float graveyardY = (screenHeight - (cardHeight + outerBufferWidth * 2)) / 2f;
+        
+        float wizardX = graveyardX - wizardWidth - (ZonePadding * 0.5f);
+        
+        float redWizardY = graveyardY - (wizardHeight * 1.2f);
+        
+        Raylib.DrawTexturePro(
+            redWizardTexture,
+            new Rectangle(0, 0, redWizardTexture.Width, redWizardTexture.Height),
+            new Rectangle(wizardX, redWizardY, wizardWidth, wizardHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
+        
+        float blueWizardY = graveyardY + (wizardHeight * 1.2f);
+        
+        Raylib.DrawTexturePro(
+            blueWizardTexture,
+            new Rectangle(0, 0, blueWizardTexture.Width, blueWizardTexture.Height),
+            new Rectangle(wizardX, blueWizardY, wizardWidth, wizardHeight),
+            Vector2.Zero,
+            0f,
+            Color.White
+        );
     }
 }

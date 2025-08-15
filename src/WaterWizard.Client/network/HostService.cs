@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 349 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -9,22 +9,32 @@
 using System.Net;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Client.network;
 
+/// <summary>
+/// Verwaltet das Hosting einer Spiel-Lobby, die Verwaltung der verbundenen Spieler und die Server-Events.
+/// </summary>
 public class HostService(NetworkManager manager)
 {
     private NetManager? server;
     private EventBasedNetListener? serverListener;
+    /// <summary>
+    /// Gibt die aktuell verbundenen Spieler zurück.
+    /// </summary>
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
     private GameSessionId? sessionId;
+    /// <summary>
+    /// Gibt die aktuelle SessionId zurück.
+    /// </summary>
     public GameSessionId? SessionId => sessionId;
 
     /// <summary>
     /// Startet einen Spielserver auf dem lokalen Rechner mit dem konfigurierten Port.
-    /// Initialisiert die Netzwerkkomponenten und registriert Event-Handler fuer Clientverbindungen.
+    /// Initialisiert die Netzwerkkomponenten und registriert Event-Handler für Clientverbindungen.
     /// </summary>
     public void StartHosting()
     {
@@ -147,6 +157,10 @@ public class HostService(NetworkManager manager)
         ConnectedPlayers.RemoveAll(p => p.Address == address);
     }
 
+    /// <summary>
+    /// Prüft, ob der Server aktuell läuft.
+    /// </summary>
+    /// <returns>True, wenn der Server läuft</returns>
     public bool IsRunning()
     {
         return server != null && server.IsRunning;
@@ -177,26 +191,13 @@ public class HostService(NetworkManager manager)
                     manager.HandleLobbyCountdown(reader);
                     break;
                 case "PlayerJoin":
-                    string playerName = reader.GetString(); // Name sent by the client
-                    var playerToUpdate = ConnectedPlayers.FirstOrDefault(p =>
-                        p.Address == peer.ToString()
+                    string playerName = reader.GetString();
+                    LobbyHandler.HandlePlayerJoin(
+                        peer,
+                        playerName,
+                        ConnectedPlayers,
+                        UpdatePlayerList
                     );
-                    if (playerToUpdate != null)
-                    {
-                        playerToUpdate.Name = playerName;
-                        UpdatePlayerList(); // Broadcast the updated player list to all clients
-                    }
-                    else
-                    {
-                        // This might indicate an unexpected state, e.g., PlayerJoin from an unrecognized peer.
-                        Console.WriteLine(
-                            $"[Host] PlayerJoin: Player with address {peer} not found in connectedPlayers. Name received: {playerName}"
-                        );
-                        // Optionally, handle this by adding the player if it's a valid scenario,
-                        // though players are typically added during PeerConnectedEvent.
-                        // connectedPlayers.Add(new Player(peer.ToString()) { Name = playerName, IsReady = false });
-                        // UpdatePlayerList();
-                    }
                     break;
                 default:
                     Console.WriteLine(
@@ -282,6 +283,10 @@ public class HostService(NetworkManager manager)
         GameStateManager.Instance.ChatLog.AddMessage($"{senderName}: {message}");
     }
 
+    /// <summary>
+    /// Sendet eine Nachricht an alle verbundenen Clients.
+    /// </summary>
+    /// <param name="message">Die zu sendende Nachricht</param>
     public void SendToAllClients(string message)
     {
         if (server == null)
@@ -296,6 +301,9 @@ public class HostService(NetworkManager manager)
         }
     }
 
+    /// <summary>
+    /// Startet das Spiel für alle verbundenen Clients, wenn alle bereit sind.
+    /// </summary>
     public void BroadcastStartGame()
     {
         if (!IsRunning() || server == null)
@@ -319,20 +327,33 @@ public class HostService(NetworkManager manager)
         GameStateManager.Instance.SetStateToInGame();
     }
 
+    /// <summary>
+    /// Prüft, ob Spieler verbunden sind.
+    /// </summary>
+    /// <returns>True, wenn mindestens ein Spieler verbunden ist</returns>
     public bool ArePlayersConnected() =>
         server != null && server.IsRunning && server.ConnectedPeersCount > 0;
 
+    /// <summary>
+    /// Verarbeitet Netzwerkereignisse (Empfang/Senden von Nachrichten).
+    /// </summary>
     public void PollEvents()
     {
         server?.PollEvents();
     }
 
+    /// <summary>
+    /// Beendet den Server und entfernt alle Spieler.
+    /// </summary>
     public void Shutdown()
     {
         server?.Stop();
         ConnectedPlayers.Clear();
     }
 
+    /// <summary>
+    /// Fügt die lokale Lobby zur Liste der entdeckten Lobbies hinzu.
+    /// </summary>
     public void AddLocalLobbyToDiscoveredList()
     {
         string localIpAddress = NetworkUtils.GetLocalIPAddress();

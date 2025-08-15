@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 13 Zeilen
 // - jdewi001: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================

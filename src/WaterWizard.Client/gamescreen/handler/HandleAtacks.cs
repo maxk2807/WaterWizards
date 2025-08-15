@@ -2,13 +2,15 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 156 Zeilen
 // - Erickk0: 34 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
@@ -122,15 +124,42 @@ public class HandleAttacks
         }
     }
 
-// float transparency = 0.5f;
-//         writer.Put(transparency);
-
+    /// <summary>
+    /// Sends an attack to the server with the specified coordinates.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
     public static void HandleCellReveal(NetPacketReader reader)
     {
         int revealX = reader.GetInt();
         int revealY = reader.GetInt();
         bool isHit = reader.GetBool();
         bool isDefender = reader.GetBool();
+        string cardVariant = reader.GetString();
+
+        if (isHit)
+        {
+            switch (cardVariant)
+            {
+                case "GreedHit":
+                    Raylib.PlaySound(SoundManager.GreedSound);
+                    break;
+                case "Firebolt":
+                    Raylib.PlaySound(SoundManager.FireboltSound);
+                    break;
+                case "Fireball":
+                    Raylib.PlaySound(SoundManager.FireballSound);
+                    break;
+                case "MagicAttack":
+                    Raylib.PlaySound(SoundManager.Magic1);
+                    break;
+                default:
+                    // Fallback für unbekannte Karten oder normale Treffer
+                    Raylib.PlaySound(SoundManager.RandomExplosion());
+                    break;
+            }
+        }
+        else
+            Raylib.PlaySound(SoundManager.MissSound);
 
         var gameScreen = GameStateManager.Instance.GameScreen;
         if (gameScreen != null)
@@ -162,6 +191,7 @@ public class HandleAttacks
                                 int relativeX = revealX - shipCellX;
                                 int relativeY = revealY - shipCellY;
                                 ship.AddDamage(relativeX, relativeY);
+                                Raylib.PlaySound(SoundManager.RandomExplosion());
                                 Console.WriteLine(
                                     $"[Client] Added damage to ship at ({relativeX},{relativeY})"
                                 );
@@ -195,5 +225,44 @@ public class HandleAttacks
         Console.WriteLine(
             $"[Client] Cell revealed: ({revealX},{revealY}) = {(isHit ? "hit" : "miss")} isDefender={isDefender}"
         );
+    }
+
+    /// <summary>
+    /// Handles the game over message received from the server, determining if the player won or lost.
+    /// </summary>
+    /// <param name="reader">The NetPacketReader containing the serialized ship data sent from the server</param>
+    public static void HandleThunderStrike(NetPacketReader reader)
+    {
+        int targetBoardIndex = reader.GetInt();
+        int strikeX = reader.GetInt();
+        int strikeY = reader.GetInt();
+        bool thunderHit = reader.GetBool();
+
+        var gameScreen = GameStateManager.Instance.GameScreen;
+        if (gameScreen != null)
+        {
+            int myPlayerIndex = GameStateManager.Instance.MyPlayerIndex;
+
+            GameBoard? targetBoard = null;
+            Console.WriteLine(
+                $"[Client] Thunder strike - MyPlayerIndex: {myPlayerIndex}, TargetBoardIndex: {targetBoardIndex}, Hit: {thunderHit}"
+            );
+            if (targetBoardIndex == myPlayerIndex)
+            {
+                targetBoard = gameScreen.playerBoard;
+                Console.WriteLine(
+                    $"Thunder visual effect on MY board (playerBoard) at ({strikeX}, {strikeY}) hit={thunderHit}"
+                );
+            }
+            else
+            {
+                targetBoard = gameScreen.opponentBoard;
+                Console.WriteLine(
+                    $"Thunder visual effect on OPPONENT's board (opponentBoard) at ({strikeX}, {strikeY}) hit={thunderHit}"
+                );
+            }
+
+            targetBoard?.AddThunderStrike(strikeX, strikeY, thunderHit);
+        }
     }
 }
