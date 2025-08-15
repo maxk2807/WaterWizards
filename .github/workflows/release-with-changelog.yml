@@ -89,6 +89,9 @@ jobs:
             else
               LATEST_VERSION="0.0.0"
             fi
+
+            env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
             echo "Project version: $PROJECT_VERSION"
             echo "Latest tag: $LATEST_TAG"
