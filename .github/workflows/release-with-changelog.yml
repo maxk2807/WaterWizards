@@ -36,16 +36,22 @@ jobs:
         run: ./build.sh Clean Compile Test
 
       - name: Publish Client (Windows)
-        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win --verbosity normal
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win --verbosity normal -p:PublishSingleFile=false -p:IncludeNativeLibrariesForSelfExtract=true
 
       - name: Publish Server (Windows)
         run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-server
 
       - name: Publish Client (MacOS)
-        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx --verbosity normal
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx --verbosity normal -p:PublishSingleFile=false -p:IncludeNativeLibrariesForSelfExtract=true
 
       - name: Publish Server (MacOS)
         run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx-server
+
+      - name: Publish Client (Linux)
+        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r linux-x64 --self-contained true -o ./publish/linux --verbosity normal -p:PublishSingleFile=false -p:IncludeNativeLibrariesForSelfExtract=true
+
+      - name: Publish Server (Linux)
+        run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r linux-x64 --self-contained true -o ./publish/linux-server
 
       - name: Prepare release assets
         run: |
@@ -53,22 +59,62 @@ jobs:
 
           # Find the actual executable names
           WIN_EXE=$(find ./publish/win -name "*.exe" -type f | head -1)
-          OSX_EXE=$(find ./publish/osx -type f -executable | grep -v "\.dll$" | grep -v "\.so$" | head -1)
+          OSX_EXE=$(find ./publish/osx -type f -executable | grep -v "\.dll$" | grep -v "\.so$" | grep -v "\.dylib$" | head -1)
+          LINUX_EXE=$(find ./publish/linux -type f -executable | grep -v "\.dll$" | grep -v "\.so$" | grep -v "\.dylib$" | head -1)
           
+          # Copy Windows executable
           if [ -n "$WIN_EXE" ]; then
             cp "$WIN_EXE" release-assets/WaterWizard.Client.exe
+            echo "✅ Windows executable found and copied"
           else
-            echo "Warning: No Windows executable found"
+            echo "❌ Warning: No Windows executable found"
           fi
           
+          # Copy macOS executable
           if [ -n "$OSX_EXE" ]; then
             cp "$OSX_EXE" release-assets/WaterWizard.Client.MacOS
+            chmod +x release-assets/WaterWizard.Client.MacOS
+            echo "✅ macOS executable found and copied"
           else
-            echo "Warning: No MacOS executable found"
+            echo "❌ Warning: No MacOS executable found"
           fi
+          
+          # Copy Linux executable
+          if [ -n "$LINUX_EXE" ]; then
+            cp "$LINUX_EXE" release-assets/WaterWizard.Client.Linux
+            chmod +x release-assets/WaterWizard.Client.Linux
+            echo "✅ Linux executable found and copied"
+          else
+            echo "❌ Warning: No Linux executable found"
+          fi
+          
+          # Also package as archives for easier distribution
+          cd ./publish
+          if [ -d "win" ]; then
+            zip -r ../release-assets/WaterWizard.Client.Windows.zip win/
+          fi
+          if [ -d "osx" ]; then
+            tar -czf ../release-assets/WaterWizard.Client.MacOS.tar.gz osx/
+          fi
+          if [ -d "linux" ]; then
+            tar -czf ../release-assets/WaterWizard.Client.Linux.tar.gz linux/
+          fi
+          cd ..
           
           echo "Release assets:"
           ls -la release-assets/
+
+      - name: Debug published files
+        run: |
+          echo "=== Windows publish directory ==="
+          ls -la ./publish/win/
+          echo "=== macOS publish directory ==="
+          ls -la ./publish/osx/
+          echo "=== Linux publish directory ==="
+          ls -la ./publish/linux/
+          
+          echo "=== Checking for native libraries ==="
+          find ./publish -name "*.dll" -o -name "*.so" -o -name "*.dylib" | head -20
 
       - name: Get and increment version if needed
         id: get_version
@@ -169,13 +215,18 @@ jobs:
           ### 📦 Installation & Usage
 
           #### 🪟 Windows
-          1. Download \`WaterWizard.Client.exe\`
+          1. Download \`WaterWizard.Client.exe\` or \`WaterWizard.Client.Windows.zip\`
           2. Run the executable
           3. Host or join a game
 
           #### 🍎 macOS
-          1. Download \`WaterWizard.Client.MacOS\`
+          1. Download \`WaterWizard.Client.MacOS\` or \`WaterWizard.Client.MacOS.tar.gz\`
           2. Make it executable: \`chmod +x WaterWizard.Client.MacOS\`
+          3. Run the game
+
+          #### 🐧 Linux
+          1. Download \`WaterWizard.Client.Linux\` or \`WaterWizard.Client.Linux.tar.gz\`
+          2. Make it executable: \`chmod +x WaterWizard.Client.Linux\`
           3. Run the game
 
           #### 🔧 Development Setup
@@ -212,4 +263,4 @@ jobs:
           prerelease: false
           files: release-assets/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
