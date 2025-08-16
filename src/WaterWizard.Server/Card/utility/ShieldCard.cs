@@ -12,6 +12,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Server.handler;
 using WaterWizard.Server.Interface;
+using WaterWizard.Server.utils;
 using WaterWizard.Shared;
 
 namespace WaterWizard.Server.Card.utility;
@@ -101,8 +102,17 @@ public class ShieldCard : IUtilityCard
                 var writer = new NetDataWriter();
                 writer.Put("ShieldCreated");
                 writer.Put(casterIndex);
-                writer.Put(x);
-                writer.Put(y);
+                if (player == players[casterIndex])
+                {
+                    writer.Put(x);
+                    writer.Put(y);
+                }
+                else
+                {
+                    (int tx, int ty) = CoordinateTransform.RotateOpponentCoordinates(x, y, GameState.boardWidth, GameState.boardHeight);
+                    writer.Put(tx);
+                    writer.Put(ty);
+                }
                 writer.Put(duration);
                 player.Send(writer, DeliveryMethod.ReliableOrdered);
             }
@@ -121,8 +131,17 @@ public class ShieldCard : IUtilityCard
                 var writer = new NetDataWriter();
                 writer.Put("ShieldExpired");
                 writer.Put(playerIndex);
-                writer.Put(x);
-                writer.Put(y);
+                if (player == players[playerIndex]) //if player is Caster
+                {
+                    writer.Put(x);
+                    writer.Put(y);
+                }
+                else
+                {
+                    (int tx, int ty) = CoordinateTransform.RotateOpponentCoordinates(x, y, GameState.boardWidth, GameState.boardHeight);
+                    writer.Put(tx);
+                    writer.Put(ty);
+                }
                 player.Send(writer, DeliveryMethod.ReliableOrdered);
             }
         }
