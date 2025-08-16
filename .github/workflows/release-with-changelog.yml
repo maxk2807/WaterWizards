@@ -72,6 +72,8 @@ jobs:
 
       - name: Get and increment version if needed
         id: get_version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git fetch --tags
           
@@ -135,6 +137,8 @@ jobs:
 
       - name: Generate Intelligent Changelog
         id: changelog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Get the previous tag
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -181,7 +185,7 @@ jobs:
           #### 🔧 Development Setup
           \`\`\`bash
           # Clone the repository
-          git clone https://github.com/$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)/WaterWizards.git
+          git clone https://github.com/maxk2807/WaterWizards.git
           cd WaterWizards
 
           # Use the optimized launcher
@@ -212,4 +216,4 @@ jobs:
           prerelease: false
           files: release-assets/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
