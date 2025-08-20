@@ -211,7 +211,7 @@ public class GameBoard
                 {
                     if (_gridStates[x, y] == CellState.Hit)
                     {
-                        hit.Add((x, y));
+                        hit.Add((x - startX, y - startY));
                         _gridStates[x, y] = CellState.Miss;
                     }
                     else
@@ -234,7 +234,7 @@ public class GameBoard
             {
                 if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
                 {
-                    if (hit.Any(cell => cell.X == x && cell.Y == y))
+                    if (hit.Any(cell => cell.X + startX == x && cell.Y + startY == y))
                     {
                         _gridStates[x, y] = CellState.Hit;
                     }
@@ -389,6 +389,19 @@ public class GameBoard
 
         // Shield-Effekte zeichnen
         DrawShieldEffects();
+
+        //Debug:
+        var mousePos = Raylib.GetMousePosition();
+        var hoveredCell = GetCellFromScreenCoords(mousePos);
+        if (hoveredCell.HasValue)
+        {
+            var text = $"CellState: {_gridStates[hoveredCell.Value.X, hoveredCell.Value.Y]}";
+            Raylib.DrawText(text, (int)mousePos.X, (int)mousePos.Y, 12, Color.Black);
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                _gridStates[hoveredCell.Value.X, hoveredCell.Value.Y] = (CellState)(((int)(_gridStates[hoveredCell.Value.X, hoveredCell.Value.Y] + 1)) % 9);
+            }
+        }
     }
 
     /// <summary>
