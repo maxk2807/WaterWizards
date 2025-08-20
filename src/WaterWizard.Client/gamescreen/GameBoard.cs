@@ -758,8 +758,8 @@ public class GameBoard
             CellState.Empty => Color.LightGray,
             CellState.Ship => this == GameStateManager.Instance.GameScreen?.playerBoard ? Color.Blank : Color.Orange, // Blank for player's board, Orange for opponent's board
             CellState.Rock => Color.DarkGray,
-            CellState.Hit => Color.Orange,
-            CellState.Miss => Color.DarkBlue,
+            CellState.Hit => this == GameStateManager.Instance.GameScreen?.playerBoard ? Color.Blank : Color.Orange,
+            CellState.Miss => this == GameStateManager.Instance.GameScreen?.playerBoard ? Color.Blank : Color.DarkBlue,
             CellState.Unknown => new Color(135, 206, 235, 0),
             CellState.Thunder => new Color(30, 30, 150, 255),
             CellState.Shield => new Color(0, 255, 255, 100),
