@@ -100,39 +100,41 @@ jobs:
         run: |
           mkdir -p release-assets
 
-          # Copy Windows executable (should be a single .exe file now)
-          if [ -f "./publish/win/WaterWizard.Client.exe" ]; then
-            cp "./publish/win/WaterWizard.Client.exe" "release-assets/WaterWizard.Client.exe"
-            echo "✅ Windows single-file executable copied"
+          # Create Windows ZIP package with assets
+          if [ -d "./publish/win" ] && [ -f "./publish/win/WaterWizard.Client.exe" ]; then
+            cd publish/win
+            zip -r "../../release-assets/WaterWizard.Client.Windows.zip" .
+            cd ../../
+            echo "✅ Windows ZIP package created"
           else
-            echo "❌ Warning: Windows executable not found"
+            echo "❌ Warning: Windows files not found"
           fi
           
-          # Copy macOS x64 executable (single file)
-          if [ -f "./publish/osx-x64/WaterWizard.Client" ]; then
-            cp "./publish/osx-x64/WaterWizard.Client" "release-assets/WaterWizard.Client.MacOS.x64"
-            chmod +x "release-assets/WaterWizard.Client.MacOS.x64"
-            echo "✅ macOS x64 single-file executable copied"
+          # Create macOS x64 TAR.GZ package with assets
+          if [ -d "./publish/osx-x64" ] && [ -f "./publish/osx-x64/WaterWizard.Client" ]; then
+            chmod +x "./publish/osx-x64/WaterWizard.Client"
+            tar -czvf "release-assets/WaterWizard.Client.MacOS.x64.tar.gz" -C publish osx-x64
+            echo "✅ macOS x64 TAR.GZ package created"
           else
-            echo "❌ Warning: macOS x64 executable not found"
+            echo "❌ Warning: macOS x64 files not found"
           fi
           
-          # Copy macOS ARM64 executable (single file)
-          if [ -f "./publish/osx-arm64/WaterWizard.Client" ]; then
-            cp "./publish/osx-arm64/WaterWizard.Client" "release-assets/WaterWizard.Client.MacOS.ARM64"
-            chmod +x "release-assets/WaterWizard.Client.MacOS.ARM64"
-            echo "✅ macOS ARM64 single-file executable copied"
+          # Create macOS ARM64 TAR.GZ package with assets
+          if [ -d "./publish/osx-arm64" ] && [ -f "./publish/osx-arm64/WaterWizard.Client" ]; then
+            chmod +x "./publish/osx-arm64/WaterWizard.Client"
+            tar -czvf "release-assets/WaterWizard.Client.MacOS.ARM64.tar.gz" -C publish osx-arm64
+            echo "✅ macOS ARM64 TAR.GZ package created"
           else
-            echo "❌ Warning: macOS ARM64 executable not found"
+            echo "❌ Warning: macOS ARM64 files not found"
           fi
           
-          # Copy Linux executable (single file)
-          if [ -f "./publish/linux/WaterWizard.Client" ]; then
-            cp "./publish/linux/WaterWizard.Client" "release-assets/WaterWizard.Client.Linux"
-            chmod +x "release-assets/WaterWizard.Client.Linux"
-            echo "✅ Linux single-file executable copied"
+          # Create Linux TAR.GZ package with assets
+          if [ -d "./publish/linux" ] && [ -f "./publish/linux/WaterWizard.Client" ]; then
+            chmod +x "./publish/linux/WaterWizard.Client"
+            tar -czvf "release-assets/WaterWizard.Client.Linux.tar.gz" -C publish linux
+            echo "✅ Linux TAR.GZ package created"
           else
-            echo "❌ Warning: Linux executable not found"
+            echo "❌ Warning: Linux files not found"
           fi
           
           echo ""
@@ -141,7 +143,7 @@ jobs:
           
           # Show file sizes for verification
           echo ""
-          echo "File sizes:"
+          echo "Package sizes:"
           du -h release-assets/*
 
       - name: Debug published files

@@ -21,10 +21,10 @@ namespace WaterWizard.Client.gamestates;
 public class LobbyListMenuState : IGameState
 {
     private static Texture2D menuBackground = TextureManager.LoadTexture(
-        "Assets/Background/WaterWizardsMenu1200x900.png"
+        "Background/WaterWizardsMenu1200x900.png"
     );
     private static Texture2D textBackground = TextureManager.LoadTexture(
-        "Assets/Background/TitleMenuBackground.png"
+        "Background/TitleMenuBackground.png"
     );
 
     public void UpdateAndDraw(GameStateManager manager)
