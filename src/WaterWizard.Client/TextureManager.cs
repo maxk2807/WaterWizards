@@ -1,4 +1,4 @@
-    // ===============================================
+// ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 15 Zeilen
 // - jdewi001: 8 Zeilen
@@ -25,7 +25,8 @@ public class TextureManager
     /// <returns>Die geladene Textur als <see cref="Texture2D"/></returns>
     public static Texture2D LoadTexture(string file)
     {
-        var texture = Raylib.LoadTexture(file);
+        string assetPath = Path.Combine(AppContext.BaseDirectory, file);
+        var texture = Raylib.LoadTexture(assetPath);
         textures.Add(texture);
         return texture;
     }

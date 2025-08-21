@@ -36,39 +36,141 @@ jobs:
         run: ./build.sh Clean Compile Test
 
       - name: Publish Client (Windows)
-        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/win --verbosity normal
+        run: |
+          dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj \
+            -c Release \
+            -r win-x64 \
+            --self-contained true \
+            -o ./publish/win \
+            --verbosity normal \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:PublishTrimmed=false \
+            -p:PublishReadyToRun=false
 
       - name: Publish Server (Windows)
         run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-server
 
-      - name: Publish Client (MacOS)
-        run: dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx --verbosity normal
+      - name: Publish Client (MacOS x64)
+        run: |
+          dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj \
+            -c Release \
+            -r osx-x64 \
+            --self-contained true \
+            -o ./publish/osx-x64 \
+            --verbosity normal \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:PublishTrimmed=false \
+            -p:PublishReadyToRun=false
+
+      - name: Publish Client (MacOS ARM64) 
+        run: |
+          dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj \
+            -c Release \
+            -r osx-arm64 \
+            --self-contained true \
+            -o ./publish/osx-arm64 \
+            --verbosity normal \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:PublishTrimmed=false \
+            -p:PublishReadyToRun=false
 
       - name: Publish Server (MacOS)
         run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r osx-x64 --self-contained true -o ./publish/osx-server
 
+      - name: Publish Client (Linux)
+        run: |
+          dotnet publish src/WaterWizard.Client/WaterWizard.Client.csproj \
+            -c Release \
+            -r linux-x64 \
+            --self-contained true \
+            -o ./publish/linux \
+            --verbosity normal \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:PublishTrimmed=false \
+            -p:PublishReadyToRun=false
+
+      - name: Publish Server (Linux)
+        run: dotnet publish src/WaterWizard.Server/WaterWizard.Server.csproj -c Release -r linux-x64 --self-contained true -o ./publish/linux-server
+
       - name: Prepare release assets
         run: |
-          mkdir release-assets
+          mkdir -p release-assets
 
-          # Find the actual executable names
-          WIN_EXE=$(find ./publish/win -name "*.exe" -type f | head -1)
-          OSX_EXE=$(find ./publish/osx -type f -executable | grep -v "\.dll$" | grep -v "\.so$" | head -1)
-          
-          if [ -n "$WIN_EXE" ]; then
-            cp "$WIN_EXE" release-assets/WaterWizard.Client.exe
+          # Copy Windows executable (should be a single .exe file now)
+          if [ -f "./publish/win/WaterWizard.Client.exe" ]; then
+            cp "./publish/win/WaterWizard.Client.exe" "release-assets/WaterWizard.Client.exe"
+            echo "✅ Windows single-file executable copied"
           else
-            echo "Warning: No Windows executable found"
+            echo "❌ Warning: Windows executable not found"
           fi
           
-          if [ -n "$OSX_EXE" ]; then
-            cp "$OSX_EXE" release-assets/WaterWizard.Client.MacOS
+          # Copy macOS x64 executable (single file)
+          if [ -f "./publish/osx-x64/WaterWizard.Client" ]; then
+            cp "./publish/osx-x64/WaterWizard.Client" "release-assets/WaterWizard.Client.MacOS.x64"
+            chmod +x "release-assets/WaterWizard.Client.MacOS.x64"
+            echo "✅ macOS x64 single-file executable copied"
           else
-            echo "Warning: No MacOS executable found"
+            echo "❌ Warning: macOS x64 executable not found"
           fi
           
-          echo "Release assets:"
+          # Copy macOS ARM64 executable (single file)
+          if [ -f "./publish/osx-arm64/WaterWizard.Client" ]; then
+            cp "./publish/osx-arm64/WaterWizard.Client" "release-assets/WaterWizard.Client.MacOS.ARM64"
+            chmod +x "release-assets/WaterWizard.Client.MacOS.ARM64"
+            echo "✅ macOS ARM64 single-file executable copied"
+          else
+            echo "❌ Warning: macOS ARM64 executable not found"
+          fi
+          
+          # Copy Linux executable (single file)
+          if [ -f "./publish/linux/WaterWizard.Client" ]; then
+            cp "./publish/linux/WaterWizard.Client" "release-assets/WaterWizard.Client.Linux"
+            chmod +x "release-assets/WaterWizard.Client.Linux"
+            echo "✅ Linux single-file executable copied"
+          else
+            echo "❌ Warning: Linux executable not found"
+          fi
+          
+          echo ""
+          echo "Final release assets:"
           ls -la release-assets/
+          
+          # Show file sizes for verification
+          echo ""
+          echo "File sizes:"
+          du -h release-assets/*
+
+      - name: Debug published files
+        run: |
+          echo "=== Windows publish directory ==="
+          ls -la ./publish/win/ || echo "Directory not found"
+          
+          echo "=== macOS x64 publish directory ==="
+          ls -la ./publish/osx-x64/ || echo "Directory not found"
+          
+          echo "=== macOS ARM64 publish directory ==="
+          ls -la ./publish/osx-arm64/ || echo "Directory not found"
+          
+          echo "=== Linux publish directory ==="
+          ls -la ./publish/linux/ || echo "Directory not found"
+          
+          echo "=== Checking executable types ==="
+          if [ -f "./publish/win/WaterWizard.Client.exe" ]; then
+            file "./publish/win/WaterWizard.Client.exe"
+          fi
+          if [ -f "./publish/osx-x64/WaterWizard.Client" ]; then
+            file "./publish/osx-x64/WaterWizard.Client"
+          fi
+          if [ -f "./publish/osx-arm64/WaterWizard.Client" ]; then
+            file "./publish/osx-arm64/WaterWizard.Client"
+          fi
+          if [ -f "./publish/linux/WaterWizard.Client" ]; then
+            file "./publish/linux/WaterWizard.Client"
+          fi
 
       - name: Get and increment version if needed
         id: get_version
@@ -173,13 +275,18 @@ jobs:
           ### 📦 Installation & Usage
 
           #### 🪟 Windows
-          1. Download \`WaterWizard.Client.exe\`
+          1. Download \`WaterWizard.Client.exe\` or \`WaterWizard.Client.Windows.zip\`
           2. Run the executable
           3. Host or join a game
 
           #### 🍎 macOS
-          1. Download \`WaterWizard.Client.MacOS\`
+          1. Download \`WaterWizard.Client.MacOS\` or \`WaterWizard.Client.MacOS.tar.gz\`
           2. Make it executable: \`chmod +x WaterWizard.Client.MacOS\`
+          3. Run the game
+
+          #### 🐧 Linux
+          1. Download \`WaterWizard.Client.Linux\` or \`WaterWizard.Client.Linux.tar.gz\`
+          2. Make it executable: \`chmod +x WaterWizard.Client.Linux\`
           3. Run the game
 
           #### 🔧 Development Setup

@@ -24,7 +24,7 @@ public class ConnectingMenuState : IGameState
         if (menuBackground.Id != 0)
             return;
         menuBackground = TextureManager.LoadTexture(
-            "src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png"
+            "Assets/Background/WaterWizardsMenu1200x900.png"
         );
     }
 

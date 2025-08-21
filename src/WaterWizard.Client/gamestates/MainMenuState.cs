@@ -27,13 +27,13 @@ public class MainMenuState : IGameState
     private Texture2D menuBackground; //Hintergrund Variable
     private Texture2D titleAsset; //Hintergrund Variable
     private static Texture2D joinButtonAsset = TextureManager.LoadTexture(
-        "src/WaterWizard.Client/Assets/Ui/MainMenu/JoinLobby.png"
+        "Assets/Ui/MainMenu/JoinLobby.png"
     );
     private static Texture2D hostButtonAsset = TextureManager.LoadTexture(
-        "src/WaterWizard.Client/Assets/Ui/MainMenu/HostLobby.png"
+        "Assets/Ui/MainMenu/HostLobby.png"
     );
     private static Texture2D mapButtonAsset = TextureManager.LoadTexture(
-        "src/WaterWizard.Client/Assets/Ui/MainMenu/MapTest.png"
+        "Assets/Ui/MainMenu/MapTest.png"
     );
 
     /// <summary>
@@ -44,13 +44,13 @@ public class MainMenuState : IGameState
         if (menuBackground.Id != 0)
             return;
         menuBackground = TextureManager.LoadTexture(
-            "src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png"
+            "Assets/Background/WaterWizardsMenu1200x900.png"
         );
 
         if (titleAsset.Id != 0)
             return;
         titleAsset = TextureManager.LoadTexture(
-            "src/WaterWizard.Client/Assets/Ui/MainMenu/titleAsset.png"
+            "Assets/Ui/MainMenu/titleAsset.png"
         );
     }
 
