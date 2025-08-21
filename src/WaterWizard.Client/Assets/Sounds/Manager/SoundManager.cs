@@ -47,16 +47,10 @@ public static class SoundManager
         ThunderSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Thunder/thunder.wav"));
         SpawnSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Spawn/spawn.wav"));
         SweeperSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Sweeper/sweeper.wav"));
-        TeleportSound = Raylib.LoadSound(
-            "Assets/Sounds/Teleport/teleport.wav"
-        );
-        PauseSound = Raylib.LoadMusicStream(
-            "Assets/Sounds/Pause/pause2.mp3"
-        );
+        TeleportSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Teleport/teleport.wav"));
+        PauseSound = Raylib.LoadMusicStream(Path.Combine(basePath, "Assets/Sounds/Pause/pause2.mp3"));
         Raylib.SetMusicVolume(PauseSound, 0.5f);
-        GreedSound = Raylib.LoadSound(
-            "Assets/Sounds/GreedSound/greedSound.wav"
-        );
+        GreedSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/GreedSound/greedSound.wav"));
     }
 
     public static void UnloadSounds()

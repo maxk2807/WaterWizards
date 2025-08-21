@@ -65,14 +65,14 @@ public class GameScreen(
         if (gameBackground.Id != 0)
             return;
         gameBackground = TextureManager.LoadTexture(
-            "Assets/Background/BasicBackground.png"
+            "Background/BasicBackground.png"
         );
         //Hintergrund für das Spielbrett
         
         if (blueWizardTexture.Id == 0)
-            blueWizardTexture = TextureManager.LoadTexture("Assets/Ui/InGame/wizblu.png");
+            blueWizardTexture = TextureManager.LoadTexture("Ui/InGame/wizblu.png");
         if (redWizardTexture.Id == 0)
-            redWizardTexture = TextureManager.LoadTexture("Assets/Ui/InGame/wizred.png");
+            redWizardTexture = TextureManager.LoadTexture("Ui/InGame/wizred.png");
     }
 
     public void LoadBoardBackground() //Hintergrund für das Grid
@@ -80,13 +80,13 @@ public class GameScreen(
         if (gridBackground.Id != 0)
             return;
         gridBackground = TextureManager.LoadTexture(
-            "Assets/Background/GridBackground.png"
+            "Background/GridBackground.png"
         );
 
         if (enemyGridBackground.Id != 0)
             return;
         enemyGridBackground = TextureManager.LoadTexture(
-            "Assets/Background/GridBackgroundEnemy.png"
+            "Background/GridBackgroundEnemy.png"
         );
     }
 
@@ -95,13 +95,13 @@ public class GameScreen(
         if (gridBackground.Id != 0)
             return;
         gridBackground = TextureManager.LoadTexture(
-            "Assets/Background/GridBackground.png"
+            "Background/GridBackground.png"
         );
 
         if (enemyGridBackground.Id != 0)
             return;
         enemyGridBackground = TextureManager.LoadTexture(
-            "Assets/Background/GridBackgroundEnemy.png"
+            "Background/GridBackgroundEnemy.png"
         );
     }
 

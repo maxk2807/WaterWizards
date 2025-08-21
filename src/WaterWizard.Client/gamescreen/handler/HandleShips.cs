@@ -26,34 +26,34 @@ namespace WaterWizard.Client.gamescreen.handler;
 public class HandleShips
 {
     public static readonly Texture2D Ship1 = TextureManager.LoadTexture(
-        "Assets/Ships/Ship1.png"
+        "Ships/Ship1.png"
     );
     public static readonly Texture2D Ship1Rotated = TextureManager.LoadTexture(
-        "Assets/Ships/Ship1-Rotated.png"
+        "Ships/Ship1-Rotated.png"
     );
     public static readonly Texture2D Ship2 = TextureManager.LoadTexture(
-        "Assets/Ships/Ship2.png"
+        "Ships/Ship2.png"
     );
     public static readonly Texture2D Ship2Rotated = TextureManager.LoadTexture(
-        "Assets/Ships/Ship2-Rotated.png"
+        "Ships/Ship2-Rotated.png"
     );
     public static readonly Texture2D Ship3 = TextureManager.LoadTexture(
-        "Assets/Ships/Ship3.png"
+        "Ships/Ship3.png"
     );
     public static readonly Texture2D Ship3Rotated = TextureManager.LoadTexture(
-        "Assets/Ships/Ship3-Rotated.png"
+        "Ships/Ship3-Rotated.png"
     );
     public static readonly Texture2D Ship4 = TextureManager.LoadTexture(
-        "Assets/Ships/Ship4.png"
+        "Ships/Ship4.png"
     );
     public static readonly Texture2D Ship4Rotated = TextureManager.LoadTexture(
-        "Assets/Ships/Ship4-Rotated.png"
+        "Ships/Ship4-Rotated.png"
     );
     public static readonly Texture2D Ship5 = TextureManager.LoadTexture(
-        "Assets/Ships/Ship5.png"
+        "Ships/Ship5.png"
     );
     public static readonly Texture2D Ship5Rotated = TextureManager.LoadTexture(
-        "Assets/Ships/Ship5-Rotated.png"
+        "Ships/Ship5-Rotated.png"
     );
 
     public static Texture2D TextureFromLength(bool rotated, int length)

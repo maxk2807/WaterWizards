@@ -22,19 +22,19 @@ public class GameCard(GameScreen gameScreen, Cards card)
     private int Height => gameScreen.cardHeight;
 
     private static Texture2D cardTemplateAsset = TextureManager.LoadTexture(
-        "Assets/Cards/CardTemplate.png"
+        "Cards/CardTemplate.png"
     );
     private static Texture2D allyIconAsset = TextureManager.LoadTexture(
-        "Assets/Cards/Icons/ally.png"
+        "Cards/Icons/ally.png"
     );
     private static Texture2D enemyIconAsset = TextureManager.LoadTexture(
-        "Assets/Cards/Icons/enemy.png"
+        "Cards/Icons/enemy.png"
     );
     private static Texture2D manaIconAsset = TextureManager.LoadTexture(
-        "Assets/Cards/Icons/mana.png"
+        "Cards/Icons/mana.png"
     );
     private static Texture2D goldIconAsset = TextureManager.LoadTexture(
-        "Assets/Cards/Icons/gold.png"
+        "Cards/Icons/gold.png"
     );
 
     /// <summary>

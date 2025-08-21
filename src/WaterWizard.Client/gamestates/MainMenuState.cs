@@ -26,15 +26,11 @@ public class MainMenuState : IGameState
 
     private Texture2D menuBackground; //Hintergrund Variable
     private Texture2D titleAsset; //Hintergrund Variable
-    private static Texture2D joinButtonAsset = TextureManager.LoadTexture(
-        "Assets/Ui/MainMenu/JoinLobby.png"
-    );
-    private static Texture2D hostButtonAsset = TextureManager.LoadTexture(
-        "Assets/Ui/MainMenu/HostLobby.png"
-    );
-    private static Texture2D mapButtonAsset = TextureManager.LoadTexture(
-        "Assets/Ui/MainMenu/MapTest.png"
-    );
+    
+    // Convert these to instance variables instead of static
+    private Texture2D joinButtonAsset;
+    private Texture2D hostButtonAsset;
+    private Texture2D mapButtonAsset;
 
     /// <summary>
     /// Lädt die benötigten Assets für das Hauptmenü.
@@ -44,14 +40,30 @@ public class MainMenuState : IGameState
         if (menuBackground.Id != 0)
             return;
         menuBackground = TextureManager.LoadTexture(
-            "Assets/Background/WaterWizardsMenu1200x900.png"
+            "Background/WaterWizardsMenu1200x900.png"
         );
 
         if (titleAsset.Id != 0)
             return;
         titleAsset = TextureManager.LoadTexture(
-            "Assets/Ui/MainMenu/titleAsset.png"
+            "Ui/MainMenu/titleAsset.png"
         );
+
+        // Load button assets lazily
+        if (joinButtonAsset.Id == 0)
+            joinButtonAsset = TextureManager.LoadTexture(
+                "Ui/MainMenu/JoinLobby.png"
+            );
+
+        if (hostButtonAsset.Id == 0)
+            hostButtonAsset = TextureManager.LoadTexture(
+                "Ui/MainMenu/HostLobby.png"
+            );
+
+        if (mapButtonAsset.Id == 0)
+            mapButtonAsset = TextureManager.LoadTexture(
+                "Ui/MainMenu/MapTest.png"
+            );
     }
 
     /// <summary>
@@ -105,7 +117,8 @@ public class MainMenuState : IGameState
         HandleMapButton(manager);
     }
 
-    private static void HandleMapButton(GameStateManager manager)
+    // Update these methods to use instance variables instead of static
+    private void HandleMapButton(GameStateManager manager)
     {
         Rectangle mapButton = new(
             (float)manager.screenWidth / 2 - 100,
@@ -124,7 +137,7 @@ public class MainMenuState : IGameState
         Raylib.DrawRectangleRec(mapButton, hoverMap ? new(255, 255, 255, 31) : Color.Blank);
     }
 
-    private static void HandleHostButton(GameStateManager manager)
+    private void HandleHostButton(GameStateManager manager)
     {
         Rectangle hostButton = new(
             (float)manager.screenWidth / 2 - 100,
@@ -150,7 +163,7 @@ public class MainMenuState : IGameState
         Raylib.DrawRectangleRec(hostButton, hoverHost ? new(255, 255, 255, 31) : Color.Blank);
     }
 
-    private static void HandleJoinButton(GameStateManager manager)
+    private void HandleJoinButton(GameStateManager manager)
     {
         Rectangle joinButton = new(
             (float)manager.screenWidth / 2 - 140,
