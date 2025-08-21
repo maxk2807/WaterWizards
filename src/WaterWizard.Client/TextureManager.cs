@@ -21,11 +21,16 @@ public class TextureManager
     /// <summary>
     /// Lädt eine Textur aus einer Datei und speichert sie für späteres Entladen.
     /// </summary>
-    /// <param name="file">Pfad zur Texturdatei</param>
+    /// <param name="file">Relativer Pfad zur Texturdatei (z.B. "Background/WaterWizardsMenu1200x900.png")</param>
     /// <returns>Die geladene Textur als <see cref="Texture2D"/></returns>
     public static Texture2D LoadTexture(string file)
     {
-        string assetPath = Path.Combine(AppContext.BaseDirectory, file);
+        string normalizedPath = file.Replace('/', Path.DirectorySeparatorChar);
+        string assetPath = Path.Combine(AppContext.BaseDirectory, "Assets", normalizedPath);
+        
+        Console.WriteLine($"[TextureManager] Loading texture: {assetPath}");
+        Console.WriteLine($"[TextureManager] File exists: {File.Exists(assetPath)}");
+        
         var texture = Raylib.LoadTexture(assetPath);
         textures.Add(texture);
         return texture;

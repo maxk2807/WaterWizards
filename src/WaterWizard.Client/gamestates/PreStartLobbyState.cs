@@ -24,10 +24,10 @@ public class PreStartLobbyState : IGameState
     }
 
     private static Texture2D menuBackground = TextureManager.LoadTexture(
-        "Assets/Background/WaterWizardsMenu1200x900.png"
+        "Background/WaterWizardsMenu1200x900.png"
     );
     private static Texture2D textBackground = TextureManager.LoadTexture(
-        "Assets/Background/TitleMenuBackground.png"
+        "Background/TitleMenuBackground.png"
     );
 
     private void DrawPreStartLobby(GameStateManager manager)

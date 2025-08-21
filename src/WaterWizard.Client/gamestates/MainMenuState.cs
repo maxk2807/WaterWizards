@@ -40,29 +40,29 @@ public class MainMenuState : IGameState
         if (menuBackground.Id != 0)
             return;
         menuBackground = TextureManager.LoadTexture(
-            "Assets/Background/WaterWizardsMenu1200x900.png"
+            "Background/WaterWizardsMenu1200x900.png"
         );
 
         if (titleAsset.Id != 0)
             return;
         titleAsset = TextureManager.LoadTexture(
-            "Assets/Ui/MainMenu/titleAsset.png"
+            "Ui/MainMenu/titleAsset.png"
         );
 
         // Load button assets lazily
         if (joinButtonAsset.Id == 0)
             joinButtonAsset = TextureManager.LoadTexture(
-                "Assets/Ui/MainMenu/JoinLobby.png"
+                "Ui/MainMenu/JoinLobby.png"
             );
 
         if (hostButtonAsset.Id == 0)
             hostButtonAsset = TextureManager.LoadTexture(
-                "Assets/Ui/MainMenu/HostLobby.png"
+                "Ui/MainMenu/HostLobby.png"
             );
 
         if (mapButtonAsset.Id == 0)
             mapButtonAsset = TextureManager.LoadTexture(
-                "Assets/Ui/MainMenu/MapTest.png"
+                "Ui/MainMenu/MapTest.png"
             );
     }
 
