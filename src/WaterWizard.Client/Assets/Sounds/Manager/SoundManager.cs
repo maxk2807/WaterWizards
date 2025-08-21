@@ -24,37 +24,33 @@ public static class SoundManager
 
     public static void LoadSounds()
     {
-        WinSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/GameOver/win.wav");
+        string basePath = AppContext.BaseDirectory;
+        
+        WinSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/GameOver/win.wav"));
         Raylib.SetSoundVolume(WinSound, 0.5f);
-        DefeatSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/GameOver/defeat2.mp3");
-        CardSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/DrawCard.wav");
-        ButtonSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/ButtonClick.wav");
+        DefeatSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/GameOver/defeat2.mp3"));
+        CardSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/DrawCard.wav"));
+        ButtonSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/ButtonClick.wav"));
         Explosions.Add(
-            Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion1.wav")
+            Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Explosions/explosion1.wav"))
         );
         Explosions.Add(
-            Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Explosions/explosion2.wav")
+            Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Explosions/explosion2.wav"))
         );
         Raylib.SetSoundVolume(Explosions[0], 0.5f);
         Raylib.SetSoundVolume(Explosions[1], 0.5f);
-        MissSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/miss.wav");
-        Magic1 = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Magic/magic1.wav");
-        HealSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Heal/repair.wav");
-        FireboltSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Fire/firebolt.wav");
-        FireballSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Fire/fireball.wav");
-        ThunderSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Thunder/thunder.wav");
-        SpawnSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Spawn/spawn.wav");
-        SweeperSound = Raylib.LoadSound("src/WaterWizard.Client/Assets/Sounds/Sweeper/sweeper.wav");
-        TeleportSound = Raylib.LoadSound(
-            "src/WaterWizard.Client/Assets/Sounds/Teleport/teleport.wav"
-        );
-        PauseSound = Raylib.LoadMusicStream(
-            "src/WaterWizard.Client/Assets/Sounds/Pause/pause2.mp3"
-        );
+        MissSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/miss.wav"));
+        Magic1 = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Magic/magic1.wav"));
+        HealSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Heal/repair.wav"));
+        FireboltSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Fire/firebolt.wav"));
+        FireballSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Fire/fireball.wav"));
+        ThunderSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Thunder/thunder.wav"));
+        SpawnSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Spawn/spawn.wav"));
+        SweeperSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Sweeper/sweeper.wav"));
+        TeleportSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/Teleport/teleport.wav"));
+        PauseSound = Raylib.LoadMusicStream(Path.Combine(basePath, "Assets/Sounds/Pause/pause2.mp3"));
         Raylib.SetMusicVolume(PauseSound, 0.5f);
-        GreedSound = Raylib.LoadSound(
-            "src/WaterWizard.Client/Assets/Sounds/GreedSound/greedSound.wav"
-        );
+        GreedSound = Raylib.LoadSound(Path.Combine(basePath, "Assets/Sounds/GreedSound/greedSound.wav"));
     }
 
     public static void UnloadSounds()

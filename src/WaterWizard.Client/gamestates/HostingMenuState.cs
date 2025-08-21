@@ -24,7 +24,7 @@ public class HostingMenuState : IGameState
             return; // Falls bereits geladen, nichts tun
 
         menuBackground = TextureManager.LoadTexture(
-            "src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png"
+            "Background/WaterWizardsMenu1200x900.png"
         );
     }
 
