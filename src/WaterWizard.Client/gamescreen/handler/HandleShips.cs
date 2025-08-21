@@ -50,10 +50,10 @@ public class HandleShips
         "Ships/Ship4-Rotated.png"
     );
     public static readonly Texture2D Ship5 = TextureManager.LoadTexture(
-        "Assets/Ships/Ship5.png"
+        "Ships/Ship5.png"
     );
     public static readonly Texture2D Ship5Rotated = TextureManager.LoadTexture(
-        "Assets/Ships/Ship5-Rotated.png"
+        "Ships/Ship5-Rotated.png"
     );
 
     public static Texture2D TextureFromLength(bool rotated, int length)

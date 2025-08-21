@@ -139,10 +139,10 @@ public class DraggableShip
         this.currentNumber = currentNumber;
         DraggedShipRectangle = new(x, y, width, height);
         rotateIcon = TextureManager.LoadTexture(
-            "Assets/icons8-rotate-48.png"
+            "icons8-rotate-48.png"
         );
         confirmIcon = TextureManager.LoadTexture(
-            "Assets/icons8-tick-60.png"
+            "icons8-tick-60.png"
         );
         shipTexture = HandleShips.TextureFromLength(
             false, Math.Max(Width / CellSize, Height / CellSize));
