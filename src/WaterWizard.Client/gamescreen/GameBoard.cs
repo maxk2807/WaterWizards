@@ -390,18 +390,6 @@ public class GameBoard
         // Shield-Effekte zeichnen
         DrawShieldEffects();
 
-        //Debug:
-        var mousePos = Raylib.GetMousePosition();
-        var hoveredCell = GetCellFromScreenCoords(mousePos);
-        if (hoveredCell.HasValue)
-        {
-            var text = $"CellState: {_gridStates[hoveredCell.Value.X, hoveredCell.Value.Y]}";
-            Raylib.DrawText(text, (int)mousePos.X, (int)mousePos.Y, 12, Color.Black);
-            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
-            {
-                _gridStates[hoveredCell.Value.X, hoveredCell.Value.Y] = (CellState)(((int)(_gridStates[hoveredCell.Value.X, hoveredCell.Value.Y] + 1)) % 9);
-            }
-        }
     }
 
     /// <summary>
