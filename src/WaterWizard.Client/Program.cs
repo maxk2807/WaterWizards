@@ -40,7 +40,7 @@ class Program
             stopWatch.Start();
 
             double lastTime = stopWatch.ElapsedMilliseconds;
-            double frameTime = 1000 / 60; // 1 Second durch 60 fps = Zeit pro Frame in Ms
+            double frameTime = 1000d / 60; // 1 Second durch 60 fps = Zeit pro Frame in Ms
             double timeAccumulator = 0;
             // Hauptspiel-Loop
             while (!Raylib.WindowShouldClose())
@@ -51,7 +51,7 @@ class Program
 
                 if(timeAccumulator >= frameTime){
                     timeAccumulator -= frameTime;
-                    
+
                     if (Raylib.IsWindowResized())
                     {
                         screenWidth = Raylib.GetScreenWidth();
