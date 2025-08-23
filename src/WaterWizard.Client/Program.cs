@@ -10,6 +10,7 @@
 // ===============================================
 
 using System;
+using System.Diagnostics;
 using Raylib_cs;
 using WaterWizard.Client;
 using WaterWizard.Client.Assets.Sounds.Manager;
@@ -26,7 +27,7 @@ class Program
             const int defaultHeight = 900;
 
             Raylib.InitWindow(defaultWidth, defaultHeight, "Water Wizard");
-            Raylib.SetWindowState(ConfigFlags.ResizableWindow); 
+            Raylib.SetWindowState(ConfigFlags.ResizableWindow);
             Raylib.SetExitKey(KeyboardKey.Escape);
 
             bool isFullscreen = false;
@@ -35,50 +36,65 @@ class Program
 
             GameStateManager.Initialize(screenWidth, screenHeight);
 
+            Stopwatch stopWatch = new();
+            stopWatch.Start();
+
+            double lastTime = stopWatch.ElapsedMilliseconds;
+            double frameTime = 1000 / 60; // 1 Second durch 60 fps = Zeit pro Frame in Ms
+            double timeAccumulator = 0;
             // Hauptspiel-Loop
             while (!Raylib.WindowShouldClose())
             {
-                if (Raylib.IsWindowResized())
-                {
-                    screenWidth = Raylib.GetScreenWidth();
-                    screenHeight = Raylib.GetScreenHeight();
-                    GameStateManager.Instance.UpdateScreenSize(screenWidth, screenHeight);
-                }
+                double currentTime = stopWatch.ElapsedMilliseconds;
+                double elapsedTime = currentTime - lastTime;
+                timeAccumulator += elapsedTime;
 
-                if (Raylib.IsKeyPressed(KeyboardKey.F11) || Raylib.IsKeyPressed(KeyboardKey.F))
-                {
-                    isFullscreen = !isFullscreen;
-
-                    if (isFullscreen)
+                if(timeAccumulator >= frameTime){
+                    timeAccumulator -= frameTime;
+                    
+                    if (Raylib.IsWindowResized())
                     {
-                        int monitorWidth = Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor());
-                        int monitorHeight = Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor());
-
-                        Raylib.ToggleFullscreen();
-                        Raylib.SetWindowSize(monitorWidth, monitorHeight);
-
-                        screenWidth = monitorWidth;
-                        screenHeight = monitorHeight;
+                        screenWidth = Raylib.GetScreenWidth();
+                        screenHeight = Raylib.GetScreenHeight();
                         GameStateManager.Instance.UpdateScreenSize(screenWidth, screenHeight);
                     }
-                    else
+
+                    if (Raylib.IsKeyPressed(KeyboardKey.F11) || Raylib.IsKeyPressed(KeyboardKey.F))
                     {
-                        if (Raylib.IsWindowFullscreen())
+                        isFullscreen = !isFullscreen;
+
+                        if (isFullscreen)
                         {
-                            Raylib.ToggleFullscreen();
-                        }
+                            int monitorWidth = Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor());
+                            int monitorHeight = Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor());
 
-                        Raylib.SetWindowSize(defaultWidth, defaultHeight);
-                        screenWidth = defaultWidth;
-                        screenHeight = defaultHeight;
-                        GameStateManager.Instance.UpdateScreenSize(screenWidth, screenHeight);
+                            Raylib.ToggleFullscreen();
+                            Raylib.SetWindowSize(monitorWidth, monitorHeight);
+
+                            screenWidth = monitorWidth;
+                            screenHeight = monitorHeight;
+                            GameStateManager.Instance.UpdateScreenSize(screenWidth, screenHeight);
+                        }
+                        else
+                        {
+                            if (Raylib.IsWindowFullscreen())
+                            {
+                                Raylib.ToggleFullscreen();
+                            }
+
+                            Raylib.SetWindowSize(defaultWidth, defaultHeight);
+                            screenWidth = defaultWidth;
+                            screenHeight = defaultHeight;
+                            GameStateManager.Instance.UpdateScreenSize(screenWidth, screenHeight);
+                        }
                     }
+
+                    GameStateManager.Instance.UpdateAndDraw();
                 }
 
-                GameStateManager.Instance.UpdateAndDraw();
+                lastTime = currentTime;
             }
 
-            TextureManager.UnloadAllTextures();
             Raylib.CloseWindow();
         }
         catch (Exception ex)
@@ -90,6 +106,7 @@ class Program
         }
         finally
         {
+            TextureManager.UnloadAllTextures();
             SoundManager.UnloadSounds();
             Raylib.CloseAudioDevice();
         }
