@@ -46,22 +46,34 @@ public class CallWindCard : IEnvironmentCard
         var ships = ShipHandler.GetShips(client);
         ships.ForEach(ship =>
         {
-            //TODO: check for walls and rocks
             Vector2 oldCoords = new(ship.X, ship.Y);
             Vector2 newCoords = Vector2.Add(oldCoords, randomDirection);
             if (
                 HandleOutsideBoard(ship, newCoords)
                 || HandleOnRocks(gameState, client, ship, newCoords)
+                || HandleOnShips(gameState, client, ship, newCoords, randomDirection)
             )
-            {
                 return;
-            }
-            if (HandleOnShips(gameState, client, ship, newCoords, randomDirection))
-            {
-                return;
-            }
+
             ship.X = (int)newCoords.X;
             ship.Y = (int)newCoords.Y;
+            var playerIndex = gameState.GetPlayerIndex(client);
+            for (int dx = 0; dx < ship.Width; dx++)
+            {
+                for (int dy = 0; dy < ship.Height; dy++)
+                {
+                    gameState.boards[playerIndex][(int)oldCoords.X + dx, (int)oldCoords.Y + dy].CellState =
+                                CellState.Empty;
+                }
+            }
+            for (int dx = 0; dx < ship.Width; dx++)
+            {
+                for (int dy = 0; dy < ship.Height; dy++)
+                {
+                    gameState.boards[playerIndex][(int)newCoords.X + dx, (int)newCoords.Y + dy].CellState =
+                                CellState.Ship;
+                }
+            }
             ShipHandler.HandlePositionUpdate(oldCoords, newCoords, client);
         });
     }
