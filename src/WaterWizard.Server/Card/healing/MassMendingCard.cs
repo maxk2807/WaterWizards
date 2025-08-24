@@ -6,6 +6,10 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Server.Card.healing;
 
+/// <summary>
+/// Heilungs-Karte „Mass Mending“: Heilt gleichzeitig mehrere eigene Schiffe.
+/// Jedes beschädigte Schiff erhält standardmäßig 1 Zelle Heilung.
+/// </summary>
 public class MassMendingCard : IHealingCard
 {
     public CardVariant Variant => CardVariant.MassMending;
@@ -16,6 +20,15 @@ public class MassMendingCard : IHealingCard
 
     public bool HasSpecialTargeting => false;
 
+    /// <summary>
+    /// Heilt auf allen eigenen Schiffen jeweils genau eine beschädigte Zelle
+    /// und sendet entsprechende Heal-Updates an den Caster.
+    /// </summary>
+    /// <param name="gameState">Aktueller Spielzustand (Server-seitig).</param>
+    /// <param name="targetCoords">Ignoriert (AoE auf alle eigenen Schiffe).</param>
+    /// <param name="caster">Wirker der Karte (Peer des Spielers).</param>
+    /// <param name="opponent">Gegnerischer Peer.</param>
+    /// <returns><c>true</c>, wenn die Heilung ausgeführt wurde.</returns>
     public bool ExecuteHealing(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
     {
         var ships = ShipHandler.GetShips(caster);
@@ -31,6 +44,11 @@ public class MassMendingCard : IHealingCard
         return true;
     }
 
+    /// <summary>
+    /// Prüft die Zielgültigkeit für Mass Mending. Immer gültig,
+    /// da die Karte alle eigenen Schiffe betrifft.
+    /// </summary>
+    /// <returns>Immer <c>true</c>.</returns>
     public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
         => true;
 }
