@@ -15,6 +15,11 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
+/// <summary>
+/// Verwaltet die Darstellung und Aktualisierung der aktuell aktiven Karten
+/// im Spielscreen. Stellt sicher, dass Karten gezeichnet, ihre Restlaufzeiten
+/// heruntergezählt und deren Status angezeigt werden.
+/// </summary>
 public class ActiveCards(GameScreen gameScreen)
 {
     private ActiveCardsHand? _cards;
@@ -27,6 +32,10 @@ public class ActiveCards(GameScreen gameScreen)
     private int ScreenWidth => gameScreen._gameStateManager.screenWidth;
     private int ScreenHeight => gameScreen._gameStateManager.screenHeight;
 
+    /// <summary>
+    /// Initialisiert den Bereich für aktive Karten basierend auf der Bildschirmgröße
+    /// und legt die Position sowie die Kartenhand fest.
+    /// </summary>
     public void Initialize()
     {
         Width = (int)(ScreenWidth * 0.274f);
@@ -37,6 +46,9 @@ public class ActiveCards(GameScreen gameScreen)
         _cards.EmptyHand();
     }
 
+    /// <summary>
+    /// Zeichnet den Container und die aktuell aktiven Karten auf den Bildschirm.
+    /// </summary>
     public void Draw()
     {
         Rectangle outerRec = new(X, Y, Width, Height);
@@ -47,6 +59,11 @@ public class ActiveCards(GameScreen gameScreen)
         _cards?.Draw(true);
     }
 
+    /// <summary>
+    /// Aktualisiert die Liste der aktiven Karten und ersetzt die bisherige Hand
+    /// durch die neu übergebene Kartenliste.
+    /// </summary>
+    /// <param name="activeCards">Liste der aktiven Karten vom Server/GameState</param>
     internal void UpdateActiveCards(List<Cards> activeCards)
     {
         _cards!.EmptyHand();
@@ -62,7 +79,8 @@ public class ActiveCards(GameScreen gameScreen)
 
         internal override void HandleCast(
             GameCard gameCard
-        ) { /*Can't cast active cards*/
+        )
+        { /*Can't cast active cards*/
         }
 
         public override void Draw(bool front)
@@ -174,10 +192,10 @@ public class ActiveCards(GameScreen gameScreen)
                 if (gameCard.card.remainingDuration > 0)
                 {
                     // Update for visual countdown only
-                    gameCard.card.remainingDuration -= deltaTime * 1000; 
-                    
+                    gameCard.card.remainingDuration -= deltaTime * 1000;
+
                     Console.WriteLine($"[Client] Card {gameCard.card.Variant} remaining: {gameCard.card.remainingDuration}ms");
-                    
+
                     if (gameCard.card.remainingDuration <= 0)
                     {
                         Console.WriteLine($"[Client] Card {gameCard.card.Variant} display countdown finished");
