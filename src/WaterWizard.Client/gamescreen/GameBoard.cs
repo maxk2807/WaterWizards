@@ -211,7 +211,7 @@ public class GameBoard
                 {
                     if (_gridStates[x, y] == CellState.Hit)
                     {
-                        hit.Add((x, y));
+                        hit.Add((x - startX, y - startY));
                         _gridStates[x, y] = CellState.Miss;
                     }
                     else
@@ -234,7 +234,7 @@ public class GameBoard
             {
                 if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
                 {
-                    if (hit.Any(cell => cell.X == x && cell.Y == y))
+                    if (hit.Any(cell => cell.X + startX == x && cell.Y + startY == y))
                     {
                         _gridStates[x, y] = CellState.Hit;
                     }
@@ -389,6 +389,7 @@ public class GameBoard
 
         // Shield-Effekte zeichnen
         DrawShieldEffects();
+
     }
 
     /// <summary>
@@ -758,8 +759,8 @@ public class GameBoard
             CellState.Empty => Color.LightGray,
             CellState.Ship => this == GameStateManager.Instance.GameScreen?.playerBoard ? Color.Blank : Color.Orange, // Blank for player's board, Orange for opponent's board
             CellState.Rock => Color.DarkGray,
-            CellState.Hit => Color.Orange,
-            CellState.Miss => Color.DarkBlue,
+            CellState.Hit => this == GameStateManager.Instance.GameScreen?.playerBoard ? Color.Blank : Color.Orange,
+            CellState.Miss => this == GameStateManager.Instance.GameScreen?.playerBoard ? Color.Blank : Color.DarkBlue,
             CellState.Unknown => new Color(135, 206, 235, 0),
             CellState.Thunder => new Color(30, 30, 150, 255),
             CellState.Shield => new Color(0, 255, 255, 100),
