@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - erick: 216 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(2, 2);   (erick: 193 Zeilen)
 // ===============================================
@@ -63,20 +63,26 @@ public class ConeOfColdCard : IUtilityCard
 
         int opponentIndex = gameState.GetPlayerIndex(opponent);
 
-        Console.WriteLine($"[Server] ConeOfCold targeting 2x2 area centered at ({centerX}, {centerY})");
-        Console.WriteLine($"[Server] Board dimensions: {GameState.boardWidth} x {GameState.boardHeight}");
+        Console.WriteLine(
+            $"[Server] ConeOfCold targeting 2x2 area centered at ({centerX}, {centerY})"
+        );
+        Console.WriteLine(
+            $"[Server] Board dimensions: {GameState.boardWidth} x {GameState.boardHeight}"
+        );
 
-        int startX = centerX - (int)Math.Floor(AreaOfEffect.X / 2f);   
-        int startY = centerY - (int)Math.Floor(AreaOfEffect.Y / 2f);  
+        int startX = centerX - (int)Math.Floor(AreaOfEffect.X / 2f);
+        int startY = centerY - (int)Math.Floor(AreaOfEffect.Y / 2f);
 
         for (int dx = 0; dx < 2; dx++)
         {
-            for (int dy = 0; dy < 2; dy++) 
+            for (int dy = 0; dy < 2; dy++)
             {
                 int x = startX + dx;
                 int y = startY + dy;
 
-                Console.WriteLine($"[Server] ConeOfCold checking cell ({x}, {y}) [offset: dx={dx}, dy={dy}]");
+                Console.WriteLine(
+                    $"[Server] ConeOfCold checking cell ({x}, {y}) [offset: dx={dx}, dy={dy}]"
+                );
 
                 if (x < 0 || x >= GameState.boardWidth || y < 0 || y >= GameState.boardHeight)
                 {
@@ -84,30 +90,45 @@ public class ConeOfColdCard : IUtilityCard
                     continue;
                 }
 
-                if (opponentIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, opponentIndex))
+                if (
+                    opponentIndex != -1
+                    && gameState.IsCoordinateProtectedByShield(x, y, opponentIndex)
+                )
                 {
-                    Console.WriteLine($"[Server] ConeOfCold attack at ({x}, {y}) blocked by shield!");
-                    CellHandler.SendCellReveal(caster, opponent, x, y, false);
+                    Console.WriteLine(
+                        $"[Server] ConeOfCold attack at ({x}, {y}) blocked by shield!"
+                    );
+                    CellHandler.SendCellReveal(caster, opponent, x, y, false, "ConeOfCold");
                     continue;
                 }
 
                 var ships = ShipHandler.GetShips(opponent);
                 bool hitAtThisPosition = false;
 
-                Console.WriteLine($"[Server] ConeOfCold checking {ships.Count} ships for cell ({x}, {y})");
+                Console.WriteLine(
+                    $"[Server] ConeOfCold checking {ships.Count} ships for cell ({x}, {y})"
+                );
 
                 foreach (var ship in ships)
                 {
-                    Console.WriteLine($"[Server] Checking ship at ({ship.X}, {ship.Y}) size {ship.Width}x{ship.Height}");
-                    
-                    if (x >= ship.X && x < ship.X + ship.Width &&
-                        y >= ship.Y && y < ship.Y + ship.Height)
+                    Console.WriteLine(
+                        $"[Server] Checking ship at ({ship.X}, {ship.Y}) size {ship.Width}x{ship.Height}"
+                    );
+
+                    if (
+                        x >= ship.X
+                        && x < ship.X + ship.Width
+                        && y >= ship.Y
+                        && y < ship.Y + ship.Height
+                    )
                     {
                         hitAtThisPosition = true;
                         anyHit = true;
                         bool newDamage = ship.DamageCell(x, y);
 
-                        Console.WriteLine($"[Server] ConeOfCold HIT ship at ({ship.X}, {ship.Y}) position ({x}, {y}), new damage: {newDamage}");
+                        Console.WriteLine(
+                            $"[Server] ConeOfCold HIT ship at ({ship.X}, {ship.Y}) position ({x}, {y}), new damage: {newDamage}"
+                        );
 
                         if (!goldFreezeApplied)
                         {
@@ -119,18 +140,27 @@ public class ConeOfColdCard : IUtilityCard
                         {
                             if (ship.IsDestroyed)
                             {
-                                Console.WriteLine($"[Server] ConeOfCold destroyed ship at ({ship.X}, {ship.Y})!");
+                                Console.WriteLine(
+                                    $"[Server] ConeOfCold destroyed ship at ({ship.X}, {ship.Y})!"
+                                );
                                 ShipHandler.SendShipReveal(caster, ship, gameState);
                                 gameState.CheckGameOver();
                             }
                             else
                             {
-                                CellHandler.SendCellReveal(caster, opponent, x, y, true);
+                                CellHandler.SendCellReveal(
+                                    caster,
+                                    opponent,
+                                    x,
+                                    y,
+                                    true,
+                                    "ConeOfCold"
+                                );
                             }
                         }
                         else
                         {
-                            CellHandler.SendCellReveal(caster, opponent, x, y, true);
+                            CellHandler.SendCellReveal(caster, opponent, x, y, true, "ConeOfCold");
                         }
                         break;
                     }
@@ -139,12 +169,14 @@ public class ConeOfColdCard : IUtilityCard
                 if (!hitAtThisPosition)
                 {
                     Console.WriteLine($"[Server] ConeOfCold MISSED at ({x}, {y})");
-                    CellHandler.SendCellReveal(caster, opponent, x, y, false);
+                    CellHandler.SendCellReveal(caster, opponent, x, y, false, "ConeOfCold");
                 }
             }
         }
 
-        Console.WriteLine($"[Server] ConeOfCold completed - Any hits: {anyHit}, Gold freeze applied: {goldFreezeApplied}");
+        Console.WriteLine(
+            $"[Server] ConeOfCold completed - Any hits: {anyHit}, Gold freeze applied: {goldFreezeApplied}"
+        );
         return true;
     }
 
@@ -165,7 +197,9 @@ public class ConeOfColdCard : IUtilityCard
 
         gameState.FreezeGoldGeneration(opponentIndex, GoldFreezeDuration);
 
-        Console.WriteLine($"[Server] ConeOfCold froze gold generation for Player {opponentIndex} for {GoldFreezeDuration} seconds");
+        Console.WriteLine(
+            $"[Server] ConeOfCold froze gold generation for Player {opponentIndex} for {GoldFreezeDuration} seconds"
+        );
 
         SendGoldFreezeNotifications(gameState, opponentIndex, GoldFreezeDuration);
     }
@@ -176,26 +210,30 @@ public class ConeOfColdCard : IUtilityCard
     /// <param name="gameState">The current game state</param>
     /// <param name="frozenPlayerIndex">The index of the player whose gold is frozen</param>
     /// <param name="duration">The duration of the freeze in seconds</param>
-    private static void SendGoldFreezeNotifications(GameState gameState, int frozenPlayerIndex, int duration)
+    private static void SendGoldFreezeNotifications(
+        GameState gameState,
+        int frozenPlayerIndex,
+        int duration
+    )
     {
         for (int i = 0; i < gameState.Server.ConnectedPeersCount; i++)
         {
             var peer = gameState.Server.ConnectedPeerList[i];
             var writer = new NetDataWriter();
-            
+
             if (i == frozenPlayerIndex)
             {
                 writer.Put("GoldFrozen");
                 writer.Put(duration);
-                writer.Put(true); 
+                writer.Put(true);
             }
             else
             {
                 writer.Put("EnemyGoldFrozen");
                 writer.Put(duration);
-                writer.Put(false); 
+                writer.Put(false);
             }
-            
+
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
             Console.WriteLine($"[Server] Sent gold freeze notification to Player {i}");
         }
@@ -209,11 +247,16 @@ public class ConeOfColdCard : IUtilityCard
     /// <param name="caster">The player casting the card</param>
     /// <param name="opponent">The defending player</param>
     /// <returns>True if the target area is within the board, otherwise false</returns>
-    public bool IsValidTarget(GameState gameState, Vector2 targetCoords, NetPeer caster, NetPeer opponent)
+    public bool IsValidTarget(
+        GameState gameState,
+        Vector2 targetCoords,
+        NetPeer caster,
+        NetPeer opponent
+    )
     {
         int boardWidth = GameState.boardWidth;
         int boardHeight = GameState.boardHeight;
-        
+
         int startX = (int)targetCoords.X - (int)Math.Floor(AreaOfEffect.X / 2f);
         int startY = (int)targetCoords.Y - (int)Math.Floor(AreaOfEffect.Y / 2f);
         int endX = startX + (int)AreaOfEffect.X - 1;

@@ -3,10 +3,12 @@
 // - erick: 21 Zeilen
 // - maxk2807: 7 Zeilen
 // - Erickk0: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
+
+using WaterWizard.Shared.ShipType;
 
 namespace WaterWizard.Server;
 
@@ -46,6 +48,11 @@ public class PlacedShip
     public bool IsDestroyed => DamagedCells.Count >= MaxHealth;
 
     /// <summary>
+    /// Repräsentiert ein platziertes Schiff auf dem Spielfeld.
+    /// </summary>
+    public ShipType ShipType { get; set; } = ShipType.DEFAULT;
+
+    /// <summary>
     /// Prüft, ob eine bestimmte Zelle beschädigt ist.
     /// </summary>
     /// <param name="cellX">X-Koordinate der Zelle</param>
@@ -73,5 +80,20 @@ public class PlacedShip
     public bool HealCell(int cellX, int cellY)
     {
         return DamagedCells.Remove((cellX, cellY));
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj!.GetType() == typeof(PlacedShip))
+        {
+            PlacedShip ps = (PlacedShip)obj;
+            return X == ps.X && Y == ps.Y && Width == ps.Width && Height == ps.Height; 
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 128 Zeilen
 // - Erickk0: 11 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // - public Vector2 AreaOfEffect => new(1, 1);   (erick: 106 Zeilen)
 // ===============================================
@@ -82,36 +82,61 @@ public class ArcaneMissileCard : IDamageCard
             // Check if this coordinate is protected by a shield
             if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
             {
-                Console.WriteLine($"[Server] Arcane Missile #{missile + 1} at ({x}, {y}) blocked by shield!");
-                CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                Console.WriteLine(
+                    $"[Server] Arcane Missile #{missile + 1} at ({x}, {y}) blocked by shield!"
+                );
+                CellHandler.SendCellReveal(attacker, defender, x, y, false, "ArcaneMissile");
                 continue;
             }
 
             foreach (var ship in ships)
             {
-                if (x >= ship.X && x < ship.X + ship.Width &&
-                    y >= ship.Y && y < ship.Y + ship.Height)
+                if (
+                    x >= ship.X
+                    && x < ship.X + ship.Width
+                    && y >= ship.Y
+                    && y < ship.Y + ship.Height
+                )
                 {
                     cellHit = true;
                     bool newDamage = ship.DamageCell(x, y);
 
-                    Console.WriteLine($"[Server] Arcane Missile hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}");
+                    Console.WriteLine(
+                        $"[Server] Arcane Missile hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}"
+                    );
 
                     if (newDamage)
                     {
                         if (ship.IsDestroyed)
                         {
-                            Console.WriteLine($"[Server] Arcane Missile destroyed ship at ({ship.X}, {ship.Y})!");
+                            Console.WriteLine(
+                                $"[Server] Arcane Missile destroyed ship at ({ship.X}, {ship.Y})!"
+                            );
+                            CellHandler.SendCellReveal(
+                                attacker,
+                                defender,
+                                x,
+                                y,
+                                true,
+                                "ArcaneMissile"
+                            );
                             ShipHandler.SendShipReveal(attacker, ship, gameState);
                         }
                         else
                         {
-                            CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                            CellHandler.SendCellReveal(
+                                attacker,
+                                defender,
+                                x,
+                                y,
+                                true,
+                                "ArcaneMissile"
+                            );
                         }
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "ArcaneMissile");
                     }
                     break;
                 }
@@ -120,7 +145,7 @@ public class ArcaneMissileCard : IDamageCard
             if (!cellHit)
             {
                 Console.WriteLine($"[Server] Arcane Missile #{missile + 1} missed at ({x}, {y})");
-                CellHandler.SendCellReveal(attacker, defender, x, y, false);
+                CellHandler.SendCellReveal(attacker, defender, x, y, false, "ArcaneMissile");
             }
 
             if (cellHit)

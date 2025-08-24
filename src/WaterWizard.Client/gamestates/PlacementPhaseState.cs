@@ -4,7 +4,7 @@
 // - maxk2807: 11 Zeilen
 // - erick: 2 Zeilen
 // - Erickk0: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -16,11 +16,19 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert die Phase, in der Spieler ihre Schiffe platzieren,
+/// bevor das eigentliche Spiel beginnt.
+/// </summary>
 public class PlacementPhaseState : IGameState
 {
-
     private bool IsReady = false;
 
+    /// <summary>
+    /// Zeichnet die Platzierungsphase inklusive Spielfeld, Hinweistext und Ready-Button.
+    /// Verarbeitet Eingaben für das Bestätigen der Platzierung oder den Wechsel ins Spiel.
+    /// </summary>
+    /// <param name="manager">Verwalter für Spielzustände und Bildschirmabmessungen.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         manager.GameScreen.Draw(manager.screenWidth, manager.screenHeight);
@@ -35,11 +43,14 @@ public class PlacementPhaseState : IGameState
         int buttonY = textY + (int)(manager.screenHeight * 0.15f);
         Rectangle readyButton = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
         bool hoverReady = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), readyButton);
-        Raylib.DrawRectangleRec(readyButton,
-            IsReady ?
-                Color.LightGray
-                    : hoverReady ? Color.DarkGreen : Color.Green);
-        if(IsReady) Raylib.DrawRectangleLinesEx(readyButton, 3, Color.Black);
+        Raylib.DrawRectangleRec(
+            readyButton,
+            IsReady ? Color.LightGray
+                : hoverReady ? Color.DarkGreen
+                : Color.Green
+        );
+        if (IsReady)
+            Raylib.DrawRectangleLinesEx(readyButton, 3, Color.Black);
         string readyText = "Fertig" + (!IsReady ? "?" : "!");
         int readyTextWidth = Raylib.MeasureText(readyText, 24);
         Raylib.DrawText(

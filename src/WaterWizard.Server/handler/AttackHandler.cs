@@ -2,13 +2,14 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 130 Zeilen
 // - Erickk0: 13 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
 using LiteNetLib;
 using LiteNetLib.Utils;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.handler;
 
@@ -26,6 +27,7 @@ public class AttackHandler
     {
         gameState = state;
     }
+
     /// <summary>
     /// Verarbeitet einen Angriff und prüft, ob ein Schiff getroffen oder zerstört wurde.
     /// </summary>
@@ -43,10 +45,14 @@ public class AttackHandler
         int defenderIndex = gameState?.GetPlayerIndex(defender) ?? -1;
 
         // Check if this coordinate is protected by a shield
-        if (defenderIndex != -1 && gameState != null && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
+        if (
+            defenderIndex != -1
+            && gameState != null
+            && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex)
+        )
         {
             Console.WriteLine($"[Server] Attack at ({x}, {y}) blocked by shield!");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "Attack");
             SendAttackResult(attacker, defender, x, y, false, false);
             return;
         }
@@ -66,24 +72,23 @@ public class AttackHandler
 
                 if (newDamage)
                 {
-                    Console.WriteLine(
-                        $"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})"
-                    );
+                    Console.WriteLine($"[Server] New damage at ({x},{y}) on ship at ({ship.X},{ship.Y})");
 
                     if (ship.IsDestroyed)
                     {
                         Console.WriteLine($"[Server] Ship at ({ship.X},{ship.Y}) destroyed!");
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "Attack");
                         ShipHandler.SendShipReveal(attacker, ship, gameState!);
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "Attack");
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[Server] Cell ({x},{y}) already damaged");
-                    CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, true, "Attack");
                 }
                 break;
             }
@@ -92,7 +97,7 @@ public class AttackHandler
         if (!hit)
         {
             Console.WriteLine($"[Server] Miss at ({x},{y})");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false); // Updated to include defender
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "Attack"); // Updated to include defender
         }
 
         /// <summary>
@@ -130,26 +135,30 @@ public class AttackHandler
         bool shipDestroyed
     )
     {
+        var (attackerDisplayX, attackerDisplayY) = CoordinateTransform.UnrotateOpponentCoordinates(
+            x, y, GameState.boardWidth, GameState.boardHeight);
+            
         var attackerWriter = new NetDataWriter();
         attackerWriter.Put("AttackResult");
-        attackerWriter.Put(x);
-        attackerWriter.Put(y);
+        attackerWriter.Put(attackerDisplayX);
+        attackerWriter.Put(attackerDisplayY);
         attackerWriter.Put(hit);
         attackerWriter.Put(shipDestroyed);
-        attackerWriter.Put(false);
+        attackerWriter.Put(false); // isDefender = false for attacker
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
+        // For the defender (viewing own board), use original coordinates
         var defenderWriter = new NetDataWriter();
         defenderWriter.Put("AttackResult");
         defenderWriter.Put(x);
         defenderWriter.Put(y);
         defenderWriter.Put(hit);
         defenderWriter.Put(shipDestroyed);
-        defenderWriter.Put(true);
+        defenderWriter.Put(true); // isDefender = true for defender
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Attack result sent: attacker sees result, defender sees damage"
+            $"[Server] Attack result sent: attacker sees ({attackerDisplayX},{attackerDisplayY}), defender sees ({x},{y})"
         );
     }
 }

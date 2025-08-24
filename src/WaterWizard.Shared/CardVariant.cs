@@ -4,7 +4,7 @@
 // - jdewi001: 2 Zeilen
 // - maxk2807: 1 Zeilen
 // - erick: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================

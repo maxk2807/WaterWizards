@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 34 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -16,7 +16,7 @@ public class GitCommandExecutor
     {
         _repositoryPath = repositoryPath;
     }
-    
+
     public async Task<string> ExecuteAsync(string command)
     {
         var process = new System.Diagnostics.Process
@@ -29,14 +29,14 @@ public class GitCommandExecutor
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
-                CreateNoWindow = true
-            }
+                CreateNoWindow = true,
+            },
         };
-        
+
         process.Start();
         var output = await process.StandardOutput.ReadToEndAsync();
         await process.WaitForExitAsync();
-        
+
         return output.Trim();
     }
-} 
+}

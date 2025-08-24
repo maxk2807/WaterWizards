@@ -1,15 +1,15 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - Erickk0: 59 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Xunit;
-using WaterWizard.Client.network;
 using WaterWizard.Client.gamescreen;
+using WaterWizard.Client.network;
 using WaterWizard.Shared;
+using Xunit;
 
 namespace WaterWizardTests
 {
@@ -20,7 +20,7 @@ namespace WaterWizardTests
         {
             // Arrange & Act
             var networkManager = new NetworkManager();
-            
+
             // Assert
             Assert.NotNull(networkManager);
             Assert.False(networkManager.IsHost());
@@ -31,10 +31,10 @@ namespace WaterWizardTests
         {
             // Arrange
             var networkManager = new NetworkManager();
-            
+
             // Act
             var players = networkManager.GetConnectedPlayers();
-            
+
             // Assert
             Assert.NotNull(players);
             Assert.Empty(players);
@@ -45,10 +45,10 @@ namespace WaterWizardTests
         {
             // Arrange
             var networkManager = new NetworkManager();
-            
+
             // Act
             var isReady = networkManager.IsClientReady();
-            
+
             // Assert
             Assert.False(isReady);
         }
@@ -58,7 +58,7 @@ namespace WaterWizardTests
         {
             // Arrange
             var cardType = "Damage";
-            
+
             // Act & Assert
             var exception = Record.Exception(() => NetworkManager.RequestCardBuy(cardType));
             Assert.Null(exception);

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 32 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -24,6 +24,8 @@ public class HealingCardFactory
         {
             CardVariant.Heal => new HealCard(),
             CardVariant.MassMending => new MassMendingCard(),
+            CardVariant.PerfectMending => new PerfectMendingCard(),
+
             _ => null,
         };
     }

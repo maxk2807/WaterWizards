@@ -4,7 +4,7 @@
 // - erick: 22 Zeilen
 // - jdewi001: 11 Zeilen
 // - Erickk0: 3 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -15,6 +15,9 @@ using static WaterWizard.Client.gamescreen.cards.ActiveCards;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
+/// <summary>
+/// Creates a new GameHand bound to a GameScreen at the given center X coordinate and Y position.
+/// </summary>
 public class GameHand(GameScreen gameScreen, int centralX, int cardY)
 {
     /// <summary>
@@ -93,6 +96,9 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
         }
     }
 
+    /// <summary>
+    /// Initiates the casting process for the given GameCard by invoking the Casting UI.
+    /// </summary>
     internal virtual void HandleCast(GameCard gameCard)
     {
         CastingUI.Instance.StartDrawingCardAim(gameCard);
@@ -153,11 +159,17 @@ public class GameHand(GameScreen gameScreen, int centralX, int cardY)
         card.Draw(previewX, previewY, true);
     }
 
+    /// <summary>
+    /// Adds a new Card to the Hand, constructed from the provided Card definition.
+    /// </summary>
     public void AddCard(Cards card)
     {
         Cards.Add(new(gameScreen, card));
     }
 
+    /// <summary>
+    /// Removes all Cards from this Hand.
+    /// </summary>
     public void EmptyHand()
     {
         Cards.Clear();

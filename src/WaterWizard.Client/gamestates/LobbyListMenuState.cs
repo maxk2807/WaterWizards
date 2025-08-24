@@ -5,30 +5,47 @@
 // - Paul: 13 Zeilen
 // - Erickk0: 8 Zeilen
 // - erick: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Raylib_cs;
 using System.Numerics;
+using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.gamescreen.handler;
 using WaterWizard.Client.network;
-using WaterWizard.Client.Assets.Sounds.Manager;
 
 namespace WaterWizard.Client.gamestates;
 
+    /// <summary>
+    /// Stellt den Menüzustand dar, der verfügbare Lobbies anzeigt, das UI rendert
+    /// und Benutzerinteraktionen (Beitreten, Aktualisieren, manuelle Verbindung, Zurück)
+    /// verarbeitet.
+    /// </summary>
 public class LobbyListMenuState : IGameState
 {
+    private static Texture2D menuBackground = TextureManager.LoadTexture(
+        "Background/WaterWizardsMenu1200x900.png"
+    );
+    private static Texture2D textBackground = TextureManager.LoadTexture(
+        "Background/TitleMenuBackground.png"
+    );
 
-    private static Texture2D menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
-    private static Texture2D textBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/TitleMenuBackground.png");
-
+    /// <summary>
+    /// Aktualisiert den Zustand des Lobbymenüs und zeichnet die Oberfläche.
+    /// </summary>
+    /// <param name="manager">Verwalter für Bildschirmmaße und Zustandswechsel.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawLobbyListMenu(manager);
     }
 
+    /// <summary>
+    /// Zeichnet die Lobbyliste samt Überschrift, Tabellenzeilen, sowie die Buttons
+    /// (Join, Aktualisieren, Manuell verbinden, Zurück) und behandelt deren Klicks.
+    /// </summary>
+    /// <param name="manager">Verwalter für Rendering-Kontext und Navigation.</param>
     private void DrawLobbyListMenu(GameStateManager manager)
     {
         Raylib.DrawTexturePro(
@@ -49,12 +66,12 @@ public class LobbyListMenuState : IGameState
                 (manager.screenWidth - 640) / 2f,
                 (float)manager.screenHeight / 10 - 40,
                 640,
-                270 + lobbies.Count * 30f),
+                270 + lobbies.Count * 30f
+            ),
             Vector2.Zero,
             0f,
             Color.White
         );
-
 
         int titleWidth = Raylib.MeasureText("Verfügbare Lobbies", 30);
         Raylib.DrawText(

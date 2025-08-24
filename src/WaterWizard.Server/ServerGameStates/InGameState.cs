@@ -6,7 +6,7 @@
 // - maxk2807: 26 Zeilen
 // - erick: 18 Zeilen
 // - jlnhsrm: 11 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -15,6 +15,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Server;
 using WaterWizard.Server.handler;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.ServerGameStates;
 
@@ -52,12 +53,12 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         goldHandler = new GoldHandler(gameState);
         utilityCardHandler = new UtilityCardHandler(gameState, paralizeHandler);
 
-        manaTimer = new System.Timers.Timer(4000);
+        manaTimer = new System.Timers.Timer(2000);
         manaTimer.Elapsed += (sender, e) => UpdateMana();
         manaTimer.AutoReset = true;
         manaTimer.Start();
 
-        goldTimer = new System.Timers.Timer(2000);
+        goldTimer = new System.Timers.Timer(4000);
         goldTimer.Elapsed += (sender, e) => UpdateGold();
         goldTimer.AutoReset = true;
         goldTimer.Start();
@@ -69,21 +70,36 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         shieldTimer.Start();
     }
 
+    /// <summary>
+    /// Aktualisiert die Manawerte der Spieler in festen Intervallen,
+    /// sofern das Spiel nicht pausiert ist.
+    /// </summary>
     private void UpdateMana()
     {
-        if (gameState.IsPaused) return;
+        if (gameState.IsPaused)
+            return;
         manaHandler?.UpdateMana();
     }
 
+    /// <summary>
+    /// Aktualisiert die Goldwerte der Spieler in festen Intervallen,
+    /// sofern das Spiel nicht pausiert ist.
+    /// </summary>
     private void UpdateGold()
     {
-        if (gameState.IsPaused) return;
+        if (gameState.IsPaused)
+            return;
         goldHandler?.UpdateGold();
     }
 
+    /// <summary>
+    /// Aktualisiert die verbleibende Dauer aktiver Schilde (in Sekunden)
+    /// in kurzen Intervallen, solange das Spiel nicht pausiert ist.
+    /// </summary>
     private void UpdateShields()
     {
-        if (gameState.IsPaused) return;
+        if (gameState.IsPaused)
+            return;
         // Update shields with delta time of 0.1 seconds (100ms timer interval)
         gameState.UpdateShields(0.1f);
     }
@@ -103,6 +119,16 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         shieldTimer?.Dispose();
     }
 
+    /// <summary>
+    /// Verarbeitet eingehende Netzwerk-Nachrichten im In-Game-Status
+    /// (z. B. Schiff platzieren, Karte kaufen/ausspielen, Angriff, Pause, Aufgabe)
+    /// und delegiert an die entsprechenden Handler.
+    /// </summary>
+    /// <param name="peer">Der sendende Client.</param>
+    /// <param name="reader">Reader für die Nutzlast der Nachricht.</param>
+    /// <param name="serverInstance">Serverinstanz zum Antworten/Broadcasten.</param>
+    /// <param name="manager">State-Manager des Servers.</param>
+    /// <param name="messageType">Typ der empfangenen Nachricht.</param>
     public void HandleNetworkEvent(
         NetPeer peer,
         NetPacketReader reader,
@@ -120,7 +146,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
             case "PlaceShip":
                 // Prüfe, ob der Spieler Schiffe in der Spielphase platzieren darf
                 int playerIndex = gameState.GetPlayerIndex(peer);
-                if (gameState.AllowShipPlacementInGame != null && gameState.AllowShipPlacementInGame[playerIndex])
+                if (
+                    gameState.AllowShipPlacementInGame != null
+                    && gameState.AllowShipPlacementInGame[playerIndex]
+                )
                 {
                     ShipHandler.HandleShipPlacement(peer, reader, gameState);
                     gameState.AllowShipPlacementInGame[playerIndex] = false; // Nach Platzierung wieder sperren
@@ -129,7 +158,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 {
                     var errorWriter = new NetDataWriter();
                     errorWriter.Put("ShipPlacementError");
-                    errorWriter.Put("Schiffsplatzierung ist in der Spielphase nur mit der Karte 'Summon Ship' erlaubt!");
+                    errorWriter.Put(
+                        "Schiffsplatzierung ist in der Spielphase nur mit der Karte 'Summon Ship' erlaubt!"
+                    );
                     peer.Send(errorWriter, DeliveryMethod.ReliableOrdered);
                 }
                 break;
@@ -137,7 +168,14 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 CardHandler.HandleCardBuying(serverInstance, peer, reader, gameState);
                 break;
             case "CastCard":
-                cardHandler.HandleCardCasting(serverInstance, peer, reader, gameState, paralizeHandler!, utilityCardHandler!);
+                cardHandler.HandleCardCasting(
+                    serverInstance,
+                    peer,
+                    reader,
+                    gameState,
+                    paralizeHandler!,
+                    utilityCardHandler!
+                );
                 break;
             case "Attack":
                 int x = reader.GetInt();
@@ -146,8 +184,13 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 var defender = FindOpponent(peer);
                 if (defender != null)
                 {
+                    var (transformedX, transformedY) = CoordinateTransform.RotateOpponentCoordinates(
+                        x, y, GameState.boardWidth, GameState.boardHeight);
+
+                    Console.WriteLine($"[Server] Transformed attack coordinates: ({x}, {y}) -> ({transformedX}, {transformedY})");
+
                     AttackHandler.Initialize(gameState);
-                    AttackHandler.HandleAttack(peer, defender, x, y);
+                    AttackHandler.HandleAttack(peer, defender, transformedX, transformedY);
                 }
                 else
                     Console.WriteLine("[Server] Kein Gegner gefunden für Attack.");
@@ -164,6 +207,11 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         }
     }
 
+    /// <summary>
+    /// Schaltet den Pausenstatus des Spiels um und broadcastet den neuen Status
+    /// an alle verbundenen Clients.
+    /// </summary>
+    /// <param name="serverInstance">Serverinstanz zum Versenden der Updates.</param>
     private void HandlePauseToggle(NetManager serverInstance)
     {
         gameState.IsPaused = !gameState.IsPaused;
@@ -199,6 +247,12 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         }
     }
 
+    /// <summary>
+    /// Ermittelt den Gegenspieler des angegebenen Clients basierend auf der
+    /// aktuellen Verbindungsliste.
+    /// </summary>
+    /// <param name="attacker">Der Referenz-Client.</param>
+    /// <returns>Den gefundenen Gegenspieler oder <c>null</c>, falls keiner existiert.</returns>
     public NetPeer? FindOpponent(NetPeer attacker)
     {
         foreach (var peer in server.ConnectedPeerList)

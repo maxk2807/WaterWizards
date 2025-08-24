@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 39 Zeilen
 // - Erickk0: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -13,6 +13,9 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.handler;
 
+/// <summary>
+/// Provides functionality for sending chat messages from the client to the server.
+/// </summary>
 public class ChatHandler
 {
     /// <summary>

@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - justinjd00: 30 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -15,7 +15,7 @@ namespace WaterWizard.Shared
         /// </summary>
         public int CurrentMana { get; private set; }
 
-        public Mana(int initialAmount = 0)
+        public Mana(int initialAmount = 6)
         {
             CurrentMana = initialAmount;
         }

@@ -2,7 +2,7 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 62 Zeilen
 // - maxk2807: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -10,6 +10,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using WaterWizard.Shared;
+using WaterWizard.Server.utils;
 
 namespace WaterWizard.Server.handler;
 
@@ -48,26 +49,39 @@ public class CellHandler
     /// <param name="x">X coordinate</param>
     /// <param name="y">Y coordinate</param>
     /// <param name="isHit">Whether it was a hit or miss</param>
-    public static void SendCellReveal(NetPeer attacker, NetPeer defender, int x, int y, bool isHit)
+    /// <param name="cardVariant">Which Card is it?</param>
+    public static void SendCellReveal(
+        NetPeer attacker,
+        NetPeer defender,
+        int x,
+        int y,
+        bool isHit,
+        string cardVariant
+    )
     {
+        var (attackerDisplayX, attackerDisplayY) = CoordinateTransform.UnrotateOpponentCoordinates(
+            x, y, GameState.boardWidth, GameState.boardHeight);
+            
         var attackerWriter = new NetDataWriter();
         attackerWriter.Put("CellReveal");
-        attackerWriter.Put(x);
-        attackerWriter.Put(y);
+        attackerWriter.Put(attackerDisplayX);
+        attackerWriter.Put(attackerDisplayY);
         attackerWriter.Put(isHit);
         attackerWriter.Put(false);
+        attackerWriter.Put(cardVariant);
         attacker.Send(attackerWriter, DeliveryMethod.ReliableOrdered);
 
         var defenderWriter = new NetDataWriter();
         defenderWriter.Put("CellReveal");
-        defenderWriter.Put(x);
-        defenderWriter.Put(y);
+        defenderWriter.Put(x); 
+        defenderWriter.Put(y); 
         defenderWriter.Put(isHit);
-        defenderWriter.Put(true);
+        defenderWriter.Put(true); // isDefender = true
+        defenderWriter.Put(cardVariant);
         defender.Send(defenderWriter, DeliveryMethod.ReliableOrdered);
 
         Console.WriteLine(
-            $"[Server] Cell reveal sent to both players: ({x},{y}) = {(isHit ? "hit" : "miss")}"
+            $"[Server] Cell reveal sent: attacker sees ({attackerDisplayX},{attackerDisplayY}), defender sees ({x},{y}) = {(isHit ? "hit" : "miss")}"
         );
     }
 }

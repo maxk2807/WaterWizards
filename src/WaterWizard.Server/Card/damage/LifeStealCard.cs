@@ -60,7 +60,7 @@ public class LifeStealCard : IDamageCard
         if (defenderIndex != -1 && gameState.IsCoordinateProtectedByShield(x, y, defenderIndex))
         {
             Console.WriteLine($"[Server] Lifesteal attack at ({x}, {y}) blocked by shield!");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "LifeSteal");
             return false;
         }
 
@@ -69,13 +69,14 @@ public class LifeStealCard : IDamageCard
 
         foreach (var ship in ships)
         {
-            if (x >= ship.X && x < ship.X + ship.Width &&
-                y >= ship.Y && y < ship.Y + ship.Height)
+            if (x >= ship.X && x < ship.X + ship.Width && y >= ship.Y && y < ship.Y + ship.Height)
             {
                 hit = true;
                 bool newDamage = ship.DamageCell(x, y);
 
-                Console.WriteLine($"[Server] Lifesteal hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}");
+                Console.WriteLine(
+                    $"[Server] Lifesteal hit ship at ({ship.X}, {ship.Y}), new damage: {newDamage}"
+                );
 
                 HandleLifesteal(gameState, attacker);
 
@@ -83,17 +84,20 @@ public class LifeStealCard : IDamageCard
                 {
                     if (ship.IsDestroyed)
                     {
-                        Console.WriteLine($"[Server] Lifesteal destroyed ship at ({ship.X}, {ship.Y})!");
+                        Console.WriteLine(
+                            $"[Server] Lifesteal destroyed ship at ({ship.X}, {ship.Y})!"
+                        );
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "LifeSteal");
                         ShipHandler.SendShipReveal(attacker, ship, gameState);
                     }
                     else
                     {
-                        CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                        CellHandler.SendCellReveal(attacker, defender, x, y, true, "LifeSteal");
                     }
                 }
                 else
                 {
-                    CellHandler.SendCellReveal(attacker, defender, x, y, true);
+                    CellHandler.SendCellReveal(attacker, defender, x, y, true, "LifeSteal");
                 }
                 break;
             }
@@ -102,7 +106,7 @@ public class LifeStealCard : IDamageCard
         if (!hit)
         {
             Console.WriteLine($"[Server] Lifesteal missed at ({x}, {y})");
-            CellHandler.SendCellReveal(attacker, defender, x, y, false);
+            CellHandler.SendCellReveal(attacker, defender, x, y, false, "LifeSteal");
         }
 
         return hit;
@@ -116,18 +120,20 @@ public class LifeStealCard : IDamageCard
     private void HandleLifesteal(GameState gameState, NetPeer attacker)
     {
         var attackerShips = ShipHandler.GetShips(attacker);
-        
+
         var damagedShips = attackerShips.Where(ship => ship.DamagedCells.Count > 0).ToList();
-        
+
         if (damagedShips.Count > 0)
         {
             var shipToHeal = damagedShips.First();
             var (healX, healY) = shipToHeal.DamagedCells.First();
-            
+
             shipToHeal.HealCell(healX, healY);
-            
-            Console.WriteLine($"[Server] Lifesteal healed ship at ({shipToHeal.X}, {shipToHeal.Y}) cell ({healX}, {healY})");
-            
+
+            Console.WriteLine(
+                $"[Server] Lifesteal healed ship at ({shipToHeal.X}, {shipToHeal.Y}) cell ({healX}, {healY})"
+            );
+
             ShipHandler.SendHealing(new Vector2(healX, healY), true, attacker);
         }
         else

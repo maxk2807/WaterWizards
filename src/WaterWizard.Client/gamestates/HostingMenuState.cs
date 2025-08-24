@@ -3,34 +3,60 @@
 // - jdewi001: 61 Zeilen
 // - Paul: 23 Zeilen
 // - maxk2807: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Raylib_cs;
 using System.Numerics;
+using Raylib_cs;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+
+/// <summary>
+/// Zustandsklasse für den Hosting-Bildschirm. Lädt das Menü-Hintergrundbild
+/// und rendert die Hosting-UI (öffentliche IP/Port, Verbindungsstatus,
+/// Zurück-Button) während der Host auf Spieler wartet.
+/// </summary>
 public class HostingMenuState : IGameState
 {
     private Texture2D menuBackground;
-    public void LoadAssets()
-{
-    if (menuBackground.Id != 0) return; // Falls bereits geladen, nichts tun
 
-    menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
-}
+    /// <summary>
+    /// Lädt einmalig die für den Hosting-Bildschirm benötigten Texturen
+    /// (Menü-Hintergrund). Führt bei bereits geladenen Assets keinen erneuten
+    /// Ladevorgang aus.
+    /// </summary>
+    public void LoadAssets()
+    {
+        if (menuBackground.Id != 0)
+            return; // Falls bereits geladen, nichts tun
+
+        menuBackground = TextureManager.LoadTexture(
+            "Background/WaterWizardsMenu1200x900.png"
+        );
+    }
+
+    /// <summary>
+    /// Aktualisiert und zeichnet den Hosting-Bildschirm für den aktuellen Frame,
+    /// indem die UI-Darstellung delegiert wird.
+    /// </summary>
+    /// <param name="manager">Zustands- und Bildschirmgrößen-Verwalter.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawHostMenu(manager);
     }
 
+    /// <summary>
+    /// Rendert den Hosting-Bildschirm: skaliertes Hintergrundbild, Timer,
+    /// öffentliche IP und Port, Verbindungsstatus sowie den „Back“-Button.
+    /// Behandelt außerdem die Eingabe für den Zurück-Navi­gationsbutton.
+    /// </summary>
+    /// <param name="manager">Zustands- und Bildschirmgrößen-Verwalter.</param>
     private void DrawHostMenu(GameStateManager manager)
     {
-
         LoadAssets();
 
         //Raylib.DrawTexture(menuBackground, 0, 0, Color.White);
@@ -43,7 +69,6 @@ public class HostingMenuState : IGameState
             0f,
             Color.White
         );
-
 
         manager.GetGameTimer().Draw(10, 10, 20, Color.Red);
         string publicIp = WaterWizard.Shared.NetworkUtils.GetPublicIPAddress();

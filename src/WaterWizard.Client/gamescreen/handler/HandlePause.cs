@@ -1,7 +1,7 @@
 // ===============================================
 // Autoren-Statistik (automatisch generiert):
 // - jdewi001: 25 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -26,8 +26,10 @@ namespace WaterWizard.Client.gamescreen.handler
             }
             else
             {
-                Console.WriteLine("[Client] Cannot send PauseToggle request, not connected to a server.");
+                Console.WriteLine(
+                    "[Client] Cannot send PauseToggle request, not connected to a server."
+                );
             }
         }
     }
-} 
+}

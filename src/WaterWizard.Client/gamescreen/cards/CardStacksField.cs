@@ -4,7 +4,7 @@
 // - justinjd00: 40 Zeilen
 // - jdewi001: 14 Zeilen
 // - erick: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -15,6 +15,11 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
+/// <summary>
+/// Stellt das Kartenfeld mit allen vier Kartenstapeln (Schaden, Umgebung,
+/// Utility und Heilung) dar. Zeichnet die Stapel, verwaltet ihre Positionen
+/// und ermöglicht das Kaufen von Karten durch Klicks.
+/// </summary>
 public class CardStacksField(GameScreen gameScreen)
 {
     private CardStack? damageStack;
@@ -23,12 +28,23 @@ public class CardStacksField(GameScreen gameScreen)
     private CardStack? healingStack;
 
     private int _x;
+    /// <summary>
+    /// Linke X-Koordinate des gesamten Kartenfeldes.
+    /// </summary>
     public int X => _x;
     private int _y;
+
+    /// <summary>
+    /// Obere Y-Koordinate des gesamten Kartenfeldes.
+    /// </summary>
     public int Y => _y;
     private int Width;
     private int Height;
 
+    /// <summary>
+    /// Initialisiert die vier Kartenstapel mit ihren Positionen im Spielfeld
+    /// und befüllt sie mit Standardkarten.
+    /// </summary>
     public void Initialize()
     {
         Width = gameScreen.cardWidth;
@@ -61,6 +77,10 @@ public class CardStacksField(GameScreen gameScreen)
         healingStack.InitHealing();
     }
 
+    /// <summary>
+    /// Zeichnet alle Kartenstapel auf den Bildschirm und behandelt gleichzeitig
+    /// die Interaktion für das Kaufen von Karten.
+    /// </summary>
     public void Draw()
     {
         // Raylib.DrawRectangleLinesEx(new(X,Y,Width,Height), 1, Color.Black);
@@ -73,6 +93,10 @@ public class CardStacksField(GameScreen gameScreen)
         HandleBuyingCardFromStack();
     }
 
+    /// <summary>
+    /// Prüft, ob ein Stapel angeklickt wurde und sendet in diesem Fall
+    /// eine Kaufanfrage an den <see cref="NetworkManager"/>.
+    /// </summary>
     private void HandleBuyingCardFromStack()
     {
         var mousePos = Raylib.GetMousePosition();

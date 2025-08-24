@@ -2,16 +2,22 @@
 // Autoren-Statistik (automatisch generiert):
 // - erick: 120 Zeilen
 // - Erickk0: 9 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
 using Raylib_cs;
-using WaterWizard.Client.network;
 using WaterWizard.Client.Assets.Sounds.Manager;
+using WaterWizard.Client.network;
+
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert den Game-Over-Zustand. Zeigt je nach Ergebnis (Sieg/Niederlage)
+/// einen animierten Titel, eine optionale Gewinnernachricht sowie Buttons zum
+/// erneuten Spielen oder Zurückkehren ins Hauptmenü.
+/// </summary>
 public class GameOverState(bool isWinner, string winnerMessage = "") : IGameState
 {
     private readonly string winnerMessage = winnerMessage;

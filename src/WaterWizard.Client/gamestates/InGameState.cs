@@ -3,7 +3,7 @@
 // - jdewi001: 36 Zeilen
 // - Erickk0: 32 Zeilen
 // - erick: 10 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -11,6 +11,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Raylib_cs;
+using WaterWizard.Client.Assets.Sounds.Manager;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
@@ -26,6 +27,7 @@ public class InGameState : IGameState
     /// <param name="manager">GameStateManager mit Zugriff auf Komponenten und Status</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
+        Raylib.UpdateMusicStream(SoundManager.PauseSound);
         if (Raylib.IsKeyPressed(KeyboardKey.S))
         {
             HandleSurrender();
@@ -48,9 +50,19 @@ public class InGameState : IGameState
                 40,
                 Color.Yellow
             );
+            // PauseMusic als Loop abspielen
+            if (!Raylib.IsMusicStreamPlaying(SoundManager.PauseSound))
+            {
+                Raylib.PlayMusicStream(SoundManager.PauseSound);
+            }
         }
         else
         {
+            // Falls PauseMusic läuft, stoppen
+            if (Raylib.IsMusicStreamPlaying(SoundManager.PauseSound))
+            {
+                Raylib.StopMusicStream(SoundManager.PauseSound);
+            }
             DrawGameScreen(manager);
 
             string surrenderHint = "Press 'S' to Surrender";
@@ -60,10 +72,15 @@ public class InGameState : IGameState
                 manager.screenWidth - hintWidth - 10,
                 10,
                 12,
-                Color.Gray);
+                Color.Gray
+            );
         }
     }
 
+    /// <summary>
+    /// Sendet eine Kapitulationsnachricht („Surrender“) zuverlässig an den Server,
+    /// sofern eine Clientverbindung besteht; andernfalls wird ein Hinweis im Log ausgegeben.
+    /// </summary>
     private static void HandleSurrender()
     {
         var client = NetworkManager.Instance.clientService.client;

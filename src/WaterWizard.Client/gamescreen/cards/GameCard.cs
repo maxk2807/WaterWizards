@@ -3,7 +3,7 @@
 // - maxk2807: 122 Zeilen
 // - jdewi001: 34 Zeilen
 // - justinjd00: 2 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -14,18 +14,43 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
+/// <summary>
+/// Repräsentiert eine einzelne Spielkarte im GameScreen.
+/// Kümmert sich um das Rendern der Vorder- und Rückseite sowie um die Darstellung von Icons,
+/// Kosten (Mana/Gold) und Zielinformationen.
+/// </summary>
 public class GameCard(GameScreen gameScreen, Cards card)
 {
+    /// <summary>
+    /// Die zugrundeliegenden Kartendaten (Typ, Kosten, Ziel usw.).
+    /// </summary>
     public Cards card = card;
 
+    /// <summary>
+    /// Breite der Karte in Pixeln (abhängig von GameScreen).
+    /// </summary>
     private int Width => gameScreen.cardWidth;
+   
+   /// <summary>
+    /// Höhe der Karte in Pixeln (abhängig von GameScreen).
+    /// </summary>
     private int Height => gameScreen.cardHeight;
 
-    private static Texture2D cardTemplateAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/CardTemplate.png");
-    private static Texture2D allyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/ally.png");
-    private static Texture2D enemyIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/enemy.png");
-    private static Texture2D manaIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/mana.png");
-    private static Texture2D goldIconAsset = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Cards/Icons/gold.png");
+    private static Texture2D cardTemplateAsset = TextureManager.LoadTexture(
+        "Cards/CardTemplate.png"
+    );
+    private static Texture2D allyIconAsset = TextureManager.LoadTexture(
+        "Cards/Icons/ally.png"
+    );
+    private static Texture2D enemyIconAsset = TextureManager.LoadTexture(
+        "Cards/Icons/enemy.png"
+    );
+    private static Texture2D manaIconAsset = TextureManager.LoadTexture(
+        "Cards/Icons/mana.png"
+    );
+    private static Texture2D goldIconAsset = TextureManager.LoadTexture(
+        "Cards/Icons/gold.png"
+    );
 
     /// <summary>
     /// Draw the individual Card at the given coordinates.
@@ -40,7 +65,12 @@ public class GameCard(GameScreen gameScreen, Cards card)
         Rectangle card = new(x, y, Width, Height);
         if (front)
         {
-            Rectangle cardTemplateRec = new(0, 0, cardTemplateAsset.Width, cardTemplateAsset.Height);
+            Rectangle cardTemplateRec = new(
+                0,
+                0,
+                cardTemplateAsset.Width,
+                cardTemplateAsset.Height
+            );
             Raylib.DrawTexturePro(
                 cardTemplateAsset,
                 cardTemplateRec,
@@ -64,7 +94,8 @@ public class GameCard(GameScreen gameScreen, Cards card)
 
             fontSize = 15;
 
-            string targetText = $"{(this.card.Target!.Ally ? "ally " : "")}{this.card.Target.Target}";
+            string targetText =
+                $"{(this.card.Target!.Ally ? "ally " : "")}{this.card.Target.Target}";
             int targetTextWidth = Raylib.MeasureText(targetText, fontSize);
             Raylib.DrawText(
                 targetText,
@@ -180,6 +211,10 @@ public class GameCard(GameScreen gameScreen, Cards card)
         }
     }
 
+    /// <summary>
+    /// Liefert die Hintergrundfarbe für die Karte abhängig vom Kartentyp.
+    /// Dabei wird unterschieden zwischen Vorderseite (helle Farben) und Rückseite (Standardfarben).
+    /// </summary>
     private Color GetColorFromCardType(bool front)
     {
         return front

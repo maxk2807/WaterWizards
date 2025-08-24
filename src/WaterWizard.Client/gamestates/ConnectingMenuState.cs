@@ -4,32 +4,51 @@
 // - Erickk0: 29 Zeilen
 // - Paul: 21 Zeilen
 // - maxk2807: 1 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
-using Raylib_cs;
 using System.Numerics;
+using Raylib_cs;
 using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert den Verbindungsmenü-Zustand, in dem der Spieler IP-Adresse und Port eingeben
+/// und eine Verbindung zu einem Server herstellen kann.
+/// </summary>
 public class ConnectingMenuState : IGameState
 {
     private Texture2D menuBackground;
 
+    /// <summary>
+    /// Lädt die Hintergrund-Assets für das Verbindungsmenü,
+    /// falls diese noch nicht geladen wurden.
+    /// </summary>
     private void LoadAssets()
     {
-        if (menuBackground.Id != 0) return;
-        menuBackground = TextureManager.LoadTexture("src/WaterWizard.Client/Assets/Background/WaterWizardsMenu1200x900.png");
+        if (menuBackground.Id != 0)
+            return;
+        menuBackground = TextureManager.LoadTexture(
+            "Background/WaterWizardsMenu1200x900.png"
+        );
     }
 
+    /// <summary>
+    /// Aktualisiert den Zustand des Menüs und zeichnet die Inhalte des Verbindungsmenüs.
+    /// </summary>
+    /// <param name="manager">Der GameStateManager, der den aktuellen Spielzustand verwaltet.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawConnectMenu(manager);
     }
 
+    /// <summary>
+    /// Zeichnet das Verbindungsmenü, inklusive IP-/Port-Eingabe, Connect- und Back-Button.
+    /// </summary>
+    /// <param name="manager">Der GameStateManager, der den aktuellen Spielzustand verwaltet.</param>
     private void DrawConnectMenu(GameStateManager manager)
     {
         LoadAssets();
@@ -42,7 +61,6 @@ public class ConnectingMenuState : IGameState
             0f,
             Color.White
         );
-
 
         Raylib.DrawText(
             "Enter IP Address:",

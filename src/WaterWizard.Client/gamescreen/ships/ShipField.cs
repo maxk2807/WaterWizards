@@ -2,16 +2,20 @@
 // Autoren-Statistik (automatisch generiert):
 // - maxk2807: 61 Zeilen
 // - jdewi001: 4 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
 
 namespace WaterWizard.Client.gamescreen.ships;
 
+/// <summary>
+/// Repräsentiert das Schiffs-Auswahlfeld neben dem Spielfeld.
+/// Initialisiert und rendert die verfügbaren, ziehbaren Schiffe für die Platzierungsphase.
+/// </summary>
 public class ShipField(GameScreen gameScreen)
 {
-    public Dictionary<DraggingShip, int> Ships = [];
+    public Dictionary<DraggableShip, int> Ships = [];
 
     private int X;
     private int Y;
@@ -20,6 +24,10 @@ public class ShipField(GameScreen gameScreen)
     private int CellSize => gameScreen.playerBoard!.CellSize;
     private int ZonePadding => (int)gameScreen.ZonePadding;
 
+    /// <summary>
+    /// Initialisiert das Schiffs-Auswahlfeld und erzeugt die ziehbaren Schiffe
+    /// mit Positionen, Größen und Startanzahlen.
+    /// </summary>
     public void Initialize()
     {
         Width = gameScreen.playerBoard!.CellSize * 3 + ZonePadding * 2;
@@ -31,7 +39,7 @@ public class ShipField(GameScreen gameScreen)
         int shipY = Y + ZonePadding / 4;
         int width = CellSize;
         int height = CellSize * 5;
-        DraggingShip ship = new(gameScreen, shipX, shipY, width, height, 1);
+        DraggableShip ship = new(gameScreen, shipX, shipY, width, height, 1);
         Ships.Add(ship, 1);
 
         shipX = X + ZonePadding / 2 + CellSize;
@@ -64,6 +72,9 @@ public class ShipField(GameScreen gameScreen)
         Console.WriteLine(Ships.Count);
     }
 
+    /// <summary>
+    /// Zeichnet alle im Auswahlfeld verfügbaren, ziehbaren Schiffe.
+    /// </summary>
     public void Draw()
     {
         foreach (var pair in Ships)

@@ -3,7 +3,7 @@
 // - justinjd00: 26 Zeilen
 // - jlnhsrm: 7 Zeilen
 // - jdewi001: 4 Zeilen
-// 
+//
 // Methoden/Funktionen in dieser Datei (Hauptautor):
 // (Keine Methoden/Funktionen gefunden)
 // ===============================================
@@ -20,12 +20,10 @@ public class CardStats
     /// </summary>
     public int Mana { get; set; }
 
-
     /// <summary>
     /// Gibt die Menge an Gold an, die benötigt wird, um die Karte zu wirken.
     /// </summary>
     public int Gold { get; set; }
-
 
     /// <summary>
     /// Gibt an, wie lange es dauert, bis der Effekt der Karte ausgelöst wird.
