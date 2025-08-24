@@ -14,10 +14,21 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+
+/// <summary>
+/// Zustandsklasse für den Hosting-Bildschirm. Lädt das Menü-Hintergrundbild
+/// und rendert die Hosting-UI (öffentliche IP/Port, Verbindungsstatus,
+/// Zurück-Button) während der Host auf Spieler wartet.
+/// </summary>
 public class HostingMenuState : IGameState
 {
     private Texture2D menuBackground;
 
+    /// <summary>
+    /// Lädt einmalig die für den Hosting-Bildschirm benötigten Texturen
+    /// (Menü-Hintergrund). Führt bei bereits geladenen Assets keinen erneuten
+    /// Ladevorgang aus.
+    /// </summary>
     public void LoadAssets()
     {
         if (menuBackground.Id != 0)
@@ -28,11 +39,22 @@ public class HostingMenuState : IGameState
         );
     }
 
+    /// <summary>
+    /// Aktualisiert und zeichnet den Hosting-Bildschirm für den aktuellen Frame,
+    /// indem die UI-Darstellung delegiert wird.
+    /// </summary>
+    /// <param name="manager">Zustands- und Bildschirmgrößen-Verwalter.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawHostMenu(manager);
     }
 
+    /// <summary>
+    /// Rendert den Hosting-Bildschirm: skaliertes Hintergrundbild, Timer,
+    /// öffentliche IP und Port, Verbindungsstatus sowie den „Back“-Button.
+    /// Behandelt außerdem die Eingabe für den Zurück-Navi­gationsbutton.
+    /// </summary>
+    /// <param name="manager">Zustands- und Bildschirmgrößen-Verwalter.</param>
     private void DrawHostMenu(GameStateManager manager)
     {
         LoadAssets();
