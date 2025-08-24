@@ -16,8 +16,16 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Zustand vor Spielbeginn: Zeigt Lobby-Infos, Chat, Bereitschaftsstatus
+/// und Host-/Client-Aktionen (Starten bzw. Ready umschalten) an.
+/// </summary>
 public class PreStartLobbyState : IGameState
 {
+    /// <summary>
+    /// Aktualisiert den Zustand und rendert die Pre-Start-Lobby.
+    /// </summary>
+    /// <param name="manager">Verwalter für Spielzustände sowie Bildschirmabmessungen.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawPreStartLobby(manager);
@@ -30,6 +38,11 @@ public class PreStartLobbyState : IGameState
         "Background/TitleMenuBackground.png"
     );
 
+    /// <summary>
+    /// Zeichnet Hintergrund, Chat, Spielerliste mit Ready-Status,
+    /// Countdown sowie Aktionsbuttons (Start/Ready/Disconnect) der Lobby.
+    /// </summary>
+    /// <param name="manager">Aktueller GameStateManager.</param>
     private void DrawPreStartLobby(GameStateManager manager)
     {
         Raylib.DrawTexturePro(
@@ -184,6 +197,11 @@ public class PreStartLobbyState : IGameState
 
     // Called when the client joins a server and receives the EnterLobby message
     // This ensures we always switch to the PreStartLobbyState after joining
+
+    /// <summary>
+    /// Wechselt programmgesteuert in den Pre-Start-Lobby-Zustand
+    /// (nach erfolgreichem Beitritt zur Sitzung).
+    /// </summary>
     public static void SwitchToPreStartLobby()
     {
         GameStateManager.Instance.SetStateToLobby();
