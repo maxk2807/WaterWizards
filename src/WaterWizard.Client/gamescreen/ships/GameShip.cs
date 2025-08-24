@@ -16,6 +16,10 @@ using WaterWizard.Client.gamescreen.handler;
 
 namespace WaterWizard.Client.gamescreen.ships;
 
+/// <summary>
+/// Represents a ship on the game board. Tracks its position, size, type, damage state,
+/// and rendering properties such as rotation, visibility, and transparency.
+/// </summary>
 public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int width, int height)
 {
     private readonly GameScreen gameScreen = gameScreen;
@@ -36,6 +40,11 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
     public bool IsRevealed { get; set; } = false;
     public float Transparency { get; set; } = 1.0f;
 
+    /// <summary>
+    /// Marks a specific cell of the ship as damaged.
+    /// </summary>
+    /// <param name="cellX">The X coordinate of the cell relative to the ship</param>
+    /// <param name="cellY">The Y coordinate of the cell relative to the ship</param>
     public void AddDamage(int cellX, int cellY)
     {
         DamagedCells.Add((cellX, cellY));
