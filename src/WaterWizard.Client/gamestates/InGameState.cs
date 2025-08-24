@@ -77,6 +77,10 @@ public class InGameState : IGameState
         }
     }
 
+    /// <summary>
+    /// Sendet eine Kapitulationsnachricht („Surrender“) zuverlässig an den Server,
+    /// sofern eine Clientverbindung besteht; andernfalls wird ein Hinweis im Log ausgegeben.
+    /// </summary>
     private static void HandleSurrender()
     {
         var client = NetworkManager.Instance.clientService.client;
