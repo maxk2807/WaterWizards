@@ -70,6 +70,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         shieldTimer.Start();
     }
 
+    /// <summary>
+    /// Aktualisiert die Manawerte der Spieler in festen Intervallen,
+    /// sofern das Spiel nicht pausiert ist.
+    /// </summary>
     private void UpdateMana()
     {
         if (gameState.IsPaused)
@@ -77,6 +81,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         manaHandler?.UpdateMana();
     }
 
+    /// <summary>
+    /// Aktualisiert die Goldwerte der Spieler in festen Intervallen,
+    /// sofern das Spiel nicht pausiert ist.
+    /// </summary>
     private void UpdateGold()
     {
         if (gameState.IsPaused)
@@ -84,6 +92,10 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         goldHandler?.UpdateGold();
     }
 
+    /// <summary>
+    /// Aktualisiert die verbleibende Dauer aktiver Schilde (in Sekunden)
+    /// in kurzen Intervallen, solange das Spiel nicht pausiert ist.
+    /// </summary>
     private void UpdateShields()
     {
         if (gameState.IsPaused)
@@ -107,6 +119,16 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         shieldTimer?.Dispose();
     }
 
+    /// <summary>
+    /// Verarbeitet eingehende Netzwerk-Nachrichten im In-Game-Status
+    /// (z. B. Schiff platzieren, Karte kaufen/ausspielen, Angriff, Pause, Aufgabe)
+    /// und delegiert an die entsprechenden Handler.
+    /// </summary>
+    /// <param name="peer">Der sendende Client.</param>
+    /// <param name="reader">Reader für die Nutzlast der Nachricht.</param>
+    /// <param name="serverInstance">Serverinstanz zum Antworten/Broadcasten.</param>
+    /// <param name="manager">State-Manager des Servers.</param>
+    /// <param name="messageType">Typ der empfangenen Nachricht.</param>
     public void HandleNetworkEvent(
         NetPeer peer,
         NetPacketReader reader,
@@ -164,9 +186,9 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
                 {
                     var (transformedX, transformedY) = CoordinateTransform.RotateOpponentCoordinates(
                         x, y, GameState.boardWidth, GameState.boardHeight);
-                        
+
                     Console.WriteLine($"[Server] Transformed attack coordinates: ({x}, {y}) -> ({transformedX}, {transformedY})");
-                    
+
                     AttackHandler.Initialize(gameState);
                     AttackHandler.HandleAttack(peer, defender, transformedX, transformedY);
                 }
@@ -185,6 +207,11 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         }
     }
 
+    /// <summary>
+    /// Schaltet den Pausenstatus des Spiels um und broadcastet den neuen Status
+    /// an alle verbundenen Clients.
+    /// </summary>
+    /// <param name="serverInstance">Serverinstanz zum Versenden der Updates.</param>
     private void HandlePauseToggle(NetManager serverInstance)
     {
         gameState.IsPaused = !gameState.IsPaused;
@@ -220,6 +247,12 @@ public class InGameState(NetManager server, GameState gameState) : IServerGameSt
         }
     }
 
+    /// <summary>
+    /// Ermittelt den Gegenspieler des angegebenen Clients basierend auf der
+    /// aktuellen Verbindungsliste.
+    /// </summary>
+    /// <param name="attacker">Der Referenz-Client.</param>
+    /// <returns>Den gefundenen Gegenspieler oder <c>null</c>, falls keiner existiert.</returns>
     public NetPeer? FindOpponent(NetPeer attacker)
     {
         foreach (var peer in server.ConnectedPeerList)
