@@ -23,7 +23,9 @@ public class HealingCardFactory
         return variant switch
         {
             CardVariant.Heal => new HealCard(),
+            CardVariant.MassMending => new MassMendingCard(),
             CardVariant.PerfectMending => new PerfectMendingCard(),
+
             _ => null,
         };
     }

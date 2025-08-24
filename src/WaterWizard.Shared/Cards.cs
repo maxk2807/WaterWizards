@@ -90,6 +90,7 @@ public class Cards
         // Healing Variants
         { CardVariant.Heal, CardType.Healing },
         { CardVariant.PerfectMending, CardType.Healing },
+        { CardVariant.MassMending, CardType.Healing },
     };
 
     private static readonly Dictionary<CardVariant, CardStats> cardStatsMapping = new Dictionary<
@@ -286,6 +287,17 @@ public class Cards
                 CastTime = "instant",
                 Duration = "instant",
                 Target = new(true, "ship"),
+            }
+        },
+        {
+            CardVariant.MassMending,
+            new CardStats
+            {
+                Mana = 6,
+                Gold = 2,
+                CastTime = "2",
+                Duration = "instant",
+                Target = new("battlefield"),
             }
         },
         {
