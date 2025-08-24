@@ -19,6 +19,14 @@ using static WaterWizard.Client.gamescreen.GameBoard;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
+/// <summary>
+/// Verwaltet die Benutzeroberfläche zum Wirken von Karten ("Casting UI").
+/// Kümmert sich um Zielauswahl (Zellen, Schiffe, Schlachtfeld), 
+/// Spezialfälle wie Teleport und SummonShip und kommuniziert 
+/// anschließend die Auswahl an den <see cref="NetworkManager"/>.
+/// 
+/// Implementiert als Singleton über <see cref="Instance"/>.
+/// </summary>
 public class CastingUI
 {
     public static CastingUI Instance => instance ??= new();
@@ -27,7 +35,14 @@ public class CastingUI
     private GameScreen GameScreen => GameStateManager.Instance.GameScreen;
     private int CellSize => GameScreen.playerBoard!.CellSize;
 
+    /// <summary>
+    /// Gibt an, ob sich die UI gerade im "Zielen"-Modus für eine Karte befindet.
+    /// </summary>
     private bool aiming = false;
+
+    /// <summary>
+    /// Die Karte, die aktuell gezielt/gewirkt werden soll.
+    /// </summary>
     private GameCard? cardToAim;
 
     /// <summary>
@@ -36,12 +51,26 @@ public class CastingUI
     /// </summary>
     private bool firstUpBattleField;
 
+    /// <summary>
+    /// True, wenn sich die Teleport-Zauber-Auswahl gerade in Phase 2 (Zielauswahl) befindet.
+    /// </summary>
     private bool isTeleportSelectionPhase = false;
+
+    /// <summary>
+    /// Index des aktuell gewählten Schiffs für Teleport-Zauber.
+    /// </summary>
     private int selectedShipIndex = -1;
+
+    /// <summary>
+    /// Spielfeld-Koordinaten des aktuell ausgewählten Schiffs (Teleport).
+    /// </summary>
     private Vector2 selectedShipCoords = new();
 
     public GameHand? PlayerHand { get; private set; }
 
+    /// <summary>
+    /// Zeichnet die Casting-UI (falls gerade gezielt wird).
+    /// </summary>
     public void Draw()
     {
         if (aiming)
@@ -174,6 +203,9 @@ public class CastingUI
         }
     }
 
+    /// <summary>
+    /// Prüft, ob eine Karte auf ein Schiff zielt.
+    /// </summary>
     private static bool IsTargetShip(GameCard gameCard)
     {
         return gameCard.card.Target!.Target.Contains("ship");
