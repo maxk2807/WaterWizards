@@ -70,6 +70,9 @@ public class HostService(NetworkManager manager)
         }
     }
 
+    /// <summary>
+    /// Registriert alle relevanten Event-Handler für den Server (Verbindungen, Nachrichten, Disconnects).
+    /// </summary>
     private void SetupServerEventHandlers()
     {
         if (serverListener == null)
@@ -119,6 +122,12 @@ public class HostService(NetworkManager manager)
         serverListener.NetworkReceiveEvent += HandleServerReceiveEvent;
     }
 
+    /// <summary>
+    /// Verarbeitet unverbundene Nachrichten (z. B. Lobby-Suchanfragen) von Clients.
+    /// </summary>
+    /// <param name="remoteEndPoint">Der Absender-Endpunkt.</param>
+    /// <param name="reader">Reader für die empfangene Nachricht.</param>
+    /// <param name="msgType">Typ der unverbundenen Nachricht.</param>
     private void HandleUnconnectedMessage(
         IPEndPoint remoteEndPoint,
         NetPacketReader reader,
@@ -166,6 +175,14 @@ public class HostService(NetworkManager manager)
         return server != null && server.IsRunning;
     }
 
+    /// <summary>
+    /// Zentraler Empfangs-Handler für verbundene Clients.
+    /// Leitet Nachrichten anhand ihres Typs an die zuständigen Handler weiter.
+    /// </summary>
+    /// <param name="peer">Der sendende Client-Peer.</param>
+    /// <param name="reader">Reader für die empfangenen Daten.</param>
+    /// <param name="channelNumber">Genutzter Übertragungskanal.</param>
+    /// <param name="deliveryMethod">Zustellmethode (z. B. ReliableOrdered).</param>
     private void HandleServerReceiveEvent(
         NetPeer peer,
         NetPacketReader reader,
@@ -216,6 +233,11 @@ public class HostService(NetworkManager manager)
         }
     }
 
+    /// <summary>
+    /// Verarbeitet den Ready- oder Not-Ready-Status eines Spielers.
+    /// </summary>
+    /// <param name="peer">Peer des Spielers.</param>
+    /// <param name="isReady">True, wenn der Spieler bereit ist, sonst False.</param>
     private void HandlePlayerReadyStatus(NetPeer peer, bool isReady)
     {
         var player = ConnectedPlayers.FirstOrDefault(p => p.Address == peer.ToString());
@@ -233,6 +255,9 @@ public class HostService(NetworkManager manager)
         }
     }
 
+    /// <summary>
+    /// Aktualisiert die Spielerliste und sendet sie an alle verbundenen Clients.
+    /// </summary>
     private void UpdatePlayerList()
     {
         if (server == null)
@@ -260,6 +285,10 @@ public class HostService(NetworkManager manager)
         Console.WriteLine($"[Host] Spielerliste mit {ConnectedPlayers.Count} Spielern gesendet.");
     }
 
+    /// <summary>
+    /// Sendet eine Systemnachricht an alle verbundenen Clients und schreibt sie ins ChatLog.
+    /// </summary>
+    /// <param name="message">Die Systemnachricht.</param>
     private void BroadcastSystemMessage(string message)
     {
         if (server == null)
@@ -271,6 +300,11 @@ public class HostService(NetworkManager manager)
         GameStateManager.Instance.ChatLog.AddMessage($"[System] {message}");
     }
 
+    /// <summary>
+    /// Sendet eine Chatnachricht eines Spielers an alle verbundenen Clients und schreibt sie ins ChatLog.
+    /// </summary>
+    /// <param name="senderName">Name des Senders.</param>
+    /// <param name="message">Die Chatnachricht.</param>
     private void BroadcastChatMessage(string senderName, string message)
     {
         if (server == null)
