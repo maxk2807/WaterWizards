@@ -100,7 +100,7 @@ public class HandleShips
         // Determine ship type - largest ship is merchant
         int size = Math.Max(width, height);
         ShipType shipType = size == 5 ? ShipType.Merchant : ShipType.DEFAULT;
-        
+
         playerBoard.putShip(
             new GameShip(
                 GameStateManager.Instance.GameScreen,
@@ -179,7 +179,7 @@ public class HandleShips
         Console.WriteLine($"[Client] Ship revealed at ({x},{y}) size {width}x{height} with {damageCount} damage cells");
 
         var opponentBoard = gameScreen.opponentBoard;
-        var shipToRemove = opponentBoard.Ships.FirstOrDefault(ship => 
+        var shipToRemove = opponentBoard.Ships.FirstOrDefault(ship =>
             ship.X == (int)opponentBoard.Position.X + x * opponentBoard.CellSize &&
             ship.Y == (int)opponentBoard.Position.Y + y * opponentBoard.CellSize);
 
@@ -194,7 +194,7 @@ public class HandleShips
                     opponentBoard.MarkCellAsHit(cellX, cellY, true);
                 }
             }
-            
+
             opponentBoard.Ships.Remove(shipToRemove);
             Console.WriteLine($"[Client] Destroyed ship removed from opponent board");
         }
@@ -328,7 +328,17 @@ public class HandleShips
         {
             int X = reader.GetInt();
             int Y = reader.GetInt();
-            GameStateManager.Instance.GameScreen.playerBoard!.SetCellState(X, Y, CellState.Ship);
+            var board = GameStateManager.Instance.GameScreen.playerBoard!;
+            board.SetCellState(X, Y, CellState.Ship);
+            var ship = board.Ships.Find(ship =>
+            {
+                var shipX = (ship.X - (int)board.Position.X) / board.CellSize;
+                var shipY = (ship.Y - (int)board.Position.Y) / board.CellSize;
+                var findDamage = Raylib.CheckCollisionPointRec(new(X, Y), new(shipX, shipY, ship.Width / board.CellSize, ship.Height / board.CellSize));
+                if (findDamage)
+                    ship.HealDamage(X, Y);
+                return findDamage;
+            });
             Console.WriteLine($"[Client] Healed At ({X},{Y})");
         }
         Console.WriteLine($"[Client] Could not Heal, Possible mismatch between Client and Server");
@@ -347,11 +357,11 @@ public class HandleShips
 
             var gridX = (ship.X - oldBoardPosition.X) / oldCellSize;
             var gridY = (ship.Y - oldBoardPosition.Y) / oldCellSize;
-            
+
 
             ship.X = (int)(board.Position.X + gridX * board.CellSize);
             ship.Y = (int)(board.Position.Y + gridY * board.CellSize);
-            
+
 
             var gridWidth = ship.Width / (int)oldCellSize;
             var gridHeight = ship.Height / (int)oldCellSize;

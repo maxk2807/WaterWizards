@@ -96,4 +96,21 @@ public class GameShip(GameScreen gameScreen, int x, int y, ShipType type, int wi
             }
         }
     }
+
+    
+    /// <summary>
+    /// Heals the Damage on a ship on the specified Cell Coordinates (eg: (3,7), (9,3) etc.) 
+    /// </summary>
+    /// <param name="X">X Coordinate in Cell Coordinates</param>
+    /// <param name="Y">Y Coordinate in Cell Coordinates</param>
+    /// <returns>Whether the Healing was successful</returns>
+    internal bool HealDamage(int X, int Y)
+    {
+        var board = GameStateManager.Instance.GameScreen.playerBoard!;
+        int shipX = (this.X - (int)board.Position.X) / CellSize;
+        int shipY = (this.Y - (int)board.Position.Y) / CellSize;
+        int damageX = X - shipX;
+        int damageY = Y - shipY;
+        return DamagedCells.Remove((damageX, damageY));
+    }
 }
