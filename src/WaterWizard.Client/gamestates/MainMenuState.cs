@@ -77,6 +77,11 @@ public class MainMenuState : IGameState
         DrawMainMenu(manager);
     }
 
+    /// <summary>
+    /// Zeichnet das Hauptmenü mit Hintergrund, Titelgrafik und ruft die Methoden
+    /// zum Rendern und Behandeln der Buttons (Join, Host, Map) auf.
+    /// </summary>
+    /// <param name="manager">Verwalter für Bildschirmmaße und Zustandswechsel.</param>
     private void DrawMainMenu(GameStateManager manager)
     {
         //Raylib.DrawTexture(menuBackground, 0, 0, Color.White); //Zeichnen des Hintergrundbildes
@@ -118,6 +123,12 @@ public class MainMenuState : IGameState
     }
 
     // Update these methods to use instance variables instead of static
+
+    /// <summary>
+    /// Zeichnet den Button für den Map-Test und verarbeitet Klicks,
+    /// die den Zustand in die Platzierungsphase wechseln.
+    /// </summary>
+    /// <param name="manager">Verwalter für Zustandswechsel.</param>
     private void HandleMapButton(GameStateManager manager)
     {
         Rectangle mapButton = new(
@@ -137,6 +148,11 @@ public class MainMenuState : IGameState
         Raylib.DrawRectangleRec(mapButton, hoverMap ? new(255, 255, 255, 31) : Color.Blank);
     }
 
+    /// <summary>
+    /// Zeichnet den Button zum Erstellen einer Lobby und verarbeitet Klicks,
+    /// die den Zustand ins Hosting-Menü wechseln.
+    /// </summary>
+    /// <param name="manager">Verwalter für Zustandswechsel.</param>
     private void HandleHostButton(GameStateManager manager)
     {
         Rectangle hostButton = new(
@@ -163,6 +179,11 @@ public class MainMenuState : IGameState
         Raylib.DrawRectangleRec(hostButton, hoverHost ? new(255, 255, 255, 31) : Color.Blank);
     }
 
+    /// <summary>
+    /// Zeichnet den Button zum Beitreten einer Lobby und verarbeitet Klicks,
+    /// die den Zustand zur Lobby-Liste wechseln.
+    /// </summary>
+    /// <param name="manager">Verwalter für Zustandswechsel.</param>
     private void HandleJoinButton(GameStateManager manager)
     {
         Rectangle joinButton = new(
