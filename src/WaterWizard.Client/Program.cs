@@ -15,8 +15,23 @@ using Raylib_cs;
 using WaterWizard.Client;
 using WaterWizard.Client.Assets.Sounds.Manager;
 
+/// <summary>
+/// Einstiegspunkt-Anwendungsklasse für Water Wizard.
+/// Verwaltet das Starten und Beenden des Programms sowie die
+/// Initialisierung und Freigabe globaler Ressourcen (Audio, Texturen).
+/// </summary>
 class Program
 {
+    
+    /// <summary>
+    /// Startet das Spiel: Initialisiert Audio und Fenster, lädt Sounds,
+    /// erstellt den <see cref="GameStateManager"/>, behandelt Fenstergröße
+    /// und Vollbild-Toggle (F11/F) und führt den Hauptspiel-Loop mit fixer
+    /// Ziel-Framerate (≈60 FPS) aus. Bei Größenänderungen wird die UI via
+    /// <c>GameStateManager.Instance.UpdateScreenSize</c> angepasst.
+    /// Fehler werden abgefangen und protokolliert; in jedem Fall werden am Ende
+    /// alle Ressourcen (Texturen, Sounds, AudioDevice) ordnungsgemäß freigegeben.
+    /// </summary>
     static void Main()
     {
         try
@@ -49,7 +64,8 @@ class Program
                 double elapsedTime = currentTime - lastTime;
                 timeAccumulator += elapsedTime;
 
-                if(timeAccumulator >= frameTime){
+                if (timeAccumulator >= frameTime)
+                {
                     timeAccumulator -= frameTime;
 
                     if (Raylib.IsWindowResized())

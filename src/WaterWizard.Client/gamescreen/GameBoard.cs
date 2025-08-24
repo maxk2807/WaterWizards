@@ -167,6 +167,9 @@ public class GameBoard
         }
     }
 
+    /// <summary>
+    /// Fügt ein Schiff dem Board hinzu und setzt die zugehörigen Zellzustände auf <c>Ship</c>.
+    /// </summary>
     public void putShip(GameShip ship)
     {
         Ships.Add(ship);
@@ -267,6 +270,9 @@ public class GameBoard
         return new Point(gridX, gridY);
     }
 
+    /// <summary>
+    /// Prüft, ob eine Bildschirmkoordinate außerhalb des Boards liegt.
+    /// </summary>
     public bool IsPointOutside(Vector2 screenPos)
     {
         return screenPos.X < Position.X
@@ -414,6 +420,9 @@ public class GameBoard
         };
     }
 
+    /// <summary>
+    /// Zeichnet die Zielanzeige für das Wirken einer Karte auf dem Board (Ausrichten, Rahmen, Hinweise).
+    /// </summary>
     public void DrawCastAim(GameCard gameCard)
     {
         var mousePos = Raylib.GetMousePosition();
@@ -488,6 +497,9 @@ public class GameBoard
         }
     }
 
+    /// <summary>
+    /// Aktiviert die Zielanzeige für die angegebene Karte.
+    /// </summary>
     public void StartDrawingCardAim(GameCard gameCard)
     {
         aiming = true;
@@ -501,6 +513,9 @@ public class GameBoard
     /// <param name="Y">Y-Coordinate</param>
     public readonly record struct Point(int X, int Y);
 
+    /// <summary>
+    /// Setzt den Zustand einer Rasterzelle, sofern die Koordinaten gültig sind.
+    /// </summary>
     public void SetCellState(int x, int y, CellState state)
     {
         if (x >= 0 && x < GridWidth && y >= 0 && y < GridHeight)
@@ -605,6 +620,9 @@ public class GameBoard
         }
     }
 
+    /// <summary>
+    /// Fügt einen visuellen Blitzeffekt an den angegebenen Zellkoordinaten hinzu und aktualisiert den Zellzustand (Hit/Miss).
+    /// </summary>
     public void AddThunderStrike(int x, int y, bool hit = false)
     {
         Vector2 position = new(
@@ -620,6 +638,9 @@ public class GameBoard
         SetCellState(x, y, hit ? CellState.Hit : CellState.Miss);
     }
 
+    /// <summary>
+    /// Entfernt alle aktiven Blitzeffekte und setzt betroffene Zellen von <c>Thunder</c> auf <c>Unknown</c> zurück.
+    /// </summary>
     public void ResetThunderFields()
     {
         for (int x = 0; x < GridWidth; x++)
@@ -843,13 +864,16 @@ public class GameBoard
         Console.WriteLine("[GameBoard] All shield effects cleared");
     }
 
+    /// <summary>
+    /// Hebt einen rechteckigen Bereich für den Hovering-Eye-Effekt hervor (nur Darstellung, kein Zustand).
+    /// </summary>
     public void AddHoveringEyeHighlight(int startX, int startY, int width, int height)
     {
         int cellX = (int)Position.X + startX * CellSize;
         int cellY = (int)Position.Y + startY * CellSize;
         int rectWidth = width * CellSize;
         int rectHeight = height * CellSize;
-        
+
         Raylib.DrawRectangleLines(cellX - 2, cellY - 2, rectWidth + 4, rectHeight + 4, new Color(255, 255, 0, 255));
         Raylib.DrawRectangleLines(cellX - 1, cellY - 1, rectWidth + 2, rectHeight + 2, new Color(255, 255, 0, 200));
     }

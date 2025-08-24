@@ -102,6 +102,9 @@ public class NetworkManager
         clientService.PollEvents();
     }
 
+    /// <summary>
+    /// Beendet alle Netzwerkverbindungen (Host und Client) und setzt den Zustand zurück.
+    /// </summary>
     public void Shutdown()
     {
         hostService.Shutdown();
@@ -110,34 +113,62 @@ public class NetworkManager
         LobbyCountdownSeconds = null;
     }
 
+    /// <summary>
+    /// Startet das Hosting einer neuen Spiel-Lobby.
+    /// </summary>
     public void StartHosting()
     {
         hostService.StartHosting();
     }
 
+    /// <summary>
+    /// Sendet die Platzierung eines Schiffs an den Server.
+    /// </summary>
+    /// <param name="x">X-Koordinate des Schiffs.</param>
+    /// <param name="y">Y-Koordinate des Schiffs.</param>
+    /// <param name="width">Breite des Schiffs in Zellen.</param>
+    /// <param name="height">Höhe des Schiffs in Zellen.</param>
     public void SendShipPlacement(int x, int y, int width, int height)
     {
         HandleShips.SendShipPlacement(x, y, width, height, Instance);
     }
 
+    /// <summary>
+    /// Sendet eine Anfrage an den Server, eine Karte zu kaufen.
+    /// </summary>
+    /// <param name="cardType">Der Typ der zu kaufenden Karte.</param>
     public static void RequestCardBuy(string cardType)
     {
         var handleCards = new HandleCards();
         handleCards.RequestCardBuy(cardType);
     }
 
+    /// <summary>
+    /// Führt das Ausspielen einer Karte mit einem Ziel aus und sendet die Aktion an den Server.
+    /// </summary>
+    /// <param name="card">Die zu spielende Karte.</param>
+    /// <param name="hoveredCoords">Die angezielten Koordinaten.</param>
     public static void HandleCast(Cards card, GameBoard.Point hoveredCoords)
     {
         var handleCards = new HandleCards();
         handleCards.HandleCast(card, hoveredCoords);
     }
 
+    /// <summary>
+    /// Sendet einen Angriff auf eine bestimmte Zelle an den Server.
+    /// </summary>
+    /// <param name="x">X-Koordinate der Zelle.</param>
+    /// <param name="y">Y-Koordinate der Zelle.</param>
     public static void SendAttack(int x, int y)
     {
         var handleAttacks = new HandleAttacks();
         handleAttacks.SendAttack(x, y);
     }
 
+    /// <summary>
+    /// Gibt die Liste aller aktuell verbundenen Spieler zurück.
+    /// </summary>
+    /// <returns>Liste der Spieler.</returns>
     public List<Player> GetConnectedPlayers()
     {
         if (hostService.IsRunning())
@@ -145,31 +176,54 @@ public class NetworkManager
         return clientService.ConnectedPlayers;
     }
 
+    /// <summary>
+    /// Prüft, ob dieser Client als Host fungiert.
+    /// </summary>
+    /// <returns>True, wenn als Host aktiv.</returns>
     public bool IsHost()
     {
         return hostService.IsRunning();
     }
 
+    /// <summary>
+    /// Startet das Spiel für alle Spieler (nur Host).
+    /// </summary>
     internal void BroadcastStartGame()
     {
         hostService.BroadcastStartGame();
     }
 
+    /// <summary>
+    /// Prüft, ob der Client bereit ist.
+    /// </summary>
+    /// <returns>True, wenn der Client bereit ist.</returns>
     public bool IsClientReady()
     {
         return clientService.IsClientReady();
     }
 
+    /// <summary>
+    /// Wechselt den Ready-Status des Spielers (bereit/nicht bereit).
+    /// </summary>
     internal void ToggleReadyStatus()
     {
         HandlePlayer.ToggleReadyStatus();
     }
 
+    /// <summary>
+    /// Baut eine Verbindung zu einem Server auf.
+    /// </summary>
+    /// <param name="ip">IP-Adresse des Servers.</param>
+    /// <param name="port">Port des Servers.</param>
     internal void ConnectToServer(string ip, int port)
     {
         ServerConnection.ConnectToServer(ip, port);
     }
 
+    /// <summary>
+    /// Sendet eine Chatnachricht an den Server.
+    /// </summary>
+    /// <param name="message">Der Nachrichteninhalt.</param>
     internal void SendChatMessage(string message)
     {
         ChatHandler.SendChatMessage(message, Instance);

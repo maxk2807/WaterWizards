@@ -29,10 +29,25 @@ public class ClientService(NetworkManager manager)
 {
     public NetManager? client;
     public EventBasedNetListener? clientListener;
+
+    /// <summary>
+    /// Kennzeichnet, ob der Client spielbereit ist (Ready-Status in der Lobby/Ingame).
+    /// </summary>
     public bool clientReady = false;
+
+    /// <summary>
+    /// Lokaler Endpunkt (IP:Port) des Clients, sobald verbunden/gestartet.
+    /// </summary>
     public string? myEndPoint;
+
+    /// <summary>
+    /// Liste der derzeit verbundenen Spieler (vom Server synchronisiert).
+    /// </summary>
     public List<Player> ConnectedPlayers { get; private set; } = [];
 
+    /// <summary>
+    /// Eindeutige Sitzungs-ID der aktuellen Spielsession (falls vorhanden).
+    /// </summary>
     public GameSessionId? sessionId;
     public GameSessionId? SessionId => sessionId;
 
@@ -170,6 +185,14 @@ public class ClientService(NetworkManager manager)
         clientListener.NetworkReceiveEvent += HandleClientReceiveEvent;
     }
 
+    /// <summary>
+    /// Zentraler Empfangs-Handler für alle eingehenden Nachrichten vom Server.
+    /// Leitet anhand des Nachrichtentyps an die jeweiligen Handler weiter.
+    /// </summary>
+    /// <param name="peer">Absender-Peer.</param>
+    /// <param name="reader">Reader für die Nutzlast der Nachricht.</param>
+    /// <param name="channelNumber">Verwendeter Kanal.</param>
+    /// <param name="deliveryMethod">Zustellmethode (reliable/unreliable etc.).</param>
     private void HandleClientReceiveEvent(
         NetPeer peer,
         NetPacketReader reader,
@@ -407,30 +430,30 @@ public class ClientService(NetworkManager manager)
                     Console.WriteLine($"[Client] Received player index: {playerIndex}");
                     break;
                 case "UpdateMana":
-                {
-                    HandleRessources.HandleUpdateMana(reader);
-                    break;
-                }
+                    {
+                        HandleRessources.HandleUpdateMana(reader);
+                        break;
+                    }
                 case "CardManaSpent":
-                {
-                    HandleCards.HandleCardManaSpent(reader);
-                    break;
-                }
+                    {
+                        HandleCards.HandleCardManaSpent(reader);
+                        break;
+                    }
                 case "UpdateGold":
-                {
-                    HandleRessources.HandleUpdateGold(reader);
-                    break;
-                }
+                    {
+                        HandleRessources.HandleUpdateGold(reader);
+                        break;
+                    }
                 case "GoldFreezeStatus":
-                {
-                    HandleRessources.HandleGoldFreeze(reader);
-                    break;
-                }
+                    {
+                        HandleRessources.HandleGoldFreeze(reader);
+                        break;
+                    }
                 case "ParalizeStatus":
-                {
-                    HandleParalize.HandleParalizeStatus(reader);
-                    break;
-                }
+                    {
+                        HandleParalize.HandleParalizeStatus(reader);
+                        break;
+                    }
                 case "HoveringEyeReveal":
                     HandleUtility.HandleHoveringEyeReveal(reader);
                     break;
