@@ -18,6 +18,11 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+    /// <summary>
+    /// Stellt den Menüzustand dar, der verfügbare Lobbies anzeigt, das UI rendert
+    /// und Benutzerinteraktionen (Beitreten, Aktualisieren, manuelle Verbindung, Zurück)
+    /// verarbeitet.
+    /// </summary>
 public class LobbyListMenuState : IGameState
 {
     private static Texture2D menuBackground = TextureManager.LoadTexture(
@@ -27,11 +32,20 @@ public class LobbyListMenuState : IGameState
         "Background/TitleMenuBackground.png"
     );
 
+    /// <summary>
+    /// Aktualisiert den Zustand des Lobbymenüs und zeichnet die Oberfläche.
+    /// </summary>
+    /// <param name="manager">Verwalter für Bildschirmmaße und Zustandswechsel.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawLobbyListMenu(manager);
     }
 
+    /// <summary>
+    /// Zeichnet die Lobbyliste samt Überschrift, Tabellenzeilen, sowie die Buttons
+    /// (Join, Aktualisieren, Manuell verbinden, Zurück) und behandelt deren Klicks.
+    /// </summary>
+    /// <param name="manager">Verwalter für Rendering-Kontext und Navigation.</param>
     private void DrawLobbyListMenu(GameStateManager manager)
     {
         Raylib.DrawTexturePro(
