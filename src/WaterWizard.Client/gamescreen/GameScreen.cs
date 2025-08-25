@@ -60,6 +60,9 @@ public class GameScreen(
 
     private bool allowSingleShipPlacement = false;
 
+    /// <summary>
+    /// Lädt die Hintergrundtexturen (Spielfeld und Zauberer), falls sie noch nicht geladen sind.
+    /// </summary>
     public void LoadBackgroundAssets()
     {
         if (gameBackground.Id != 0)
@@ -68,13 +71,16 @@ public class GameScreen(
             "Background/BasicBackground.png"
         );
         //Hintergrund für das Spielbrett
-        
+
         if (blueWizardTexture.Id == 0)
             blueWizardTexture = TextureManager.LoadTexture("Ui/InGame/wizblu.png");
         if (redWizardTexture.Id == 0)
             redWizardTexture = TextureManager.LoadTexture("Ui/InGame/wizred.png");
     }
 
+    /// <summary>
+    /// Lädt die Hintergrundtexturen für Spieler- und Gegner-Board.
+    /// </summary>
     public void LoadBoardBackground() //Hintergrund für das Grid
     {
         if (gridBackground.Id != 0)
@@ -90,6 +96,9 @@ public class GameScreen(
         );
     }
 
+    /// <summary>
+    /// Lädt die UI-Hintergrundtexturen für die Boards.
+    /// </summary>
     public void LoadUiBackground() //Ui hintergrund
     {
         if (gridBackground.Id != 0)
@@ -476,6 +485,9 @@ public class GameScreen(
         );
     }
 
+    /// <summary>
+    /// Passt die Spielfeldelemente an neue Bildschirmgrößen an und repositioniert Schiffe.
+    /// </summary>
     public void UpdateScreenSize(int width, int height)
     {
         screenWidth = width;
@@ -484,7 +496,7 @@ public class GameScreen(
         var oldBoardPosition = playerBoard.Position;
         Initialize();
         UpdateShipPosition(oldBoardPosition, oldCellSize);
-        
+
         // Reinitialize ShipField to fix draggable ship positions
         if (shipField != null)
         {
@@ -497,7 +509,12 @@ public class GameScreen(
         HandleShips.UpdateShipPositionsFullScreen(oldBoardPosition, oldCellSize);
     }
 
-    public void Reset()
+    /// <summary>
+    /// Setzt Boards und Hände zurück und initialisiert den GameScreen neu.
+    /// </summary>
+    public void Reset()/// <summary>
+/// Fügt eine gekaufte Karte zur Spielerhand hinzu, zieht die Goldkosten ab und aktualisiert die Anzeige.
+/// </summary>
     {
         if (playerBoard is null || opponentBoard is null)
         {
@@ -531,6 +548,9 @@ public class GameScreen(
         return Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rec);
     }
 
+    /// <summary>
+    /// Fügt eine gekaufte Karte zur Spielerhand hinzu, zieht die Goldkosten ab und aktualisiert die Anzeige.
+    /// </summary>
     public void HandleBoughtCard(string variant)
     {
         if (Enum.TryParse<CardVariant>(variant, true, out var cardVariant))
@@ -549,6 +569,9 @@ public class GameScreen(
         }
     }
 
+    /// <summary>
+    /// Fügt dem Gegner eine gekaufte Karte hinzu und spielt den Kaufsound ab.
+    /// </summary>
     public void HandleOpponentBoughtCard(string type)
     {
         List<Cards> cards;
@@ -595,6 +618,9 @@ public class GameScreen(
         Console.WriteLine("[Client][GameScreen] Boards reset");
     }
 
+    /// <summary>
+    /// Aktualisiert zeitabhängige Elemente (Donner, aktive Karten, Casting-Abbruch).
+    /// </summary>
     public void Update(float deltaTime)
     {
         // Update Thunder-Timer
@@ -620,6 +646,9 @@ public class GameScreen(
         }
     }
 
+    /// <summary>
+    /// Aktiviert das Platzieren eines einzelnen Schiffs im Spiel und startet den Drag-Prozess für ein zufälliges Schiff.
+    /// </summary>
     public void EnableSingleShipPlacement()
     {
         allowSingleShipPlacement = true;

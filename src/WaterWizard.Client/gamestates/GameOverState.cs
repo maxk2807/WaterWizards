@@ -13,6 +13,11 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert den Game-Over-Zustand. Zeigt je nach Ergebnis (Sieg/Niederlage)
+/// einen animierten Titel, eine optionale Gewinnernachricht sowie Buttons zum
+/// erneuten Spielen oder Zurückkehren ins Hauptmenü.
+/// </summary>
 public class GameOverState(bool isWinner, string winnerMessage = "") : IGameState
 {
     private readonly string winnerMessage = winnerMessage;

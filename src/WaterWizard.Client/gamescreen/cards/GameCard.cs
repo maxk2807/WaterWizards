@@ -14,11 +14,26 @@ using WaterWizard.Shared;
 
 namespace WaterWizard.Client.gamescreen.cards;
 
+/// <summary>
+/// Repräsentiert eine einzelne Spielkarte im GameScreen.
+/// Kümmert sich um das Rendern der Vorder- und Rückseite sowie um die Darstellung von Icons,
+/// Kosten (Mana/Gold) und Zielinformationen.
+/// </summary>
 public class GameCard(GameScreen gameScreen, Cards card)
 {
+    /// <summary>
+    /// Die zugrundeliegenden Kartendaten (Typ, Kosten, Ziel usw.).
+    /// </summary>
     public Cards card = card;
 
+    /// <summary>
+    /// Breite der Karte in Pixeln (abhängig von GameScreen).
+    /// </summary>
     private int Width => gameScreen.cardWidth;
+   
+   /// <summary>
+    /// Höhe der Karte in Pixeln (abhängig von GameScreen).
+    /// </summary>
     private int Height => gameScreen.cardHeight;
 
     private static Texture2D cardTemplateAsset = TextureManager.LoadTexture(
@@ -196,6 +211,10 @@ public class GameCard(GameScreen gameScreen, Cards card)
         }
     }
 
+    /// <summary>
+    /// Liefert die Hintergrundfarbe für die Karte abhängig vom Kartentyp.
+    /// Dabei wird unterschieden zwischen Vorderseite (helle Farben) und Rückseite (Standardfarben).
+    /// </summary>
     private Color GetColorFromCardType(bool front)
     {
         return front

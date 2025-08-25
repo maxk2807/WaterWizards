@@ -16,10 +16,19 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert die Phase, in der Spieler ihre Schiffe platzieren,
+/// bevor das eigentliche Spiel beginnt.
+/// </summary>
 public class PlacementPhaseState : IGameState
 {
     private bool IsReady = false;
 
+    /// <summary>
+    /// Zeichnet die Platzierungsphase inklusive Spielfeld, Hinweistext und Ready-Button.
+    /// Verarbeitet Eingaben für das Bestätigen der Platzierung oder den Wechsel ins Spiel.
+    /// </summary>
+    /// <param name="manager">Verwalter für Spielzustände und Bildschirmabmessungen.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         manager.GameScreen.Draw(manager.screenWidth, manager.screenHeight);

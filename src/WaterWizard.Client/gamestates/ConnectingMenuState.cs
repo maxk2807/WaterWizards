@@ -15,10 +15,18 @@ using WaterWizard.Client.network;
 
 namespace WaterWizard.Client.gamestates;
 
+/// <summary>
+/// Repräsentiert den Verbindungsmenü-Zustand, in dem der Spieler IP-Adresse und Port eingeben
+/// und eine Verbindung zu einem Server herstellen kann.
+/// </summary>
 public class ConnectingMenuState : IGameState
 {
     private Texture2D menuBackground;
 
+    /// <summary>
+    /// Lädt die Hintergrund-Assets für das Verbindungsmenü,
+    /// falls diese noch nicht geladen wurden.
+    /// </summary>
     private void LoadAssets()
     {
         if (menuBackground.Id != 0)
@@ -28,11 +36,19 @@ public class ConnectingMenuState : IGameState
         );
     }
 
+    /// <summary>
+    /// Aktualisiert den Zustand des Menüs und zeichnet die Inhalte des Verbindungsmenüs.
+    /// </summary>
+    /// <param name="manager">Der GameStateManager, der den aktuellen Spielzustand verwaltet.</param>
     public void UpdateAndDraw(GameStateManager manager)
     {
         DrawConnectMenu(manager);
     }
 
+    /// <summary>
+    /// Zeichnet das Verbindungsmenü, inklusive IP-/Port-Eingabe, Connect- und Back-Button.
+    /// </summary>
+    /// <param name="manager">Der GameStateManager, der den aktuellen Spielzustand verwaltet.</param>
     private void DrawConnectMenu(GameStateManager manager)
     {
         LoadAssets();
